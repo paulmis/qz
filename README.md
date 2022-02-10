@@ -10,10 +10,10 @@ Add your own name (do not add the names for others!) to the section below.
 
 | Profile Picture                                                                                           | Name               | Email                             |
 | --------------------------------------------------------------------------------------------------------- | ------------------ | --------------------------------- |
-| ![](https://avatars.githubusercontent.com/u/34619913?v=4&size=50) | David Dinucu-Jianu | D.Dinucu-Jianu@student.tudelft.nl |
+| <img src="https://gitlab.ewi.tudelft.nl/uploads/-/system/user/avatar/4705/avatar.png?width=100" width=50> | David Dinucu-Jianu | D.Dinucu-Jianu@student.tudelft.nl |
 | ![](https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50)             | Rok Štular         | R.Stular@student.tudelft.nl       |
 | ![](https://avatars.githubusercontent.com/u/45182027?v=4&size=50)                                         | Paul Misterka      | P.M.Misterka@student.tudelft.nl   |
-
+| <img src="https://secure.gravatar.com/avatar/065ab34531af46f9d554ea8c2067a07d?s=800&d=identicon" width=50> | Alexandru-Gabriel Cojocaru | A.G.Cojocaru-2@student.tudelft.nl |
 <!-- Instructions (remove once assignment has been completed -->
 <!-- - Add (only!) your own name to the table above (use Markdown formatting) -->
 <!-- - Mention your *student* email address -->
