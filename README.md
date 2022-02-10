@@ -10,7 +10,7 @@ Add your own name (do not add the names for others!) to the section below.
 
 | Profile Picture                                                                                           | Name               | Email                             |
 | --------------------------------------------------------------------------------------------------------- | ------------------ | --------------------------------- |
-| <img src="https://gitlab.ewi.tudelft.nl/uploads/-/system/user/avatar/4705/avatar.png?width=100" width=50> | David Dinucu-Jianu | D.Dinucu-Jianu@student.tudelft.nl |
+| ![](https://avatars.githubusercontent.com/u/34619913?v=4&size=50) | David Dinucu-Jianu | D.Dinucu-Jianu@student.tudelft.nl |
 | ![](https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50)             | Rok Štular         | R.Stular@student.tudelft.nl       |
 | ![](https://avatars.githubusercontent.com/u/45182027?v=4&size=50)                                         | Paul Misterka      | P.M.Misterka@student.tudelft.nl   |
 
