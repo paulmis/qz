@@ -13,6 +13,7 @@ Add your own name (do not add the names for others!) to the section below.
 | <img src="https://gitlab.ewi.tudelft.nl/uploads/-/system/user/avatar/4705/avatar.png?width=100" width=50> | David Dinucu-Jianu | D.Dinucu-Jianu@student.tudelft.nl |
 | ![](https://eu.ui-avatars.com/api/?name=OOPP&length=4&size=50&color=DDD&background=777&font-size=0.325) | Your Name Here | Y.NameHere@student.tudelft.nl |
 | ![](https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50) | Rok Štular | R.Stular@student.tudelft.nl |
+| ![](https://avatars.githubusercontent.com/u/45182027?v=4) | Paul Misterka | P.M.Misterka@student.tudelft.nl |
 
 <!-- Instructions (remove once assignment has been completed -->
 <!-- - Add (only!) your own name to the table above (use Markdown formatting) -->
