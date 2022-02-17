@@ -3,6 +3,9 @@ package client.scenes;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 
+/**
+ * Game Screen Controller.
+ */
 public class GameScreenCtrl {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
