@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package server.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
+import commons.Person;
+import commons.Quote;
 import java.util.Random;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import commons.Person;
-import commons.Quote;
-
+/**
+ * Tests for the quote controller.
+ */
 public class QuoteControllerTest {
 
     public int nextInt;
@@ -69,6 +71,9 @@ public class QuoteControllerTest {
         return new Quote(new Person(q, q), q);
     }
 
+    /**
+     * Used to check if random was called properly.
+     */
     @SuppressWarnings("serial")
     public class MyRandom extends Random {
 
