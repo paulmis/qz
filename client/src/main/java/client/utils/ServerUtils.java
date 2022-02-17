@@ -13,27 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package client.utils;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.List;
-
-import org.glassfish.jersey.client.ClientConfig;
 
 import commons.Quote;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.List;
+import org.glassfish.jersey.client.ClientConfig;
 
+
+/**
+ * Utilities for communicating with the server.
+ */
 public class ServerUtils {
 
     private static final String SERVER = "http://localhost:8080/";
 
+    /** Obtain all existing quotes from the server manually.
+     *
+     * @throws IOException Exception thrown during the GET request
+     */
     public void getQuotesTheHardWay() throws IOException {
         var url = new URL("http://localhost:8080/api/quotes");
         var is = url.openConnection().getInputStream();
@@ -44,6 +51,10 @@ public class ServerUtils {
         }
     }
 
+    /** Obtain all existing quotes from the server.
+     *
+     * @return List of quotes obtained from the server
+     */
     public List<Quote> getQuotes() {
         return ClientBuilder.newClient(new ClientConfig()) //
                 .target(SERVER).path("api/quotes") //
@@ -52,6 +63,11 @@ public class ServerUtils {
                 .get(new GenericType<List<Quote>>() {});
     }
 
+    /** Add a new quote to the remote server.
+     *
+     * @param quote Quote to add
+     * @return Quote returned by the server
+     */
     public Quote addQuote(Quote quote) {
         return ClientBuilder.newClient(new ClientConfig()) //
                 .target(SERVER).path("api/quotes") //
