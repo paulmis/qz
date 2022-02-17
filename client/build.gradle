@@ -11,7 +11,16 @@ javafx {
     version = "17.0.2"
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
-
+run {
+	jvmArgs = [
+			"--add-opens=java.base/java.lang.reflect=com.jfoenix",
+			"--add-opens=java.base/java.lang.reflect=com.jfoenix",
+			"--add-opens=javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
+			"--add-opens=javafx.base/com.sun.javafx.binding=com.jfoenix",
+			"--add-opens=javafx.graphics/com.sun.javafx.stage=com.jfoenix",
+			"--add-opens=javafx.base/com.sun.javafx.event=com.jfoenix",
+	]
+}
 
 dependencies {
 	implementation project(":commons")
@@ -28,5 +37,7 @@ dependencies {
 	
 	implementation 'org.openjfx:javafx-controls:17.0.2'
 	implementation 'org.openjfx:javafx-fxml:17.0.2'
-	
+
+	implementation group: 'com.jfoenix', name: 'jfoenix', version: '9.0.9'
+	implementation group: 'de.jensd', name: 'fontawesomefx-fontawesome', version: '4.7.0-9.1.2'
 }
