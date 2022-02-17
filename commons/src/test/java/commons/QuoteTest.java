@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package commons;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,38 +22,41 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Test the Quote data type.
+ */
 public class QuoteTest {
 
-	private static final Person SOME_PERSON = new Person("a", "b");
+    private static final Person SOME_PERSON = new Person("a", "b");
 
-	@Test
-	public void checkConstructor() {
-		var q = new Quote(SOME_PERSON, "q");
-		assertEquals(SOME_PERSON, q.person);
-		assertEquals("q", q.quote);
-	}
+    @Test
+    public void checkConstructor() {
+        var q = new Quote(SOME_PERSON, "q");
+        assertEquals(SOME_PERSON, q.person);
+        assertEquals("q", q.quote);
+    }
 
-	@Test
-	public void equalsHashCode() {
-		var a = new Quote(new Person("a", "b"), "c");
-		var b = new Quote(new Person("a", "b"), "c");
-		assertEquals(a, b);
-		assertEquals(a.hashCode(), b.hashCode());
-	}
+    @Test
+    public void equalsHashCode() {
+        var a = new Quote(new Person("a", "b"), "c");
+        var b = new Quote(new Person("a", "b"), "c");
+        assertEquals(a, b);
+        assertEquals(a.hashCode(), b.hashCode());
+    }
 
-	@Test
-	public void notEqualsHashCode() {
-		var a = new Quote(new Person("a", "b"), "c");
-		var b = new Quote(new Person("a", "b"), "d");
-		assertNotEquals(a, b);
-		assertNotEquals(a.hashCode(), b.hashCode());
-	}
+    @Test
+    public void notEqualsHashCode() {
+        var a = new Quote(new Person("a", "b"), "c");
+        var b = new Quote(new Person("a", "b"), "d");
+        assertNotEquals(a, b);
+        assertNotEquals(a.hashCode(), b.hashCode());
+    }
 
-	@Test
-	public void hasToString() {
-		var actual = new Quote(new Person("a", "b"), "c").toString();
-		assertTrue(actual.contains(Quote.class.getSimpleName()));
-		assertTrue(actual.contains("\n"));
-		assertTrue(actual.contains("person"));
-	}
+    @Test
+    public void hasToString() {
+        var actual = new Quote(new Person("a", "b"), "c").toString();
+        assertTrue(actual.contains(Quote.class.getSimpleName()));
+        assertTrue(actual.contains("\n"));
+        assertTrue(actual.contains("person"));
+    }
 }
