@@ -13,16 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package server;
 
 import java.util.Random;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configuration of the quote application.
+ */
 @Configuration
 public class Config {
 
+    /** Retrieve a new PRNG object.
+     *
+     * @return Newly-generated PRNG object
+     */
     @Bean
     public Random getRandom() {
         return new Random();

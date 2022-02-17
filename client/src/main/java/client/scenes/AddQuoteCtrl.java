@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package client.scenes;
 
-import com.google.inject.Inject;
-
 import client.utils.ServerUtils;
+import com.google.inject.Inject;
 import commons.Person;
 import commons.Quote;
 import jakarta.ws.rs.WebApplicationException;
@@ -27,6 +27,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 
+/**
+ * UI controller for adding quotes.
+ */
 public class AddQuoteCtrl {
 
     private final ServerUtils server;
@@ -41,18 +44,28 @@ public class AddQuoteCtrl {
     @FXML
     private TextField quote;
 
+    /** Initialize a new controller using dependency injection.
+     *
+     * @param server Reference to communication utilities object.
+     * @param mainCtrl Reference to the main controller.
+     */
     @Inject
     public AddQuoteCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
-
     }
 
+    /**
+     * Cancel adding a quote.
+     */
     public void cancel() {
         clearFields();
         mainCtrl.showOverview();
     }
 
+    /**
+     * Confirm adding a quote - send the quote to the server.
+     */
     public void ok() {
         try {
             server.addQuote(getQuote());
@@ -69,28 +82,39 @@ public class AddQuoteCtrl {
         mainCtrl.showOverview();
     }
 
+    /** Get current quote information from the UI fields.
+     *
+     * @return Generated quote object.
+     */
     private Quote getQuote() {
         var p = new Person(firstName.getText(), lastName.getText());
         var q = quote.getText();
         return new Quote(p, q);
     }
 
+    /**
+     * Clear all relevant fields.
+     */
     private void clearFields() {
         firstName.clear();
         lastName.clear();
         quote.clear();
     }
 
+    /** Handle key-press events.
+     *
+     * @param e Event information
+     */
     public void keyPressed(KeyEvent e) {
         switch (e.getCode()) {
-        case ENTER:
-            ok();
-            break;
-        case ESCAPE:
-            cancel();
-            break;
-        default:
-            break;
+            case ENTER:
+                ok();
+                break;
+            case ESCAPE:
+                cancel();
+                break;
+            default:
+                break;
         }
     }
 }

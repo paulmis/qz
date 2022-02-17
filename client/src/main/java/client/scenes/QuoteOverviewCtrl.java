@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package client.scenes;
 
+import client.utils.ServerUtils;
+import com.google.inject.Inject;
+import commons.Quote;
 import java.net.URL;
 import java.util.ResourceBundle;
-
-import com.google.inject.Inject;
-
-import client.utils.ServerUtils;
-import commons.Quote;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,6 +29,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
+/**
+ * Control used for showing overview of the quotes.
+ */
 public class QuoteOverviewCtrl implements Initializable {
 
     private final ServerUtils server;
@@ -63,6 +65,9 @@ public class QuoteOverviewCtrl implements Initializable {
         mainCtrl.showAdd();
     }
 
+    /**
+     * Refresh the list of quotes from the server.
+     */
     public void refresh() {
         var quotes = server.getQuotes();
         data = FXCollections.observableList(quotes);
