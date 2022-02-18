@@ -1,0 +1,43 @@
+package commons;
+
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import java.util.List;
+
+@Entity
+public class MC_Question extends Question {
+
+    @ManyToOne
+    @JoinColumn(name = "answer_id")
+    public Activity answer;
+    public boolean guessConsumption;
+
+    @SuppressWarnings("unused")
+    private MC_Question() {
+        // for object mapper
+    }
+
+    public MC_Question(List<Activity> activities, String text, Activity answer, boolean guessConsumption) {
+        super(activities, text);
+        this.answer = answer;
+        this.guessConsumption = guessConsumption;
+    }
+
+    MC_Question(Question Q, Activity answer, boolean guessConsumption){
+        super(Q);
+        this.answer = answer;
+        this.guessConsumption = guessConsumption;
+    }
+
+    @Override
+    public boolean CheckAnswer(List<Activity> userAnswer) {
+        // There should be a single answer in this list
+        /*
+        NB! This assumes the offered options will always have different cost values.
+        Otherwise, a user might select the correct value while it is associated to a different activity
+         */
+        Activity givenAnswer = userAnswer.get(0);
+        return givenAnswer.equals(answer);
+    }
+}
