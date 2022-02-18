@@ -1,17 +1,17 @@
 package commons;
 
+import java.util.List;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import java.util.List;
 
 /**
- * MC_Question data structure - describes a multiple choice question.
+ * MCQuestion data structure - describes a multiple choice question.
  */
 @Entity
 @DiscriminatorValue("MC")
-public class MC_Question extends Question {
+public class MCQuestion extends Question {
 
     @ManyToOne
     @JoinColumn(name = "answer_id")
@@ -20,26 +20,35 @@ public class MC_Question extends Question {
     public boolean guessConsumption;
 
     @SuppressWarnings("unused")
-    private MC_Question() {
+    private MCQuestion() {
         // for object mapper
     }
 
-    public MC_Question(List<Activity> activities, String text, Activity answer, boolean guessConsumption) {
+    /**
+     * Constructor for the Multiple Choice Question class.
+     *
+     * @param activities list of activities that produce the question.
+     * @param text text of the question.
+     * @param answer activity corresponding to the correct answer.
+     * @param guessConsumption boolean to indicate if the user has to guess the energy consumption
+     *                         or the corresponding activity.
+     */
+    public MCQuestion(List<Activity> activities, String text, Activity answer, boolean guessConsumption) {
         super(activities, text);
         this.answer = answer;
         this.guessConsumption = guessConsumption;
     }
 
-    MC_Question(Question Q, Activity answer, boolean guessConsumption){
-        super(Q);
+    MCQuestion(Question q, Activity answer, boolean guessConsumption) {
+        super(q);
         this.answer = answer;
         this.guessConsumption = guessConsumption;
     }
 
     @Override
-    public boolean CheckAnswer(List<Activity> userAnswer) {
+    public boolean checkAnswer(List<Activity> userAnswer) {
         // There should be a single answer in this list
-        if(userAnswer.size() != 1){
+        if (userAnswer.size() != 1) {
             return false;
         }
         /*
