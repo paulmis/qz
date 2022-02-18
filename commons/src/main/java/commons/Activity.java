@@ -24,7 +24,7 @@ public abstract class Activity {
     List<Question> UsedIn;
 
     public String description;
-    public double cost;
+    public int cost;
     public String icon;
 
     @SuppressWarnings("unused")
@@ -32,7 +32,7 @@ public abstract class Activity {
         // for object mapper
     }
 
-    public Activity(String description, double cost, String icon) {
+    public Activity(String description, int cost, String icon) {
         this.description = description;
         this.cost = cost;
         this.icon = icon;
