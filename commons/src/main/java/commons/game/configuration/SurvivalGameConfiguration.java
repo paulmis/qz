@@ -1,5 +1,6 @@
 package commons.game.configuration;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import lombok.AllArgsConstructor;
@@ -24,5 +25,6 @@ public class SurvivalGameConfiguration extends GameConfiguration {
     /**
      * The speed increase/decrease of the game.
      */
-    private float speedModifier = 1.0f;
+    @Column(nullable = false)
+    private Float speedModifier = 1.0f;
 }
