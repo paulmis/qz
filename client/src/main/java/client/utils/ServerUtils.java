@@ -101,6 +101,27 @@ public class ServerUtils {
     }
 
     /**
+     * Gets a list of all the powerUp urls from the backend.
+     *
+     * @return List of emoji urls
+     */
+    public List<URL> getPowerUps() {
+        try {
+            return Arrays.asList(
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Function that causes the user to leave the game.
      */
     public void quitGame() {
@@ -114,14 +135,11 @@ public class ServerUtils {
     public List<URL> getLeaderBoardImages() {
         try {
             return Arrays.asList(
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"));
         } catch (Exception e) {
             return new ArrayList<>();
         }

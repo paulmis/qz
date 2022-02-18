@@ -3,9 +3,12 @@ package client.scenes;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -13,10 +16,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
-import org.checkerframework.checker.units.qual.A;
 
 /**
  * Game Screen Controller.
@@ -24,6 +27,9 @@ import org.checkerframework.checker.units.qual.A;
 public class GameScreenCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+
+    @FXML
+    private BorderPane mainBorderPane;
 
     @FXML
     private HBox avatarHBox;
@@ -35,10 +41,10 @@ public class GameScreenCtrl implements Initializable {
     private HBox powerUpHBox;
 
     @FXML
-    private Button quitButton;
+    private JFXButton quitButton;
 
     @FXML
-    private Button settingsButton;
+    private JFXButton settingsButton;
 
     @FXML
     private Label timerLabel;
@@ -78,6 +84,26 @@ public class GameScreenCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        setEmojis();
+        setPowerUps();
+        setTopBarLeaderBoard();
+        try {
+            EventHandler<ActionEvent> doSomething = (e) -> {};
+            mainBorderPane.setCenter(new MultipleChoiceQuestionPane("Short question",
+                    Arrays.asList("answer 12", "asdasd", "asdasdasd", "asdasda"),
+                    Arrays.asList(
+                            new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                            new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                            new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                            new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50")),
+                    Arrays.asList(doSomething, doSomething, doSomething, doSomething)));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setEmojis() {
+        emojiHBox.getChildren().clear();
         var emojiUrls = server.getEmojis();
         try {
             emojiUrls.forEach(emojiUrl -> {
@@ -93,19 +119,47 @@ public class GameScreenCtrl implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
-        var leaderBoardUrls = server.getLeaderBoardImages();
-
+    private void setPowerUps() {
+        powerUpHBox.getChildren().clear();
+        var powerUpUrls = server.getEmojis();
         try {
-            leaderBoardUrls.forEach(emojiUrl -> {
+            powerUpUrls.forEach(powerUpUrl -> {
+                var image = new ImageView();
+                image.setImage(new Image(String.valueOf(powerUpUrl),
+                        40,
+                        40,
+                        false,
+                        true));
+
+                powerUpHBox.getChildren().add(image);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void setTopBarLeaderBoard() {
+        avatarHBox.getChildren().clear();
+        var leaderBoardUrls = server.getLeaderBoardImages();
+        try {
+            for (int i = 0; i < leaderBoardUrls.size(); i++) {
                 var imageCircle = new Circle(21);
-                imageCircle.setFill(new ImagePattern(new Image(String.valueOf(emojiUrl),
+                var imageUrl = leaderBoardUrls.get(i);
+                imageCircle.setId("Rank" + i);
+
+                imageCircle.setFill(new ImagePattern(new Image(String.valueOf(imageUrl),
                         40,
                         40,
                         false,
                         true)));
 
                 avatarHBox.getChildren().add(imageCircle);
+            }
+            leaderBoardUrls.forEach(emojiUrl -> {
+
             });
         } catch (Exception e) {
             e.printStackTrace();
