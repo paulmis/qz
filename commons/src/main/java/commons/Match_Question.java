@@ -1,5 +1,6 @@
 package commons;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import java.util.List;
  * Match_Question data structure - describes a match question.
  */
 @Entity
+@DiscriminatorValue("MATCH")
 public class Match_Question extends Question {
     @SuppressWarnings("unused")
     private Match_Question() {
