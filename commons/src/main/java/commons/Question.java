@@ -23,6 +23,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 I followed this guide: https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
 to handle inheritance
  */
+
 /**
  * Question data structure - describes a question of the quiz.
  */
@@ -58,7 +59,7 @@ public abstract class Question {
      * Constructor for the Question class.
      *
      * @param activities list of activities that produce the question.
-     * @param text text of the question.
+     * @param text       text of the question.
      */
     public Question(List<Activity> activities, String text) {
         this.activities = activities;

@@ -27,7 +27,7 @@ public class EstimateQuestion extends Question {
     /**
      * getRanking: returns the list of users from the closest to the right guess to the furthest.
      *
-     * @param guesses list of guesses from each user.
+     * @param guesses        list of guesses from each user.
      * @param remainingTimes seconds remaining to answer for each user.
      * @return array of integers, in position 0 the index of the highest ranking user.
      */

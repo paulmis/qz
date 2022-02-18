@@ -38,8 +38,8 @@ public abstract class Activity {
      * Constructor for the Activity class.
      *
      * @param description a string describing the activity.
-     * @param cost the energy cost in Wh of the activity.
-     * @param icon the filepath to the icon of the activity.
+     * @param cost        the energy cost in Wh of the activity.
+     * @param icon        the filepath to the icon of the activity.
      */
     public Activity(String description, int cost, String icon) {
         this.description = description;

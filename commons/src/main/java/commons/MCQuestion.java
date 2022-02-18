@@ -27,9 +27,9 @@ public class MCQuestion extends Question {
     /**
      * Constructor for the Multiple Choice Question class.
      *
-     * @param activities list of activities that produce the question.
-     * @param text text of the question.
-     * @param answer activity corresponding to the correct answer.
+     * @param activities       list of activities that produce the question.
+     * @param text             text of the question.
+     * @param answer           activity corresponding to the correct answer.
      * @param guessConsumption boolean to indicate if the user has to guess the energy consumption
      *                         or the corresponding activity.
      */
