@@ -80,7 +80,8 @@ public class ServerUtils {
     }
 
     /**
-     * Gets a list of all the emoji urls from the backend
+     * Gets a list of all the emoji urls from the backend.
+     *
      * @return List of emoji urls
      */
     public List<URL> getEmojis() {
@@ -106,6 +107,10 @@ public class ServerUtils {
         System.out.println("Quitting game");
     }
 
+    /** Gets a list of the leaderboard images from the server.
+     *
+     * @return a list of leaderboard images.
+     */
     public List<URL> getLeaderBoardImages() {
         try {
             return Arrays.asList(
