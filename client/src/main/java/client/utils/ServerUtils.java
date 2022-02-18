@@ -25,7 +25,10 @@ import jakarta.ws.rs.core.GenericType;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.glassfish.jersey.client.ClientConfig;
 
@@ -74,5 +77,48 @@ public class ServerUtils {
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
+    }
+
+    /**
+     * Gets a list of all the emoji urls from the backend
+     * @return List of emoji urls
+     */
+    public List<URL> getEmojis() {
+        try {
+            return Arrays.asList(
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Function that causes the user to leave the game.
+     */
+    public void quitGame() {
+        System.out.println("Quitting game");
+    }
+
+    public List<URL> getLeaderBoardImages() {
+        try {
+            return Arrays.asList(
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 }
