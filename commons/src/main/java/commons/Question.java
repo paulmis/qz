@@ -13,7 +13,14 @@ import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 /**
  * Question data structure - describes a question of the quiz.
  */
+/*
+I followed this guide: https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
+to handle inheritance
+ */
 @Entity
+@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="QUESTION_TYPE", discriminatorType=DiscriminatorType.STRING)
+@DiscriminatorValue("BASE")
 public abstract class Question {
 
     @Id

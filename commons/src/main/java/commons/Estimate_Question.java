@@ -1,5 +1,6 @@
 package commons;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +11,7 @@ import java.util.List;
  * Estimate_Question data structure - describes an estimate question.
  */
 @Entity
+@DiscriminatorValue("ESTIMATE")
 public class Estimate_Question extends Question {
 
     @SuppressWarnings("unused")
