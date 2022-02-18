@@ -20,7 +20,7 @@ public abstract class Activity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     public long id;
 
-    @ManyToMany(mappedBy = "ActivitiesAsked")
+    @ManyToMany(mappedBy = "activities")
     List<Question> UsedIn;
 
     public String description;
