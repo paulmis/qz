@@ -5,12 +5,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.util.List;
 
+/**
+ * MC_Question data structure - describes a multiple choice question.
+ */
 @Entity
 public class MC_Question extends Question {
 
     @ManyToOne
     @JoinColumn(name = "answer_id")
     public Activity answer;
+    // indicates whether the user is asked to guess the energy consumption given the activity or vice versa
     public boolean guessConsumption;
 
     @SuppressWarnings("unused")
@@ -33,11 +37,13 @@ public class MC_Question extends Question {
     @Override
     public boolean CheckAnswer(List<Activity> userAnswer) {
         // There should be a single answer in this list
+        if(userAnswer.size() != 1){
+            return false;
+        }
         /*
         NB! This assumes the offered options will always have different cost values.
         Otherwise, a user might select the correct value while it is associated to a different activity
          */
-        Activity givenAnswer = userAnswer.get(0);
-        return givenAnswer.equals(answer);
+        return answer.equals(userAnswer.get(0));
     }
 }
