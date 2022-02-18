@@ -1,52 +1,52 @@
 package commons;
 
+import java.util.List;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import java.util.List;
 
 /**
  * Match_Question data structure - describes a match question.
  */
 @Entity
 @DiscriminatorValue("ORDER")
-public class Order_Question extends Question {
+public class OrderQuestion extends Question {
 
     public boolean increasing;
 
     @SuppressWarnings("unused")
-    private Order_Question() {
+    private OrderQuestion() {
         // for object mapper
     }
 
-    public Order_Question(Question Q, boolean increasing) {
-        super(Q);
+    public OrderQuestion(Question q, boolean increasing) {
+        super(q);
         this.increasing = increasing;
     }
 
-    public Order_Question(List<Activity> activities, String text, boolean increasing) {
+    public OrderQuestion(List<Activity> activities, String text, boolean increasing) {
         super(activities, text);
         this.increasing = increasing;
     }
 
     @Override
-    public boolean CheckAnswer(List<Activity> userAnswer) {
-        if(userAnswer.size() != activities.size()){
+    public boolean checkAnswer(List<Activity> userAnswer) {
+        if (userAnswer.size() != activities.size()) {
             return false;
         }
         // Check if the order of answers' costs is correct
         int currentVal = userAnswer.get(0).cost;
-        if(increasing){
-            for(int idx = 1; idx < activities.size(); idx++){
+        if (increasing) {
+            for (int idx = 1; idx < activities.size(); idx++) {
                 int newVal = userAnswer.get(idx).cost;
-                if(newVal < currentVal){
+                if (newVal < currentVal) {
                     return false;
                 }
                 currentVal = newVal;
             }
-        } else{
-            for(int idx = 1; idx < activities.size(); idx++){
+        } else {
+            for (int idx = 1; idx < activities.size(); idx++) {
                 int newVal = userAnswer.get(idx).cost;
-                if(newVal > currentVal){
+                if (newVal > currentVal) {
                     return false;
                 }
                 currentVal = newVal;
