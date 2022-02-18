@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.scenes.questions.MultipleChoiceQuestionPane;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;

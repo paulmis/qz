@@ -133,7 +133,7 @@
                            <graphic>
                               <ImageView fx:id="emojiBarIcon" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@/client/images/emojis/emojiBarIcon.png" />
+                                    <Image url="@/client/images/emojiBarIcon.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -145,7 +145,7 @@
                            <graphic>
                               <ImageView fx:id="powerUpBarIcon" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@/client/images/emojis/emojiBarIcon.png" />
+                                    <Image url="@/client/images/powerUpBarIcon.png" />
                                  </image></ImageView>
                            </graphic>
                         </JFXButton>

@@ -1,4 +1,4 @@
-package client.scenes;
+package client.scenes.questions;
 
 import java.net.URL;
 import java.util.List;
@@ -31,7 +31,7 @@ public class MultipleChoiceQuestionPane extends StackPane {
                                       List<URL> answersImages,
                                       List<EventHandler<ActionEvent>> actions) {
         FXMLLoader fxmlLoader =
-                new FXMLLoader(getClass().getResource("/client/scenes/MultipleChoiceQuestion.fxml"));
+                new FXMLLoader(getClass().getResource("/client/scenes/questions/MultipleChoiceQuestion.fxml"));
 
         fxmlLoader.setControllerFactory(param ->
                 controller = new MultipleChoiceQuestionCtrl(questionText, answersImages, answersText, actions));

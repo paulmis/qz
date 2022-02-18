@@ -1,4 +1,4 @@
-package client.scenes;
+package client.scenes.questions;
 
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
@@ -23,7 +23,7 @@ import javafx.scene.shape.Circle;
 import org.checkerframework.checker.units.qual.A;
 
 /**
- * Game Screen Controller.
+ * Multiple Choice Question Controller.
  */
 public class MultipleChoiceQuestionCtrl implements Initializable {
 
