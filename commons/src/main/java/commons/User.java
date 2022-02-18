@@ -15,9 +15,9 @@ import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
 @Entity
 public class User {
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-    @Id
     private String email;
     private String password;
     private int score;
