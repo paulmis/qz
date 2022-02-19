@@ -1,8 +1,11 @@
 package server.database.entities.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -63,21 +66,44 @@ public abstract class Game {
      */
     private Integer currentQuestion = 0;
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    private List<GamePlayer> players = new ArrayList<>();
+    // @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    // @ToString.Exclude
+    // private List<GamePlayer> players = new ArrayList<>();
 
     private Integer randomState = ThreadLocalRandom.current().nextInt();
+
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GamePlayer> players = Collections.synchronizedSet(new LinkedHashSet<>());
 
     // TODO
     // private abstract Optional<Question> getNextQuestion();
 
-    /** Add a new player to the game.
+    /** Add a player to the game.
      *
-     * @param player Player to add to the game.
+     * @param player The player to add.
+     * @return Whether the player was added (and not already in the game).
      */
-    public void addPlayer(GamePlayer player) {
-        this.players.add(player);
+    public boolean addPlayer(GamePlayer player) {
+        Objects.requireNonNull(player, "Player cannot be null.");
+        return this.players.add(player);
+    }
+
+    /** Remove a player from the game.
+     *
+     * @param player The player to remove.
+     * @return Whether the player was removed.
+     */
+    public boolean removePlayer(GamePlayer player) {
+        Objects.requireNonNull(player, "Player cannot be null.");
+        return this.players.remove(player);
+    }
+
+    /** Get the number of players in the game.
+     *
+     * @return The number of players.
+     */
+    public int getNumPlayers() {
+        return players.size();
     }
 
     @Override
