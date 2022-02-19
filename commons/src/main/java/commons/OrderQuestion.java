@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 /**
  * OrderQuestion data structure - describes a match question.
  */
-@SuperBuilder
+@Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -21,7 +21,7 @@ public class OrderQuestion extends Question {
     /**
      * A boolean indicating whether the answer should be in increasing order.
      */
-    public boolean increasing;
+    public boolean increasing = true;
 
     public OrderQuestion(Question q, boolean increasing) {
         super(q);

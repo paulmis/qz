@@ -6,14 +6,14 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 /**
  * MCQuestion data structure - describes a multiple choice question.
  */
-@SuperBuilder
+@Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -26,11 +26,12 @@ public class MCQuestion extends Question {
     @ManyToOne
     @JoinColumn(name = "answer_id")
     public Activity answer;
+
     /**
      * Boolean to indicate if the user has to guess the energy consumption
      * or the corresponding activity.
      */
-    public boolean guessConsumption;
+    public boolean guessConsumption = true;
 
     MCQuestion(Question q, Activity answer, boolean guessConsumption) {
         super(q);

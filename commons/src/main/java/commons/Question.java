@@ -2,6 +2,7 @@ package commons;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -15,12 +16,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 
 /*
 I followed this guide to handle onheritance:
@@ -30,16 +27,11 @@ https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
 /**
  * Question data structure - describes a question of the quiz.
  */
-@SuperBuilder
+@Data
 @NoArgsConstructor
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "QUESTION_TYPE", discriminatorType = DiscriminatorType.STRING)
-@DiscriminatorValue("BASE")
 public abstract class Question {
 
     @Id
@@ -54,7 +46,8 @@ public abstract class Question {
             name = "ActivitiesAsked",
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "activity_id"))
-    public List<Activity> activities;
+    public List<Activity> activities = new ArrayList<>();
+
     /**
      * String of the question asked the user.
      */

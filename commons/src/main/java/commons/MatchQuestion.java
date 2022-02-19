@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 /**
  * MatchQuestion data structure - describes a match question.
  */
-@SuperBuilder
+@Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity

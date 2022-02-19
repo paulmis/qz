@@ -6,14 +6,14 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 /**
  * EstimateQuestion data structure - describes an estimate question.
  */
-@SuperBuilder
+@Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
