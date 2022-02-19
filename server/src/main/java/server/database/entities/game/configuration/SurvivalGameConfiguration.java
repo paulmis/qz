@@ -1,4 +1,4 @@
-package server.entities.game.configuration;
+package server.database.entities.game.configuration;
 
 import java.util.Objects;
 import javax.persistence.Column;
@@ -8,13 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
 
 /**
- * Configuration for the normal game mode, which contains a fixed number of questions.
+ * Configuration for the survival game mode.
+ * In this mode, the player has to survive as long as possible, while the
+ * time available to answer questions decreases with each round.
  */
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,13 +23,13 @@ import org.hibernate.Hibernate;
 @Setter
 @ToString
 @Entity
-@DiscriminatorValue("normal")
-public class NormalGameConfiguration extends GameConfiguration {
+@DiscriminatorValue("survival")
+public class SurvivalGameConfiguration extends GameConfiguration {
     /**
-     * The number of questions in the game.
+     * The speed increase/decrease of the game.
      */
     @Column(nullable = false)
-    @NonNull Integer numQuestions = 10;
+    @NonNull Float speedModifier = 1.0f;
 
     @Override
     public boolean equals(Object o) {
@@ -38,7 +39,7 @@ public class NormalGameConfiguration extends GameConfiguration {
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
             return false;
         }
-        NormalGameConfiguration that = (NormalGameConfiguration) o;
+        SurvivalGameConfiguration that = (SurvivalGameConfiguration) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 

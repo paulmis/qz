@@ -1,4 +1,4 @@
-package server.entities.game;
+package server.database.entities.game;
 
 /**
  * The type of game.

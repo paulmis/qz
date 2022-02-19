@@ -1,5 +1,7 @@
-package server.entities.game.gamemodes;
+package server.database.entities.game;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.persistence.CascadeType;
@@ -8,17 +10,15 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
-import server.entities.game.GameStatus;
-import server.entities.game.GameType;
-import server.entities.game.configuration.GameConfiguration;
+import server.database.entities.game.configuration.GameConfiguration;
 
 /**
  * Game entity which represents a game and its state.
@@ -47,6 +47,9 @@ public abstract class Game {
      */
     private GameType gameType = GameType.PUBLIC;
 
+    /**
+     * The game configuration.
+     */
     @OneToOne(cascade = CascadeType.ALL)
     private GameConfiguration configuration;
 
@@ -60,16 +63,21 @@ public abstract class Game {
      */
     private Integer currentQuestion = 0;
 
-    // TODO
-    // private List<GamePlayer> players = new ArrayList<>();
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GamePlayer> players = new ArrayList<>();
 
     private Integer randomState = ThreadLocalRandom.current().nextInt();
 
     // TODO
     // private abstract Optional<Question> getNextQuestion();
 
-    // TODO
-    // private void addPlayer(GamePlayer player);
+    /** Add a new player to the game.
+     *
+     * @param player Player to add to the game.
+     */
+    public void addPlayer(GamePlayer player) {
+        this.players.add(player);
+    }
 
     @Override
     public boolean equals(Object o) {

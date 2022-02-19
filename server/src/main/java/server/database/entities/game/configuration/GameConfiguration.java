@@ -1,4 +1,4 @@
-package server.entities.game.configuration;
+package server.database.entities.game.configuration;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
