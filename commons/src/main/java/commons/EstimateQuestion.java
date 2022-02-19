@@ -27,6 +27,9 @@ public class EstimateQuestion extends Question {
      */
     @Override
     public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
+        if (userAnswers == null) {
+            throw new IllegalArgumentException("NULL input");
+        }
         List<Double> points = new ArrayList<>();
         List<Integer> errors = new ArrayList<>();
         Set<Integer> sortedErrors = new TreeSet<>();

@@ -26,6 +26,9 @@ public class MatchQuestion extends Question {
      */
     @Override
     public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
+        if (userAnswers == null) {
+            throw new IllegalArgumentException("NULL input");
+        }
         List<Double> points = new ArrayList<>();
         for (Answer ans : userAnswers) {
             if (ans.getUserChoice().size() != activities.size()) {
