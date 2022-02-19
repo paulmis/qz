@@ -1,5 +1,6 @@
 package commons;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -28,29 +29,42 @@ public class OrderQuestion extends Question {
     }
 
     @Override
-    public boolean checkAnswer(List<Activity> userAnswer) {
-        if (userAnswer.size() != activities.size()) {
-            return false;
-        }
-        // Check if the order of answers' costs is correct
-        int currentVal = userAnswer.get(0).cost;
-        if (increasing) {
-            for (int idx = 1; idx < activities.size(); idx++) {
-                int newVal = userAnswer.get(idx).cost;
-                if (newVal < currentVal) {
-                    return false;
-                }
-                currentVal = newVal;
+    public List<Double> checkAnswer(List<Answer> userAnswers) {
+        List<Double> points = new ArrayList<>();
+        for (Answer ans : userAnswers) {
+            if (ans.getUserChoice().size() != activities.size()) {
+                points.add(0.0);
+                continue;
             }
-        } else {
-            for (int idx = 1; idx < activities.size(); idx++) {
-                int newVal = userAnswer.get(idx).cost;
-                if (newVal > currentVal) {
-                    return false;
+            // Check if the order of answers' costs is correct
+            int currentVal = ans.getUserChoice().get(0).getCost();
+            double currentPoints = 0;
+            double pointStep = 1.0 / (activities.size() - 1);
+            if (increasing) {
+                for (int idx = 1; idx < activities.size(); idx++) {
+                    int newVal = ans.getUserChoice().get(idx).getCost();
+                    if (newVal < currentVal) {
+                        continue;
+                    }
+                    currentVal = newVal;
+                    currentPoints += pointStep;
                 }
-                currentVal = newVal;
+            } else {
+                for (int idx = 1; idx < activities.size(); idx++) {
+                    int newVal = ans.getUserChoice().get(idx).getCost();
+                    if (newVal > currentVal) {
+                        continue;
+                    }
+                    currentVal = newVal;
+                    currentPoints += pointStep;
+                }
             }
+            if (currentPoints + pointStep > 1) {
+                // This is to avoid rounding errors like 3*(1/3) != 1
+                currentPoints = 1;
+            }
+            points.add(currentPoints);
         }
-        return true;
+        return points;
     }
 }

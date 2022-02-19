@@ -74,8 +74,8 @@ public abstract class Question {
     /**
      * checkAnswer, checks if the answer is correct.
      *
-     * @param userAnswer list of activities provided as answer.
-     * @return true if the answer is correct, false otherwise.
+     * @param userAnswers list of answers provided by each user.
+     * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
-    public abstract boolean checkAnswer(List<Activity> userAnswer);
+    public abstract List<Double> checkAnswer(List<Answer> userAnswers);
 }

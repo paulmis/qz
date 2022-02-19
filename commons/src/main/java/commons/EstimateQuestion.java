@@ -1,8 +1,9 @@
 package commons;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import lombok.EqualsAndHashCode;
@@ -20,41 +21,38 @@ import lombok.experimental.SuperBuilder;
 public class EstimateQuestion extends Question {
 
     @Override
-    public boolean checkAnswer(List<Activity> userAnswer) {
-        // It doesn't make sense in this case, use getRanking instead
-        return false;
-    }
+    public List<Double> checkAnswer(List<Answer> userAnswers) {
+        List<Double> points = new ArrayList<>();
+        List<Integer> errors = new ArrayList<>();
+        Set<Integer> sortedErrors = new TreeSet<>();
 
-    /**
-     * getRanking: returns the list of users from the closest to the right guess to the furthest.
-     *
-     * @param guesses        list of guesses from each user.
-     * @param remainingTimes seconds remaining to answer for each user.
-     * @return array of integers, in position 0 the index of the highest ranking user.
-     */
-    public int[] getRanking(int[] guesses, int[] remainingTimes) {
-        // NB remainingTimes is how many seconds were left to answer the question
-        List<Integer> ranking = new ArrayList<>();
-        for (int idx = 0; idx < ranking.size(); idx++) {
-            ranking.set(idx, idx);
+        int target = activities.get(0).getCost();
+        for (Answer ans : userAnswers) {
+            points.add(0.0);
+            if (ans.getUserChoice().size() != 1) {
+                errors.add(Integer.MAX_VALUE);
+                continue;
+            }
+            int userError = Math.abs(ans.getUserChoice().get(0).getCost() - target);
+            errors.add(userError);
+            sortedErrors.add(userError);
         }
 
-        // NB highest ranking user is in index 0
-        ranking.sort(new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                int goal = activities.get(0).cost;
-                int est1 = Math.abs(guesses[o1] - goal);
-                int est2 = Math.abs(guesses[o2] - goal);
-                if (est1 == est2) {
-                    // answer time is tiebreaker
-                    // the longer the remaining time the higher the ranking
-                    return remainingTimes[o2] - remainingTimes[o1];
+        double pointStep = 1.0 / (sortedErrors.size() - 1);
+        for (int myError : errors) {
+            double currentPoints = 1;
+            for (int err : sortedErrors) {
+                if (myError == err) {
+                    break;
                 }
-                // the closer the estimate the higher the ranking
-                return est1 - est2;
+                currentPoints -= pointStep;
             }
-        });
-        return ranking.stream().mapToInt(i -> i).toArray();
+            if (currentPoints - pointStep < 0) {
+                currentPoints = 0;
+            }
+            points.add(currentPoints);
+        }
+
+        return points;
     }
 }
