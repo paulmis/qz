@@ -3,10 +3,10 @@ package commons;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.Test;
 
 class MatchQuestionTest {
 
@@ -31,82 +31,76 @@ class MatchQuestionTest {
 
     @Test
     void checkAnswerTest() {
-        Question q = getDefaultQuestion();
-
-        List<Answer> userAnswers = new ArrayList<>();
-        Answer a;
-        List<Activity> answerAct;
-
         // first user has all correct
-        a = new Answer();
-        answerAct = new ArrayList<>();
+        List<Activity> answerAct = new ArrayList<>();
         answerAct.add(getActivity(0));
         answerAct.add(getActivity(1));
         answerAct.add(getActivity(2));
         answerAct.add(getActivity(3));
+        Answer a = new Answer();
         a.setUserChoice(answerAct);
+        List<Answer> userAnswers = new ArrayList<>();
         userAnswers.add(a);
 
         // second user has all wrong
-        a = new Answer();
         answerAct = new ArrayList<>();
         answerAct.add(getActivity(3));
         answerAct.add(getActivity(2));
         answerAct.add(getActivity(1));
         answerAct.add(getActivity(0));
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
         // third user has two switched (2/4 of points)
-        a = new Answer();
         answerAct = new ArrayList<>();
         answerAct.add(getActivity(0));
         answerAct.add(getActivity(2));
         answerAct.add(getActivity(1));
         answerAct.add(getActivity(3));
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
-        assertEquals(new ArrayList<>(Arrays.asList(1.0, 0.0, 2.0/4)), q.checkAnswer(userAnswers));
+        Question q = getDefaultQuestion();
+        assertEquals(new ArrayList<>(Arrays.asList(1.0, 0.0, 2.0 / 4)), q.checkAnswer(userAnswers));
     }
 
     @Test
     void checkAnswerMismatchingSize() {
-        Question q = getDefaultQuestion();
-        List<Answer> userAnswers = new ArrayList<>();
-        Answer a;
-        List<Activity> answerAct;
         // first user has 4 activities
-        a = new Answer();
-        answerAct = new ArrayList<>();
+        List<Activity> answerAct = new ArrayList<>();
         answerAct.add(getActivity(0));
         answerAct.add(getActivity(1));
         answerAct.add(getActivity(2));
         answerAct.add(getActivity(3));
+        Answer a = new Answer();
         a.setUserChoice(answerAct);
+        List<Answer> userAnswers = new ArrayList<>();
         userAnswers.add(a);
 
         // second user has 5 activities
-        a = new Answer();
         answerAct = new ArrayList<>();
         answerAct.add(getActivity(3));
         answerAct.add(getActivity(2));
         answerAct.add(getActivity(1));
         answerAct.add(getActivity(0));
         answerAct.add(getActivity(12));
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
         // third user has 4 activities
-        a = new Answer();
         answerAct = new ArrayList<>();
         answerAct.add(getActivity(0));
         answerAct.add(getActivity(2));
         answerAct.add(getActivity(1));
         answerAct.add(getActivity(3));
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
+        Question q = getDefaultQuestion();
         assertThrows(IllegalArgumentException.class, () -> {
             q.checkAnswer(null);
         });
