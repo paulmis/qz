@@ -2,7 +2,6 @@ package commons;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,12 +17,12 @@ import lombok.NoArgsConstructor;
 public class MatchQuestion extends Question {
 
     @Override
-    public List<Double> checkAnswer(List<Answer> userAnswers) {
+    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
         List<Double> points = new ArrayList<>();
         for (Answer ans : userAnswers) {
             if (ans.getUserChoice().size() != activities.size()) {
-                points.add(0.0);
-                continue;
+                throw new IllegalArgumentException(
+                        "The number of activities in the answer must be the same as the question.");
             }
             // Check if the order of answers corresponds to the order of questions
             double currentPoints = 0;

@@ -1,13 +1,8 @@
 package commons;
 
-import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -70,5 +65,5 @@ public abstract class Question {
      * @param userAnswers list of answers provided by each user.
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
-    public abstract List<Double> checkAnswer(List<Answer> userAnswers);
+    public abstract List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException;
 }

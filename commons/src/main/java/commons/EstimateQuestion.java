@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,17 +19,15 @@ import lombok.NoArgsConstructor;
 public class EstimateQuestion extends Question {
 
     @Override
-    public List<Double> checkAnswer(List<Answer> userAnswers) {
+    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
         List<Double> points = new ArrayList<>();
         List<Integer> errors = new ArrayList<>();
         Set<Integer> sortedErrors = new TreeSet<>();
 
         int target = activities.get(0).getCost();
         for (Answer ans : userAnswers) {
-            points.add(0.0);
             if (ans.getUserChoice().size() != 1) {
-                errors.add(Integer.MAX_VALUE);
-                continue;
+                throw new IllegalArgumentException("There should be a single activity per answer.");
             }
             int userError = Math.abs(ans.getUserChoice().get(0).getCost() - target);
             errors.add(userError);
