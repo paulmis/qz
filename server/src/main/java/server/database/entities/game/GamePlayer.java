@@ -7,6 +7,8 @@ import javax.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -19,6 +21,7 @@ import lombok.ToString;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@RequiredArgsConstructor
 @ToString
 public class GamePlayer {
     @Id private Long id;
@@ -43,7 +46,7 @@ public class GamePlayer {
      */
     @ManyToOne(optional = false)
     @JoinColumn(name = "game_id", nullable = false)
-    private Game game;
+    @NonNull private Game game;
 
     // TODO: add relation to the user entity.
 }
