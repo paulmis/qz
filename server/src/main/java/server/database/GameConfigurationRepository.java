@@ -1,6 +1,6 @@
 package server.database;
 
-import commons.game.configuration.GameConfiguration;
+import server.entities.game.configuration.GameConfiguration;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

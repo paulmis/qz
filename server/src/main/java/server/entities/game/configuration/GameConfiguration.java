@@ -1,4 +1,4 @@
-package commons.game.configuration;
+package server.entities.game.configuration;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
