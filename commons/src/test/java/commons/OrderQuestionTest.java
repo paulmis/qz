@@ -49,6 +49,7 @@ class OrderQuestionTest {
         answerAct.add(getActivity(2));
         answerAct.add(getActivity(1));
         answerAct.add(getActivity(0));
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
@@ -58,6 +59,7 @@ class OrderQuestionTest {
         answerAct.add(getActivity(2));
         answerAct.add(getActivity(1));
         answerAct.add(getActivity(3));
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
@@ -84,6 +86,7 @@ class OrderQuestionTest {
         answerAct.add(getActivity(2));
         answerAct.add(getActivity(1));
         answerAct.add(getActivity(0));
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
@@ -93,6 +96,7 @@ class OrderQuestionTest {
         answerAct.add(getActivity(2));
         answerAct.add(getActivity(1));
         answerAct.add(getActivity(3));
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
@@ -121,6 +125,7 @@ class OrderQuestionTest {
         answerAct.add(getActivity(1));
         answerAct.add(getActivity(0));
         answerAct.add(getActivity(12));
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
@@ -130,6 +135,7 @@ class OrderQuestionTest {
         answerAct.add(getActivity(2));
         answerAct.add(getActivity(1));
         answerAct.add(getActivity(3));
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
