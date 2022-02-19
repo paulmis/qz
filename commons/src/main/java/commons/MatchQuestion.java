@@ -37,7 +37,7 @@ public class MatchQuestion extends Question {
             }
             // Check if the order of answers corresponds to the order of questions
             double currentPoints = 0;
-            double pointStep = 1.0 / (activities.size() - 1);
+            double pointStep = 1.0 / activities.size();
             for (int idx = 0; idx < activities.size(); idx++) {
                 if (activities.get(idx).getCost() == ans.getUserChoice().get(idx).getCost()) {
                     currentPoints += pointStep;
