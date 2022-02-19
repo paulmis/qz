@@ -29,7 +29,7 @@ public class MultipleChoiceQuestionPane extends StackPane {
     public MultipleChoiceQuestionPane(String questionText,
                                       List<String> answersText,
                                       List<URL> answersImages,
-                                      List<EventHandler<ActionEvent>> actions) {
+                                      List<MultipleChoiceQuestionCtrl.AnswerHandler> actions) {
         FXMLLoader fxmlLoader =
                 new FXMLLoader(getClass().getResource("/client/scenes/questions/MultipleChoiceQuestion.fxml"));
 

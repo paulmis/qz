@@ -1,5 +1,8 @@
 package client.scenes;
 
+import client.scenes.questions.CloseQuestionCtrl;
+import client.scenes.questions.CloseQuestionPane;
+import client.scenes.questions.MultipleChoiceQuestionCtrl;
 import client.scenes.questions.MultipleChoiceQuestionPane;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
@@ -88,9 +91,15 @@ public class GameScreenCtrl implements Initializable {
         setEmojis();
         setPowerUps();
         setTopBarLeaderBoard();
-        /*
+
+
+        //CloseQuestionCtrl.AnswerHandler doSomething = (e) -> {};
+
+        //mainBorderPane.setCenter(new CloseQuestionPane("Short question", doSomething));
+
+
         try {
-            EventHandler<ActionEvent> doSomething = (e) -> {};
+            MultipleChoiceQuestionCtrl.AnswerHandler doSomething = () -> {};
 
             mainBorderPane.setCenter(new MultipleChoiceQuestionPane("Short question",
                     Arrays.asList("answer 12", "asdasd", "asdasdasd", "asdasda"),
@@ -103,8 +112,6 @@ public class GameScreenCtrl implements Initializable {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-
-         */
     }
 
     private void setEmojis() {

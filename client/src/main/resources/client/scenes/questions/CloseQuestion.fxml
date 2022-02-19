@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.questions.CloseQuestionCtrl">
    <children>
       <Label fx:id="questionLabel" alignment="CENTER" maxHeight="200.0" prefHeight="50.0" style="-fx-background-color: white;" text="Question" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
          <font>
@@ -38,7 +38,7 @@
                         <Font size="24.0" />
                      </font>
                   </Label>
-                  <TextField alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" promptText="Enter your estimate" GridPane.columnIndex="1">
+                  <TextField fx:id="guessField" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" promptText="Enter your estimate" GridPane.columnIndex="1">
                      <font>
                         <Font size="24.0" />
                      </font>

@@ -1,31 +1,34 @@
 package client.scenes.questions;
 
-import client.utils.ServerUtils;
-import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Circle;
-import org.checkerframework.checker.units.qual.A;
 
 /**
  * Multiple Choice Question Controller.
  */
 public class MultipleChoiceQuestionCtrl implements Initializable {
+
+
+    /** The interface for the answer handler.
+     * Handles the click option event.
+     */
+    public interface AnswerHandler {
+        /**
+         * Handle function of the interface.
+         * Deals with the click of one of the buttons.
+         */
+        void handle();
+    }
 
     @FXML
     private Label questionLabel;
@@ -65,7 +68,7 @@ public class MultipleChoiceQuestionCtrl implements Initializable {
     private final String questionText;
     private final List<URL> answersImages;
     private final List<String> answersText;
-    private final List<EventHandler<ActionEvent>> actions;
+    private final List<AnswerHandler> actions;
 
     /** Constructs the controller for multiple choice question type.
      *
@@ -77,7 +80,7 @@ public class MultipleChoiceQuestionCtrl implements Initializable {
     public MultipleChoiceQuestionCtrl(String questionText,
                                       List<URL> answersImages,
                                       List<String> answersText,
-                                      List<EventHandler<ActionEvent>> actions) {
+                                      List<AnswerHandler> actions) {
         this.questionText = questionText;
         this.answersImages = answersImages;
         this.answersText = answersText;
@@ -107,8 +110,7 @@ public class MultipleChoiceQuestionCtrl implements Initializable {
 
             var buttonOption = buttonOptionArray.get(i);
             var action = actions.get(i);
-            buttonOption.setOnAction(action);
-
+            buttonOption.setOnAction((actionEvent) -> action.handle());
         }
     }
 }
