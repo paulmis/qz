@@ -1,54 +1,33 @@
 package commons;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
+import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.ToString;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.UUID;
-
-import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
-
-@Entity
-public class User {
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@ToString(includeFieldNames = false)
+@Data public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+    @Column(nullable = false, unique = true)
     private String email;
-    private String password;
+    @NonNull private String password;
     private int score;
     private int gamesPlayed;
-
-
-    @SuppressWarnings("unused")
-    private User() {
-        // for object mapper
-    }
-
-    public User(UUID id, String email, String password, int score, int gamesPlayed) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.score = score;
-        this.gamesPlayed = gamesPlayed;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, MULTI_LINE_STYLE);
-    }
 }
