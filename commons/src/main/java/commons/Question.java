@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
@@ -20,7 +21,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /*
-I followed this guide to handle onheritance:
+I followed this guide to handle inheritance:
 https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
  */
 
@@ -36,20 +37,20 @@ public abstract class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public long id;
+    private UUID id;
 
     /**
      * List of activities used to generate the question.
      */
     @ManyToMany
     @JoinTable(
-            name = "ActivitiesAsked",
+            name = "activities_asked",
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "activity_id"))
     public List<Activity> activities = new ArrayList<>();
 
     /**
-     * String of the question asked the user.
+     * Question asked the user.
      */
     public String text;
 
