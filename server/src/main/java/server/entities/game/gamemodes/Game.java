@@ -28,7 +28,6 @@ import server.entities.game.configuration.GameConfiguration;
 @Setter
 @ToString
 @NoArgsConstructor
-@RequiredArgsConstructor
 @AllArgsConstructor
 @Inheritance(strategy = javax.persistence.InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "game_mode")
@@ -67,7 +66,7 @@ public abstract class Game {
     private Integer randomState = ThreadLocalRandom.current().nextInt();
 
     // TODO
-    // private Optional<Question> getNextQuestion();
+    // private abstract Optional<Question> getNextQuestion();
 
     // TODO
     // private void addPlayer(GamePlayer player);

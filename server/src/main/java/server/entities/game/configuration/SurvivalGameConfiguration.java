@@ -23,7 +23,6 @@ import org.hibernate.Hibernate;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
 @Entity
 @DiscriminatorValue("survival")
 public class SurvivalGameConfiguration extends GameConfiguration {

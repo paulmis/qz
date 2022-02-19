@@ -21,7 +21,6 @@ import org.hibernate.Hibernate;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
 @Entity
 @DiscriminatorValue("normal")
 public class NormalGameConfiguration extends GameConfiguration {
