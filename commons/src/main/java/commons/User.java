@@ -12,6 +12,10 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.ToString;
 
+/**
+ * User entity - describes an user in the context of the entire application.
+ */
+
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @ToString(includeFieldNames = false)
