@@ -18,6 +18,13 @@ import lombok.NoArgsConstructor;
 @Entity
 public class EstimateQuestion extends Question {
 
+    /**
+     * checkAnswer, checks if the answer of an estimate question is correct.
+     *
+     * @param userAnswers list of answers provided by each user.
+     *                    Each user should have a single activity as answer.
+     * @return a value between 0 and 1 indicating the percentage of points each user should get.
+     */
     @Override
     public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
         List<Double> points = new ArrayList<>();

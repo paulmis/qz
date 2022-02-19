@@ -21,11 +21,25 @@ public class OrderQuestion extends Question {
      */
     public boolean increasing = true;
 
+    /**
+     * Copy constructor for the MC_Question class.
+     *
+     * @param q          an instance of Question to copy.
+     * @param increasing if the user has to provide the answer in increasing order or not.
+     */
     public OrderQuestion(Question q, boolean increasing) {
         super(q);
         this.increasing = increasing;
     }
 
+    /**
+     * checkAnswer, checks if the answer of an order question is correct.
+     *
+     * @param userAnswers list of answers provided by each user.
+     *                    Each user should have a list activities as answer,
+     *                    their order is checked to assign the points.
+     * @return a value between 0 and 1 indicating the percentage of points each user should get.
+     */
     @Override
     public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
         List<Double> points = new ArrayList<>();
