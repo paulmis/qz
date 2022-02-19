@@ -30,10 +30,14 @@ public class EstimateQuestion extends Question {
         if (userAnswers == null) {
             throw new IllegalArgumentException("NULL input");
         }
+
         List<Double> points = new ArrayList<>();
+        // estimation error of each user
         List<Integer> errors = new ArrayList<>();
+        // all the different errors, sorted and unique
         Set<Integer> sortedErrors = new TreeSet<>();
 
+        // Get all estimation errors
         int target = activities.get(0).getCost();
         for (Answer ans : userAnswers) {
             if (ans.getUserChoice().size() != 1) {
@@ -44,6 +48,7 @@ public class EstimateQuestion extends Question {
             sortedErrors.add(userError);
         }
 
+        // For each user find their ranking
         double pointStep = 1.0 / (sortedErrors.size() - 1);
         for (int myError : errors) {
             double currentPoints = 1;
@@ -51,9 +56,11 @@ public class EstimateQuestion extends Question {
                 if (myError == err) {
                     break;
                 }
+                // the furthest a user is from the top rank the fewer points they get
                 currentPoints -= pointStep;
             }
             if (currentPoints - pointStep < 0) {
+                // This is to avoid rounding errors like 3*(1/3) != 1
                 currentPoints = 0;
             }
             points.add(currentPoints);

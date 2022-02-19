@@ -22,11 +22,15 @@ public class Activity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    /**
+     * List of questions in which the activity is used.
+     * Needed for the many-to-many relation.
+     */
     @ManyToMany(mappedBy = "activities")
     List<Question> usedIn;
 
     /**
-     * A string describing the activity.
+     * Description of the activity.
      */
     public String description;
 

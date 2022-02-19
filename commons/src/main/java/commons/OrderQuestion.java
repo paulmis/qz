@@ -57,19 +57,15 @@ public class OrderQuestion extends Question {
             double pointStep = 1.0 / (activities.size() - 1);
             if (increasing) {
                 for (int idx = 1; idx < activities.size(); idx++) {
-                    int newVal = ans.getUserChoice().get(idx).getCost();
-                    if (newVal >= currentVal) {
+                    if (ans.getUserChoice().get(idx).getCost() >= ans.getUserChoice().get(idx - 1).getCost()) {
                         currentPoints += pointStep;
                     }
-                    currentVal = newVal;
                 }
             } else {
                 for (int idx = 1; idx < activities.size(); idx++) {
-                    int newVal = ans.getUserChoice().get(idx).getCost();
-                    if (newVal <= currentVal) {
+                    if (ans.getUserChoice().get(idx).getCost() <= ans.getUserChoice().get(idx - 1).getCost()) {
                         currentPoints += pointStep;
                     }
-                    currentVal = newVal;
                 }
             }
             if (currentPoints + pointStep > 1) {

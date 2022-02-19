@@ -6,28 +6,31 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class MCQuestionTest {
 
-    private Activity getActivity(int id) {
+    static Question q;
+
+    static private Activity getActivity(int id) {
         Activity a = new Activity();
         a.setDescription("Activity" + (id + 1));
         a.setCost(2 + id * 4);
         return a;
     }
 
-    private Question getDefaultQuestion() {
+    @BeforeAll
+    static void defaultQuestion() {
         List<Activity> components = new ArrayList<>();
         Activity a;
         for (int idx = 0; idx < 4; idx++) {
             a = getActivity(idx);
             components.add(a);
         }
-        Question myQ = new MCQuestion();
-        myQ.setActivities(components);
-        ((MCQuestion) myQ).setAnswer(components.get(1));
-        return myQ;
+        q = new MCQuestion();
+        q.setActivities(components);
+        ((MCQuestion) q).setAnswer(components.get(1));
     }
 
     @Test
@@ -43,7 +46,6 @@ class MCQuestionTest {
             userAnswers.add(ans);
         }
 
-        Question q = getDefaultQuestion();
         assertEquals(new ArrayList<>(Arrays.asList(0.0, 1.0, 0.0, 0.0, 0.0, 1.0)), q.checkAnswer(userAnswers));
     }
 
@@ -64,7 +66,6 @@ class MCQuestionTest {
             userAnswers.add(ans);
         }
 
-        Question q = getDefaultQuestion();
         assertThrows(IllegalArgumentException.class, () -> {
             q.checkAnswer(userAnswers);
         });
@@ -72,7 +73,6 @@ class MCQuestionTest {
 
     @Test
     void checkAnswerNullInput() {
-        Question q = getDefaultQuestion();
         assertThrows(IllegalArgumentException.class, () -> {
             q.checkAnswer(null);
         });
