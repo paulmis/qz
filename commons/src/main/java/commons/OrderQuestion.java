@@ -3,28 +3,27 @@ package commons;
 import java.util.List;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
- * Match_Question data structure - describes a match question.
+ * OrderQuestion data structure - describes a match question.
  */
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @DiscriminatorValue("ORDER")
 public class OrderQuestion extends Question {
 
+    /**
+     * A boolean indicating whether the answer should be in increasing order.
+     */
     public boolean increasing;
-
-    @SuppressWarnings("unused")
-    private OrderQuestion() {
-        // for object mapper
-    }
 
     public OrderQuestion(Question q, boolean increasing) {
         super(q);
-        this.increasing = increasing;
-    }
-
-    public OrderQuestion(List<Activity> activities, String text, boolean increasing) {
-        super(activities, text);
         this.increasing = increasing;
     }
 

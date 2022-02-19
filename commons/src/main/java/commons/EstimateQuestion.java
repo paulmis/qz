@@ -5,18 +5,19 @@ import java.util.Comparator;
 import java.util.List;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
- * Estimate_Question data structure - describes an estimate question.
+ * EstimateQuestion data structure - describes an estimate question.
  */
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @DiscriminatorValue("ESTIMATE")
 public class EstimateQuestion extends Question {
-
-    @SuppressWarnings("unused")
-    private EstimateQuestion() {
-        // for object mapper
-    }
 
     @Override
     public boolean checkAnswer(List<Activity> userAnswer) {

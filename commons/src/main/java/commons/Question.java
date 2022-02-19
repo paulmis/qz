@@ -15,18 +15,27 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /*
-I followed this guide: https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
-to handle inheritance
+I followed this guide to handle onheritance:
+https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
  */
 
 /**
  * Question data structure - describes a question of the quiz.
  */
+@SuperBuilder
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "QUESTION_TYPE", discriminatorType = DiscriminatorType.STRING)
@@ -37,33 +46,29 @@ public abstract class Question {
     @GeneratedValue(strategy = GenerationType.AUTO)
     public long id;
 
+    /**
+     * List of activities used to generate the question.
+     */
     @ManyToMany
     @JoinTable(
             name = "ActivitiesAsked",
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "activity_id"))
     public List<Activity> activities;
+    /**
+     * String of the question asked the user.
+     */
     public String text;
 
-    @SuppressWarnings("unused")
-    protected Question() {
-        // for object mapper
-    }
-
+    /**
+     * Copy constructor for the Question class.
+     *
+     * @param q an instance of Question to copy.
+     */
     public Question(Question q) {
+        this.id = q.id;
         this.activities = q.activities;
         this.text = q.text;
-    }
-
-    /**
-     * Constructor for the Question class.
-     *
-     * @param activities list of activities that produce the question.
-     * @param text       text of the question.
-     */
-    public Question(List<Activity> activities, String text) {
-        this.activities = activities;
-        this.text = text;
     }
 
     /**
@@ -73,19 +78,4 @@ public abstract class Question {
      * @return true if the answer is correct, false otherwise.
      */
     public abstract boolean checkAnswer(List<Activity> userAnswer);
-
-    @Override
-    public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, MULTI_LINE_STYLE);
-    }
 }

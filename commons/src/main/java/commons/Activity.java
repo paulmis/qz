@@ -8,13 +8,22 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Activity data structure - describes a single activity and its energetic cost.
  */
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
 @Entity
 public abstract class Activity {
 
@@ -25,40 +34,16 @@ public abstract class Activity {
     @ManyToMany(mappedBy = "activities")
     List<Question> usedIn;
 
-    public String description;
-    public int cost;
-    public String icon;
-
-    @SuppressWarnings("unused")
-    private Activity() {
-        // for object mapper
-    }
-
     /**
-     * Constructor for the Activity class.
-     *
-     * @param description a string describing the activity.
-     * @param cost        the energy cost in Wh of the activity.
-     * @param icon        the filepath to the icon of the activity.
+     * A string describing the activity.
      */
-    public Activity(String description, int cost, String icon) {
-        this.description = description;
-        this.cost = cost;
-        this.icon = icon;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, MULTI_LINE_STYLE);
-    }
+    public String description;
+    /**
+     * The energy cost in Wh of the activity.
+     */
+    public int cost;
+    /**
+     * The filepath to the icon of the activity.
+     */
+    public String icon;
 }
