@@ -88,8 +88,10 @@ public class GameScreenCtrl implements Initializable {
         setEmojis();
         setPowerUps();
         setTopBarLeaderBoard();
+        /*
         try {
             EventHandler<ActionEvent> doSomething = (e) -> {};
+
             mainBorderPane.setCenter(new MultipleChoiceQuestionPane("Short question",
                     Arrays.asList("answer 12", "asdasd", "asdasdasd", "asdasda"),
                     Arrays.asList(
@@ -101,6 +103,8 @@ public class GameScreenCtrl implements Initializable {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+
+         */
     }
 
     private void setEmojis() {
