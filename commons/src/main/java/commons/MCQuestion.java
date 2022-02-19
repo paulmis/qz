@@ -5,39 +5,31 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * MCQuestion data structure - describes a multiple choice question.
  */
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @DiscriminatorValue("MC")
 public class MCQuestion extends Question {
 
+    /**
+     * Activity corresponding to the correct answer.
+     */
     @ManyToOne
     @JoinColumn(name = "answer_id")
     public Activity answer;
-    // indicates whether the user is asked to guess the energy consumption given the activity or vice versa
-    public boolean guessConsumption;
-
-    @SuppressWarnings("unused")
-    private MCQuestion() {
-        // for object mapper
-    }
-
     /**
-     * Constructor for the Multiple Choice Question class.
-     *
-     * @param activities       list of activities that produce the question.
-     * @param text             text of the question.
-     * @param answer           activity corresponding to the correct answer.
-     * @param guessConsumption boolean to indicate if the user has to guess the energy consumption
-     *                         or the corresponding activity.
+     * Boolean to indicate if the user has to guess the energy consumption
+     * or the corresponding activity.
      */
-    public MCQuestion(List<Activity> activities, String text, Activity answer, boolean guessConsumption) {
-        super(activities, text);
-        this.answer = answer;
-        this.guessConsumption = guessConsumption;
-    }
+    public boolean guessConsumption;
 
     MCQuestion(Question q, Activity answer, boolean guessConsumption) {
         super(q);

@@ -3,17 +3,19 @@ package commons;
 import java.util.List;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
- * Match_Question data structure - describes a match question.
+ * MatchQuestion data structure - describes a match question.
  */
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @DiscriminatorValue("MATCH")
 public class MatchQuestion extends Question {
-    @SuppressWarnings("unused")
-    private MatchQuestion() {
-        // for object mapper
-    }
 
     @Override
     public boolean checkAnswer(List<Activity> userAnswer) {
