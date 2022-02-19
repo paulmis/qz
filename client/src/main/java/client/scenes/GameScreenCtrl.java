@@ -1,27 +1,35 @@
 package client.scenes;
 
-import client.scenes.questions.CloseQuestionCtrl;
 import client.scenes.questions.CloseQuestionPane;
 import client.scenes.questions.MultipleChoiceQuestionCtrl;
 import client.scenes.questions.MultipleChoiceQuestionPane;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXSlider;
+import com.jfoenix.controls.JFXToggleButton;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
@@ -74,6 +82,26 @@ public class GameScreenCtrl implements Initializable {
     @FXML
     private ScrollPane powerUpScrollPane;
 
+    @FXML
+    private AnchorPane settingsPanel;
+
+    @FXML
+    private JFXButton volumeButton;
+
+    @FXML
+    private JFXSlider volumeSlider;
+
+    @FXML
+    private JFXToggleButton muteEveryoneToggleButton;
+
+    @FXML
+    private FontAwesomeIconView volumeIconView;
+
+    private SimpleIntegerProperty volume;
+
+    private List<FontAwesomeIcon> volumeIconList;
+
+
     /** Initialize a new controller using dependency injection.
      *
      * @param server Reference to communication utilities object.
@@ -88,16 +116,15 @@ public class GameScreenCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setEmojis();
-        setPowerUps();
-        setTopBarLeaderBoard();
+        setUpEmojis();
+        setUpPowerUps();
+        setUpTopBarLeaderBoard();
+        setUpVolume();
 
+        loadMockClose();
+    }
 
-        //CloseQuestionCtrl.AnswerHandler doSomething = (e) -> {};
-
-        //mainBorderPane.setCenter(new CloseQuestionPane("Short question", doSomething));
-
-
+    private void loadMockMCQ() {
         try {
             MultipleChoiceQuestionCtrl.AnswerHandler doSomething = () -> {};
 
@@ -114,38 +141,76 @@ public class GameScreenCtrl implements Initializable {
         }
     }
 
-    private void setEmojis() {
+    private void loadMockClose() {
+        mainBorderPane.setCenter(
+                new CloseQuestionPane(
+                        "Short question",
+                        System.out::println));
+    }
+
+    private void setUpVolume() {
+        volume = new SimpleIntegerProperty(100);
+        volumeIconList = Arrays.asList(
+                FontAwesomeIcon.VOLUME_OFF,
+                FontAwesomeIcon.VOLUME_DOWN,
+                FontAwesomeIcon.VOLUME_UP);
+
+        volumeSlider.valueProperty().bindBidirectional(volume);
+        volume.addListener((observable, oldValue, newValue) -> {
+            volumeIconView.setGlyphName(volumeIconList.get(
+                    Math.round(newValue.floatValue() / 50)
+            ).name());
+        });
+    }
+
+    private void setUpEmojis() {
         emojiHBox.getChildren().clear();
         var emojiUrls = server.getEmojis();
         try {
             emojiUrls.forEach(emojiUrl -> {
+                var jfxButton = new JFXButton();
+                jfxButton.setPadding(Insets.EMPTY);
+                jfxButton.setRipplerFill(Color.WHITESMOKE);
+
+                jfxButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
                 var image = new ImageView();
+
                 image.setImage(new Image(String.valueOf(emojiUrl),
-                        40,
-                        40,
+                        35,
+                        35,
                         false,
                         true));
+                jfxButton.setGraphic(image);
 
-                emojiHBox.getChildren().add(image);
+                emojiHBox.getChildren().add(jfxButton);
             });
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void setPowerUps() {
+    private void setUpPowerUps() {
         powerUpHBox.getChildren().clear();
         var powerUpUrls = server.getEmojis();
         try {
             powerUpUrls.forEach(powerUpUrl -> {
+                var jfxButton = new JFXButton();
+                jfxButton.setPadding(Insets.EMPTY);
+                jfxButton.setRipplerFill(Color.WHITESMOKE);
+
+                jfxButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
                 var image = new ImageView();
+
                 image.setImage(new Image(String.valueOf(powerUpUrl),
-                        40,
-                        40,
+                        35,
+                        35,
                         false,
                         true));
+                jfxButton.setGraphic(image);
 
-                powerUpHBox.getChildren().add(image);
+                powerUpHBox.getChildren().add(jfxButton);
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -153,7 +218,7 @@ public class GameScreenCtrl implements Initializable {
     }
 
 
-    private void setTopBarLeaderBoard() {
+    private void setUpTopBarLeaderBoard() {
         avatarHBox.getChildren().clear();
         var leaderBoardUrls = server.getLeaderBoardImages();
         try {
@@ -195,6 +260,11 @@ public class GameScreenCtrl implements Initializable {
 
     @FXML
     private void settingButtonClick(ActionEvent actionEvent) {
-        System.out.println("Showing settings page.");
+        settingsPanel.setVisible(!settingsPanel.isVisible());
+    }
+
+    @FXML
+    private void volumeButtonClick(ActionEvent actionEvent) {
+        volume.setValue(volume.getValue() == 0 ? 100 : 0);
     }
 }

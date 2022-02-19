@@ -98,10 +98,13 @@ public class MultipleChoiceQuestionCtrl implements Initializable {
         for (int i = 0; i < imageOptionArray.size(); i++) {
             var imageOption = imageOptionArray.get(i);
             var imageUrl = answersImages.get(i);
+
             imageOption.setImage(new Image(imageUrl.toString()));
+
             imageOption.fitHeightProperty().bind(Bindings.min(
                     imageVBox.widthProperty(),
                     imageVBox.heightProperty()).multiply(0.8));
+
             imageOption.fitWidthProperty().bind(imageOption.fitHeightProperty());
 
             var labelOption = labelOptionArray.get(i);

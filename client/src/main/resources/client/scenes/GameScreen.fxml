@@ -1,159 +1,225 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXSlider?>
+<?import com.jfoenix.controls.JFXToggleButton?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Polygon?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="mainBorderPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #505ed1;" stylesheets="@/client/stylesheets/GameScreen.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.GameScreenCtrl">
-    <top>
-        <BorderPane prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: #FFFFFF;" BorderPane.alignment="CENTER">
-            <center>
-                <ScrollPane hbarPolicy="NEVER" prefHeight="50.0" prefWidth="200.0" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
-                    <content>
-                        <HBox fx:id="avatarHBox" prefHeight="46.0" spacing="10.0">
-                            <padding>
-                                <Insets bottom="2.5" left="2.5" right="2.5" top="2.5" />
-                            </padding>
-                        </HBox>
-                    </content>
-                </ScrollPane>
-            </center>
-            <right>
-                <Label fx:id="timerLabel" text="00:05" BorderPane.alignment="CENTER">
-                    <font>
-                        <Font name="System Bold" size="24.0" />
-                    </font>
-                    <BorderPane.margin>
-                        <Insets left="10.0" right="10.0" />
-                    </BorderPane.margin>
-                </Label>
-            </right>
-            <left>
-                <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="89.0" BorderPane.alignment="CENTER">
-                    <children>
-                  <JFXButton fx:id="quitButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" onAction="#quitButtonClick">
-                     <graphic>
-                        <FontAwesomeIconView fill="RED" glyphName="CLOSE" size="24" text="" />
-                     </graphic>
-                  </JFXButton>
-                  <JFXButton fx:id="settingsButton" contentDisplay="GRAPHIC_ONLY" onAction="#settingButtonClick">
-                     <graphic>
-                        <FontAwesomeIconView fill="GREY" glyphName="COG" size="24" text="" />
-                     </graphic>
-                  </JFXButton>
-                    </children>
-                    <padding>
-                        <Insets left="10.0" right="10.0" />
-                    </padding>
-                </HBox>
-            </left>
-        </BorderPane>
-    </top>
-   <bottom>
-      <VBox alignment="BOTTOM_LEFT" prefHeight="100.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-         <children>
-            <GridPane prefHeight="50.0">
-              <columnConstraints>
-                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
-                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.GameScreenCtrl">
+   <children>
+      <BorderPane fx:id="mainBorderPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #505ed1;" stylesheets="@/client/stylesheets/GameScreen.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+          <top>
+              <BorderPane prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: #FFFFFF;">
+                  <center>
+                      <ScrollPane hbarPolicy="NEVER" pannable="true" prefHeight="50.0" prefWidth="200.0" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
+                          <content>
+                              <HBox fx:id="avatarHBox" prefHeight="46.0" spacing="10.0">
+                                  <padding>
+                                      <Insets bottom="2.5" left="2.5" right="2.5" top="2.5" />
+                                  </padding>
+                              </HBox>
+                          </content>
+                      </ScrollPane>
+                  </center>
+                  <right>
+                      <Label fx:id="timerLabel" text="00:05" BorderPane.alignment="CENTER">
+                          <font>
+                              <Font name="System Bold" size="24.0" />
+                          </font>
+                          <BorderPane.margin>
+                              <Insets left="10.0" right="10.0" />
+                          </BorderPane.margin>
+                      </Label>
+                  </right>
+                  <left>
+                      <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="89.0" spacing="5.0" BorderPane.alignment="CENTER">
+                          <children>
+                        <JFXButton fx:id="quitButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" onAction="#quitButtonClick">
+                           <graphic>
+                              <FontAwesomeIconView fill="RED" glyphName="CLOSE" size="24" text="" />
+                           </graphic>
+                        </JFXButton>
+                        <JFXButton fx:id="settingsButton" contentDisplay="GRAPHIC_ONLY" onAction="#settingButtonClick">
+                           <graphic>
+                              <FontAwesomeIconView fill="GREY" glyphName="COG" size="24" text="" />
+                           </graphic>
+                        </JFXButton>
+                          </children>
+                          <padding>
+                              <Insets left="10.0" right="10.0" />
+                          </padding>
+                      </HBox>
+                  </left>
+              </BorderPane>
+          </top>
+         <bottom>
+            <VBox alignment="BOTTOM_LEFT" prefHeight="100.0" prefWidth="100.0" BorderPane.alignment="CENTER">
                <children>
-                  <ScrollPane fx:id="emojiScrollPane" hbarPolicy="NEVER" maxWidth="400.0" prefHeight="50.0" prefWidth="200.0" style="-fx-background-radius: 10 10 0 0; -fx-view-order: -1;" vbarPolicy="NEVER" visible="false">
-                     <content>
-                        <HBox fx:id="emojiHBox" alignment="CENTER" prefHeight="46.0" spacing="10.0">
-                           <padding>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="7.5" />
-                           </padding>
-                        </HBox>
-                     </content>
-                     <GridPane.margin>
-                        <Insets left="100.0" right="15.0" />
-                     </GridPane.margin>
-                  </ScrollPane>
-                  <ScrollPane fx:id="powerUpScrollPane" hbarPolicy="NEVER" maxWidth="400.0" prefHeight="50.0" prefWidth="400.0" style="-fx-background-radius: 10 10 0 0; -fx-view-order: -1;" vbarPolicy="NEVER" visible="false" GridPane.columnIndex="1">
-                     <content>
-                        <HBox fx:id="powerUpHBox" prefHeight="46.0" spacing="10.0">
-                           <padding>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="7.5" />
-                           </padding>
-                        </HBox>
-                     </content>
-                     <GridPane.margin>
-                        <Insets left="15.0" right="100.0" />
-                     </GridPane.margin>
-                  </ScrollPane>
+                  <GridPane prefHeight="50.0">
+                    <columnConstraints>
+                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
+                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <ScrollPane fx:id="emojiScrollPane" hbarPolicy="NEVER" maxWidth="400.0" pannable="true" prefHeight="50.0" prefWidth="200.0" style="-fx-background-radius: 10 10 0 0; -fx-view-order: -1;" vbarPolicy="NEVER" visible="false">
+                           <content>
+                              <HBox fx:id="emojiHBox" alignment="CENTER" maxHeight="40.0" prefHeight="40.0" spacing="10.0">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </HBox>
+                           </content>
+                           <GridPane.margin>
+                              <Insets left="100.0" right="15.0" />
+                           </GridPane.margin>
+                        </ScrollPane>
+                        <ScrollPane fx:id="powerUpScrollPane" hbarPolicy="NEVER" maxWidth="400.0" pannable="true" prefHeight="50.0" prefWidth="400.0" style="-fx-background-radius: 10 10 0 0; -fx-view-order: -1;" vbarPolicy="NEVER" visible="false" GridPane.columnIndex="1">
+                           <content>
+                              <HBox fx:id="powerUpHBox" maxHeight="40.0" prefHeight="40.0" spacing="10.0">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </HBox>
+                           </content>
+                           <GridPane.margin>
+                              <Insets left="15.0" right="100.0" />
+                           </GridPane.margin>
+                        </ScrollPane>
+                     </children>
+                  </GridPane>
+                  <BorderPane prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: #FFFFFF;">
+                     <left>
+                        <Label fx:id="questionNumberLabel" alignment="CENTER" prefHeight="35.0" prefWidth="75.0" style="-fx-text-fill: #5463db;" text="2 of 20" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                           <BorderPane.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </BorderPane.margin>
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                     </left>
+                     <right>
+                        <Label alignment="CENTER" prefHeight="35.0" prefWidth="75.0" style="-fx-text-fill: #FFFFFF; -fx-background-color: #5463db;" text="1200" BorderPane.alignment="CENTER">
+                           <BorderPane.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </BorderPane.margin>
+                           <font>
+                              <Font name="System Bold" size="24.0" />
+                           </font>
+                        </Label>
+                     </right>
+                     <center>
+                        <GridPane BorderPane.alignment="CENTER">
+                           <columnConstraints>
+                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
+                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <JFXButton fx:id="emojiBarButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" maxHeight="1.7976931348623157E308" onAction="#emojiBarButtonClick">
+                                 <graphic>
+                                    <ImageView fx:id="emojiBarIcon" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@/client/images/emojiBarIcon.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </JFXButton>
+                              <JFXButton fx:id="powerUpBarButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" onAction="#powerUpBarButtonClick" GridPane.columnIndex="1">
+                                 <graphic>
+                                    <ImageView fx:id="powerUpBarIcon" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@/client/images/powerUpBarIcon.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </JFXButton>
+                           </children>
+                        </GridPane>
+                     </center>
+                  </BorderPane>
                </children>
-            </GridPane>
-            <BorderPane prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: #FFFFFF;">
-               <left>
-                  <Label fx:id="questionNumberLabel" alignment="CENTER" prefHeight="35.0" prefWidth="75.0" style="-fx-text-fill: #5463db;" text="2 of 20" textAlignment="CENTER" BorderPane.alignment="CENTER">
-                     <BorderPane.margin>
-                        <Insets left="10.0" right="10.0" />
-                     </BorderPane.margin>
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Label>
-               </left>
-               <right>
-                  <Label alignment="CENTER" prefHeight="35.0" prefWidth="75.0" style="-fx-text-fill: #FFFFFF; -fx-background-color: #5463db;" text="1200" BorderPane.alignment="CENTER">
-                     <BorderPane.margin>
-                        <Insets left="10.0" right="10.0" />
-                     </BorderPane.margin>
-                     <font>
-                        <Font name="System Bold" size="24.0" />
-                     </font>
-                  </Label>
-               </right>
-               <center>
-                  <GridPane BorderPane.alignment="CENTER">
+            </VBox>
+         </bottom>
+      </BorderPane>
+      <AnchorPane fx:id="settingsPanel" prefHeight="100.0" prefWidth="200.0" visible="false" AnchorPane.topAnchor="50.0">
+         <children>
+            <Polygon fill="WHITE" points="43.99998092651367, 10.000011444091797, 87.9999771118164, 10.000011444091797, 68.9999771118164, -8.666675567626953" stroke="WHITE" strokeType="INSIDE" AnchorPane.leftAnchor="45.0" AnchorPane.topAnchor="0.0" />
+            <GridPane maxWidth="200.0" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 10 10 10 10; -fx-view-order: -1; -fx-effect: dropshadow( three-pass-box , gray , 2, 10.0 , 0 , 0 );" stylesheets="@/client/stylesheets/Slider.css" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+               <columnConstraints>
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="75.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <GridPane prefHeight="30.0" prefWidth="150.0" style="-fx-background-radius: 10 10 10 10;" stylesheets="@/client/stylesheets/Slider.css">
                      <columnConstraints>
-                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
-                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="75.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="70.0" prefWidth="75.0" />
                      </columnConstraints>
                      <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                      </rowConstraints>
                      <children>
-                        <JFXButton fx:id="emojiBarButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" maxHeight="1.7976931348623157E308" onAction="#emojiBarButtonClick">
+                        <JFXSlider fx:id="volumeSlider" GridPane.columnIndex="1" />
+                        <JFXButton fx:id="volumeButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" maxWidth="30.0" minWidth="40.0" onAction="#volumeButtonClick" prefWidth="30.0">
                            <graphic>
-                              <ImageView fx:id="emojiBarIcon" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@/client/images/emojiBarIcon.png" />
-                                 </image>
-                              </ImageView>
-                           </graphic>
-                           <GridPane.margin>
-                              <Insets />
-                           </GridPane.margin>
-                        </JFXButton>
-                        <JFXButton fx:id="powerUpBarButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" onAction="#powerUpBarButtonClick" GridPane.columnIndex="1">
-                           <graphic>
-                              <ImageView fx:id="powerUpBarIcon" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@/client/images/powerUpBarIcon.png" />
-                                 </image></ImageView>
+                              <FontAwesomeIconView fx:id="volumeIconView" fill="#505ed1" glyphName="VOLUME_UP" size="25" />
                            </graphic>
                         </JFXButton>
                      </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
                   </GridPane>
-               </center>
-            </BorderPane>
+                  <GridPane prefHeight="30.0" prefWidth="150.0" style="-fx-background-radius: 10 10 10 10;" stylesheets="@/client/stylesheets/Slider.css" GridPane.rowIndex="1">
+                     <columnConstraints>
+                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="75.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <children>
+                        <JFXToggleButton fx:id="muteEveryoneToggleButton" text="Mute Everybody" textFill="#505ed1" toggleColor="#505ed1" toggleLineColor="#6471d7">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </JFXToggleButton>
+                     </children>
+                  </GridPane>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </GridPane>
          </children>
-      </VBox>
-   </bottom>
-</BorderPane>
+      </AnchorPane>
+   </children>
+</AnchorPane>

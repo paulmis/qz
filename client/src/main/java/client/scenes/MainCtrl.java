@@ -16,6 +16,8 @@
 
 package client.scenes;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -30,6 +32,7 @@ public class MainCtrl {
 
     private GameScreenCtrl gameScreenCtrl;
     private Scene gameScreen;
+
 
     /** Initialize the main controller.
      *
