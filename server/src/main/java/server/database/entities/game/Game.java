@@ -64,6 +64,7 @@ public abstract class Game {
     private Integer currentQuestion = 0;
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<GamePlayer> players = new ArrayList<>();
 
     private Integer randomState = ThreadLocalRandom.current().nextInt();
