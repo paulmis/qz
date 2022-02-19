@@ -12,7 +12,7 @@ stages:
 build:
   stage: build
   script:
-    - ./gradlew build
+    - ./gradlew --build-cache assemble
 
 checkstyle-main:
   stage: analysis
