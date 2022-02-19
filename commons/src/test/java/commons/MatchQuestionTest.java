@@ -13,7 +13,7 @@ class MatchQuestionTest {
 
     static Question q;
 
-    static private Activity getActivity(int id) {
+    private static Activity getActivity(int id) {
         Activity a = new Activity();
         a.setDescription("Activity" + (id + 1));
         a.setCost(2 + id * 4);
