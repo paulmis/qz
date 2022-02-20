@@ -11,6 +11,9 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 import server.database.entities.question.Question;
 
+/**
+ * Implementation of the custom QuestionRepository interface logic.
+ */
 @Repository
 @Transactional
 public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
