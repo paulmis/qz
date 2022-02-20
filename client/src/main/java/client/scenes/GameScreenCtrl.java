@@ -158,7 +158,7 @@ public class GameScreenCtrl implements Initializable {
         volumeSlider.valueProperty().bindBidirectional(volume);
         volume.addListener((observable, oldValue, newValue) -> {
             volumeIconView.setGlyphName(volumeIconList.get(
-                    Math.round(newValue.floatValue() / 50)
+                    Math.round(newValue.floatValue() / 100 * (volumeIconList.size() - 1))
             ).name());
         });
     }
