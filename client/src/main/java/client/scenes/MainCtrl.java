@@ -16,6 +16,8 @@
 
 package client.scenes;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -28,46 +30,34 @@ public class MainCtrl {
 
     private Stage primaryStage;
 
-    private QuoteOverviewCtrl overviewCtrl;
-    private Scene overview;
+    private GameScreenCtrl gameScreenCtrl;
+    private Scene gameScreen;
 
-    private AddQuoteCtrl addCtrl;
-    private Scene add;
 
-    /** Initialize the main controller.
+    /**
+     * Initialize the main controller.
      *
      * @param primaryStage Primary stage of the application
-     * @param overview Quote overview control and its parent
-     * @param add AddQuote control and its parent
      */
-    public void initialize(Stage primaryStage, Pair<QuoteOverviewCtrl, Parent> overview,
-            Pair<AddQuoteCtrl, Parent> add) {
+    public void initialize(Stage primaryStage, Pair<GameScreenCtrl, Parent> gameScreen) {
         this.primaryStage = primaryStage;
-        this.overviewCtrl = overview.getKey();
-        this.overview = new Scene(overview.getValue());
 
-        this.addCtrl = add.getKey();
-        this.add = new Scene(add.getValue());
+        this.gameScreenCtrl = gameScreen.getKey();
+        this.gameScreen = new Scene(gameScreen.getValue());
 
-        showOverview();
+        showGameScreen();
         primaryStage.show();
     }
 
     /**
-     * Show the current quote overview.
+     * This function displays the game screen.
+     * It also sets it min width and height.
      */
-    public void showOverview() {
-        primaryStage.setTitle("Quotes: Overview");
-        primaryStage.setScene(overview);
-        overviewCtrl.refresh();
-    }
-
-    /**
-     * Show the "add quote" dialog.
-     */
-    public void showAdd() {
-        primaryStage.setTitle("Quotes: Adding Quote");
-        primaryStage.setScene(add);
-        add.setOnKeyPressed(e -> addCtrl.keyPressed(e));
+    public void showGameScreen() {
+        primaryStage.setTitle("Game Screen");
+        primaryStage.setScene(gameScreen);
+        primaryStage.sizeToScene();
+        primaryStage.setMinHeight(500);
+        primaryStage.setMinWidth(500);
     }
 }
