@@ -6,5 +6,4 @@ import server.database.entities.game.Game;
 /**
  * JPA repository for interacting with Game entities in the database.
  */
-public interface GameRepository extends JpaRepository<Game, Long> {
-}
+public interface GameRepository extends JpaRepository<Game, Long> {}
