@@ -1,4 +1,4 @@
-package server.database;
+package server.database.repositories.game;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import server.database.entities.game.Game;

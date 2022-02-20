@@ -1,4 +1,4 @@
-package server.database;
+package server.database.repositories;
 
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
