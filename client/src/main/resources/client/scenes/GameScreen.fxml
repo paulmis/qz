@@ -19,18 +19,18 @@
 <?import javafx.scene.shape.Polygon?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.GameScreenCtrl">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="576" prefWidth="1024" stylesheets="@/client/stylesheets/GameScreen.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.GameScreenCtrl">
    <children>
-      <BorderPane fx:id="mainBorderPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #505ed1;" stylesheets="@/client/stylesheets/GameScreen.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane fx:id="mainBorderPane" minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #505ed1;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
           <top>
-              <BorderPane prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: #FFFFFF;">
+              <BorderPane prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: white; -fx-border-color: white;">
                   <center>
-                      <ScrollPane hbarPolicy="NEVER" pannable="true" prefHeight="50.0" prefWidth="200.0" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
+                      <ScrollPane hbarPolicy="NEVER" pannable="true" prefHeight="49.0" prefWidth="200.0" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
                           <content>
-                              <HBox fx:id="avatarHBox" prefHeight="46.0" spacing="10.0">
-                                  <padding>
-                                      <Insets bottom="2.5" left="2.5" right="2.5" top="2.5" />
-                                  </padding>
+                              <HBox fx:id="avatarHBox" fillHeight="false" prefHeight="45.0" spacing="10.0" style="-fx-background-color: transparent;">
+                           <padding>
+                              <Insets bottom="2.5" left="2.5" right="2.5" top="2.5" />
+                           </padding>
                               </HBox>
                           </content>
                       </ScrollPane>

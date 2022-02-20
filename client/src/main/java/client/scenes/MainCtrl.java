@@ -34,7 +34,8 @@ public class MainCtrl {
     private Scene gameScreen;
 
 
-    /** Initialize the main controller.
+    /**
+     * Initialize the main controller.
      *
      * @param primaryStage Primary stage of the application
      */
@@ -48,8 +49,15 @@ public class MainCtrl {
         primaryStage.show();
     }
 
+    /**
+     * This function displays the game screen.
+     * It also sets it min width and height.
+     */
     public void showGameScreen() {
         primaryStage.setTitle("Game Screen");
         primaryStage.setScene(gameScreen);
+        primaryStage.sizeToScene();
+        primaryStage.setMinHeight(500);
+        primaryStage.setMinWidth(500);
     }
 }

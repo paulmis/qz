@@ -6,8 +6,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 
-/** The class that encompasses the multiple
+/**
+ * The class that encompasses the multiple
  * choice question type control.
+ * The purpose of this class is to allow the
+ * generation of the control inside code.
  */
 public class MultipleChoiceQuestionPane extends StackPane {
 
@@ -28,16 +31,24 @@ public class MultipleChoiceQuestionPane extends StackPane {
                                       List<String> answersText,
                                       List<URL> answersImages,
                                       List<MultipleChoiceQuestionCtrl.AnswerHandler> actions) {
+
+        // We create the loader for the fxml of the question
         FXMLLoader fxmlLoader =
                 new FXMLLoader(getClass().getResource("/client/scenes/questions/MultipleChoiceQuestion.fxml"));
 
+        // We set the controller of the fxml to our newly created controller
+        // we also pass in the question text and the answer handler
         fxmlLoader.setControllerFactory(param ->
                 controller = new MultipleChoiceQuestionCtrl(questionText, answersImages, answersText, actions));
+
+        // This loads the fxml
         try {
             view = (Node) fxmlLoader.load();
         } catch (Exception e) {
             System.out.println(e);
         }
+
+        // Adds it to the view of this control(stack pane)
         getChildren().add(view);
     }
 }
