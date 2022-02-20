@@ -4,13 +4,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 
-/** The class that encompasses the close
+/** The class that encompasses the estimate
  *  question type control.
  */
-public class CloseQuestionPane extends StackPane {
+public class EstimateQuestionPane extends StackPane {
 
     private Node view;
-    private CloseQuestionCtrl controller;
+    private EstimateQuestionCtrl controller;
 
 
     /** Creates the Node view of the control
@@ -20,12 +20,12 @@ public class CloseQuestionPane extends StackPane {
      * @param questionText The question in string format.
      * @param answerHandler The handler for when the user changes his answer.
      */
-    public CloseQuestionPane(String questionText, CloseQuestionCtrl.AnswerHandler answerHandler) {
+    public EstimateQuestionPane(String questionText, EstimateQuestionCtrl.AnswerHandler answerHandler) {
         FXMLLoader fxmlLoader =
-                new FXMLLoader(getClass().getResource("/client/scenes/questions/CloseQuestion.fxml"));
+                new FXMLLoader(getClass().getResource("/client/scenes/questions/EstimateQuestion.fxml"));
 
         fxmlLoader.setControllerFactory(param ->
-                controller = new CloseQuestionCtrl(questionText, answerHandler));
+                controller = new EstimateQuestionCtrl(questionText, answerHandler));
         try {
             view = (Node) fxmlLoader.load();
         } catch (Exception e) {

@@ -10,10 +10,10 @@ import javafx.scene.control.TextField;
 
 
 
-/** Close Question type controller.
+/** Estimate Question type controller.
  *
  */
-public class CloseQuestionCtrl implements Initializable {
+public class EstimateQuestionCtrl implements Initializable {
 
     /** The interface for the answer handler.
      * Handles the change text event.
@@ -37,7 +37,7 @@ public class CloseQuestionCtrl implements Initializable {
     @FXML
     private TextField guessField;
 
-    public CloseQuestionCtrl(String questionText, AnswerHandler answerHandler) {
+    public EstimateQuestionCtrl(String questionText, AnswerHandler answerHandler) {
         this.questionText = questionText;
         this.answerHandler = answerHandler;
     }

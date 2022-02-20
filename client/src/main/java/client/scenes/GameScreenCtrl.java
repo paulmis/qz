@@ -1,6 +1,6 @@
 package client.scenes;
 
-import client.scenes.questions.CloseQuestionPane;
+import client.scenes.questions.EstimateQuestionPane;
 import client.scenes.questions.MultipleChoiceQuestionCtrl;
 import client.scenes.questions.MultipleChoiceQuestionPane;
 import client.utils.ServerUtils;
@@ -121,7 +121,7 @@ public class GameScreenCtrl implements Initializable {
         setUpTopBarLeaderBoard();
         setUpVolume();
 
-        loadMockClose();
+        loadMockEstimate();
     }
 
     private void loadMockMCQ() {
@@ -141,9 +141,9 @@ public class GameScreenCtrl implements Initializable {
         }
     }
 
-    private void loadMockClose() {
+    private void loadMockEstimate() {
         mainBorderPane.setCenter(
-                new CloseQuestionPane(
+                new EstimateQuestionPane(
                         "Short question",
                         System.out::println));
     }
@@ -192,7 +192,7 @@ public class GameScreenCtrl implements Initializable {
 
     private void setUpPowerUps() {
         powerUpHBox.getChildren().clear();
-        var powerUpUrls = server.getEmojis();
+        var powerUpUrls = server.getPowerUps();
         try {
             powerUpUrls.forEach(powerUpUrl -> {
                 var jfxButton = new JFXButton();
