@@ -3,12 +3,13 @@ package server.database.repositories.question;
 import server.database.entities.question.Question;
 
 /**
- * JPA question repository - Custom methods for QuestionRepository.
+ * QuestionRepositoryCustom.java - Custom methods for QuestionRepository.
  */
 public interface QuestionRepositoryCustom {
-    /** Get a random question from the database.
+    /** Get the question at the given index from the database.
      *
-     * @return Random question from the DB.
+     * @param n The index of the question to get.
+     * @return The question at the given index.
      */
-    Question getRandomQuestion();
+    Question getNthQuestion(int n);
 }
