@@ -11,6 +11,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import server.database.entities.User;
 
 /**
  * Player entity, which represents an instance of a player in a specific game.
@@ -48,5 +49,10 @@ public class GamePlayer {
     @JoinColumn(name = "game_id", nullable = false)
     @NonNull private Game game;
 
-    // TODO: add relation to the user entity.
+    /**
+     * The user the player is.
+     */
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }
