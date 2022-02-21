@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 /*
@@ -27,6 +28,7 @@ https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
 @NoArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Generated
 public abstract class Question {
 
     @Id
