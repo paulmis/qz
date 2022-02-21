@@ -2,7 +2,7 @@ package server.database.entities.game.configuration;
 
 import java.util.UUID;
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Entity
 public abstract class GameConfiguration {
     @Id
     private UUID id;

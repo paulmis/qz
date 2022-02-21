@@ -2,6 +2,7 @@ package server.database.entities.game.configuration;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,6 +19,7 @@ import lombok.NonNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
+@MappedSuperclass
 public class SurvivalGameConfiguration extends GameConfiguration {
     /**
      * The speed increase/decrease of the game.

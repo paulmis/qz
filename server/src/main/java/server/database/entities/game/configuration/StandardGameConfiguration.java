@@ -1,6 +1,8 @@
 package server.database.entities.game.configuration;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,6 +16,8 @@ import lombok.NonNull;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@MappedSuperclass
 public class StandardGameConfiguration extends GameConfiguration {
     /**
      * The number of questions in the game.
