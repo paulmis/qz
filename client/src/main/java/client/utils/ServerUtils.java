@@ -16,18 +16,10 @@
 
 package client.utils;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
-
-import commons.Quote;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.GenericType;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import org.glassfish.jersey.client.ClientConfig;
 
 
 /**
@@ -37,42 +29,69 @@ public class ServerUtils {
 
     private static final String SERVER = "http://localhost:8080/";
 
-    /** Obtain all existing quotes from the server manually.
+    /**
+     * Gets a list of all the emoji urls from the backend.
      *
-     * @throws IOException Exception thrown during the GET request
+     * @return List of emoji urls
      */
-    public void getQuotesTheHardWay() throws IOException {
-        var url = new URL("http://localhost:8080/api/quotes");
-        var is = url.openConnection().getInputStream();
-        var br = new BufferedReader(new InputStreamReader(is));
-        String line;
-        while ((line = br.readLine()) != null) {
-            System.out.println(line);
+    public List<URL> getEmojis() {
+        try {
+            return Arrays.asList(
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
+        } catch (Exception e) {
+            return new ArrayList<>();
         }
     }
 
-    /** Obtain all existing quotes from the server.
+    /**
+     * Gets a list of all the powerUp urls from the backend.
      *
-     * @return List of quotes obtained from the server
+     * @return List of emoji urls
      */
-    public List<Quote> getQuotes() {
-        return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/quotes") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Quote>>() {});
+    public List<URL> getPowerUps() {
+        try {
+            return Arrays.asList(
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
-    /** Add a new quote to the remote server.
-     *
-     * @param quote Quote to add
-     * @return Quote returned by the server
+    /**
+     * Function that causes the user to leave the game.
      */
-    public Quote addQuote(Quote quote) {
-        return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/quotes") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
+    public void quitGame() {
+        System.out.println("Quitting game");
+    }
+
+    /** Gets a list of the leaderboard images from the server.
+     *
+     * @return a list of leaderboard images.
+     */
+    public List<URL> getLeaderBoardImages() {
+        try {
+            return Arrays.asList(
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"));
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 }
