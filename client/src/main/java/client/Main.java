@@ -26,10 +26,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import lombok.Generated;
 
 /**
  * Main class for the client application.
  */
+@Generated
 public class Main extends Application {
 
     private static final Injector INJECTOR = createInjector(new MyModule());

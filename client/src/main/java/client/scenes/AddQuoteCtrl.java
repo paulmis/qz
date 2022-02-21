@@ -26,10 +26,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
+import lombok.Generated;
 
 /**
  * UI controller for adding quotes.
  */
+
+@Generated
 public class AddQuoteCtrl {
 
     private final ServerUtils server;

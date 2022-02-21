@@ -28,10 +28,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import lombok.Generated;
 
 /**
  * Control used for showing overview of the quotes.
  */
+@Generated
 public class QuoteOverviewCtrl implements Initializable {
 
     private final ServerUtils server;
