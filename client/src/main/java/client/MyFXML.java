@@ -32,7 +32,6 @@ import lombok.Generated;
 /**
  * Main FXML design class.
  */
-@Generated
 public class MyFXML {
 
     private Injector injector;
@@ -68,6 +67,7 @@ public class MyFXML {
         return MyFXML.class.getClassLoader().getResource(path);
     }
 
+    @Generated
     private class MyFactory implements BuilderFactory, Callback<Class<?>, Object> {
 
         @Override
