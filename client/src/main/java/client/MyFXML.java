@@ -27,6 +27,7 @@ import javafx.util.Builder;
 import javafx.util.BuilderFactory;
 import javafx.util.Callback;
 import javafx.util.Pair;
+import lombok.Generated;
 
 /**
  * Main FXML design class.
@@ -66,6 +67,7 @@ public class MyFXML {
         return MyFXML.class.getClassLoader().getResource(path);
     }
 
+    @Generated
     private class MyFactory implements BuilderFactory, Callback<Class<?>, Object> {
 
         @Override
