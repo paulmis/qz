@@ -21,10 +21,12 @@ import client.scenes.MainCtrl;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
+import lombok.Generated;
 
 /**
  * Module class.
  */
+@Generated
 public class MyModule implements Module {
 
     @Override
