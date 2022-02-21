@@ -4,9 +4,41 @@ variables:
   # Disable the Gradle daemon to ensure isolated runs of the CI pipeline.
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
+stages:
+  - build
+  - analysis
+  - test
+
 build:
+  stage: build
   script:
-    - ./gradlew build
+    - ./gradlew --build-cache assemble
+
+checkstyle-main:
+  stage: analysis
+  script: ./gradlew checkstyleMain
+  cache:
+    key: "$CI_COMMIT_REF_NAME-main"
+    policy: pull
+    paths:
+      - build/
+      - .gradle/
+  allow_failure: true
+
+checkstyle-test:
+  stage: analysis
+  script: ./gradlew checkstyleTest
+  cache:
+    key: "$CI_COMMIT_REF_NAME-test"
+    policy: pull
+    paths:
+      - build/
+      - .gradle/
+  allow_failure: true
+
+test:
+  stage: test
+  script:
     - ./gradlew AggregateJacocoReport
     # preserve coverage information in an easy-to-reach folder
     - mv build/reports/jacoco/aggregate/html ./coverage

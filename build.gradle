@@ -30,6 +30,7 @@ subprojects {
 		useJUnitPlatform()
 		finalizedBy jacocoTestReport 
 	}
+
 	jacocoTestReport {
 		reports {
 			xml.required = false
@@ -37,12 +38,25 @@ subprojects {
 			html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
 			}
 	}
+
+	configurations {
+		compileOnly {
+			extendsFrom annotationProcessor
+		}
+	}
 	
 	dependencies {
 		implementation 'org.apache.commons:commons-lang3:3.12.0'
-		
 		testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
 		testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 		testImplementation 'org.mockito:mockito-core:4.1.0'
+
+		/**
+		 * Lombok
+		 */
+		compileOnly 'org.projectlombok:lombok:1.18.22'
+		annotationProcessor 'org.projectlombok:lombok:1.18.22'
+		testCompileOnly 'org.projectlombok:lombok:1.18.22'
+		testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 	}
 }

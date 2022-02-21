@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package client;
 
+import com.google.inject.Injector;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-
-import com.google.inject.Injector;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.util.Builder;
 import javafx.util.BuilderFactory;
 import javafx.util.Callback;
 import javafx.util.Pair;
+import lombok.Generated;
 
+/**
+ * Main FXML design class.
+ */
 public class MyFXML {
 
     private Injector injector;
@@ -37,9 +40,20 @@ public class MyFXML {
         this.injector = injector;
     }
 
+    /** Load a new FXML class.
+     *
+     * @param c Generic wrapper
+     * @param parts Parts to use
+     * @param <T> Type
+     * @return Generated structure?
+     */
     public <T> Pair<T, Parent> load(Class<T> c, String... parts) {
         try {
-            var loader = new FXMLLoader(getLocation(parts), null, null, new MyFactory(), StandardCharsets.UTF_8);
+            var loader = new FXMLLoader(getLocation(parts),
+                    null,
+                    null,
+                    new MyFactory(),
+                    StandardCharsets.UTF_8);
             Parent parent = loader.load();
             T ctrl = loader.getController();
             return new Pair<>(ctrl, parent);
@@ -53,6 +67,7 @@ public class MyFXML {
         return MyFXML.class.getClassLoader().getResource(path);
     }
 
+    @Generated
     private class MyFactory implements BuilderFactory, Callback<Class<?>, Object> {
 
         @Override

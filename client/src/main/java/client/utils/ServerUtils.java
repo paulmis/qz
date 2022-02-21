@@ -13,50 +13,85 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package client.utils;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.glassfish.jersey.client.ClientConfig;
 
-import commons.Quote;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.GenericType;
-
+/**
+ * Utilities for communicating with the server.
+ */
 public class ServerUtils {
 
     private static final String SERVER = "http://localhost:8080/";
 
-    public void getQuotesTheHardWay() throws IOException {
-        var url = new URL("http://localhost:8080/api/quotes");
-        var is = url.openConnection().getInputStream();
-        var br = new BufferedReader(new InputStreamReader(is));
-        String line;
-        while ((line = br.readLine()) != null) {
-            System.out.println(line);
+    /**
+     * Gets a list of all the emoji urls from the backend.
+     *
+     * @return List of emoji urls
+     */
+    public List<URL> getEmojis() {
+        try {
+            return Arrays.asList(
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
+        } catch (Exception e) {
+            return new ArrayList<>();
         }
     }
 
-    public List<Quote> getQuotes() {
-        return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/quotes") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Quote>>() {});
+    /**
+     * Gets a list of all the powerUp urls from the backend.
+     *
+     * @return List of emoji urls
+     */
+    public List<URL> getPowerUps() {
+        try {
+            return Arrays.asList(
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
+                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
-    public Quote addQuote(Quote quote) {
-        return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/quotes") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
+    /**
+     * Function that causes the user to leave the game.
+     */
+    public void quitGame() {
+        System.out.println("Quitting game");
+    }
+
+    /** Gets a list of the leaderboard images from the server.
+     *
+     * @return a list of leaderboard images.
+     */
+    public List<URL> getLeaderBoardImages() {
+        try {
+            return Arrays.asList(
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"));
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 }
