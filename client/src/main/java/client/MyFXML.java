@@ -27,10 +27,12 @@ import javafx.util.Builder;
 import javafx.util.BuilderFactory;
 import javafx.util.Callback;
 import javafx.util.Pair;
+import lombok.Generated;
 
 /**
  * Main FXML design class.
  */
+@Generated
 public class MyFXML {
 
     private Injector injector;

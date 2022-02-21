@@ -25,6 +25,7 @@ import java.util.List;
 /**
  * Utilities for communicating with the server.
  */
+@Generated
 public class ServerUtils {
 
     private static final String SERVER = "http://localhost:8080/";
