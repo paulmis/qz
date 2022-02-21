@@ -20,6 +20,9 @@ public class EasyRandom {
     @Transient
     private final int increment = 12345;
 
+    /**
+     * Internal state of the LCG.
+     */
     @NonNull private Integer random;
 
     /**
@@ -29,7 +32,8 @@ public class EasyRandom {
         this.random = ThreadLocalRandom.current().nextInt();
     }
 
-    /** Generates a new random number.
+    /**
+     * Generates a new random number.
      *
      * @return a random number between 0 and 2^31.
      */
@@ -38,7 +42,8 @@ public class EasyRandom {
         return this.random;
     }
 
-    /** Generates a random number between min and max.
+    /**
+     * Generates a random number between min and max.
      *
      * @param min the minimum value to generate (inclusive).
      * @param max the maximum value to generate (exclusive).
@@ -51,7 +56,8 @@ public class EasyRandom {
         return Math.floorMod(value, (max - min)) + min;
     }
 
-    /** Set the internal state of the generator.
+    /**
+     * Set the internal state of the generator.
      *
      * @param newState the new random state to set.
      */
