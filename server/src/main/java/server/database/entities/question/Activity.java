@@ -1,4 +1,4 @@
-package commons;
+package server.database.entities.question;
 
 import java.util.List;
 import java.util.UUID;

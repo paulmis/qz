@@ -1,4 +1,4 @@
-package commons;
+package server.database.entities.question;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,17 +1,23 @@
-package commons;
+package server.database.entities;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.ToString;
+import server.database.entities.game.GamePlayer;
 
 
 /**
@@ -20,7 +26,6 @@ import lombok.ToString;
 
 @NoArgsConstructor
 @AllArgsConstructor (access = AccessLevel.PUBLIC)
-@ToString (includeFieldNames = false)
 @Data
 @Entity
 public class User {
@@ -40,6 +45,7 @@ public class User {
     /**
      * password - string representing user's salted password.
      */
+    @ToString.Exclude
     @NonNull private String password;
 
     /**
@@ -51,4 +57,10 @@ public class User {
      * id - random unique uuid assigned to a certain player.
      */
     private int gamesPlayed;
+
+    /**
+     * Relation to player entities for each individual game.
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GamePlayer> gamePlayers = Collections.synchronizedSet(new HashSet<>());
 }

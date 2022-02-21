@@ -1,4 +1,4 @@
-package commons;
+package server.database.entities.question;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
  * MCQuestion data structure - describes a multiple choice question.
  */
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 @Entity
 public class MCQuestion extends Question {
 
@@ -39,7 +39,7 @@ public class MCQuestion extends Question {
      * @param guessConsumption if the user has to guess the energy consumption of the activity
      *                         or the activity with a given consumption.
      */
-    MCQuestion(Question q, Activity answer, boolean guessConsumption) {
+    public MCQuestion(Question q, Activity answer, boolean guessConsumption) {
         super(q);
         this.answer = answer;
         this.guessConsumption = guessConsumption;

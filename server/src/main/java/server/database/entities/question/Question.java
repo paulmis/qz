@@ -1,8 +1,7 @@
-package commons;
+package server.database.entities.question;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,6 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /*
 I followed this guide to handle inheritance:
@@ -31,7 +31,7 @@ public abstract class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Long id;
 
     /**
      * List of activities used to generate the question.
@@ -41,6 +41,7 @@ public abstract class Question {
             name = "activities_asked",
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "activity_id"))
+    @ToString.Exclude
     public List<Activity> activities = new ArrayList<>();
 
     /**

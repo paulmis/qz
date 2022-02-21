@@ -1,4 +1,4 @@
-package commons;
+package server.database.entities.question;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
  * OrderQuestion data structure - describes a match question.
  */
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 @Entity
 public class OrderQuestion extends Question {
 
