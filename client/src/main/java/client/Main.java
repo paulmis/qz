@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package client;
 
 import static com.google.inject.Guice.createInjector;
 
+import client.scenes.GameScreenCtrl;
+import client.scenes.MainCtrl;
+import com.google.inject.Injector;
 import java.io.IOException;
 import java.net.URISyntaxException;
-
-import com.google.inject.Injector;
-
-import client.scenes.AddQuoteCtrl;
-import client.scenes.MainCtrl;
-import client.scenes.QuoteOverviewCtrl;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import lombok.Generated;
 
+/**
+ * Main class for the client application.
+ */
+@Generated
 public class Main extends Application {
 
     private static final Injector INJECTOR = createInjector(new MyModule());
@@ -40,10 +43,9 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
 
-        var overview = FXML.load(QuoteOverviewCtrl.class, "client", "scenes", "QuoteOverview.fxml");
-        var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
+        var gameScreen = FXML.load(GameScreenCtrl.class, "client", "scenes", "GameScreen.fxml");
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, overview, add);
+        mainCtrl.initialize(primaryStage, gameScreen);
     }
 }
