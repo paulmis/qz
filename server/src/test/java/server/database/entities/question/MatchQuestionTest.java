@@ -1,4 +1,4 @@
-package commons;
+package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class OrderQuestionTest {
+class MatchQuestionTest {
 
     static Question q;
 
@@ -28,14 +28,13 @@ class OrderQuestionTest {
             a = getActivity(idx);
             components.add(a);
         }
-        q = new OrderQuestion();
+        q = new MatchQuestion();
         q.setActivities(components);
-        ((OrderQuestion) q).setIncreasing(true);
     }
 
     @Test
     void checkAnswerTest() {
-        // first user is right
+        // first user has all correct
         List<Activity> answerAct = new ArrayList<>(Arrays.asList(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
         Answer a = new Answer();
@@ -43,49 +42,21 @@ class OrderQuestionTest {
         List<Answer> userAnswers = new ArrayList<>();
         userAnswers.add(a);
 
-        // second user is decreasing
+        // second user has all wrong
         answerAct = new ArrayList<>(Arrays.asList(
                 getActivity(3), getActivity(2), getActivity(1), getActivity(0)));
         a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
-        // third user has two inverted (2/3 of points)
+        // third user has two switched (2/4 of points)
         answerAct = new ArrayList<>(Arrays.asList(
                 getActivity(0), getActivity(2), getActivity(1), getActivity(3)));
         a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
-        assertEquals(new ArrayList<>(Arrays.asList(1.0, 0.0, 2.0 / 3)), q.checkAnswer(userAnswers));
-    }
-
-    @Test
-    void checkAnswerDecreasing() {
-        // first user is increasing
-        List<Activity> answerAct = new ArrayList<>(Arrays.asList(
-                getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        Answer a = new Answer();
-        a.setUserChoice(answerAct);
-        List<Answer> userAnswers = new ArrayList<>();
-        userAnswers.add(a);
-
-        // second user is decreasing
-        answerAct = new ArrayList<>(Arrays.asList(
-                getActivity(30), getActivity(2), getActivity(1), getActivity(0)));
-        a = new Answer();
-        a.setUserChoice(answerAct);
-        userAnswers.add(a);
-
-        // third user has two inverted (1/3 of points)
-        answerAct = new ArrayList<>(Arrays.asList(
-                getActivity(0), getActivity(2), getActivity(1), getActivity(3)));
-        a = new Answer();
-        a.setUserChoice(answerAct);
-        userAnswers.add(a);
-
-        ((OrderQuestion) q).setIncreasing(false);
-        assertEquals(new ArrayList<>(Arrays.asList(0.0, 1.0, 1.0 / 3)), q.checkAnswer(userAnswers));
+        assertEquals(new ArrayList<>(Arrays.asList(1.0, 0.0, 2.0 / 4)), q.checkAnswer(userAnswers));
     }
 
     @Test

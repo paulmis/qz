@@ -26,7 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
-import server.database.QuoteRepository;
+import server.database.repositories.QuoteRepository;
 
 /**
  * Tests for the Quote JPA Repository.
