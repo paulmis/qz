@@ -1,16 +1,12 @@
 package server.database.entities.game.configuration;
 
-import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.Hibernate;
 
 /**
  * Configuration for the survival game mode.
@@ -19,9 +15,7 @@ import org.hibernate.Hibernate;
  */
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-@ToString
+@Data
 @Entity
 @DiscriminatorValue("survival")
 public class SurvivalGameConfiguration extends GameConfiguration {
@@ -30,21 +24,4 @@ public class SurvivalGameConfiguration extends GameConfiguration {
      */
     @Column(nullable = false)
     @NonNull Float speedModifier = 1.0f;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
-            return false;
-        }
-        SurvivalGameConfiguration that = (SurvivalGameConfiguration) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

@@ -1,32 +1,31 @@
 package server.database.entities.game.configuration;
 
+import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 /**
  * Base class for game configuration.
  */
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-@ToString
-@Entity
-// As we want to make switching between different game modes as painless as possible, keep all configs in the same table
-@Inheritance(strategy = javax.persistence.InheritanceType.SINGLE_TABLE)
+@Data
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @DiscriminatorColumn(name = "game_mode")
 public abstract class GameConfiguration {
     @Id
-    private Long id;
+    private UUID id;
 
+    /**
+     * Time (in seconds) available for each player to answer each question.
+     * In the future, we could switch to a Duration datatype, but JPA/Hibernate doesn't support it out of the box.
+     */
     @Column(nullable = false)
     private Integer answerTime = 10;
 }

@@ -51,7 +51,7 @@ class EasyRandomTest {
      */
     @Test
     void testBounds() {
-        EasyRandom generator = new EasyRandom();
+        EasyRandom generator = new EasyRandom(236849);
 
         for (int i = 0; i < 100; i++) {
             Integer integer = generator.getRandom(10, 15);

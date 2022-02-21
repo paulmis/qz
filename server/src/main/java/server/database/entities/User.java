@@ -1,7 +1,7 @@
 package server.database.entities;
 
-import java.util.LinkedHashSet;
-import java.util.Objects;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import javax.persistence.CascadeType;
@@ -13,13 +13,10 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
 import server.database.entities.game.GamePlayer;
 
 
@@ -29,10 +26,7 @@ import server.database.entities.game.GamePlayer;
 
 @NoArgsConstructor
 @AllArgsConstructor (access = AccessLevel.PUBLIC)
-@ToString (includeFieldNames = false)
-@Getter
-@Setter
-@RequiredArgsConstructor
+@Data
 @Entity
 public class User {
     /**
@@ -51,6 +45,7 @@ public class User {
     /**
      * password - string representing user's salted password.
      */
+    @ToString.Exclude
     @NonNull private String password;
 
     /**
@@ -67,23 +62,5 @@ public class User {
      * Relation to player entities for each individual game.
      */
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    private Set<GamePlayer> gamePlayers = new LinkedHashSet<>();
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
-            return false;
-        }
-        User user = (User) o;
-        return id != null && Objects.equals(id, user.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+    private Set<GamePlayer> gamePlayers = Collections.synchronizedSet(new HashSet<>());
 }
