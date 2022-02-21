@@ -13,6 +13,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
@@ -33,8 +34,7 @@ import server.utils.EasyRandom;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Inheritance(strategy = javax.persistence.InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "game_mode")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Game {
     @Id
     private UUID id;

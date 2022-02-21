@@ -1,9 +1,9 @@
 package server.database.entities.game.configuration;
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
@@ -13,7 +13,7 @@ import lombok.NonNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@DiscriminatorValue("standard")
+@EqualsAndHashCode(callSuper = true)
 public class StandardGameConfiguration extends GameConfiguration {
     /**
      * The number of questions in the game.

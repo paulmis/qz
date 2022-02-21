@@ -2,21 +2,18 @@ package server.database.entities.question;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import lombok.Data;
-import lombok.Getter;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.Hibernate;
 
 /**
  * MCQuestion data structure - describes a multiple choice question.
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Entity
 public class MCQuestion extends Question {

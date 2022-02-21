@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-@DiscriminatorColumn(name = "game_mode")
 public abstract class GameConfiguration {
     @Id
     private UUID id;

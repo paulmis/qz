@@ -1,10 +1,10 @@
 package server.database.entities.game.configuration;
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
@@ -16,8 +16,8 @@ import lombok.NonNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@DiscriminatorValue("survival")
 public class SurvivalGameConfiguration extends GameConfiguration {
     /**
      * The speed increase/decrease of the game.
