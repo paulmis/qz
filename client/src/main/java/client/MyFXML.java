@@ -32,6 +32,7 @@ import lombok.Generated;
 /**
  * Main FXML design class.
  */
+@Generated
 public class MyFXML {
 
     private Injector injector;
