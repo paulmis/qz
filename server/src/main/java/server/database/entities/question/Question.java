@@ -2,6 +2,7 @@ package server.database.entities.question;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -33,7 +34,7 @@ public abstract class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private UUID id;
 
     /**
      * List of activities used to generate the question.
