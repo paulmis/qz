@@ -7,12 +7,12 @@ import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 /**
- * Data transfer object for the standard-mode game configuration.
+ * Data transfer object for the survival-mode game configuration.
  */
 @Data
 @NoArgsConstructor
 @Generated
-public class StandardGameConfigurationDto implements Serializable {
+public class SurvivalGameConfigurationDTO implements Serializable {
     /**
      * UUID of the current game configuration.
      */
@@ -24,7 +24,7 @@ public class StandardGameConfigurationDto implements Serializable {
     private Integer answerTime;
 
     /**
-     * Number of questions in the game.
+     * Speed modifier for the game.
      */
-    private Integer numQuestions;
+    private Float speedModifier;
 }

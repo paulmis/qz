@@ -1,6 +1,5 @@
 package commons.entities;
 
-import commons.entities.ActivityDto;
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Generated
-public class QuestionDto implements Serializable {
+public class QuestionDTO implements Serializable {
     /**
      * UUID of the question.
      */
@@ -23,7 +22,7 @@ public class QuestionDto implements Serializable {
     /**
      * List of activities related to the question.
      */
-    private List<ActivityDto> activities;
+    private List<ActivityDTO> activities;
 
     /**
      * Question text.

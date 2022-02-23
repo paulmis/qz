@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Generated
-public class UserDto implements Serializable {
+public class UserDTO implements Serializable {
 
     /**
      * The user's ID.

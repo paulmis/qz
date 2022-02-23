@@ -1,6 +1,6 @@
 package server.database.entities.question;
 
-import commons.entities.AnswerDto;
+import commons.entities.AnswerDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -70,5 +70,5 @@ public abstract class Question {
      * @param userAnswers list of answers provided by each user.
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
-    public abstract List<Double> checkAnswer(List<AnswerDto> userAnswers) throws IllegalArgumentException;
+    public abstract List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException;
 }

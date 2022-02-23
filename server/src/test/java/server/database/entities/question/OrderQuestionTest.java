@@ -3,8 +3,8 @@ package server.database.entities.question;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import commons.entities.ActivityDto;
-import commons.entities.AnswerDto;
+import commons.entities.ActivityDTO;
+import commons.entities.AnswerDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,36 +47,36 @@ class OrderQuestionTest {
     @Test
     void checkAnswerTest() {
         // first user is right
-        List<ActivityDto> answerAct = List.of(
-                this.mapper.map(getActivity(0), ActivityDto.class),
-                this.mapper.map(getActivity(1), ActivityDto.class),
-                this.mapper.map(getActivity(2), ActivityDto.class),
-                this.mapper.map(getActivity(3), ActivityDto.class)
+        List<ActivityDTO> answerAct = List.of(
+                this.mapper.map(getActivity(0), ActivityDTO.class),
+                this.mapper.map(getActivity(1), ActivityDTO.class),
+                this.mapper.map(getActivity(2), ActivityDTO.class),
+                this.mapper.map(getActivity(3), ActivityDTO.class)
         );
-        AnswerDto a = new AnswerDto();
+        AnswerDTO a = new AnswerDTO();
         a.setUserChoice(answerAct);
-        List<AnswerDto> userAnswers = new ArrayList<>();
+        List<AnswerDTO> userAnswers = new ArrayList<>();
         userAnswers.add(a);
 
         // second user is decreasing
         answerAct = List.of(
-                this.mapper.map(getActivity(3), ActivityDto.class),
-                this.mapper.map(getActivity(2), ActivityDto.class),
-                this.mapper.map(getActivity(1), ActivityDto.class),
-                this.mapper.map(getActivity(0), ActivityDto.class)
+                this.mapper.map(getActivity(3), ActivityDTO.class),
+                this.mapper.map(getActivity(2), ActivityDTO.class),
+                this.mapper.map(getActivity(1), ActivityDTO.class),
+                this.mapper.map(getActivity(0), ActivityDTO.class)
         );
-        a = new AnswerDto();
+        a = new AnswerDTO();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
         // third user has two inverted (2/3 of points)
         answerAct = List.of(
-                this.mapper.map(getActivity(0), ActivityDto.class),
-                this.mapper.map(getActivity(2), ActivityDto.class),
-                this.mapper.map(getActivity(1), ActivityDto.class),
-                this.mapper.map(getActivity(3), ActivityDto.class)
+                this.mapper.map(getActivity(0), ActivityDTO.class),
+                this.mapper.map(getActivity(2), ActivityDTO.class),
+                this.mapper.map(getActivity(1), ActivityDTO.class),
+                this.mapper.map(getActivity(3), ActivityDTO.class)
         );
-        a = new AnswerDto();
+        a = new AnswerDTO();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
@@ -86,36 +86,36 @@ class OrderQuestionTest {
     @Test
     void checkAnswerDecreasing() {
         // first user is increasing
-        List<ActivityDto> answerAct = List.of(
-                this.mapper.map(getActivity(0), ActivityDto.class),
-                this.mapper.map(getActivity(1), ActivityDto.class),
-                this.mapper.map(getActivity(2), ActivityDto.class),
-                this.mapper.map(getActivity(3), ActivityDto.class)
+        List<ActivityDTO> answerAct = List.of(
+                this.mapper.map(getActivity(0), ActivityDTO.class),
+                this.mapper.map(getActivity(1), ActivityDTO.class),
+                this.mapper.map(getActivity(2), ActivityDTO.class),
+                this.mapper.map(getActivity(3), ActivityDTO.class)
         );
-        AnswerDto a = new AnswerDto();
+        AnswerDTO a = new AnswerDTO();
         a.setUserChoice(answerAct);
-        List<AnswerDto> userAnswers = new ArrayList<>();
+        List<AnswerDTO> userAnswers = new ArrayList<>();
         userAnswers.add(a);
 
         // second user is decreasing
         answerAct = List.of(
-                this.mapper.map(getActivity(30), ActivityDto.class),
-                this.mapper.map(getActivity(2), ActivityDto.class),
-                this.mapper.map(getActivity(1), ActivityDto.class),
-                this.mapper.map(getActivity(0), ActivityDto.class)
+                this.mapper.map(getActivity(30), ActivityDTO.class),
+                this.mapper.map(getActivity(2), ActivityDTO.class),
+                this.mapper.map(getActivity(1), ActivityDTO.class),
+                this.mapper.map(getActivity(0), ActivityDTO.class)
         );
-        a = new AnswerDto();
+        a = new AnswerDTO();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
         // third user has two inverted (1/3 of points)
         answerAct = List.of(
-                this.mapper.map(getActivity(0), ActivityDto.class),
-                this.mapper.map(getActivity(2), ActivityDto.class),
-                this.mapper.map(getActivity(1), ActivityDto.class),
-                this.mapper.map(getActivity(3), ActivityDto.class)
+                this.mapper.map(getActivity(0), ActivityDTO.class),
+                this.mapper.map(getActivity(2), ActivityDTO.class),
+                this.mapper.map(getActivity(1), ActivityDTO.class),
+                this.mapper.map(getActivity(3), ActivityDTO.class)
         );
-        a = new AnswerDto();
+        a = new AnswerDTO();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
@@ -126,37 +126,37 @@ class OrderQuestionTest {
     @Test
     void checkAnswerMismatchingSize() {
         // first user has 4 activities
-        List<ActivityDto> answerAct = List.of(
-                this.mapper.map(getActivity(0), ActivityDto.class),
-                this.mapper.map(getActivity(1), ActivityDto.class),
-                this.mapper.map(getActivity(2), ActivityDto.class),
-                this.mapper.map(getActivity(3), ActivityDto.class)
+        List<ActivityDTO> answerAct = List.of(
+                this.mapper.map(getActivity(0), ActivityDTO.class),
+                this.mapper.map(getActivity(1), ActivityDTO.class),
+                this.mapper.map(getActivity(2), ActivityDTO.class),
+                this.mapper.map(getActivity(3), ActivityDTO.class)
         );
-        AnswerDto a = new AnswerDto();
+        AnswerDTO a = new AnswerDTO();
         a.setUserChoice(answerAct);
-        List<AnswerDto> userAnswers = new ArrayList<>();
+        List<AnswerDTO> userAnswers = new ArrayList<>();
         userAnswers.add(a);
 
         // second user has 5 activities
         answerAct = List.of(
-                this.mapper.map(getActivity(3), ActivityDto.class),
-                this.mapper.map(getActivity(2), ActivityDto.class),
-                this.mapper.map(getActivity(1), ActivityDto.class),
-                this.mapper.map(getActivity(0), ActivityDto.class),
-                this.mapper.map(getActivity(12), ActivityDto.class)
+                this.mapper.map(getActivity(3), ActivityDTO.class),
+                this.mapper.map(getActivity(2), ActivityDTO.class),
+                this.mapper.map(getActivity(1), ActivityDTO.class),
+                this.mapper.map(getActivity(0), ActivityDTO.class),
+                this.mapper.map(getActivity(12), ActivityDTO.class)
         );
-        a = new AnswerDto();
+        a = new AnswerDTO();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
         // third user has 4 activities
         answerAct = List.of(
-                this.mapper.map(getActivity(0), ActivityDto.class),
-                this.mapper.map(getActivity(2), ActivityDto.class),
-                this.mapper.map(getActivity(1), ActivityDto.class),
-                this.mapper.map(getActivity(3), ActivityDto.class)
+                this.mapper.map(getActivity(0), ActivityDTO.class),
+                this.mapper.map(getActivity(2), ActivityDTO.class),
+                this.mapper.map(getActivity(1), ActivityDTO.class),
+                this.mapper.map(getActivity(3), ActivityDTO.class)
         );
-        a = new AnswerDto();
+        a = new AnswerDTO();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 

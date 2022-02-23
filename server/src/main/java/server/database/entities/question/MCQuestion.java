@@ -1,6 +1,6 @@
 package server.database.entities.question;
 
-import commons.entities.AnswerDto;
+import commons.entities.AnswerDTO;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
@@ -54,12 +54,12 @@ public class MCQuestion extends Question {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     @Override
-    public List<Double> checkAnswer(List<AnswerDto> userAnswers) throws IllegalArgumentException {
+    public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
         if (userAnswers == null) {
             throw new IllegalArgumentException("NULL input");
         }
         List<Double> points = new ArrayList<>();
-        for (AnswerDto ans : userAnswers) {
+        for (AnswerDTO ans : userAnswers) {
             // There should be a single activity per answer
             if (ans.getUserChoice().size() != 1) {
                 throw new IllegalArgumentException("There should be a single activity per answer.");

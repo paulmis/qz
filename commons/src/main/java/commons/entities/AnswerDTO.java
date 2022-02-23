@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Generated
-public class AnswerDto {
+public class AnswerDTO {
 
     /**
      * The list of activities from the Question given as an answer.
      */
-    public List<ActivityDto> userChoice = new ArrayList<>();
+    public List<ActivityDTO> userChoice = new ArrayList<>();
 }

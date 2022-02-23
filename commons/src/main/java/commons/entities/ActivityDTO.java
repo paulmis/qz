@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Generated
-public class ActivityDto implements Serializable {
+public class ActivityDTO implements Serializable {
     /**
      * UUID of the activity.
      */

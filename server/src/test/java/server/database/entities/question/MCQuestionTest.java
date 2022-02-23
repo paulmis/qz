@@ -3,8 +3,8 @@ package server.database.entities.question;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import commons.entities.ActivityDto;
-import commons.entities.AnswerDto;
+import commons.entities.ActivityDTO;
+import commons.entities.AnswerDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,13 +46,13 @@ class MCQuestionTest {
 
     @Test
     void checkAnswerTest() {
-        List<AnswerDto> userAnswers = new ArrayList<>();
+        List<AnswerDTO> userAnswers = new ArrayList<>();
         for (int idx = 0; idx < 6; idx++) {
-            List<ActivityDto> answerActivities = new ArrayList<>();
+            List<ActivityDTO> answerActivities = new ArrayList<>();
             int choice = idx % 4;
-            ActivityDto a = this.mapper.map(getActivity(choice), ActivityDto.class);
+            ActivityDTO a = this.mapper.map(getActivity(choice), ActivityDTO.class);
             answerActivities.add(a);
-            AnswerDto ans = new AnswerDto();
+            AnswerDTO ans = new AnswerDTO();
             ans.setUserChoice(answerActivities);
             userAnswers.add(ans);
         }
@@ -62,17 +62,17 @@ class MCQuestionTest {
 
     @Test
     void checkAnswerMultipleAnswers() {
-        List<AnswerDto> userAnswers = new ArrayList<>();
+        List<AnswerDTO> userAnswers = new ArrayList<>();
         for (int idx = 0; idx < 6; idx++) {
-            List<ActivityDto> answerActivities = new ArrayList<>();
+            List<ActivityDTO> answerActivities = new ArrayList<>();
             int choice = idx % 4;
             Activity a = getActivity(choice);
-            answerActivities.add(this.mapper.map(a, ActivityDto.class));
+            answerActivities.add(this.mapper.map(a, ActivityDTO.class));
             if (idx == 2) {
                 a = getActivity(12);
-                answerActivities.add(this.mapper.map(a, ActivityDto.class));
+                answerActivities.add(this.mapper.map(a, ActivityDTO.class));
             }
-            AnswerDto ans = new AnswerDto();
+            AnswerDTO ans = new AnswerDTO();
             ans.setUserChoice(answerActivities);
             userAnswers.add(ans);
         }
