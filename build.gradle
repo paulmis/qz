@@ -58,5 +58,10 @@ subprojects {
 		annotationProcessor 'org.projectlombok:lombok:1.18.22'
 		testCompileOnly 'org.projectlombok:lombok:1.18.22'
 		testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+		/**
+		 * SpringBoot validator
+		 */
+		implementation 'org.springframework.boot:spring-boot-starter-validation:2.6.3'
 	}
 }
