@@ -16,18 +16,17 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Polygon?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="576" prefWidth="1024" stylesheets="@/client/stylesheets/GameScreen.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.GameScreenCtrl">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="576" prefWidth="1024" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.GameScreenCtrl">
    <children>
-      <BorderPane fx:id="mainBorderPane" minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #505ed1;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane fx:id="mainBorderPane" minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
           <top>
-              <BorderPane prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: white; -fx-border-color: white;">
+              <BorderPane fx:id="topBar" prefHeight="50.0" prefWidth="200.0">
                   <center>
                       <ScrollPane hbarPolicy="NEVER" pannable="true" prefHeight="49.0" prefWidth="200.0" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
                           <content>
-                              <HBox fx:id="avatarHBox" fillHeight="false" prefHeight="45.0" spacing="10.0" style="-fx-background-color: transparent;">
+                              <HBox fx:id="avatarHBox" fillHeight="false" prefHeight="45.0" spacing="10.0">
                            <padding>
                               <Insets bottom="2.5" left="2.5" right="2.5" top="2.5" />
                            </padding>
@@ -50,12 +49,12 @@
                           <children>
                         <JFXButton fx:id="quitButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" onAction="#quitButtonClick">
                            <graphic>
-                              <FontAwesomeIconView fill="RED" glyphName="CLOSE" size="24" text="" />
+                              <FontAwesomeIconView fx:id="quitIconView" glyphName="CLOSE" size="24" text="" />
                            </graphic>
                         </JFXButton>
                         <JFXButton fx:id="settingsButton" contentDisplay="GRAPHIC_ONLY" onAction="#settingButtonClick">
                            <graphic>
-                              <FontAwesomeIconView fill="GREY" glyphName="COG" size="24" text="" />
+                              <FontAwesomeIconView fx:id="settingsIconView" glyphName="COG" size="24" text="" />
                            </graphic>
                         </JFXButton>
                           </children>
@@ -78,7 +77,7 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <ScrollPane fx:id="emojiScrollPane" hbarPolicy="NEVER" maxWidth="400.0" pannable="true" prefHeight="50.0" prefWidth="200.0" style="-fx-background-radius: 10 10 0 0; -fx-view-order: -1;" vbarPolicy="NEVER" visible="false">
+                        <ScrollPane fx:id="emojiScrollPane" hbarPolicy="NEVER" maxWidth="400.0" pannable="true" prefHeight="50.0" prefWidth="200.0" vbarPolicy="NEVER" visible="false">
                            <content>
                               <HBox fx:id="emojiHBox" alignment="CENTER" maxHeight="40.0" prefHeight="40.0" spacing="10.0">
                                  <padding>
@@ -90,7 +89,7 @@
                               <Insets left="100.0" right="15.0" />
                            </GridPane.margin>
                         </ScrollPane>
-                        <ScrollPane fx:id="powerUpScrollPane" hbarPolicy="NEVER" maxWidth="400.0" pannable="true" prefHeight="50.0" prefWidth="400.0" style="-fx-background-radius: 10 10 0 0; -fx-view-order: -1;" vbarPolicy="NEVER" visible="false" GridPane.columnIndex="1">
+                        <ScrollPane fx:id="powerUpScrollPane" hbarPolicy="NEVER" maxWidth="400.0" pannable="true" prefHeight="50.0" prefWidth="400.0" vbarPolicy="NEVER" visible="false" GridPane.columnIndex="1">
                            <content>
                               <HBox fx:id="powerUpHBox" maxHeight="40.0" prefHeight="40.0" spacing="10.0">
                                  <padding>
@@ -104,9 +103,9 @@
                         </ScrollPane>
                      </children>
                   </GridPane>
-                  <BorderPane prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: #FFFFFF;">
+                  <BorderPane fx:id="bottomBar" prefHeight="50.0" prefWidth="200.0">
                      <left>
-                        <Label fx:id="questionNumberLabel" alignment="CENTER" prefHeight="35.0" prefWidth="75.0" style="-fx-text-fill: #5463db;" text="2 of 20" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                        <Label fx:id="questionNumberLabel" alignment="CENTER" prefHeight="35.0" prefWidth="75.0" text="2 of 20" textAlignment="CENTER" BorderPane.alignment="CENTER">
                            <BorderPane.margin>
                               <Insets left="10.0" right="10.0" />
                            </BorderPane.margin>
@@ -116,7 +115,7 @@
                         </Label>
                      </left>
                      <right>
-                        <Label alignment="CENTER" prefHeight="35.0" prefWidth="75.0" style="-fx-text-fill: #FFFFFF; -fx-background-color: #5463db;" text="1200" BorderPane.alignment="CENTER">
+                        <Label fx:id="pointsLabel" alignment="CENTER" prefHeight="35.0" prefWidth="75.0" text="1200" BorderPane.alignment="CENTER">
                            <BorderPane.margin>
                               <Insets left="10.0" right="10.0" />
                            </BorderPane.margin>
@@ -166,8 +165,7 @@
       </BorderPane>
       <AnchorPane fx:id="settingsPanel" prefHeight="100.0" prefWidth="200.0" visible="false" AnchorPane.topAnchor="50.0">
          <children>
-            <Polygon fill="WHITE" points="43.99998092651367, 10.000011444091797, 87.9999771118164, 10.000011444091797, 68.9999771118164, -8.666675567626953" stroke="WHITE" strokeType="INSIDE" AnchorPane.leftAnchor="45.0" AnchorPane.topAnchor="0.0" />
-            <GridPane maxWidth="200.0" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 10 10 10 10; -fx-view-order: -1; -fx-effect: dropshadow( three-pass-box , gray , 2, 10.0 , 0 , 0 );" stylesheets="@/client/stylesheets/Slider.css" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+            <GridPane fx:id="settingsPanelGrid" maxWidth="200.0" prefHeight="100.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
                <columnConstraints>
                   <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="75.0" />
                </columnConstraints>
@@ -176,7 +174,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <GridPane prefHeight="30.0" prefWidth="150.0" style="-fx-background-radius: 10 10 10 10;" stylesheets="@/client/stylesheets/Slider.css">
+                  <GridPane fx:id="settingsPanelSliderAreaGrid" prefHeight="30.0" prefWidth="150.0">
                      <columnConstraints>
                         <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="75.0" />
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="70.0" prefWidth="75.0" />
@@ -188,7 +186,7 @@
                         <JFXSlider fx:id="volumeSlider" GridPane.columnIndex="1" />
                         <JFXButton fx:id="volumeButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" maxWidth="30.0" minWidth="40.0" onAction="#volumeButtonClick" prefWidth="30.0">
                            <graphic>
-                              <FontAwesomeIconView fx:id="volumeIconView" fill="#505ed1" glyphName="VOLUME_UP" size="25" />
+                              <FontAwesomeIconView fx:id="volumeIconView" glyphName="VOLUME_UP" size="25" text="" />
                            </graphic>
                         </JFXButton>
                      </children>
@@ -196,7 +194,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
                   </GridPane>
-                  <GridPane prefHeight="30.0" prefWidth="150.0" style="-fx-background-radius: 10 10 10 10;" stylesheets="@/client/stylesheets/Slider.css" GridPane.rowIndex="1">
+                  <GridPane fx:id="settingsPanelCheckAreaGrid" prefHeight="30.0" prefWidth="150.0" GridPane.rowIndex="1">
                      <columnConstraints>
                         <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="75.0" />
                      </columnConstraints>
@@ -207,7 +205,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
                      <children>
-                        <JFXToggleButton fx:id="muteEveryoneToggleButton" text="Mute Everybody" textFill="#505ed1" toggleColor="#505ed1" toggleLineColor="#6471d7">
+                        <JFXToggleButton fx:id="muteEveryoneToggleButton" text="Mute Everybody">
                            <font>
                               <Font name="System Bold" size="13.0" />
                            </font>
