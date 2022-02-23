@@ -1,5 +1,6 @@
 package server.database.entities.question;
 
+import commons.entities.AnswerDto;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
@@ -41,12 +42,12 @@ public class OrderQuestion extends Question {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     @Override
-    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
+    public List<Double> checkAnswer(List<AnswerDto> userAnswers) throws IllegalArgumentException {
         if (userAnswers == null) {
             throw new IllegalArgumentException("NULL input");
         }
         List<Double> points = new ArrayList<>();
-        for (Answer ans : userAnswers) {
+        for (AnswerDto ans : userAnswers) {
             if (ans.getUserChoice().size() != activities.size()) {
                 throw new IllegalArgumentException(
                         "The number of activities in the answer must be the same as the question.");

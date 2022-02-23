@@ -63,5 +63,10 @@ subprojects {
 		 * SpringBoot validator
 		 */
 		implementation 'org.springframework.boot:spring-boot-starter-validation:2.6.3'
+
+		/**
+		 * ModelMapper
+		 */
+		implementation 'org.modelmapper:modelmapper:3.0.0'
 	}
 }

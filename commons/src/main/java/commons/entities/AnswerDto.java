@@ -1,8 +1,9 @@
-package server.database.entities.question;
+package commons.entities;
 
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 /**
@@ -10,10 +11,11 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class Answer {
+@Generated
+public class AnswerDto {
 
     /**
      * The list of activities from the Question given as an answer.
      */
-    public List<Activity> userChoice = new ArrayList<>();
+    public List<ActivityDto> userChoice = new ArrayList<>();
 }

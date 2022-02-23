@@ -3,13 +3,24 @@ package server.database.entities.question;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import commons.entities.ActivityDto;
+import commons.entities.AnswerDto;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 
 class MCQuestionTest {
+
+    private ModelMapper mapper;
+
+    @BeforeEach
+    void setup() {
+        this.mapper = new ModelMapper();
+    }
 
     static Question q;
 
@@ -35,13 +46,13 @@ class MCQuestionTest {
 
     @Test
     void checkAnswerTest() {
-        List<Answer> userAnswers = new ArrayList<>();
+        List<AnswerDto> userAnswers = new ArrayList<>();
         for (int idx = 0; idx < 6; idx++) {
-            List<Activity> answerActivities = new ArrayList<>();
+            List<ActivityDto> answerActivities = new ArrayList<>();
             int choice = idx % 4;
-            Activity a = getActivity(choice);
+            ActivityDto a = this.mapper.map(getActivity(choice), ActivityDto.class);
             answerActivities.add(a);
-            Answer ans = new Answer();
+            AnswerDto ans = new AnswerDto();
             ans.setUserChoice(answerActivities);
             userAnswers.add(ans);
         }
@@ -51,17 +62,17 @@ class MCQuestionTest {
 
     @Test
     void checkAnswerMultipleAnswers() {
-        List<Answer> userAnswers = new ArrayList<>();
+        List<AnswerDto> userAnswers = new ArrayList<>();
         for (int idx = 0; idx < 6; idx++) {
-            List<Activity> answerActivities = new ArrayList<>();
+            List<ActivityDto> answerActivities = new ArrayList<>();
             int choice = idx % 4;
             Activity a = getActivity(choice);
-            answerActivities.add(a);
+            answerActivities.add(this.mapper.map(a, ActivityDto.class));
             if (idx == 2) {
                 a = getActivity(12);
-                answerActivities.add(a);
+                answerActivities.add(this.mapper.map(a, ActivityDto.class));
             }
-            Answer ans = new Answer();
+            AnswerDto ans = new AnswerDto();
             ans.setUserChoice(answerActivities);
             userAnswers.add(ans);
         }

@@ -1,5 +1,6 @@
 package server.database.entities.question;
 
+import commons.entities.AnswerDto;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +27,7 @@ public class EstimateQuestion extends Question {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     @Override
-    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
+    public List<Double> checkAnswer(List<AnswerDto> userAnswers) throws IllegalArgumentException {
         if (userAnswers == null) {
             throw new IllegalArgumentException("NULL input");
         }
@@ -39,7 +40,7 @@ public class EstimateQuestion extends Question {
 
         // Get all estimation errors
         int target = activities.get(0).getCost();
-        for (Answer ans : userAnswers) {
+        for (AnswerDto ans : userAnswers) {
             if (ans.getUserChoice().size() != 1) {
                 throw new IllegalArgumentException("There should be a single activity per answer.");
             }

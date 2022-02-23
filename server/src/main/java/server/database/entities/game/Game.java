@@ -47,7 +47,7 @@ public abstract class Game {
     private String gameId;
 
     /**
-     * Timestmap of game creation.
+     * Timestamp of game creation.
      */
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

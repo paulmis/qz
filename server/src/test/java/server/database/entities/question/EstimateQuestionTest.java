@@ -3,13 +3,24 @@ package server.database.entities.question;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import commons.entities.ActivityDto;
+import commons.entities.AnswerDto;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 
 class EstimateQuestionTest {
+
+    private ModelMapper mapper;
+
+    @BeforeEach
+    void setup() {
+        this.mapper = new ModelMapper();
+    }
 
     private static Question q;
 
@@ -29,17 +40,17 @@ class EstimateQuestionTest {
         q.setActivities(components);
     }
 
-    private Answer getAnswer(int estimate) {
-        Answer ans = new Answer();
-        List<Activity> answerActivities = new ArrayList<>();
-        answerActivities.add(getActivity(estimate));
+    private AnswerDto getAnswer(int estimate) {
+        AnswerDto ans = new AnswerDto();
+        List<ActivityDto> answerActivities = new ArrayList<>();
+        answerActivities.add(this.mapper.map(getActivity(estimate), ActivityDto.class));
         ans.setUserChoice(answerActivities);
         return ans;
     }
 
     @Test
     void checkAnswerTest() {
-        List<Answer> userGuesses = new ArrayList<>(Arrays.asList(
+        List<AnswerDto> userGuesses = new ArrayList<>(Arrays.asList(
                 getAnswer(90), // #2
                 getAnswer(50), // #4
                 getAnswer(107), // #1
@@ -51,7 +62,7 @@ class EstimateQuestionTest {
 
     @Test
     void checkAnswerSameRankTest() {
-        List<Answer> userGuesses = new ArrayList<>(Arrays.asList(
+        List<AnswerDto> userGuesses = new ArrayList<>(Arrays.asList(
                 getAnswer(90), // #2
                 getAnswer(50), // #3
                 getAnswer(107), // #1
@@ -64,15 +75,19 @@ class EstimateQuestionTest {
 
     @Test
     void checkAnswerMismatchingSize() {
-        List<Answer> userGuesses = new ArrayList<>(Arrays.asList(
+        List<AnswerDto> userGuesses = new ArrayList<>(Arrays.asList(
                 getAnswer(90), // #2
                 getAnswer(50), // #3
                 getAnswer(107), // #1
                 getAnswer(0))); // #4
 
-        List<Activity> answerAct = new ArrayList<>(Arrays.asList(
-                getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        Answer a = new Answer();
+        List<ActivityDto> answerAct = List.of(
+                this.mapper.map(getActivity(0), ActivityDto.class),
+                this.mapper.map(getActivity(1), ActivityDto.class),
+                this.mapper.map(getActivity(2), ActivityDto.class),
+                this.mapper.map(getActivity(3), ActivityDto.class)
+        );
+        AnswerDto a = new AnswerDto();
         a.setUserChoice(answerAct);
         userGuesses.add(a);
 
