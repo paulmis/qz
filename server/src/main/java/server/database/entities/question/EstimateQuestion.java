@@ -38,7 +38,7 @@ public class EstimateQuestion extends Question {
         Set<Integer> sortedErrors = new TreeSet<>();
 
         // Get all estimation errors
-        int target = activities.get(0).getCost();
+        int target = getActivities().get(0).getCost();
         for (Answer ans : userAnswers) {
             if (ans.getUserChoice().size() != 1) {
                 throw new IllegalArgumentException("There should be a single activity per answer.");

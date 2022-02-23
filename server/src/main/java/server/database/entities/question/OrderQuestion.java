@@ -47,22 +47,22 @@ public class OrderQuestion extends Question {
         }
         List<Double> points = new ArrayList<>();
         for (Answer ans : userAnswers) {
-            if (ans.getUserChoice().size() != activities.size()) {
+            if (ans.getUserChoice().size() != getActivities().size()) {
                 throw new IllegalArgumentException(
                         "The number of activities in the answer must be the same as the question.");
             }
             // Check if the order of answers' costs is correct
             int currentVal = ans.getUserChoice().get(0).getCost();
             double currentPoints = 0;
-            double pointStep = 1.0 / (activities.size() - 1);
+            double pointStep = 1.0 / (getActivities().size() - 1);
             if (increasing) {
-                for (int idx = 1; idx < activities.size(); idx++) {
+                for (int idx = 1; idx < getActivities().size(); idx++) {
                     if (ans.getUserChoice().get(idx).getCost() >= ans.getUserChoice().get(idx - 1).getCost()) {
                         currentPoints += pointStep;
                     }
                 }
             } else {
-                for (int idx = 1; idx < activities.size(); idx++) {
+                for (int idx = 1; idx < getActivities().size(); idx++) {
                     if (ans.getUserChoice().get(idx).getCost() <= ans.getUserChoice().get(idx - 1).getCost()) {
                         currentPoints += pointStep;
                     }

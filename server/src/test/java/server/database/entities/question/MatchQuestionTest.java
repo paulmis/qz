@@ -1,11 +1,15 @@
 package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -93,5 +97,23 @@ class MatchQuestionTest {
         assertThrows(IllegalArgumentException.class, () -> {
             q.checkAnswer(null);
         });
+    }
+
+    @Test
+    void allArgsConstructorTest() {
+        // Show all available constructors
+        Class ctClass = MatchQuestion.class;
+
+        Constructor[] constructors = ctClass.getConstructors();
+        for (int i = 0; i < constructors.length; i++) {
+            System.out.println("constructor: " + constructors[i]);
+        }
+
+        // Actual test
+        String questionText = "aQuestion";
+        Question match = new MatchQuestion(UUID.randomUUID(), new ArrayList<>(), questionText);
+        assertNotNull(match);
+        assertEquals(questionText, match.getText());
+        assertTrue(match.getActivities().isEmpty());
     }
 }
