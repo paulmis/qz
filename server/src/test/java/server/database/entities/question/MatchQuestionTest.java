@@ -1,10 +1,12 @@
 package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
+import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +35,12 @@ class MatchQuestionTest {
         }
         q = new MatchQuestion();
         q.setActivities(components);
+    }
+
+    @Test
+    void constructorTest() {
+        MatchQuestion q = new MatchQuestion(new QuestionDTO());
+        assertNotNull(q);
     }
 
     @Test

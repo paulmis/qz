@@ -15,6 +15,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.ToString;
+import org.modelmapper.ModelMapper;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.utils.BaseEntity;
 
@@ -30,6 +31,16 @@ import server.database.entities.utils.BaseEntity;
 @Entity
 public class User extends BaseEntity<UserDTO> {
     /**
+     * Construct a new entity from a DTO.
+     *
+     * @param dto DTO to map to entity.
+     */
+    public User(UserDTO dto) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.map(dto, this);
+    }
+
+    /**
      * email - string used for authentication purposes representing the email of the user.
      */
     @Column(nullable = false, unique = true)
@@ -39,7 +50,8 @@ public class User extends BaseEntity<UserDTO> {
      * password - string representing user's salted password.
      */
     @ToString.Exclude
-    @NonNull private String password;
+    @Column(nullable = false)
+    private String password;
 
     /**
      * score - integer representing a player's total score.

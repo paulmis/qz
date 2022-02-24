@@ -1,10 +1,12 @@
 package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
+import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +44,12 @@ class MCQuestionTest {
         q = new MCQuestion();
         q.setActivities(components);
         ((MCQuestion) q).setAnswer(components.get(1));
+    }
+
+    @Test
+    void constructorTest() {
+        MCQuestion q = new MCQuestion(new QuestionDTO());
+        assertNotNull(q);
     }
 
     @Test

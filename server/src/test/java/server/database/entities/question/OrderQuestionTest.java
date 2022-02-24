@@ -1,10 +1,12 @@
 package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
+import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +44,12 @@ class OrderQuestionTest {
         q = new OrderQuestion();
         q.setActivities(components);
         ((OrderQuestion) q).setIncreasing(true);
+    }
+
+    @Test
+    void constructorTest() {
+        OrderQuestion q = new OrderQuestion(new QuestionDTO());
+        assertNotNull(q);
     }
 
     @Test

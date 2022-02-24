@@ -1,10 +1,12 @@
 package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
+import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +48,12 @@ class EstimateQuestionTest {
         answerActivities.add(this.mapper.map(getActivity(estimate), ActivityDTO.class));
         ans.setUserChoice(answerActivities);
         return ans;
+    }
+
+    @Test
+    void constructorTest() {
+        EstimateQuestion q = new EstimateQuestion(new QuestionDTO());
+        assertNotNull(q);
     }
 
     @Test
