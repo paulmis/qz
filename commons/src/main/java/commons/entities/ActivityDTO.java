@@ -3,7 +3,6 @@ package commons.entities;
 import commons.entities.utils.DTO;
 import java.util.UUID;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
 

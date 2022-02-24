@@ -1,5 +1,6 @@
 package server.database.entities.question;
 
+import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -28,6 +30,7 @@ https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
 /**
  * Question data structure - describes a question of the quiz.
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @Entity

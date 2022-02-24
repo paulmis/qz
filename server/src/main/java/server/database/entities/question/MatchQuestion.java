@@ -1,12 +1,14 @@
 package server.database.entities.question;
 
 import commons.entities.AnswerDTO;
+import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.modelmapper.ModelMapper;
 
 /**
  * MatchQuestion data structure - describes a match question.
@@ -16,6 +18,16 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 public class MatchQuestion extends Question {
+
+    /**
+     * Construct a new entity from a DTO.
+     *
+     * @param dto DTO to map to entity.
+     */
+    public MatchQuestion(QuestionDTO dto) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.map(dto, this);
+    }
 
     /**
      * checkAnswer, checks if the answer of a match question is correct.

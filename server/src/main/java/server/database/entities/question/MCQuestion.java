@@ -1,6 +1,7 @@
 package server.database.entities.question;
 
 import commons.entities.AnswerDTO;
+import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.persistence.ManyToOne;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.modelmapper.ModelMapper;
 
 /**
  * MCQuestion data structure - describes a multiple choice question.
@@ -18,6 +20,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 public class MCQuestion extends Question {
+
+    /**
+     * Construct a new entity from a DTO.
+     *
+     * @param dto DTO to map to entity.
+     */
+    public MCQuestion(QuestionDTO dto) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.map(dto, this);
+    }
 
     /**
      * Activity corresponding to the correct answer.

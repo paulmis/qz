@@ -1,5 +1,7 @@
 package server.database.entities.game;
 
+import commons.entities.QuestionDTO;
+import commons.entities.game.GamePlayerDTO;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,7 +14,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.modelmapper.ModelMapper;
 import server.database.entities.User;
+import server.database.entities.utils.BaseEntity;
 
 /**
  * Player entity, which represents an instance of a player in a specific game.
@@ -25,7 +29,21 @@ import server.database.entities.User;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @ToString
-public class GamePlayer {
+public class GamePlayer extends BaseEntity<GamePlayerDTO> {
+
+    /**
+     * Construct a new entity from a DTO.
+     *
+     * @param dto DTO to map to entity.
+     */
+    public GamePlayer(GamePlayerDTO dto) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.map(dto, this);
+    }
+
+    /**
+     * The unique identifier of the player.
+     */
     @Id
     private UUID id;
 
