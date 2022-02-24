@@ -17,13 +17,6 @@ import org.modelmapper.ModelMapper;
 
 class EstimateQuestionTest {
 
-    private ModelMapper mapper;
-
-    @BeforeEach
-    void setup() {
-        this.mapper = new ModelMapper();
-    }
-
     private static Question q;
 
     private static Activity getActivity(int cost) {
@@ -45,7 +38,7 @@ class EstimateQuestionTest {
     private AnswerDTO getAnswer(int estimate) {
         AnswerDTO ans = new AnswerDTO();
         List<ActivityDTO> answerActivities = new ArrayList<>();
-        answerActivities.add(this.mapper.map(getActivity(estimate), ActivityDTO.class));
+        answerActivities.add(getActivity(estimate).getDTO());
         ans.setUserChoice(answerActivities);
         return ans;
     }
@@ -90,10 +83,10 @@ class EstimateQuestionTest {
                 getAnswer(0))); // #4
 
         List<ActivityDTO> answerAct = List.of(
-                this.mapper.map(getActivity(0), ActivityDTO.class),
-                this.mapper.map(getActivity(1), ActivityDTO.class),
-                this.mapper.map(getActivity(2), ActivityDTO.class),
-                this.mapper.map(getActivity(3), ActivityDTO.class)
+                getActivity(0).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(3).getDTO()
         );
         AnswerDTO a = new AnswerDTO();
         a.setUserChoice(answerAct);

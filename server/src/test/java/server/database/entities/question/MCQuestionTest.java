@@ -11,18 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 
 class MCQuestionTest {
-
-    private ModelMapper mapper;
-
-    @BeforeEach
-    void setup() {
-        this.mapper = new ModelMapper();
-    }
 
     static Question q;
 
@@ -58,7 +49,7 @@ class MCQuestionTest {
         for (int idx = 0; idx < 6; idx++) {
             List<ActivityDTO> answerActivities = new ArrayList<>();
             int choice = idx % 4;
-            ActivityDTO a = this.mapper.map(getActivity(choice), ActivityDTO.class);
+            ActivityDTO a = getActivity(choice).getDTO();
             answerActivities.add(a);
             AnswerDTO ans = new AnswerDTO();
             ans.setUserChoice(answerActivities);
@@ -75,10 +66,10 @@ class MCQuestionTest {
             List<ActivityDTO> answerActivities = new ArrayList<>();
             int choice = idx % 4;
             Activity a = getActivity(choice);
-            answerActivities.add(this.mapper.map(a, ActivityDTO.class));
+            answerActivities.add(a.getDTO());
             if (idx == 2) {
                 a = getActivity(12);
-                answerActivities.add(this.mapper.map(a, ActivityDTO.class));
+                answerActivities.add(a.getDTO());
             }
             AnswerDTO ans = new AnswerDTO();
             ans.setUserChoice(answerActivities);
