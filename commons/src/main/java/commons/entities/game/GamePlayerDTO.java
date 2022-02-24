@@ -3,29 +3,33 @@ package commons.entities.game;
 import commons.entities.utils.DTO;
 import java.util.UUID;
 import lombok.Data;
+import lombok.Generated;
+import lombok.NoArgsConstructor;
 
 /**
  * DTO for game player.
  */
 @Data
+@NoArgsConstructor
+@Generated
 public class GamePlayerDTO implements DTO {
     /**
      * UUID of game player.
      */
-    private final UUID id;
+    protected UUID id;
 
     /**
      * Current score of the player.
      */
-    private final Integer score;
+    protected Integer score;
 
     /**
      * Streak of the player.
      */
-    private final Integer streak;
+    protected Integer streak;
 
     /**
      * Nickname of the player.
      */
-    private final String nickname;
+    protected String nickname;
 }
