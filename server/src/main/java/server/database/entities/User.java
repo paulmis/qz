@@ -1,5 +1,6 @@
 package server.database.entities;
 
+import commons.entities.UserDTO;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,6 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.ToString;
 import server.database.entities.game.GamePlayer;
+import server.database.entities.utils.BaseEntity;
 
 
 /**
@@ -28,14 +30,7 @@ import server.database.entities.game.GamePlayer;
 @AllArgsConstructor (access = AccessLevel.PUBLIC)
 @Data
 @Entity
-public class User {
-    /**
-     * id - random unique uuid assigned to a certain player.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
+public class User extends BaseEntity<UserDTO> {
     /**
      * email - string used for authentication purposes representing the email of the user.
      */

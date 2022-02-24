@@ -1,6 +1,7 @@
 package server.database.entities.question;
 
 import commons.entities.AnswerDTO;
+import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +18,7 @@ import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import server.database.entities.utils.BaseEntity;
 
 /*
 I followed this guide to handle inheritance:
@@ -31,7 +33,7 @@ https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Generated
-public abstract class Question {
+public abstract class Question extends BaseEntity<QuestionDTO> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

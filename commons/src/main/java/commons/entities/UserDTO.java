@@ -1,5 +1,6 @@
 package commons.entities;
 
+import commons.entities.utils.DTO;
 import java.util.UUID;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Generated
-public class UserDTO {
+public class UserDTO implements DTO {
 
     /**
      * The user's ID.

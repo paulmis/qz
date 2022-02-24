@@ -14,14 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
 class MatchQuestionTest {
-
-    private ModelMapper mapper;
-
-    @BeforeEach
-    void setup() {
-        this.mapper = new ModelMapper();
-    }
-
     static Question q;
 
     private static Activity getActivity(int id) {
@@ -47,10 +39,10 @@ class MatchQuestionTest {
     void checkAnswerTest() {
         // first user has all correct
         List<ActivityDTO> answerAct = List.of(
-                this.mapper.map(getActivity(0), ActivityDTO.class),
-                this.mapper.map(getActivity(1), ActivityDTO.class),
-                this.mapper.map(getActivity(2), ActivityDTO.class),
-                this.mapper.map(getActivity(3), ActivityDTO.class)
+                getActivity(0).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(3).getDTO()
         );
         AnswerDTO a = new AnswerDTO();
         a.setUserChoice(answerAct);
@@ -59,10 +51,10 @@ class MatchQuestionTest {
 
         // second user has all wrong
         answerAct = List.of(
-                this.mapper.map(getActivity(3), ActivityDTO.class),
-                this.mapper.map(getActivity(2), ActivityDTO.class),
-                this.mapper.map(getActivity(1), ActivityDTO.class),
-                this.mapper.map(getActivity(0), ActivityDTO.class)
+                getActivity(3).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(0).getDTO()
         );
         a = new AnswerDTO();
         a.setUserChoice(answerAct);
@@ -70,10 +62,10 @@ class MatchQuestionTest {
 
         // third user has two switched (2/4 of points)
         answerAct = List.of(
-                this.mapper.map(getActivity(0), ActivityDTO.class),
-                this.mapper.map(getActivity(2), ActivityDTO.class),
-                this.mapper.map(getActivity(1), ActivityDTO.class),
-                this.mapper.map(getActivity(3), ActivityDTO.class)
+                getActivity(0).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(3).getDTO()
         );
         a = new AnswerDTO();
         a.setUserChoice(answerAct);
@@ -86,10 +78,10 @@ class MatchQuestionTest {
     void checkAnswerMismatchingSize() {
         // first user has 4 activities
         List<ActivityDTO> answerAct = List.of(
-                this.mapper.map(getActivity(0), ActivityDTO.class),
-                this.mapper.map(getActivity(1), ActivityDTO.class),
-                this.mapper.map(getActivity(2), ActivityDTO.class),
-                this.mapper.map(getActivity(3), ActivityDTO.class)
+                getActivity(0).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(3).getDTO()
         );
         AnswerDTO a = new AnswerDTO();
         a.setUserChoice(answerAct);
@@ -98,11 +90,11 @@ class MatchQuestionTest {
 
         // second user has 5 activities
         answerAct = List.of(
-                this.mapper.map(getActivity(3), ActivityDTO.class),
-                this.mapper.map(getActivity(2), ActivityDTO.class),
-                this.mapper.map(getActivity(1), ActivityDTO.class),
-                this.mapper.map(getActivity(0), ActivityDTO.class),
-                this.mapper.map(getActivity(12), ActivityDTO.class)
+                getActivity(3).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(0).getDTO(),
+                getActivity(12).getDTO()
         );
         a = new AnswerDTO();
         a.setUserChoice(answerAct);
@@ -110,10 +102,10 @@ class MatchQuestionTest {
 
         // third user has 4 activities
         answerAct = List.of(
-                this.mapper.map(getActivity(0), ActivityDTO.class),
-                this.mapper.map(getActivity(2), ActivityDTO.class),
-                this.mapper.map(getActivity(1), ActivityDTO.class),
-                this.mapper.map(getActivity(3), ActivityDTO.class)
+                getActivity(0).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(3).getDTO()
         );
         a = new AnswerDTO();
         a.setUserChoice(answerAct);

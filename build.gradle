@@ -68,5 +68,10 @@ subprojects {
 		 * ModelMapper
 		 */
 		implementation 'org.modelmapper:modelmapper:3.0.0'
+
+		/**
+		 * Guava
+		 */
+		implementation 'com.google.guava:guava:31.0.1-jre'
 	}
 }

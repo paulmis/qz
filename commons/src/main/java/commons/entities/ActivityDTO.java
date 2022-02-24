@@ -1,7 +1,9 @@
 package commons.entities;
 
+import commons.entities.utils.DTO;
 import java.util.UUID;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
 
@@ -11,9 +13,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Generated
-public class ActivityDTO {
+public class ActivityDTO implements DTO {
     /**
-     * UUID of the activity.
+     * The ID of the activity.
      */
     protected UUID id;
 
