@@ -25,6 +25,19 @@ public abstract class BaseEntity<D extends DTO> {
     protected UUID id;
 
     /**
+     * Convert the DTO to an entity.
+     *
+     * @param dto The DTO to convert to an entity.
+     * @param <T> The type of the entity.
+     * @return The entity.
+     */
+    public static <T extends BaseEntity> T getEntity(DTO dto) {
+        TypeToken<T> typeToken = new TypeToken<T>(dto.getClass()) {};
+        Type type = typeToken.getType();
+        return new ModelMapper().map(dto, type);
+    }
+
+    /**
      * Convert the entity to a DTO.
      *
      * @return DTO for the specific entity.
