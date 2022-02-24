@@ -38,10 +38,6 @@ https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
 @Generated
 public abstract class Question extends BaseEntity<QuestionDTO> {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
     /**
      * List of activities used to generate the question.
      */

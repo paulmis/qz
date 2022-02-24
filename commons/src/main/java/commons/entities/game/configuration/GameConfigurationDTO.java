@@ -3,6 +3,7 @@ package commons.entities.game.configuration;
 import commons.entities.utils.DTO;
 import java.io.Serializable;
 import java.util.UUID;
+import javax.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
+@MappedSuperclass
 @Generated
 public abstract class GameConfigurationDTO implements DTO {
     /**

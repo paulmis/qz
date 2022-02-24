@@ -42,12 +42,6 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     }
 
     /**
-     * The unique identifier of the player.
-     */
-    @Id
-    private UUID id;
-
-    /**
      * Player's score.
      */
     private Integer score = 0;
