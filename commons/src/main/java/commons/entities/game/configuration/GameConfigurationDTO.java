@@ -8,14 +8,19 @@ import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 /**
- * Data transfer object for the standard-mode game configuration.
+ * DTO for game configuration.
  */
 @Data
 @NoArgsConstructor
 @Generated
-public class StandardGameConfigurationDTO extends GameConfigurationDTO implements DTO {
+public abstract class GameConfigurationDTO implements DTO {
     /**
-     * Number of questions in the game.
+     * The id of the game configuration.
      */
-    protected Integer numQuestions;
+    protected UUID id;
+
+    /**
+     * Time to answer in seconds.
+     */
+    protected Integer answerTime;
 }

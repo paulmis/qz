@@ -1,4 +1,4 @@
-package server.database.entities.game;
+package commons.entities.game;
 
 /**
  * Enum stores the status of a Game object.

@@ -1,5 +1,6 @@
 package commons.entities.game.configuration;
 
+import commons.entities.utils.DTO;
 import java.io.Serializable;
 import java.util.UUID;
 import lombok.Data;
@@ -12,19 +13,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Generated
-public class SurvivalGameConfigurationDTO implements Serializable {
-    /**
-     * UUID of the current game configuration.
-     */
-    private UUID id;
-
-    /**
-     * Time to answer in seconds.
-     */
-    private Integer answerTime;
-
+public class SurvivalGameConfigurationDTO extends GameConfigurationDTO implements DTO {
     /**
      * Speed modifier for the game.
      */
-    private Float speedModifier;
+    protected Float speedModifier;
 }

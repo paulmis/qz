@@ -14,10 +14,10 @@ import lombok.NonNull;
  * In this mode, the player has to survive as long as possible, while the
  * time available to answer questions decreases with each round.
  */
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @MappedSuperclass
 public class SurvivalGameConfiguration extends GameConfiguration {
