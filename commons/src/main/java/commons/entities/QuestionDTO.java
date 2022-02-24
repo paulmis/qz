@@ -17,15 +17,15 @@ public class QuestionDTO implements Serializable {
     /**
      * UUID of the question.
      */
-    private UUID id;
+    protected UUID id;
 
     /**
      * List of activities related to the question.
      */
-    private List<ActivityDTO> activities;
+    protected List<ActivityDTO> activities;
 
     /**
      * Question text.
      */
-    private String text;
+    protected String text;
 }

@@ -16,20 +16,20 @@ public class ActivityDTO implements Serializable {
     /**
      * UUID of the activity.
      */
-    private UUID id;
+    protected UUID id;
 
     /**
      * Name of the activity.
      */
-    private String description;
+    protected String description;
 
     /**
      * Energy consumption of the activity.
      */
-    private int cost;
+    protected int cost;
 
     /**
      * URL of the picture of the activity.
      */
-    private String icon;
+    protected String icon;
 }

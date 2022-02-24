@@ -17,5 +17,5 @@ public class AnswerDTO {
     /**
      * The list of activities from the Question given as an answer.
      */
-    public List<ActivityDTO> userChoice = new ArrayList<>();
+    protected List<ActivityDTO> userChoice = new ArrayList<>();
 }

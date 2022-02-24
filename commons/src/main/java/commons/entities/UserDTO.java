@@ -19,27 +19,27 @@ public class UserDTO implements Serializable {
     /**
      * The user's ID.
      */
-    private UUID id;
+    protected UUID id;
 
     /**
      * User's email address.
      */
     @Email
-    private String email;
+    protected String email;
 
     /**
      * User's password.
      */
     @Size(min = 8)
-    private String password;
+    protected String password;
 
     /**
      * User's global score.
      */
-    private int score;
+    protected int score;
 
     /**
      * Number of games played by the user.
      */
-    private int gamesPlayed;
+    protected int gamesPlayed;
 }
