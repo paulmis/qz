@@ -97,11 +97,11 @@ class EstimateQuestionTest {
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
         UUID anId = UUID.randomUUID();
-        Question estimateAllArgs = new EstimateQuestion(anId, activities, questionText);
         Question estimateNoArgs = new EstimateQuestion();
         estimateNoArgs.setId(anId);
         estimateNoArgs.setActivities(List.copyOf(activities));
         estimateNoArgs.setText(questionText);
+        Question estimateAllArgs = new EstimateQuestion(anId, activities, questionText);
 
         // Constructor comparison
         assertNotNull(estimateAllArgs);

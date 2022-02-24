@@ -125,17 +125,17 @@ class OrderQuestionTest {
     @Test
     void allArgsConstructorTest() {
         // Test setup
-        String questionText = "aQuestion";
+        Question orderNoArgs = new OrderQuestion();
+        UUID anId = UUID.randomUUID();
+        orderNoArgs.setId(anId);
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        UUID anId = UUID.randomUUID();
-        boolean order = true;
-        Question orderAllArgs = new OrderQuestion(anId, activities, questionText, order);
-        Question orderNoArgs = new OrderQuestion();
-        orderNoArgs.setId(anId);
         orderNoArgs.setActivities(List.copyOf(activities));
+        String questionText = "aQuestion";
         orderNoArgs.setText(questionText);
+        boolean order = true;
         ((OrderQuestion) orderNoArgs).setIncreasing(order);
+        Question orderAllArgs = new OrderQuestion(anId, activities, questionText, order);
 
         // Constructor comparison
         assertNotNull(orderAllArgs);

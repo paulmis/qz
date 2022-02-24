@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,7 +38,7 @@ class MatchQuestionTest {
     @Test
     void checkAnswerTest() {
         // first user has all correct
-        List<Activity> answerAct = new ArrayList<>(List.of(
+        List<Activity> answerAct = new ArrayList<>(Arrays.asList(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
         Answer a = new Answer();
         a.setUserChoice(answerAct);
@@ -44,26 +46,26 @@ class MatchQuestionTest {
         userAnswers.add(a);
 
         // second user has all wrong
-        answerAct = new ArrayList<>(List.of(
+        answerAct = new ArrayList<>(Arrays.asList(
                 getActivity(3), getActivity(2), getActivity(1), getActivity(0)));
         a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
         // third user has two switched (2/4 of points)
-        answerAct = new ArrayList<>(List.of(
+        answerAct = new ArrayList<>(Arrays.asList(
                 getActivity(0), getActivity(2), getActivity(1), getActivity(3)));
         a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
-        assertEquals(new ArrayList<>(List.of(1.0, 0.0, 2.0 / 4)), q.checkAnswer(userAnswers));
+        assertEquals(new ArrayList<>(Arrays.asList(1.0, 0.0, 2.0 / 4)), q.checkAnswer(userAnswers));
     }
 
     @Test
     void checkAnswerMismatchingSize() {
         // first user has 4 activities
-        List<Activity> answerAct = new ArrayList<>(List.of(
+        List<Activity> answerAct = new ArrayList<>(Arrays.asList(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
         Answer a = new Answer();
         a.setUserChoice(answerAct);
@@ -71,14 +73,14 @@ class MatchQuestionTest {
         userAnswers.add(a);
 
         // second user has 5 activities
-        answerAct = new ArrayList<>(List.of(
+        answerAct = new ArrayList<>(Arrays.asList(
                 getActivity(3), getActivity(2), getActivity(1), getActivity(0), getActivity(12)));
         a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
         // third user has 4 activities
-        answerAct = new ArrayList<>(List.of(
+        answerAct = new ArrayList<>(Arrays.asList(
                 getActivity(0), getActivity(2), getActivity(1), getActivity(3)));
         a = new Answer();
         a.setUserChoice(answerAct);
@@ -103,33 +105,16 @@ class MatchQuestionTest {
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
         UUID anId = UUID.randomUUID();
-        Question matchAllArgs = new MatchQuestion(anId, activities, questionText);
         Question matchNoArgs = new MatchQuestion();
         matchNoArgs.setId(anId);
         matchNoArgs.setActivities(List.copyOf(activities));
         matchNoArgs.setText(questionText);
+        Question matchAllArgs = new MatchQuestion(anId, activities, questionText);
 
         // Constructor comparison
         assertNotNull(matchAllArgs);
         assertEquals(matchNoArgs.getId(), matchAllArgs.getId());
         assertEquals(matchNoArgs.getActivities(), matchAllArgs.getActivities());
         assertEquals(matchNoArgs.getText(), matchAllArgs.getText());
-    }
-
-    @Test
-    void copyConstructorTest() {
-        // Test setup
-        String questionText = "aQuestion";
-        List<Activity> activities = new ArrayList<>(List.of(
-                getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        UUID anId = UUID.randomUUID();
-        Question matchAllArgs = new MatchQuestion(anId, activities, questionText);
-        Question matchCopy = new MatchQuestion(matchAllArgs);
-
-        // Constructor comparison
-        assertNotNull(matchCopy);
-        assertEquals(matchAllArgs.getId(), matchCopy.getId());
-        assertEquals(matchAllArgs.getActivities(), matchCopy.getActivities());
-        assertEquals(matchAllArgs.getText(), matchCopy.getText());
     }
 }

@@ -83,19 +83,19 @@ class MCQuestionTest {
     @Test
     void allArgsConstructorTest() {
         // Test setup
-        String questionText = "aQuestion";
+        Question mcNoArgs = new MCQuestion();
+        UUID anId = UUID.randomUUID();
+        mcNoArgs.setId(anId);
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        UUID anId = UUID.randomUUID();
-        Activity answer = getActivity(2);
-        boolean guessConsumption = true;
-        Question mcAllArgs = new MCQuestion(anId, activities, questionText, answer, guessConsumption);
-        Question mcNoArgs = new MCQuestion();
-        mcNoArgs.setId(anId);
         mcNoArgs.setActivities(List.copyOf(activities));
+        String questionText = "aQuestion";
         mcNoArgs.setText(questionText);
+        Activity answer = getActivity(2);
         ((MCQuestion) mcNoArgs).setAnswer(answer);
+        boolean guessConsumption = true;
         ((MCQuestion) mcNoArgs).setGuessConsumption(guessConsumption);
+        Question mcAllArgs = new MCQuestion(anId, activities, questionText, answer, guessConsumption);
 
         // Constructor comparison
         assertNotNull(mcAllArgs);
