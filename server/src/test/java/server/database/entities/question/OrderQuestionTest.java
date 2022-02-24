@@ -168,7 +168,7 @@ class OrderQuestionTest {
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
-        assertThrows(IllegalArgumentException.class, () -> q.checkAnswer(null));
+        assertThrows(IllegalArgumentException.class, () -> q.checkAnswer(userAnswers));
     }
 
     @Test

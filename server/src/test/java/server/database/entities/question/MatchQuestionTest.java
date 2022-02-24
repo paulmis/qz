@@ -120,7 +120,7 @@ class MatchQuestionTest {
         userAnswers.add(a);
 
         assertThrows(IllegalArgumentException.class, () -> {
-            q.checkAnswer(null);
+            q.checkAnswer(userAnswers);
         });
     }
 
