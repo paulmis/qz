@@ -17,12 +17,24 @@ import lombok.NoArgsConstructor;
 @Entity
 public class MatchQuestion extends Question {
 
-    public MatchQuestion(Question mq) {
-        super(mq);
-    }
-
+    /**
+     * Constructor for the MatchQuestion class.
+     *
+     * @param id         the UUID of the question.
+     * @param activities the list of activities that compose the question.
+     * @param text       the description of the question.
+     */
     public MatchQuestion(UUID id, List<Activity> activities, String text) {
         super(id, activities, text);
+    }
+
+    /**
+     * Copy constructor for the MatchQuestion class.
+     *
+     * @param mq an instance of Question to copy.
+     */
+    public MatchQuestion(Question mq) {
+        super(mq);
     }
 
     /**

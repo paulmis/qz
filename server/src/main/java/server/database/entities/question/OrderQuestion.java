@@ -2,6 +2,7 @@ package server.database.entities.question;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,10 +20,23 @@ public class OrderQuestion extends Question {
     /**
      * A boolean indicating whether the answer should be in increasing order.
      */
-    public boolean increasing = true;
+    protected boolean increasing = true;
 
     /**
-     * Copy constructor for the MC_Question class.
+     * Constructor for the OrderQuestion class.
+     *
+     * @param id         the UUID of the question.
+     * @param activities the list of activities that compose the question.
+     * @param text       the description of the question.
+     * @param increasing if the user has to provide the answer in increasing order or not.
+     */
+    public OrderQuestion(UUID id, List<Activity> activities, String text, boolean increasing) {
+        super(id, activities, text);
+        this.increasing = increasing;
+    }
+
+    /**
+     * Copy constructor for the OrderQuestion class.
      *
      * @param q          an instance of Question to copy.
      * @param increasing if the user has to provide the answer in increasing order or not.

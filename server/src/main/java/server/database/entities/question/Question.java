@@ -37,7 +37,7 @@ public abstract class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    protected UUID id;
 
     /**
      * List of activities used to generate the question.
@@ -48,12 +48,12 @@ public abstract class Question {
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "activity_id"))
     @ToString.Exclude
-    private List<Activity> activities = new ArrayList<>();
+    protected List<Activity> activities = new ArrayList<>();
 
     /**
      * Question asked the user.
      */
-    private String text;
+    protected String text;
 
     /**
      * Copy constructor for the Question class.

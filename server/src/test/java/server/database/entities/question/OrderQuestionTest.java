@@ -1,11 +1,13 @@
 package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -118,5 +120,47 @@ class OrderQuestionTest {
     @Test
     void checkAnswerNullInput() {
         assertThrows(IllegalArgumentException.class, () -> q.checkAnswer(null));
+    }
+
+    @Test
+    void allArgsConstructorTest() {
+        // Test setup
+        String questionText = "aQuestion";
+        List<Activity> activities = new ArrayList<>(List.of(
+                getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
+        UUID anId = UUID.randomUUID();
+        boolean order = true;
+        Question orderAllArgs = new OrderQuestion(anId, activities, questionText, order);
+        Question orderNoArgs = new OrderQuestion();
+        orderNoArgs.setId(anId);
+        orderNoArgs.setActivities(List.copyOf(activities));
+        orderNoArgs.setText(questionText);
+        ((OrderQuestion) orderNoArgs).setIncreasing(order);
+
+        // Constructor comparison
+        assertNotNull(orderAllArgs);
+        assertEquals(orderNoArgs.getId(), orderAllArgs.getId());
+        assertEquals(orderNoArgs.getActivities(), orderAllArgs.getActivities());
+        assertEquals(orderNoArgs.getText(), orderAllArgs.getText());
+        assertEquals(((OrderQuestion) orderNoArgs).isIncreasing(), ((OrderQuestion) orderAllArgs).isIncreasing());
+    }
+
+    @Test
+    void copyConstructorTest() {
+        // Test setup
+        String questionText = "aQuestion";
+        List<Activity> activities = new ArrayList<>(List.of(
+                getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
+        UUID anId = UUID.randomUUID();
+        boolean order = true;
+        Question orderAllArgs = new OrderQuestion(anId, activities, questionText, order);
+        Question orderCopy = new OrderQuestion(orderAllArgs, order);
+
+        // Constructor comparison
+        assertNotNull(orderCopy);
+        assertEquals(orderAllArgs.getId(), orderCopy.getId());
+        assertEquals(orderAllArgs.getActivities(), orderCopy.getActivities());
+        assertEquals(orderAllArgs.getText(), orderCopy.getText());
+        assertEquals(((OrderQuestion) orderAllArgs).isIncreasing(), ((OrderQuestion) orderCopy).isIncreasing());
     }
 }

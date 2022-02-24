@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 import javax.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,6 +18,26 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 public class EstimateQuestion extends Question {
+
+    /**
+     * Constructor for the EstimateQuestion class.
+     *
+     * @param id         the UUID of the question.
+     * @param activities the list of activities that compose the question.
+     * @param text       the description of the question.
+     */
+    public EstimateQuestion(UUID id, List<Activity> activities, String text) {
+        super(id, activities, text);
+    }
+
+    /**
+     * Copy constructor for the EstimateQuestion class.
+     *
+     * @param mq an instance of Question to copy.
+     */
+    public EstimateQuestion(Question mq) {
+        super(mq);
+    }
 
     /**
      * checkAnswer, checks if the answer of an estimate question is correct.
