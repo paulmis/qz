@@ -1,6 +1,5 @@
 package commons.entities;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 import lombok.Data;
@@ -13,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Generated
-public class QuestionDTO implements Serializable {
+public class QuestionDTO {
     /**
      * UUID of the question.
      */

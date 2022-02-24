@@ -1,6 +1,5 @@
 package commons.entities;
 
-import java.io.Serializable;
 import java.util.UUID;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
@@ -14,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Generated
-public class UserDTO implements Serializable {
+public class UserDTO {
 
     /**
      * The user's ID.

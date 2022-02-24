@@ -1,6 +1,5 @@
 package commons.entities;
 
-import java.io.Serializable;
 import java.util.UUID;
 import lombok.Data;
 import lombok.Generated;
@@ -12,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Generated
-public class ActivityDTO implements Serializable {
+public class ActivityDTO {
     /**
      * UUID of the activity.
      */
