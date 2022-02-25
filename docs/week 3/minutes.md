@@ -54,7 +54,7 @@ Action points (Issues) have been assigned or will be assigned with its respectiv
 From the TA:
 * Equalize work in terms of Gitlab reviews
 * Define “Done” as a issue status
-* Have at least one API endpoint for GET, PUSH, PUT, DELETE
+* Have at least one API endpoint for GET, POST, PUT, DELETE
     * PUT should be idempotent
     * POST can modify and depend on the state
 * One feature, one issue. Make smaller issues
