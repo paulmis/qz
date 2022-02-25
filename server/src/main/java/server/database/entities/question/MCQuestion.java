@@ -2,6 +2,7 @@ package server.database.entities.question;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -13,8 +14,8 @@ import lombok.NoArgsConstructor;
  * MCQuestion data structure - describes a multiple choice question.
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Entity
 public class MCQuestion extends Question {
 
@@ -23,16 +24,32 @@ public class MCQuestion extends Question {
      */
     @ManyToOne
     @JoinColumn(name = "answer_id")
-    public Activity answer;
+    protected Activity answer;
 
     /**
      * Boolean to indicate if the user has to guess the energy consumption
      * or the corresponding activity.
      */
-    public boolean guessConsumption = true;
+    protected boolean guessConsumption = true;
 
     /**
-     * Copy constructor for the MC_Question class.
+     * Constructor for the MCQuestion class.
+     *
+     * @param id               the UUID of the question.
+     * @param activities       the list of activities that compose the question.
+     * @param text             the description of the question.
+     * @param answer           the Activity that corresponds to the correct answer.
+     * @param guessConsumption if the user has to guess the energy consumption of the activity
+     *                         or the activity with a given consumption.
+     */
+    public MCQuestion(UUID id, List<Activity> activities, String text, Activity answer, boolean guessConsumption) {
+        super(id, activities, text);
+        this.answer = answer;
+        this.guessConsumption = guessConsumption;
+    }
+
+    /**
+     * Copy constructor for the MCQuestion class.
      *
      * @param q                an instance of Question to copy.
      * @param answer           the Activity that corresponds to the correct answer.
