@@ -21,54 +21,46 @@ _Inform_
 _Inform_
 
 [16:40 - 16:45] **Present back-end progress + entity diagram**
-
-- Introduced Lombok into the workflow
-- Added user class
-- Added question related entities
-- Added the game entity
+* Introduced Lombok into the workflow
+* Added user class
+* Added question related entities
+* Added the game entity
 _Inform_
 
 [16:45 - 16:50] **Front-end progress**
-
-- Designed the lobby UI
-- Designed the game UI
-- Implemented the game UI in java FX
+* Designed the lobby UI
+* Designed the game UI
+* Implemented the game UI in java FX
 _Inform_
 
 [16:50 - 16:55] **Gitlab best practices**
-
-- Introduce the wiki for the documentation of the project
-- Everyone should perform at least one code review on Gitlab and
+* Introduce the wiki for the documentation of the project
+* Everyone should perform at least one code review on Gitlab and
     approve one MR
 
 [16:55 - 17:00] **Present this week’s goals**
-
-- MVP for a single player game
-    o Create the communication between the server and the
-       client
-    o Expose the endpoints necessary for a standard single player
-       game to be played.
-- Complete the UI design for the application.
-    o The authentication screens
-    o The nickname selection screen
-    o The lobby UI
-    o The game screens
+* MVP for a single player game
+    * Create the communication between the server and the client
+    * Expose the endpoints necessary for a standard single player game to be played.
+* Complete the UI design for the application.
+    * The authentication screens
+    * The nickname selection screen
+    * The lobby UI
+    * The game screens
 _Inform_
 
 [17:00 - 17:10] **API endpoints**
-
-- User creation/ authentication
-- Lobby retrieval
-- Lobby joining
-- Gathering the emojis
-- Gathering the powerups
-- Other
+* User creation/ authentication
+* Lobby retrieval
+* Lobby joining
+* Gathering the emojis
+* Gathering the powerups
+* Other
 _Discuss_
 
 [17:10 - 17:15] **Approaching the HCI draft**
-
-- Finishing the UI
-- Getting reviews from other teams
+* Finishing the UI
+* Getting reviews from other teams
 _Discuss_
 
 [17:15 - 17:20] **Feedback Round**
