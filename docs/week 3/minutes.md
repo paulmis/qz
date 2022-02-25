@@ -56,7 +56,7 @@ From the TA:
 * Define “Done” as a issue status
 * Have at least one API endpoint for GET, PUSH, PUT, DELETE
     * PUT should be idempotent
-    * PUSH can modify and depend on the state
+    * POST can modify and depend on the state
 * One feature, one issue. Make smaller issues
 * One or two members assigned max
 * Time indication for the issues
