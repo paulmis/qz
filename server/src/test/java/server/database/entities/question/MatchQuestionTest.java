@@ -1,10 +1,8 @@
 package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -112,9 +110,24 @@ class MatchQuestionTest {
         Question matchAllArgs = new MatchQuestion(anId, activities, questionText);
 
         // Constructor comparison
-        assertNotNull(matchAllArgs);
         assertEquals(matchNoArgs.getId(), matchAllArgs.getId());
         assertEquals(matchNoArgs.getActivities(), matchAllArgs.getActivities());
         assertEquals(matchNoArgs.getText(), matchAllArgs.getText());
+    }
+
+    @Test
+    void copyConstructorTest() {
+        // Test setup
+        String questionText = "aQuestion";
+        List<Activity> activities = new ArrayList<>(List.of(
+                getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
+        UUID anId = UUID.randomUUID();
+        Question matchAllArgs = new MatchQuestion(anId, activities, questionText);
+        Question matchCopy = new MatchQuestion(matchAllArgs);
+
+        // Constructor comparison
+        assertEquals(matchAllArgs.getId(), matchCopy.getId());
+        assertEquals(matchAllArgs.getActivities(), matchCopy.getActivities());
+        assertEquals(matchAllArgs.getText(), matchCopy.getText());
     }
 }

@@ -1,7 +1,6 @@
 package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
@@ -138,7 +137,6 @@ class OrderQuestionTest {
         Question orderAllArgs = new OrderQuestion(anId, activities, questionText, order);
 
         // Constructor comparison
-        assertNotNull(orderAllArgs);
         assertEquals(orderNoArgs.getId(), orderAllArgs.getId());
         assertEquals(orderNoArgs.getActivities(), orderAllArgs.getActivities());
         assertEquals(orderNoArgs.getText(), orderAllArgs.getText());
@@ -157,7 +155,6 @@ class OrderQuestionTest {
         Question orderCopy = new OrderQuestion(orderAllArgs, order);
 
         // Constructor comparison
-        assertNotNull(orderCopy);
         assertEquals(orderAllArgs.getId(), orderCopy.getId());
         assertEquals(orderAllArgs.getActivities(), orderCopy.getActivities());
         assertEquals(orderAllArgs.getText(), orderCopy.getText());

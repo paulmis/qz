@@ -1,7 +1,6 @@
 package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
@@ -104,7 +103,6 @@ class EstimateQuestionTest {
         Question estimateAllArgs = new EstimateQuestion(anId, activities, questionText);
 
         // Constructor comparison
-        assertNotNull(estimateAllArgs);
         assertEquals(estimateNoArgs.getId(), estimateAllArgs.getId());
         assertEquals(estimateNoArgs.getActivities(), estimateAllArgs.getActivities());
         assertEquals(estimateNoArgs.getText(), estimateAllArgs.getText());
@@ -121,7 +119,6 @@ class EstimateQuestionTest {
         Question estimateCopy = new EstimateQuestion(estimateAllArgs);
 
         // Constructor comparison
-        assertNotNull(estimateCopy);
         assertEquals(estimateAllArgs.getId(), estimateCopy.getId());
         assertEquals(estimateAllArgs.getActivities(), estimateCopy.getActivities());
         assertEquals(estimateAllArgs.getText(), estimateCopy.getText());
