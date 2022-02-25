@@ -1,10 +1,11 @@
 package server.database.entities.game;
 
 import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Objects;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -12,15 +13,16 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.Hibernate;
+import org.hibernate.annotations.CreationTimestamp;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.question.Question;
 import server.utils.EasyRandom;
@@ -29,16 +31,13 @@ import server.utils.EasyRandom;
  * Game entity which represents a game and its state.
  */
 @Entity
-@Getter
-@Setter
-@ToString
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Inheritance(strategy = javax.persistence.InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "game_mode")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Game {
     @Id
-    private Long id;
+    private UUID id;
 
     /**
      * ID of the game shown to the user.
@@ -46,6 +45,13 @@ public abstract class Game {
      */
     @Column(nullable = false, unique = true)
     private String gameId;
+
+    /**
+     * Timestmap of game creation.
+     */
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createDate;
 
     /**
      * Whether the game is public or not.
@@ -78,58 +84,42 @@ public abstract class Game {
      * List of players currently in the game.
      */
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    private Set<GamePlayer> players = Collections.synchronizedSet(new LinkedHashSet<>());
+    private Set<GamePlayer> players = Collections.synchronizedSet(new HashSet<>());
 
 
-    /** Get the next question in the game.
+    /**
+     * Get the next question in the game.
      *
      * @return The current question.
      */
     public abstract Optional<Question> getNextQuestion();
 
-    /** Add a player to the game.
+    /**
+     * Add a player to the game.
      *
      * @param player The player to add.
      * @return Whether the player was added (and not already in the game).
      */
-    public boolean addPlayer(GamePlayer player) {
-        Objects.requireNonNull(player, "Player cannot be null.");
+    public boolean add(GamePlayer player) {
         return this.players.add(player);
     }
 
-    /** Remove a player from the game.
+    /**
+     * Remove a player from the game.
      *
      * @param player The player to remove.
      * @return Whether the player was removed.
      */
-    public boolean removePlayer(GamePlayer player) {
-        Objects.requireNonNull(player, "Player cannot be null.");
+    public boolean remove(GamePlayer player) {
         return this.players.remove(player);
     }
 
-    /** Get the number of players in the game.
+    /**
+     * Get the number of players in the game.
      *
      * @return The number of players.
      */
-    public int getNumPlayers() {
+    public int size() {
         return players.size();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
-            return false;
-        }
-        Game game = (Game) o;
-        return id != null && Objects.equals(id, game.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
     }
 }

@@ -2,22 +2,18 @@ package server.database.entities.question;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.Hibernate;
 
 /**
  * MCQuestion data structure - describes a multiple choice question.
  */
-@Getter
-@Setter
-@ToString
+@Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Entity
 public class MCQuestion extends Question {
@@ -75,22 +71,5 @@ public class MCQuestion extends Question {
             }
         }
         return points;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
-            return false;
-        }
-        MCQuestion that = (MCQuestion) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
     }
 }

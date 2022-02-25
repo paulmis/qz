@@ -1,5 +1,6 @@
 package server.database.entities.game;
 
+import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -25,7 +26,8 @@ import server.database.entities.User;
 @RequiredArgsConstructor
 @ToString
 public class GamePlayer {
-    @Id private Long id;
+    @Id
+    private UUID id;
 
     /**
      * Player's score.

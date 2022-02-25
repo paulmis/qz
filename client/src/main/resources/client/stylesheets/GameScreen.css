@@ -1,0 +1,19 @@
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane {
+    -fx-background-color: white;
+}
+
+#Rank0 {
+    -fx-effect: dropshadow(three-pass-box, gold, 2, 10.0, 0, 0);
+}
+
+#Rank1 {
+    -fx-effect: dropshadow(three-pass-box, gray, 2, 10.0, 0, 0);
+}
+
+#Rank2 {
+    -fx-effect: dropshadow(three-pass-box, brown, 2, 10.0, 0, 0);
+}

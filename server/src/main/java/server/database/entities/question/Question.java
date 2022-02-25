@@ -2,7 +2,6 @@ package server.database.entities.question;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,12 +12,10 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import lombok.Getter;
+import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
 
 /*
 I followed this guide to handle inheritance:
@@ -28,17 +25,16 @@ https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
 /**
  * Question data structure - describes a question of the quiz.
  */
-@Getter
-@Setter
-@ToString
+@Data
 @NoArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Generated
 public abstract class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private UUID id;
 
     /**
      * List of activities used to generate the question.
@@ -74,21 +70,4 @@ public abstract class Question {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     public abstract List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
-            return false;
-        }
-        Question question = (Question) o;
-        return id != null && Objects.equals(id, question.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

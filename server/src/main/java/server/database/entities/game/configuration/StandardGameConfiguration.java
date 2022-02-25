@@ -10,9 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 /**
- * Configuration for the survival game mode.
- * In this mode, the player has to survive as long as possible, while the
- * time available to answer questions decreases with each round.
+ * Configuration for the normal game mode, which contains a fixed number of questions.
  */
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,10 +18,10 @@ import lombok.NonNull;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @MappedSuperclass
-public class SurvivalGameConfiguration extends GameConfiguration {
+public class StandardGameConfiguration extends GameConfiguration {
     /**
-     * The speed increase/decrease of the game.
+     * The number of questions in the game.
      */
     @Column(nullable = false)
-    @NonNull Float speedModifier = 1.0f;
+    @NonNull Integer numQuestions = 10;
 }
