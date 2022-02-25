@@ -1,0 +1,31 @@
+#buttonOptionA {
+    -fx-background-color: backgroundColor;
+}
+
+#buttonOptionB {
+    -fx-background-color: backgroundColor;
+}
+
+#buttonOptionC {
+    -fx-background-color: backgroundColor;
+}
+
+#buttonOptionD {
+    -fx-background-color: backgroundColor;
+}
+
+#labelOptionA {
+    -fx-text-fill: answersTextColor;
+}
+
+#labelOptionB {
+    -fx-text-fill: answersTextColor;
+}
+
+#labelOptionC {
+    -fx-text-fill: answersTextColor;
+}
+
+#labelOptionD {
+    -fx-text-fill: answersTextColor;
+}

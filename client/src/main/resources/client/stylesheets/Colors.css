@@ -1,0 +1,21 @@
+/*
+    This is file describes the colors
+    used for the entire application.
+
+    Every color used in the app should be based
+    on the colors below.
+
+    If you need a color that is not here just
+    add it below. Don't place it inside other css files.
+*/
+
+* {
+    primaryColor: #6EB26C;
+    secondaryColor: #DFD93F;
+    thirdColor: #47AC79;
+    backgroundColor: white;
+    labelColor: primaryColor;
+    buttonTextColor: white;
+    questionTextColor: black;
+    answersTextColor: black;
+}
