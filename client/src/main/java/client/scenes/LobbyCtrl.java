@@ -4,12 +4,12 @@ import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import javafx.fxml.FXML;
-import lombok.Data;
+import lombok.Getter;
 
 /**
  * Lobby controller.
  */
-@Data
+@Getter
 public class LobbyCtrl {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
