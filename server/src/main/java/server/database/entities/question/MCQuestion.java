@@ -1,5 +1,7 @@
 package server.database.entities.question;
 
+import commons.entities.AnswerDTO;
+import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -10,6 +12,7 @@ import javax.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.modelmapper.ModelMapper;
 
 /**
  * MCQuestion data structure - describes a multiple choice question.
@@ -20,6 +23,15 @@ import lombok.NoArgsConstructor;
 @MappedSuperclass
 @Entity
 public class MCQuestion extends Question {
+
+    /**
+     * Construct a new entity from a DTO.
+     *
+     * @param dto DTO to map to entity.
+     */
+    public MCQuestion(QuestionDTO dto) {
+        new ModelMapper().map(dto, this);
+    }
 
     /**
      * Activity corresponding to the correct answer.
@@ -45,7 +57,8 @@ public class MCQuestion extends Question {
      *                         or the activity with a given consumption.
      */
     public MCQuestion(UUID id, List<Activity> activities, String text, Activity answer, boolean guessConsumption) {
-        super(id, activities, text);
+        super(activities, text);
+        this.setId(id);
         this.answer = answer;
         this.guessConsumption = guessConsumption;
     }
@@ -72,12 +85,12 @@ public class MCQuestion extends Question {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     @Override
-    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
+    public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
         if (userAnswers == null) {
             throw new IllegalArgumentException("NULL input");
         }
         List<Double> points = new ArrayList<>();
-        for (Answer ans : userAnswers) {
+        for (AnswerDTO ans : userAnswers) {
             // There should be a single activity per answer
             if (ans.getUserChoice().size() != 1) {
                 throw new IllegalArgumentException("There should be a single activity per answer.");

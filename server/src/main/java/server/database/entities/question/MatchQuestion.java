@@ -1,5 +1,7 @@
 package server.database.entities.question;
 
+import commons.entities.AnswerDTO;
+import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -8,6 +10,7 @@ import javax.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.modelmapper.ModelMapper;
 
 /**
  * MatchQuestion data structure - describes a match question.
@@ -27,7 +30,8 @@ public class MatchQuestion extends Question {
      * @param text       the description of the question.
      */
     public MatchQuestion(UUID id, List<Activity> activities, String text) {
-        super(id, activities, text);
+        super(activities, text);
+        this.setId(id);
     }
 
     /**
@@ -40,6 +44,15 @@ public class MatchQuestion extends Question {
     }
 
     /**
+     * Construct a new entity from a DTO.
+     *
+     * @param dto DTO to map to entity.
+     */
+    public MatchQuestion(QuestionDTO dto) {
+        new ModelMapper().map(dto, this);
+    }
+
+    /**
      * checkAnswer, checks if the answer of a match question is correct.
      *
      * @param userAnswers list of answers provided by each user.
@@ -48,12 +61,12 @@ public class MatchQuestion extends Question {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     @Override
-    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
+    public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
         if (userAnswers == null) {
             throw new IllegalArgumentException("NULL input");
         }
         List<Double> points = new ArrayList<>();
-        for (Answer ans : userAnswers) {
+        for (AnswerDTO ans : userAnswers) {
             if (ans.getUserChoice().size() != getActivities().size()) {
                 throw new IllegalArgumentException(
                         "The number of activities in the answer must be the same as the question.");
