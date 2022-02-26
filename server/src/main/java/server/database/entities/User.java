@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import server.database.entities.game.GamePlayer;
 
@@ -25,7 +26,8 @@ import server.database.entities.game.GamePlayer;
  * User entity - describes an user in the context of the entire application.
  */
 @NoArgsConstructor
-@AllArgsConstructor (access = AccessLevel.PUBLIC)
+@RequiredArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Data
 @Entity
 public class User {
@@ -37,27 +39,36 @@ public class User {
     private UUID id;
 
     /**
+     * User's nickname.
+     */
+    @Column(nullable = false, unique = true)
+    @NonNull private String username;
+
+    /**
      * email - string used for authentication purposes representing the email of the user.
      */
     @Column(nullable = false, unique = true)
-    private String email;
+    @NonNull private String email;
 
     /**
      * password - string representing user's salted password.
      */
     @ToString.Exclude
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(nullable = false)
     @NonNull private String password;
 
     /**
      * score - integer representing a player's total score.
      */
-    private int score;
+    @Column
+    private int score = 0;
 
     /**
      * id - random unique uuid assigned to a certain player.
      */
-    private int gamesPlayed;
+    @Column
+    private int gamesPlayed = 0;
 
     /**
      * Relation to player entities for each individual game.
