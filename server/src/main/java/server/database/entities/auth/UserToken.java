@@ -1,7 +1,5 @@
 package server.database.entities.auth;
 
-import java.util.UUID;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -17,15 +15,9 @@ import server.database.entities.User;
 @NoArgsConstructor
 public class UserToken {
     /**
-     * Entity ID.
-     */
-    @Id
-    protected UUID id;
-
-    /**
      * The token string.
      */
-    @Column
+    @Id
     protected String token;
 
     /**
@@ -33,6 +25,4 @@ public class UserToken {
      */
     @ManyToOne
     protected User user;
-
-    // TODO: DTO
 }

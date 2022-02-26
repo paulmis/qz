@@ -9,10 +9,12 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import java.util.Date;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Manages JWT tokens.
  */
+@Component
 public class JWTHandler {
     /**
      * TTL for all JWT tokens in seconds.
