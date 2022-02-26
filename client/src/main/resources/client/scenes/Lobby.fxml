@@ -21,9 +21,7 @@
                   <Button mnemonicParsing="false" style="-fx-border-color: #FFFFFF;">
                      <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0">
-                           <image>
-                              <Image url="@../images/lobby/user.png" />
-                           </image>
+                           <Image url="@../images/lobby/user.png"/>
                         </ImageView>
                      </graphic>
                   </Button>
