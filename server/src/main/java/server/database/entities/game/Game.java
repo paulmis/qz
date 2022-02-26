@@ -1,5 +1,8 @@
 package server.database.entities.game;
 
+import commons.entities.game.GameDTO;
+import commons.entities.game.GameStatus;
+import commons.entities.game.GameType;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -8,7 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -25,6 +27,7 @@ import lombok.NonNull;
 import org.hibernate.annotations.CreationTimestamp;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.question.Question;
+import server.database.entities.utils.BaseEntity;
 import server.utils.EasyRandom;
 
 /**
@@ -35,10 +38,7 @@ import server.utils.EasyRandom;
 @NoArgsConstructor
 @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class Game {
-    @Id
-    private UUID id;
-
+public abstract class Game extends BaseEntity<GameDTO> {
     /**
      * ID of the game shown to the user.
      * Should be randomly generated.
@@ -47,7 +47,7 @@ public abstract class Game {
     private String gameId;
 
     /**
-     * Timestmap of game creation.
+     * Timestamp of game creation.
      */
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

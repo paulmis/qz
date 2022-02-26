@@ -1,5 +1,7 @@
 package server.database.entities.question;
 
+import commons.entities.AnswerDTO;
+import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -8,6 +10,7 @@ import javax.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.modelmapper.ModelMapper;
 
 /**
  * OrderQuestion data structure - describes a match question.
@@ -18,6 +21,15 @@ import lombok.NoArgsConstructor;
 @MappedSuperclass
 @Entity
 public class OrderQuestion extends Question {
+
+    /**
+     * Construct a new entity from a DTO.
+     *
+     * @param dto DTO to map to entity.
+     */
+    public OrderQuestion(QuestionDTO dto) {
+        new ModelMapper().map(dto, this);
+    }
 
     /**
      * A boolean indicating whether the answer should be in increasing order.
@@ -57,13 +69,13 @@ public class OrderQuestion extends Question {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     @Override
-    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
+    public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
         if (userAnswers == null) {
             throw new IllegalArgumentException("NULL input");
         }
         List<Double> points = new ArrayList<>();
-        for (Answer ans : userAnswers) {
-            if (ans.getUserChoice().size() != getActivities().size()) {
+        for (AnswerDTO ans : userAnswers) {
+            if (ans.getUserChoice().size() != activities.size()) {
                 throw new IllegalArgumentException(
                         "The number of activities in the answer must be the same as the question.");
             }

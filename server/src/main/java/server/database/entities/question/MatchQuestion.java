@@ -1,5 +1,7 @@
 package server.database.entities.question;
 
+import commons.entities.AnswerDTO;
+import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -8,6 +10,7 @@ import javax.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.modelmapper.ModelMapper;
 
 /**
  * MatchQuestion data structure - describes a match question.
@@ -20,23 +23,12 @@ import lombok.NoArgsConstructor;
 public class MatchQuestion extends Question {
 
     /**
-     * Constructor for the MatchQuestion class.
+     * Construct a new entity from a DTO.
      *
-     * @param id         the UUID of the question.
-     * @param activities the list of activities that compose the question.
-     * @param text       the description of the question.
+     * @param dto DTO to map to entity.
      */
-    public MatchQuestion(UUID id, List<Activity> activities, String text) {
-        super(id, activities, text);
-    }
-
-    /**
-     * Copy constructor for the MatchQuestion class.
-     *
-     * @param mq an instance of Question to copy.
-     */
-    public MatchQuestion(Question mq) {
-        super(mq);
+    public MatchQuestion(QuestionDTO dto) {
+        new ModelMapper().map(dto, this);
     }
 
     /**
@@ -48,13 +40,13 @@ public class MatchQuestion extends Question {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     @Override
-    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
+    public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
         if (userAnswers == null) {
             throw new IllegalArgumentException("NULL input");
         }
         List<Double> points = new ArrayList<>();
-        for (Answer ans : userAnswers) {
-            if (ans.getUserChoice().size() != getActivities().size()) {
+        for (AnswerDTO ans : userAnswers) {
+            if (ans.getUserChoice().size() != activities.size()) {
                 throw new IllegalArgumentException(
                         "The number of activities in the answer must be the same as the question.");
             }
