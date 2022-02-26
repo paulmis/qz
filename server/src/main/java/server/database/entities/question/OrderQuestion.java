@@ -4,7 +4,9 @@ import commons.entities.AnswerDTO;
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,6 +18,7 @@ import org.modelmapper.ModelMapper;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@MappedSuperclass
 @Entity
 public class OrderQuestion extends Question {
 
@@ -31,10 +34,23 @@ public class OrderQuestion extends Question {
     /**
      * A boolean indicating whether the answer should be in increasing order.
      */
-    public boolean increasing = true;
+    protected boolean increasing = true;
 
     /**
-     * Copy constructor for the MC_Question class.
+     * Constructor for the OrderQuestion class.
+     *
+     * @param id         the UUID of the question.
+     * @param activities the list of activities that compose the question.
+     * @param text       the description of the question.
+     * @param increasing if the user has to provide the answer in increasing order or not.
+     */
+    public OrderQuestion(UUID id, List<Activity> activities, String text, boolean increasing) {
+        super(id, activities, text);
+        this.increasing = increasing;
+    }
+
+    /**
+     * Copy constructor for the OrderQuestion class.
      *
      * @param q          an instance of Question to copy.
      * @param increasing if the user has to provide the answer in increasing order or not.
@@ -66,15 +82,15 @@ public class OrderQuestion extends Question {
             // Check if the order of answers' costs is correct
             int currentVal = ans.getUserChoice().get(0).getCost();
             double currentPoints = 0;
-            double pointStep = 1.0 / (activities.size() - 1);
+            double pointStep = 1.0 / (getActivities().size() - 1);
             if (increasing) {
-                for (int idx = 1; idx < activities.size(); idx++) {
+                for (int idx = 1; idx < getActivities().size(); idx++) {
                     if (ans.getUserChoice().get(idx).getCost() >= ans.getUserChoice().get(idx - 1).getCost()) {
                         currentPoints += pointStep;
                     }
                 }
             } else {
-                for (int idx = 1; idx < activities.size(); idx++) {
+                for (int idx = 1; idx < getActivities().size(); idx++) {
                     if (ans.getUserChoice().get(idx).getCost() <= ans.getUserChoice().get(idx - 1).getCost()) {
                         currentPoints += pointStep;
                     }

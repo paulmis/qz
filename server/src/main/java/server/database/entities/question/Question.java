@@ -15,6 +15,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Generated;
@@ -33,7 +34,7 @@ https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-@Entity
+@AllArgsConstructor
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Generated
 public abstract class Question extends BaseEntity<QuestionDTO> {
@@ -47,12 +48,12 @@ public abstract class Question extends BaseEntity<QuestionDTO> {
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "activity_id"))
     @ToString.Exclude
-    public List<Activity> activities = new ArrayList<>();
+    protected List<Activity> activities = new ArrayList<>();
 
     /**
      * Question asked the user.
      */
-    public String text;
+    protected String text;
 
     /**
      * Copy constructor for the Question class.

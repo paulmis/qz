@@ -20,6 +20,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import lombok.Generated;
@@ -46,7 +47,7 @@ public class MainCtrl {
 
         this.gameScreenCtrl = gameScreen.getKey();
         this.gameScreen = new Scene(gameScreen.getValue());
-
+        primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
         showGameScreen();
         primaryStage.show();
     }

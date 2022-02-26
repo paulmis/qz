@@ -1,0 +1,62 @@
+#mainBorderPane {
+    -fx-background-color: primaryColor;
+}
+
+#questionLabel {
+    -fx-background-color: backgroundColor;
+    -fx-text-fill: questionTextColor;
+}
+
+#Rank0 {
+    -fx-effect: dropshadow(three-pass-box, gold, 2, 10.0, 0, 0);
+}
+
+#Rank1 {
+    -fx-effect: dropshadow(three-pass-box, gray, 2, 10.0, 0, 0);
+}
+
+#Rank2 {
+    -fx-effect: dropshadow(three-pass-box, brown, 2, 10.0, 0, 0);
+}
+
+#topBar {
+    -fx-background-color: backgroundColor;
+    -fx-border-color: backgroundColor;
+}
+
+#emojiScrollPane,#powerUpScrollPane {
+    -fx-background-radius: 10 10 0 0;
+    -fx-view-order: -1;
+}
+
+#bottomBar {
+    -fx-background-color: backgroundColor;
+}
+
+#pointsLabel {
+    -fx-text-fill: backgroundColor;
+    -fx-background-color: primaryColor;
+}
+
+#settingsPanelGrid {
+    -fx-background-color: backgroundColor;
+    -fx-background-radius: 10 10 10 10;
+    -fx-view-order: -1;
+    -fx-effect: dropshadow(three-pass-box, gray, 2, 10.0, 0, 0);
+}
+
+#settingsPanelSliderAreaGrid {
+    -fx-background-radius: 10 10 10 10;
+}
+
+#settingsPanelCheckAreaGrid {
+    -fx-background-radius: 10 10 10 10;
+}
+
+#quitIconView {
+    -fx-fill: red;
+}
+
+#settingsIconView {
+    -fx-fill: gray;
+}

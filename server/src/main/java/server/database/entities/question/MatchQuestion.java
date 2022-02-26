@@ -4,7 +4,9 @@ import commons.entities.AnswerDTO;
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,6 +18,7 @@ import org.modelmapper.ModelMapper;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@MappedSuperclass
 @Entity
 public class MatchQuestion extends Question {
 
@@ -49,9 +52,9 @@ public class MatchQuestion extends Question {
             }
             // Check if the order of answers corresponds to the order of questions
             double currentPoints = 0;
-            double pointStep = 1.0 / activities.size();
-            for (int idx = 0; idx < activities.size(); idx++) {
-                if (activities.get(idx).getCost() == ans.getUserChoice().get(idx).getCost()) {
+            double pointStep = 1.0 / getActivities().size();
+            for (int idx = 0; idx < getActivities().size(); idx++) {
+                if (getActivities().get(idx).getCost() == ans.getUserChoice().get(idx).getCost()) {
                     currentPoints += pointStep;
                 }
             }
