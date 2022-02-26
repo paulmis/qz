@@ -1,6 +1,9 @@
 package server.api;
 
+import commons.entities.game.GameDTO;
+import commons.entities.game.GameStatus;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import server.database.entities.game.Game;
-import server.database.entities.game.GameStatus;
 import server.database.repositories.game.GameRepository;
 
 /*
@@ -36,11 +37,18 @@ public class LobbyController {
      * @return a list of available lobbies.
      */
     @GetMapping(path = {"", "/test/{param}"})
-    ResponseEntity<List<Game>> testEndpoint(
-            @RequestParam(required = false) Integer id, @PathVariable(required = false) String param) {
-        System.out.println(param + ", " + id);
-        List<Game> lobbies = lobbyRepository.findAllByStatus(GameStatus.CREATED);
-        if (id == 42) {
+    ResponseEntity<List<GameDTO>> testEndpoint(
+            @RequestParam(required = false) Integer id, @PathVariable(required = false) Optional<String> param) {
+        if (!param.isPresent()) {
+            System.out.println(id);
+        } else {
+            System.out.println(param.get() + ", " + id);
+        }
+        List<GameDTO> lobbies = lobbyRepository.findAllByStatus(GameStatus.CREATED);
+        if (id == null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        if (id.equals(42)) {
             return new ResponseEntity<>(null, HttpStatus.I_AM_A_TEAPOT);
         }
         return new ResponseEntity<>(lobbies, HttpStatus.OK);
@@ -52,9 +60,9 @@ public class LobbyController {
      * @return a list of available lobbies.
      */
     @GetMapping(path = {"", "/available"})
-    ResponseEntity<List<Game>> availableLobbies() {
+    ResponseEntity<List<GameDTO>> availableLobbies() {
         // It should return games with status Created
-        List<Game> lobbies = lobbyRepository.findAllByStatus(GameStatus.CREATED);
+        List<GameDTO> lobbies = lobbyRepository.findAllByStatus(GameStatus.CREATED);
         return new ResponseEntity<>(lobbies, HttpStatus.OK);
     }
 }
