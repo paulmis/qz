@@ -1,5 +1,6 @@
 package server.database.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +24,6 @@ import server.database.entities.game.GamePlayer;
 /**
  * User entity - describes an user in the context of the entire application.
  */
-
 @NoArgsConstructor
 @AllArgsConstructor (access = AccessLevel.PUBLIC)
 @Data
@@ -46,6 +46,7 @@ public class User {
      * password - string representing user's salted password.
      */
     @ToString.Exclude
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NonNull private String password;
 
     /**
