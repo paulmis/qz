@@ -1,5 +1,6 @@
 package commons.entities.game;
 
+import commons.entities.UserDTO;
 import commons.entities.utils.DTO;
 import java.util.UUID;
 import lombok.Data;
@@ -32,4 +33,9 @@ public class GamePlayerDTO implements DTO {
      * Nickname of the player.
      */
     protected String nickname;
+
+    /**
+     * Associated user.
+     */
+    protected UserDTO user;
 }

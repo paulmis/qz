@@ -37,8 +37,7 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
      * @param dto DTO to map to entity.
      */
     public GamePlayer(GamePlayerDTO dto) {
-        ModelMapper mapper = new ModelMapper();
-        mapper.map(dto, this);
+        new ModelMapper().map(dto, this);
     }
 
     /**

@@ -36,8 +36,7 @@ public class User extends BaseEntity<UserDTO> {
      * @param dto DTO to map to entity.
      */
     public User(UserDTO dto) {
-        ModelMapper mapper = new ModelMapper();
-        mapper.map(dto, this);
+        new ModelMapper().map(dto, this);
     }
 
     /**

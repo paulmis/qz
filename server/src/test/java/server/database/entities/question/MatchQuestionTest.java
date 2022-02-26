@@ -1,7 +1,6 @@
 package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import commons.entities.ActivityDTO;
@@ -11,9 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 
 class MatchQuestionTest {
     static Question q;
@@ -38,9 +35,12 @@ class MatchQuestionTest {
     }
 
     @Test
-    void constructorTest() {
-        MatchQuestion q = new MatchQuestion(new QuestionDTO());
-        assertNotNull(q);
+    void testFromDTOConstructor() {
+        QuestionDTO questionDTO = new QuestionDTO();
+        questionDTO.setText("Question text");
+
+        MatchQuestion q = new MatchQuestion(questionDTO);
+        assertEquals("Question text", q.getText());
     }
 
     @Test

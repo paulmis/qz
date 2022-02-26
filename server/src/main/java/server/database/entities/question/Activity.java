@@ -25,8 +25,7 @@ public class Activity extends BaseEntity<ActivityDTO> {
      * @param dto DTO to map to entity.
      */
     public Activity(ActivityDTO dto) {
-        ModelMapper mapper = new ModelMapper();
-        mapper.map(dto, this);
+        new ModelMapper().map(dto, this);
     }
 
     /**
@@ -34,22 +33,22 @@ public class Activity extends BaseEntity<ActivityDTO> {
      * Needed for the many-to-many relation.
      */
     @ManyToMany(mappedBy = "activities")
-    public List<Question> usedIn;
+    private List<Question> usedIn;
 
     /**
      * Description of the activity.
      */
-    public String description;
+    private String description;
 
     /**
      * The energy cost in Wh of the activity.
      */
-    public int cost;
+    private int cost;
 
     /**
      * The filepath to the icon of the activity.
      */
-    public String icon;
+    private String icon;
 
 
 }

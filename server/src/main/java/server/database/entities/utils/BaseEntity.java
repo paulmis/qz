@@ -18,15 +18,6 @@ import org.modelmapper.ModelMapper;
 @Data
 @MappedSuperclass
 public abstract class BaseEntity<D extends DTO> {
-    @Transient
-    private final TypeToken<D> typeToken = new TypeToken<D>(getClass()) {};
-
-    @Transient
-    private final Type type = typeToken.getType();
-
-    @Transient
-    private final ModelMapper mapper = new ModelMapper();
-
     /**
      * id - random unique uuid assigned to a certain player.
      */
@@ -39,6 +30,8 @@ public abstract class BaseEntity<D extends DTO> {
      * @return DTO for the specific entity.
      */
     public D getDTO() {
-        return this.mapper.map(this, type);
+        TypeToken<D> typeToken = new TypeToken<D>(getClass()) {};
+        Type type = typeToken.getType();
+        return new ModelMapper().map(this, type);
     }
 }

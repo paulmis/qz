@@ -1,7 +1,6 @@
 package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import commons.entities.ActivityDTO;
@@ -38,9 +37,12 @@ class MCQuestionTest {
     }
 
     @Test
-    void constructorTest() {
-        MCQuestion q = new MCQuestion(new QuestionDTO());
-        assertNotNull(q);
+    void testFromDTOConstructor() {
+        QuestionDTO questionDTO = new QuestionDTO();
+        questionDTO.setText("Question text");
+
+        MCQuestion q = new MCQuestion(questionDTO);
+        assertEquals("Question text", q.getText());
     }
 
     @Test

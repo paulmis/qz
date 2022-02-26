@@ -27,8 +27,7 @@ public class EstimateQuestion extends Question {
      * @param dto DTO to map to entity.
      */
     public EstimateQuestion(QuestionDTO dto) {
-        ModelMapper mapper = new ModelMapper();
-        mapper.map(dto, this);
+        new ModelMapper().map(dto, this);
     }
 
     /**

@@ -25,8 +25,7 @@ public class MatchQuestion extends Question {
      * @param dto DTO to map to entity.
      */
     public MatchQuestion(QuestionDTO dto) {
-        ModelMapper mapper = new ModelMapper();
-        mapper.map(dto, this);
+        new ModelMapper().map(dto, this);
     }
 
     /**

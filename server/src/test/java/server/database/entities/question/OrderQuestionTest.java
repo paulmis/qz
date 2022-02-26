@@ -1,7 +1,6 @@
 package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import commons.entities.ActivityDTO;
@@ -37,9 +36,12 @@ class OrderQuestionTest {
     }
 
     @Test
-    void constructorTest() {
-        OrderQuestion q = new OrderQuestion(new QuestionDTO());
-        assertNotNull(q);
+    void testFromDTOConstructor() {
+        QuestionDTO questionDTO = new QuestionDTO();
+        questionDTO.setText("Question text");
+
+        OrderQuestion q = new OrderQuestion(questionDTO);
+        assertEquals("Question text", q.getText());
     }
 
     @Test
