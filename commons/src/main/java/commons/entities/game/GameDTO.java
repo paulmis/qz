@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 /**
@@ -14,7 +13,6 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-@Generated
 public class GameDTO implements DTO {
     /**
      * The unique identifier of the game.

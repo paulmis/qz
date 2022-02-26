@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-@Generated
 public class UserDTO implements DTO {
 
     /**

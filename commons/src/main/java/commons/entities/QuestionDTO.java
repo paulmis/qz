@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-@Generated
 public class QuestionDTO implements DTO {
     /**
      * UUID of the question.

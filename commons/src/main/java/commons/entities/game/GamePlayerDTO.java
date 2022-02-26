@@ -4,7 +4,6 @@ import commons.entities.UserDTO;
 import commons.entities.utils.DTO;
 import java.util.UUID;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 /**
@@ -12,7 +11,6 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-@Generated
 public class GamePlayerDTO implements DTO {
     /**
      * UUID of game player.

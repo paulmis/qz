@@ -1,10 +1,7 @@
 package commons.entities.game.configuration;
 
 import commons.entities.utils.DTO;
-import java.io.Serializable;
-import java.util.UUID;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 /**
@@ -12,7 +9,6 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-@Generated
 public class SurvivalGameConfigurationDTO extends GameConfigurationDTO implements DTO {
     /**
      * Speed modifier for the game.
