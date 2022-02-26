@@ -1,6 +1,8 @@
 package server.database.entities.auth.config;
 
 import javax.servlet.http.HttpServletResponse;
+
+import lombok.Generated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 /**
  * Handles security policies.
  */
+@Generated
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -28,11 +31,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable()
                 .cors()
                 .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
                 .authorizeHttpRequests()
                 .antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/api/user/**").hasRole("USER")
+                .antMatchers("/api/**").hasRole("USER")
                 .and()
                 .userDetailsService(customUserDetailsService)
                 .exceptionHandling()
@@ -43,6 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         (request, response, authException) ->
                                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
                 )
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
     }
