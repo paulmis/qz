@@ -45,11 +45,11 @@ public class AuthFilter extends OncePerRequestFilter {
             } else {
                 try {
                     // Validate the token and retrieve the user
-                    UUID userId = handler.validateToken(jwt);
-                    Optional<User> user = userRepository.findById(userId);
+                    String email = handler.validateToken(jwt);
+                    Optional<User> user = userRepository.findByEmail(email);
 
                     // Set the user in the security context
-                    var authToken = getAuthToken(userId);
+                    var authToken = getAuthToken(email);
                     if (SecurityContextHolder.getContext().getAuthentication() == null) {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
@@ -71,14 +71,14 @@ public class AuthFilter extends OncePerRequestFilter {
     /**
      * Provides a user id-based DAO for JWT authentication.
      *
-     * @param userId user id
+     * @param email user email
      * @return the authentication DAO
      * @throws NoSuchElementException if the user does not exist
      */
-    protected UsernamePasswordAuthenticationToken getAuthToken(UUID userId) throws NoSuchElementException {
+    protected UsernamePasswordAuthenticationToken getAuthToken(String email) throws NoSuchElementException {
         return new UsernamePasswordAuthenticationToken(
-                userId.toString(),
-                userRepository.findById(userId).get().getPassword(),
+                email,
+                userRepository.findByEmail(email).get().getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
     }
 }

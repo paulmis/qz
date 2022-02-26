@@ -30,15 +30,15 @@ public class JWTHandler {
     /**
      * Generates a JWT token for the given user.
      *
-     * @param userId id of the user
+     * @param email user's email
      * @return a new JWT token
      * @throws IllegalArgumentException if the provided id is null
      * @throws JWTCreationException     if the token could not be created
      */
-    public String generateToken(UUID userId) throws IllegalArgumentException, JWTCreationException {
+    public String generateToken(String email) throws IllegalArgumentException, JWTCreationException {
         return JWT.create()
                 .withSubject("User")
-                .withClaim("userId", userId.toString())
+                .withClaim("email", email)
                 .withIssuedAt(new Date())
                 .sign(Algorithm.HMAC256(secret));
     }
@@ -47,15 +47,15 @@ public class JWTHandler {
      * Verifies the given JWT token and returns the ID of the user.
      *
      * @param token JWT token
-     * @return ID of the user
+     * @return user's email
      * @throws TokenExpiredException if the token expired
      * @throws SignatureVerificationException if the token could not be verified
      */
-    public UUID validateToken(String token) throws TokenExpiredException, SignatureVerificationException {
+    public String validateToken(String token) throws TokenExpiredException, SignatureVerificationException {
         DecodedJWT jwt = JWT.require(Algorithm.HMAC256(secret))
                 .withSubject("User")
                 .build()
                 .verify(token);
-        return UUID.fromString(jwt.getClaim("userId").asString());
+        return jwt.getClaim("email").asString();
     }
 }
