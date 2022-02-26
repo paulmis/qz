@@ -16,6 +16,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import server.database.entities.User;
@@ -27,8 +29,8 @@ import server.database.repositories.UserRepository;
 @Component
 public class AuthFilter extends OncePerRequestFilter {
 
-    @Autowired private UserRepository userRepository;
     @Autowired private JWTHandler handler;
+    @Autowired private CustomUserDetailsService customUserDetailsService;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -46,19 +48,21 @@ public class AuthFilter extends OncePerRequestFilter {
                 try {
                     // Validate the token and retrieve the user
                     String email = handler.validateToken(jwt);
-                    Optional<User> user = userRepository.findByEmail(email);
+                    UserDetails authDAO = customUserDetailsService.loadUserByUsername(email);
+
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(email, authDAO.getPassword(), authDAO.getAuthorities());
 
                     // Set the user in the security context
-                    var authToken = getAuthToken(email);
                     if (SecurityContextHolder.getContext().getAuthentication() == null) {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
-                // Catch exceptions
+                    // Catch exceptions
                 } catch (TokenExpiredException exc) {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT Token has expired");
                 } catch (SignatureVerificationException ex) {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token");
-                } catch (NoSuchElementException ex) {
+                } catch (NoSuchElementException | UsernameNotFoundException ex) {
                     response.sendError(HttpServletResponse.SC_CONFLICT, "JWT Token's user no longer exists");
                 }
             }
@@ -66,19 +70,5 @@ public class AuthFilter extends OncePerRequestFilter {
 
         // Invoke the next filter in the chain
         filterChain.doFilter(request, response);
-    }
-
-    /**
-     * Provides a user id-based DAO for JWT authentication.
-     *
-     * @param email user email
-     * @return the authentication DAO
-     * @throws NoSuchElementException if the user does not exist
-     */
-    protected UsernamePasswordAuthenticationToken getAuthToken(String email) throws NoSuchElementException {
-        return new UsernamePasswordAuthenticationToken(
-                email,
-                userRepository.findByEmail(email).get().getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
     }
 }

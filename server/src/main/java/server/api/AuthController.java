@@ -64,7 +64,7 @@ public class AuthController {
         try {
             // TODO: allow authentication with both mail and username
             // Authenticate the user
-            var authToken = new UsernamePasswordAuthenticationToken(auth.getPassword(), auth.getPassword());
+            var authToken = new UsernamePasswordAuthenticationToken(auth.getEmail(), auth.getPassword());
             authenticationManager.authenticate(authToken);
 
             // Generate a JWT token and return it
