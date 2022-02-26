@@ -19,6 +19,7 @@ package client;
 import static com.google.inject.Guice.createInjector;
 
 import client.scenes.GameScreenCtrl;
+import client.scenes.LobbyCtrl;
 import client.scenes.MainCtrl;
 import com.google.inject.Injector;
 import java.io.IOException;
@@ -44,8 +45,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws IOException {
 
         var gameScreen = FXML.load(GameScreenCtrl.class, "client", "scenes", "GameScreen.fxml");
+        var lobbyScreen = FXML.load(LobbyCtrl.class, "client", "scenes", "Lobby.fxml");
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, gameScreen);
+        mainCtrl.initialize(primaryStage, lobbyScreen, gameScreen);
     }
 }
