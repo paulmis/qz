@@ -1,7 +1,6 @@
 package server.database.entities.auth.config;
 
 import javax.servlet.http.HttpServletResponse;
-
 import lombok.Generated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

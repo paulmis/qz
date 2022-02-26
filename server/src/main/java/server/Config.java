@@ -17,7 +17,6 @@
 package server;
 
 import java.util.Random;
-
 import lombok.Generated;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
