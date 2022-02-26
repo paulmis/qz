@@ -54,7 +54,6 @@ public class MainCtrl {
 
         showLobbyScreen();
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
-        showGameScreen();
         primaryStage.show();
     }
 
