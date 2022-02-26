@@ -17,10 +17,10 @@
    <children>
       <ImageView fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <image>
-            <Image url="@../../images/appolinary-kalashnikova-WYGhTLym344-unsplash-stroke-and-fill%201.jpg" />
+            <Image url="@../../images/appolinary-kalashnikova-WYGhTLym344-unsplash-stroke-and-fill 1.jpg" />
          </image>
       </ImageView>
-      <Pane layoutX="400.0" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;" stylesheets="@../OOPP/repository-template/client/src/main/resources/client/stylesheets/GlobalTheme.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="400.0" AnchorPane.topAnchor="0.0">
+      <Pane layoutX="400.0" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="400.0" AnchorPane.topAnchor="0.0">
          <children>
             <TextField layoutX="16.0" layoutY="181.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
                <font>
