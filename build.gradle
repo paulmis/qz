@@ -48,7 +48,7 @@ subprojects {
 	dependencies {
 		implementation 'org.apache.commons:commons-lang3:3.12.0'
 		implementation group: 'com.auth0', name: 'java-jwt', version: '3.18.3'
-		implementation 'assertj-core:assertj-core:3.12.1'
+		testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.22.0'
 		testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
 		testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 		testImplementation 'org.mockito:mockito-core:4.1.0'
