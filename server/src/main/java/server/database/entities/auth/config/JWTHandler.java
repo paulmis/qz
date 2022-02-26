@@ -37,6 +37,7 @@ public class JWTHandler {
      */
     public String generateToken(String email) throws IllegalArgumentException, JWTCreationException {
         return JWT.create()
+                .withExpiresAt(new Date(System.currentTimeMillis() + JWT_TTL * 1000))
                 .withSubject("User")
                 .withClaim("email", email)
                 .withIssuedAt(new Date())
