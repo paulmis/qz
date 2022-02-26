@@ -16,6 +16,9 @@
 
 package client.scenes;
 
+import client.scenes.authentication.RegisterScreenCtrl;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -37,6 +40,10 @@ public class MainCtrl {
     private Scene lobbyScene;
 
 
+    private RegisterScreenCtrl registerScreenCtrl;
+    private Scene registerScreen;
+
+
     /**
      * Initialize the main controller.
      *
@@ -45,6 +52,7 @@ public class MainCtrl {
     public void initialize(Stage primaryStage,
                            Pair<LobbyCtrl, Parent> lobbyScreen,
                            Pair<GameScreenCtrl, Parent> gameScreen) {
+    public void initialize(Stage primaryStage, Pair<RegisterScreenCtrl, Parent> registerScreen, Pair<GameScreenCtrl, Parent> gameScreen) {
         this.primaryStage = primaryStage;
 
         this.lobbyCtrl = lobbyScreen.getKey();
@@ -53,7 +61,12 @@ public class MainCtrl {
         this.gameScreen = new Scene(gameScreen.getValue());
 
         showLobbyScreen();
+
+        this.registerScreen = new Scene (registerScreen.getValue());
+        this.registerScreenCtrl = registerScreen.getKey();
+
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
+        showRegisterScreen();
         primaryStage.show();
     }
 
@@ -75,6 +88,18 @@ public class MainCtrl {
     public void showLobbyScreen() {
         primaryStage.setTitle(lobbyCtrl.getName());
         primaryStage.setScene(lobbyScene);
+        primaryStage.sizeToScene();
+        primaryStage.setMinHeight(500);
+        primaryStage.setMinWidth(500);
+    }
+
+    /**
+     * This function displays the register screen.
+     * It also sets it min width and height
+     */
+    public void showRegisterScreen() {
+        primaryStage.setTitle("Register Screen");
+        primaryStage.setScene(registerScreen);
         primaryStage.sizeToScene();
         primaryStage.setMinHeight(500);
         primaryStage.setMinWidth(500);

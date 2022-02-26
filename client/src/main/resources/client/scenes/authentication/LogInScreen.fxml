@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
+   <children>
+      <ImageView fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <image>
+            <Image url="@../../images/appolinary-kalashnikova-WYGhTLym344-unsplash-stroke-and-fill%201.jpg" />
+         </image>
+      </ImageView>
+      <Pane layoutX="200.0" layoutY="100.0" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;" stylesheets="@../OOPP/repository-template/client/src/main/resources/client/stylesheets/GlobalTheme.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <TextField alignment="BOTTOM_LEFT" editable="false" layoutX="14.0" layoutY="166.0" text="Email :">
+               <font>
+                  <Font name="Arial Bold" size="11.0" />
+               </font>
+            </TextField>
+            <TextField alignment="BOTTOM_LEFT" editable="false" layoutX="14.0" layoutY="215.0" text="Password :">
+               <font>
+                  <Font name="Arial Bold" size="11.0" />
+               </font>
+            </TextField>
+            <ImageView fitHeight="103.0" fitWidth="120.0" layoutX="51.0" layoutY="17.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../images/logo.png" />
+               </image>
+            </ImageView>
+            <TextField editable="false" layoutX="14.0" layoutY="134.0" prefHeight="31.0" prefWidth="161.0" text="Log in">
+               <font>
+                  <Font name="Arial Bold" size="16.0" />
+               </font>
+            </TextField>
+            <TextField layoutX="14.0" layoutY="186.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </TextField>
+            <TextField layoutX="14.0" layoutY="237.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </TextField>
+            <CheckBox layoutX="14.0" layoutY="266.0" mnemonicParsing="false" text="Remember me">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </CheckBox>
+            <Button alignment="CENTER" layoutX="111.0" layoutY="297.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="84.0" style="-fx-background-color: #6EB26C;" text="Log in" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
+            <Button alignment="CENTER" layoutX="20.0" layoutY="355.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="161.0" style="-fx-background-color: #DFD93F;" text="I want to create an account" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="11.0" />
+               </font>
+            </Button>
+         </children></Pane>
+   </children>
+</AnchorPane>
