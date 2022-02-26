@@ -49,9 +49,11 @@ public class AuthFilter extends OncePerRequestFilter {
                     // Validate the token and retrieve the user
                     String email = handler.validateToken(jwt);
                     UserDetails authDAO = customUserDetailsService.loadUserByUsername(email);
-
                     UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(email, authDAO.getPassword(), authDAO.getAuthorities());
+                            new UsernamePasswordAuthenticationToken(
+                                    email,
+                                    authDAO.getPassword(),
+                                    authDAO.getAuthorities());
 
                     // Set the user in the security context
                     if (SecurityContextHolder.getContext().getAuthentication() == null) {

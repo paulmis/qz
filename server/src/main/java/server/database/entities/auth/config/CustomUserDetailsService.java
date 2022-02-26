@@ -1,5 +1,7 @@
 package server.database.entities.auth.config;
 
+import java.util.Collections;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,9 +10,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import server.database.entities.User;
 import server.database.repositories.UserRepository;
-
-import java.util.Collections;
-import java.util.Optional;
 
 /**
  * Implements the UserDetailsService providing DAOs for authentication manager.
