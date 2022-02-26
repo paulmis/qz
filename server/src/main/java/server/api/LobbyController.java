@@ -4,6 +4,7 @@ import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,8 @@ public class LobbyController {
         } else {
             System.out.println(param.get() + ", " + id);
         }
-        List<GameDTO> lobbies = lobbyRepository.findAllByStatus(GameStatus.CREATED);
+        List<GameDTO> lobbies = lobbyRepository.findAllByStatus(GameStatus.CREATED)
+                .stream().map(g -> g.getDTO()).collect(Collectors.toList());
         if (id == null) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
@@ -62,7 +64,8 @@ public class LobbyController {
     @GetMapping(path = {"", "/available"})
     ResponseEntity<List<GameDTO>> availableLobbies() {
         // It should return games with status Created
-        List<GameDTO> lobbies = lobbyRepository.findAllByStatus(GameStatus.CREATED);
+        List<GameDTO> lobbies = lobbyRepository.findAllByStatus(GameStatus.CREATED)
+                .stream().map(g -> g.getDTO()).collect(Collectors.toList());
         return new ResponseEntity<>(lobbies, HttpStatus.OK);
     }
 }
