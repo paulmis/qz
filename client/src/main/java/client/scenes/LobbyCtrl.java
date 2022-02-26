@@ -14,20 +14,20 @@ public class LobbyCtrl {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
-    protected String name = "Ligma's Lobby";
+    private String name = "Ligma's Lobby";
 
     @FXML
-    public JFXButton settingsButton;
+    private JFXButton settingsButton;
     @FXML
-    public JFXButton userButton;
+    private JFXButton userButton;
     @FXML
-    public JFXButton copyLinkButton;
+    private JFXButton copyLinkButton;
     @FXML
-    public JFXButton startButton;
+    private JFXButton startButton;
     @FXML
-    public JFXButton lobbySettingsButton;
+    private JFXButton lobbySettingsButton;
     @FXML
-    public JFXButton disbandButton;
+    private JFXButton disbandButton;
 
     /**
      * Initialize a new controller using dependency injection.
