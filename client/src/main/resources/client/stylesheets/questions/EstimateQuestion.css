@@ -1,0 +1,11 @@
+#answerBox {
+    -fx-background-color: backgroundColor;
+}
+
+#estimatePrompt {
+    -fx-text-fill: answersTextColor;
+}
+
+#whLabel {
+    -fx-text-fill: answersTextColor;
+}

@@ -1,0 +1,4 @@
+.button {
+    -fx-background-color: primaryColor;
+    -fx-text-fill: buttonTextColor;
+}

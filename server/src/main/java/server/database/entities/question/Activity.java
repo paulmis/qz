@@ -1,46 +1,54 @@
 package server.database.entities.question;
 
+import commons.entities.ActivityDTO;
 import java.util.List;
-import java.util.UUID;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.modelmapper.ModelMapper;
+import server.database.entities.utils.BaseEntity;
 
 /**
  * Activity data structure - describes a single activity and its energetic cost.
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @Entity
-public class Activity {
+public class Activity extends BaseEntity<ActivityDTO> {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    /**
+     * Construct a new entity from a DTO.
+     *
+     * @param dto DTO to map to entity.
+     */
+    public Activity(ActivityDTO dto) {
+        new ModelMapper().map(dto, this);
+    }
 
     /**
      * List of questions in which the activity is used.
      * Needed for the many-to-many relation.
      */
     @ManyToMany(mappedBy = "activities")
-    List<Question> usedIn;
+    private List<Question> usedIn;
 
     /**
      * Description of the activity.
      */
-    public String description;
+    private String description;
 
     /**
      * The energy cost in Wh of the activity.
      */
-    public int cost;
+    private int cost;
 
     /**
      * The filepath to the icon of the activity.
      */
-    public String icon;
+    private String icon;
+
+
 }
