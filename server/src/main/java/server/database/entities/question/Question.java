@@ -12,7 +12,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Generated;
@@ -30,9 +29,9 @@ https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Generated
+@Entity
 public abstract class Question {
 
     @Id
