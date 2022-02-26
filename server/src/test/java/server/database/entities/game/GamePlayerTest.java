@@ -23,5 +23,7 @@ class GamePlayerTest {
 
         GamePlayer gamePlayerEntity = new GamePlayer(gamePlayer);
         assertEquals(userID, gamePlayerEntity.getUser().getId());
+        assertEquals(email, gamePlayerEntity.getUser().getEmail());
+        assertEquals(password, gamePlayerEntity.getUser().getPassword());
     }
 }

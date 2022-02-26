@@ -8,10 +8,11 @@ import org.junit.jupiter.api.Test;
 class ActivityTest {
     @Test
     void testFromDTOConstructor() {
+        String desc = "A sample description";
         ActivityDTO activityDTO = new ActivityDTO();
-        activityDTO.setDescription("A sample description");
+        activityDTO.setDescription(desc);
 
         Activity activity = new Activity(activityDTO);
-        assertEquals("A sample description", activity.getDescription());
+        assertEquals(desc, activity.getDescription());
     }
 }
