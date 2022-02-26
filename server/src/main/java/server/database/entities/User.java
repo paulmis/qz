@@ -1,40 +1,43 @@
 package server.database.entities;
 
+import commons.entities.UserDTO;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.ToString;
+import org.modelmapper.ModelMapper;
 import server.database.entities.game.GamePlayer;
+import server.database.entities.utils.BaseEntity;
 
 
 /**
  * User entity - describes an user in the context of the entire application.
  */
 
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor (access = AccessLevel.PUBLIC)
 @Data
 @Entity
-public class User {
+public class User extends BaseEntity<UserDTO> {
     /**
-     * id - random unique uuid assigned to a certain player.
+     * Construct a new entity from a DTO.
+     *
+     * @param dto DTO to map to entity.
      */
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    public User(UserDTO dto) {
+        new ModelMapper().map(dto, this);
+    }
 
     /**
      * email - string used for authentication purposes representing the email of the user.
@@ -46,7 +49,8 @@ public class User {
      * password - string representing user's salted password.
      */
     @ToString.Exclude
-    @NonNull private String password;
+    @Column(nullable = false)
+    private String password;
 
     /**
      * score - integer representing a player's total score.

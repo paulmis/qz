@@ -1,0 +1,19 @@
+/*
+    This file should be included in every screen.
+    It imports all the stylings.
+
+    If you need another stylesheet make sure to
+    include it below.
+*/
+
+@import "Colors.css";
+@import "controls/Slider.css";
+@import "controls/ScrollPane.css";
+@import "controls/IconView.css";
+@import "controls/ToggleButton.css";
+@import "controls/Label.css";
+@import "controls/HBox.css";
+@import "controls/TextField.css";
+@import "screens/GameScreen.css";
+@import "questions/MultipleChoiceQuestion.css";
+@import "questions/EstimateQuestion.css";
