@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -86,5 +87,40 @@ class EstimateQuestionTest {
         assertThrows(IllegalArgumentException.class, () -> {
             q.checkAnswer(null);
         });
+    }
+
+    @Test
+    void allArgsConstructorTest() {
+        // Test setup
+        String questionText = "aQuestion";
+        List<Activity> activities = new ArrayList<>(List.of(
+                getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
+        UUID anId = UUID.randomUUID();
+        Question estimateNoArgs = new EstimateQuestion();
+        estimateNoArgs.setId(anId);
+        estimateNoArgs.setActivities(List.copyOf(activities));
+        estimateNoArgs.setText(questionText);
+        Question estimateAllArgs = new EstimateQuestion(anId, activities, questionText);
+
+        // Constructor comparison
+        assertEquals(estimateNoArgs.getId(), estimateAllArgs.getId());
+        assertEquals(estimateNoArgs.getActivities(), estimateAllArgs.getActivities());
+        assertEquals(estimateNoArgs.getText(), estimateAllArgs.getText());
+    }
+
+    @Test
+    void copyConstructorTest() {
+        // Test setup
+        String questionText = "aQuestion";
+        List<Activity> activities = new ArrayList<>(List.of(
+                getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
+        UUID anId = UUID.randomUUID();
+        Question estimateAllArgs = new EstimateQuestion(anId, activities, questionText);
+        Question estimateCopy = new EstimateQuestion(estimateAllArgs);
+
+        // Constructor comparison
+        assertEquals(estimateAllArgs.getId(), estimateCopy.getId());
+        assertEquals(estimateAllArgs.getActivities(), estimateCopy.getActivities());
+        assertEquals(estimateAllArgs.getText(), estimateCopy.getText());
     }
 }

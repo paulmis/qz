@@ -12,6 +12,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.MappedSuperclass;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
@@ -27,14 +29,15 @@ https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
  */
 @Data
 @NoArgsConstructor
-@Entity
+@AllArgsConstructor
+@MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Generated
 public abstract class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    protected UUID id;
 
     /**
      * List of activities used to generate the question.
@@ -45,12 +48,12 @@ public abstract class Question {
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "activity_id"))
     @ToString.Exclude
-    public List<Activity> activities = new ArrayList<>();
+    protected List<Activity> activities = new ArrayList<>();
 
     /**
      * Question asked the user.
      */
-    public String text;
+    protected String text;
 
     /**
      * Copy constructor for the Question class.

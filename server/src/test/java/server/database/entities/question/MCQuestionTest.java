@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -76,5 +77,50 @@ class MCQuestionTest {
         assertThrows(IllegalArgumentException.class, () -> {
             q.checkAnswer(null);
         });
+    }
+
+    @Test
+    void allArgsConstructorTest() {
+        // Test setup
+        Question mcNoArgs = new MCQuestion();
+        UUID anId = UUID.randomUUID();
+        mcNoArgs.setId(anId);
+        List<Activity> activities = new ArrayList<>(List.of(
+                getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
+        mcNoArgs.setActivities(List.copyOf(activities));
+        String questionText = "aQuestion";
+        mcNoArgs.setText(questionText);
+        Activity answer = getActivity(2);
+        ((MCQuestion) mcNoArgs).setAnswer(answer);
+        boolean guessConsumption = true;
+        ((MCQuestion) mcNoArgs).setGuessConsumption(guessConsumption);
+        Question mcAllArgs = new MCQuestion(anId, activities, questionText, answer, guessConsumption);
+
+        // Constructor comparison
+        assertEquals(mcNoArgs.getId(), mcAllArgs.getId());
+        assertEquals(mcNoArgs.getActivities(), mcAllArgs.getActivities());
+        assertEquals(mcNoArgs.getText(), mcAllArgs.getText());
+        assertEquals(((MCQuestion) mcNoArgs).getAnswer(), ((MCQuestion) mcAllArgs).getAnswer());
+        assertEquals(((MCQuestion) mcNoArgs).isGuessConsumption(), ((MCQuestion) mcAllArgs).isGuessConsumption());
+    }
+
+    @Test
+    void copyConstructorTest() {
+        // Test setup
+        String questionText = "aQuestion";
+        List<Activity> activities = new ArrayList<>(List.of(
+                getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
+        UUID anId = UUID.randomUUID();
+        Activity answer = getActivity(2);
+        boolean guessConsumption = true;
+        Question mcAllArgs = new MCQuestion(anId, activities, questionText, answer, guessConsumption);
+        Question mcCopy = new MCQuestion(mcAllArgs, answer, guessConsumption);
+
+        // Constructor comparison
+        assertEquals(mcAllArgs.getId(), mcCopy.getId());
+        assertEquals(mcAllArgs.getActivities(), mcCopy.getActivities());
+        assertEquals(mcAllArgs.getText(), mcCopy.getText());
+        assertEquals(((MCQuestion) mcAllArgs).getAnswer(), ((MCQuestion) mcCopy).getAnswer());
+        assertEquals(((MCQuestion) mcAllArgs).isGuessConsumption(), ((MCQuestion) mcCopy).isGuessConsumption());
     }
 }
