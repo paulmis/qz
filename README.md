@@ -23,16 +23,16 @@ This project is a quizzz app. The quizzz app is a singleplayer and multiplayer g
 The quizzz app consists of two components; a client and a server. Both of these must be run seperatly in order to work, with the serve running first and then the client. 
 
 Running the server:
-1. Run the `main` java file in the `server` folder
+1. Run the `Main` java file in the `server` folder
 2. This may take a few minutes during the initial build/run
 3. In the command line it should say `started main` in the last lines
 4. The server is now running
 
 Running the client:
-1. Edit run/debug configuration the`main` file in the `client` folder
+1. Edit run/debug configuration the`Main` file in the `client` folder
 2. Click on VM options/arguments and add the following:
 `--module-path="<LIB PATH IN JAVAFX FOLDER WHICH WAS DOWNLOADED>"--add-modules=javafx.controls,javafx.fxml`
-3. Run the `main` java file in the `client` folder
+3. Run the `Main` java file in the `client` folder
 4. The client is now running and is interactable
 
 ## How to setup development environment
