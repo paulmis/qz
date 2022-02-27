@@ -6,7 +6,10 @@ import java.util.ResourceBundle;
 import client.scenes.MainCtrl;
 import client.utils.ServerUtils;
 import com.jfoenix.controls.JFXButton;
+<<<<<<< HEAD
 import com.google.inject.Inject;
+=======
+>>>>>>> 6bf611a (Added server utils function and removed useless attributes)
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -29,10 +32,10 @@ public class RegisterScreenCtrl implements Initializable {
     private final MainCtrl mainCtrl;
 
     @FXML
-    private Button signUpButton;
+    private JFXButton signUpButton;
 
     @FXML
-    private Button haveAccountButton;
+    private JFXButton haveAccountButton;
 
     @FXML
     private CheckBox rememberMe;
@@ -49,7 +52,10 @@ public class RegisterScreenCtrl implements Initializable {
      * @param email The email of the user
      * @param password The password of the user.
      */
+<<<<<<< HEAD
     @Inject
+=======
+>>>>>>> 6bf611a (Added server utils function and removed useless attributes)
     public RegisterScreenCtrl(String email, String password, ServerUtils server, MainCtrl mainCtrl) {
         this.email = email;
         this.password = password;
@@ -67,6 +73,7 @@ public class RegisterScreenCtrl implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+<<<<<<< HEAD
     }
 
     /**
@@ -98,5 +105,13 @@ public class RegisterScreenCtrl implements Initializable {
 
     public void rememberMeUntick () {
         System.out.print("User wants to not be registered...");
+=======
+       signUpButton.setOnAction(event -> {
+               var ans = server.register(emailField.getText(), passwordField.getText());
+               System.out.println("Da");
+               if(ans.length()>0)
+                   System.out.println("Da");
+           });
+>>>>>>> 6bf611a (Added server utils function and removed useless attributes)
     }
 }
