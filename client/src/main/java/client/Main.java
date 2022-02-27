@@ -21,7 +21,9 @@ import static com.google.inject.Guice.createInjector;
 import client.scenes.GameScreenCtrl;
 import client.scenes.LobbyCtrl;
 import client.scenes.MainCtrl;
+import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
+import client.scenes.authentication.ServerConnectScreenCtrl;
 import com.google.inject.Injector;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -47,9 +49,12 @@ public class Main extends Application {
 
         var gameScreen = FXML.load(GameScreenCtrl.class, "client", "scenes", "GameScreen.fxml");
         var registerScreen = FXML.load(RegisterScreenCtrl.class, "client", "scenes", "authentication", "RegisterScreen.fxml");
+        var serverConnectScreen = FXML.load (ServerConnectScreenCtrl.class, "client", "scenes", "authentication", "ServerConnectScreen.fxml");
+        var LogInScreen = FXML.load (LogInScreenCtrl.class, "client", "scenes", "authentication", "LogInScreen.fxml");
         var lobbyScreen = FXML.load(LobbyCtrl.class, "client", "scenes", "LobbyScreen.fxml");
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
+        mainCtrl.initialize(primaryStage, serverConnectScreen, LogInScreen, registerScreen, gameScreen);
         mainCtrl.initialize(primaryStage, registerScreen, gameScreen);
         mainCtrl.initialize(primaryStage, lobbyScreen, gameScreen);
     }

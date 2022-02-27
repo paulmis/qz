@@ -16,7 +16,9 @@
 
 package client.scenes;
 
+import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
+import client.scenes.authentication.ServerConnectScreenCtrl;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.Parent;
@@ -25,6 +27,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import lombok.Generated;
+import lombok.extern.java.Log;
 
 /**
  * Main controller for the client application.
@@ -43,6 +46,11 @@ public class MainCtrl {
     private RegisterScreenCtrl registerScreenCtrl;
     private Scene registerScreen;
 
+    private ServerConnectScreenCtrl serverConnectScreenCtrl;
+    private Scene serverConnectScreen;
+
+    private LogInScreenCtrl logInScreenCtrl;
+    private Scene logInScreen;
 
     /**
      * Initialize the main controller.
@@ -53,6 +61,7 @@ public class MainCtrl {
                            Pair<LobbyCtrl, Parent> lobbyScreen,
                            Pair<GameScreenCtrl, Parent> gameScreen) {
     public void initialize(Stage primaryStage, Pair<RegisterScreenCtrl, Parent> registerScreen, Pair<GameScreenCtrl, Parent> gameScreen) {
+    public void initialize(Stage primaryStage, Pair<ServerConnectScreenCtrl, Parent> serverConnectScreen, Pair<LogInScreenCtrl, Parent> logInScreen, Pair<RegisterScreenCtrl, Parent> registerScreen, Pair<GameScreenCtrl, Parent> gameScreen) {
         this.primaryStage = primaryStage;
 
         this.lobbyCtrl = lobbyScreen.getKey();
@@ -62,21 +71,40 @@ public class MainCtrl {
 
         showLobbyScreen();
 
+        this.logInScreen = new Scene (logInScreen.getValue());
+        this.logInScreenCtrl = logInScreen.getKey();
+
         this.registerScreen = new Scene (registerScreen.getValue());
         this.registerScreenCtrl = registerScreen.getKey();
 
+        this.serverConnectScreen = new Scene (serverConnectScreen.getValue());
+        this.serverConnectScreenCtrl = serverConnectScreen.getKey();
+
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
-        showRegisterScreen();
+        showServerConnectScreen();
         primaryStage.show();
     }
 
+
     /**
-     * This function displays the game screen.
+     * This function displays the register screen.
+     * It also sets it min width and height
+     */
+    public void showServerConnectScreen() {
+        primaryStage.setTitle("Server Connect Screen");
+        primaryStage.setScene(serverConnectScreen);
+        primaryStage.sizeToScene();
+        primaryStage.setMinHeight(500);
+        primaryStage.setMinWidth(500);
+    }
+
+    /**
+     * This function displays the log in screen.
      * It also sets it min width and height.
      */
-    public void showGameScreen() {
-        primaryStage.setTitle("Game Screen");
-        primaryStage.setScene(gameScreen);
+    public void showLogInScreen() {
+        primaryStage.setTitle("Log In Screen");
+        primaryStage.setScene(logInScreen);
         primaryStage.sizeToScene();
         primaryStage.setMinHeight(500);
         primaryStage.setMinWidth(500);
@@ -100,6 +128,18 @@ public class MainCtrl {
     public void showRegisterScreen() {
         primaryStage.setTitle("Register Screen");
         primaryStage.setScene(registerScreen);
+        primaryStage.sizeToScene();
+        primaryStage.setMinHeight(500);
+        primaryStage.setMinWidth(500);
+    }
+
+    /**
+     * This function displays the game screen.
+     * It also sets it min width and height.
+     */
+    public void showGameScreen() {
+        primaryStage.setTitle("Game Screen");
+        primaryStage.setScene(gameScreen);
         primaryStage.sizeToScene();
         primaryStage.setMinHeight(500);
         primaryStage.setMinWidth(500);

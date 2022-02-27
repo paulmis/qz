@@ -32,10 +32,10 @@ public class RegisterScreenCtrl implements Initializable {
     private final MainCtrl mainCtrl;
 
     @FXML
-    private JFXButton signUpButton;
+    private Button signUpButton;
 
     @FXML
-    private JFXButton haveAccountButton;
+    private Button haveAccountButton;
 
     @FXML
     private CheckBox rememberMe;
@@ -113,5 +113,36 @@ public class RegisterScreenCtrl implements Initializable {
                    System.out.println("Da");
            });
 >>>>>>> 6bf611a (Added server utils function and removed useless attributes)
+    }
+
+    /**
+     * Function that sends new account credentials to server
+     * after a button click
+     */
+    public void signUpButtonClick () {
+        server.register(emailField.getText(), passwordField.getText());
+        System.out.print("Registering new account credentials...");
+        mainCtrl.showGameScreen();
+    }
+
+    /**
+     * Function that takes user to login page
+     * if they have an account
+     */
+    public void haveAccountButtonClick () {
+        mainCtrl.showLogInScreen();
+        System.out.print("Registering new account credentials...");
+    }
+
+    /**
+     * Function that keeps track if user
+     * wants to be remembered locally or not
+     */
+    public void rememberMeTick () {
+        System.out.print("User wants to be registered...");
+    }
+
+    public void rememberMeUntick () {
+        System.out.print("User wants to not be registered...");
     }
 }

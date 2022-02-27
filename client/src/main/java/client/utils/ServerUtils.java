@@ -96,7 +96,17 @@ public class ServerUtils {
     }
 
     public String register (String email, String password) {
-        System.out.println("registered");
+        System.out.println("Registering new User...");
+        return "200";
+    }
+
+    public String connectUser (String email, String password) {
+        System.out.println("Verifying  User Credentials...");
+        return "200";
+    }
+
+    public String connect () {
+        System.out.println("new connection");
         return "200";
     }
 }
