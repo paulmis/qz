@@ -20,6 +20,20 @@ This project is a quizzz app. The quizzz app is a singleplayer and multiplayer g
 <!-- - (please make sure the photos have the same size) -->
 
 ## How to run it
+
+
+## How to setup development environment
+Setting up environment:
+1. Resources required for development:
+    * Install an IDE of your choice ie. Intellij IDEA, Eclipse, etc.
+    * Download [JavaFX](https://gluonhq.com/products/javafx/)
+    * Download [Scene Builder](https://gluonhq.com/products/scene-builder/#download)
+    * Download [Postman (HTTP Requests Testing Tool)](https://www.postman.com/downloads/)
+2. Clone this repository
+3. Import the repository folder into your chosen IDE
+4. This will take a few minutes to initialize
+5. You can start development
+
 The quizzz app consists of two components; a client and a server. Both of these must be run seperatly in order to work, with the serve running first and then the client. 
 
 Running the server:
@@ -35,19 +49,8 @@ Running the client:
 3. Run the `Main` java file in the `client` folder
 4. The client is now running and is interactable
 
-## How to setup development environment
-1. Resources required for development:
-    * Install [JDK](https://www.oracle.com/java/technologies/downloads/)
-    * Install an IDE of your choice ie. Intellij IDEA, Eclipse, etc.
-    * Download [JavaFX](https://gluonhq.com/products/javafx/)
-    * Download [Scene Builder](https://gluonhq.com/products/scene-builder/#download)
-    * Download [Postman (HTTP Requests Testing Tool)](https://www.postman.com/downloads/)
-2. Clone this repository
-3. Import the repository folder into your chosen IDE
-4. This will take a few minutes to initialize
-5. You can start development
-
 ## How to contribute to it
+`<TBA>`
 
 ## Copyright / License
 GNU General Public License:
