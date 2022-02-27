@@ -1,5 +1,6 @@
 package server.database.entities.auth.config;
 
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import java.io.IOException;
@@ -66,6 +67,8 @@ public class AuthFilter extends OncePerRequestFilter {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token");
                 } catch (NoSuchElementException | UsernameNotFoundException ex) {
                     response.sendError(HttpServletResponse.SC_CONFLICT, "JWT Token's user no longer exists");
+                } catch (JWTDecodeException ex) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Malformed request");
                 }
             }
         }
