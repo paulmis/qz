@@ -94,4 +94,9 @@ public class ServerUtils {
             return new ArrayList<>();
         }
     }
+
+    public String register (String email, String password) {
+        System.out.println("registered");
+        return "200";
+    }
 }

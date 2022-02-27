@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -16,7 +17,7 @@
       <Insets />
    </opaqueInsets>
    <children>
-      <ImageView blendMode="OVERLAY" fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" AnchorPane.topAnchor="0.0">
+      <ImageView fitHeight="400.0" fitWidth="329.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@/client/images/appolinary-kalashnikova-WYGhTLym344-unsplash-stroke-and-fill 1.jpg" />
          </image>
@@ -25,32 +26,14 @@
          <right>
             <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
                <children>
-                  <ImageView fitHeight="103.0" fitWidth="120.0" layoutX="49.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="103.0" fitWidth="120.0" layoutX="37.0" layoutY="14.0" pickOnBounds="true">
                      <image>
                         <Image url="@/client/images/logo.png" />
                      </image>
                   </ImageView>
-                  <TextField editable="false" layoutX="16.0" layoutY="127.0" prefHeight="31.0" prefWidth="161.0" style="-fx-border-color: white;" text="Register">
-                     <font>
-                        <Font name="Arial Bold" size="16.0" />
-                     </font>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                  </TextField>
-                  <TextField alignment="BOTTOM_LEFT" editable="false" layoutX="16.0" layoutY="159.0" text="Email :">
-                     <font>
-                        <Font name="Arial Bold" size="11.0" />
-                     </font>
-                  </TextField>
                   <TextField layoutX="16.0" layoutY="181.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
                      <font>
                         <Font size="13.0" />
-                     </font>
-                  </TextField>
-                  <TextField alignment="BOTTOM_LEFT" editable="false" layoutX="16.0" layoutY="210.0" text="Password :">
-                     <font>
-                        <Font name="Arial Bold" size="11.0" />
                      </font>
                   </TextField>
                   <TextField layoutX="16.0" layoutY="232.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
@@ -73,6 +56,21 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Button>
+                  <Label alignment="CENTER" layoutX="19.0" layoutY="133.0" prefHeight="21.0" prefWidth="128.0" text="Register">
+                     <font>
+                        <Font name="Arial Bold" size="19.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="22.0" layoutY="162.0" prefHeight="19.0" prefWidth="149.0" text="Email">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="19.0" layoutY="210.0" prefHeight="21.0" prefWidth="155.0" text="Password">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </Label>
                </children>
             </Pane>
          </right>
