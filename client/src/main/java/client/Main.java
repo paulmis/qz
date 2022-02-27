@@ -54,8 +54,6 @@ public class Main extends Application {
         var lobbyScreen = FXML.load(LobbyCtrl.class, "client", "scenes", "LobbyScreen.fxml");
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, serverConnectScreen, LogInScreen, registerScreen, gameScreen);
-        mainCtrl.initialize(primaryStage, registerScreen, gameScreen);
-        mainCtrl.initialize(primaryStage, lobbyScreen, gameScreen);
+        mainCtrl.initialize(primaryStage, serverConnectScreen, LogInScreen, registerScreen, lobbyScreen, gameScreen);
     }
 }

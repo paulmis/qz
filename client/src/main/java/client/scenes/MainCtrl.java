@@ -58,18 +58,15 @@ public class MainCtrl {
      * @param primaryStage Primary stage of the application
      */
     public void initialize(Stage primaryStage,
+                           Pair<ServerConnectScreenCtrl, Parent> serverConnectScreen,
+                           Pair<LogInScreenCtrl, Parent> logInScreen,
+                           Pair<RegisterScreenCtrl, Parent> registerScreen,
                            Pair<LobbyCtrl, Parent> lobbyScreen,
                            Pair<GameScreenCtrl, Parent> gameScreen) {
-    public void initialize(Stage primaryStage, Pair<RegisterScreenCtrl, Parent> registerScreen, Pair<GameScreenCtrl, Parent> gameScreen) {
-    public void initialize(Stage primaryStage, Pair<ServerConnectScreenCtrl, Parent> serverConnectScreen, Pair<LogInScreenCtrl, Parent> logInScreen, Pair<RegisterScreenCtrl, Parent> registerScreen, Pair<GameScreenCtrl, Parent> gameScreen) {
         this.primaryStage = primaryStage;
 
         this.lobbyCtrl = lobbyScreen.getKey();
         this.lobbyScene = new Scene(lobbyScreen.getValue());
-        this.gameScreenCtrl = gameScreen.getKey();
-        this.gameScreen = new Scene(gameScreen.getValue());
-
-        showLobbyScreen();
 
         this.logInScreen = new Scene (logInScreen.getValue());
         this.logInScreenCtrl = logInScreen.getKey();
@@ -79,6 +76,10 @@ public class MainCtrl {
 
         this.serverConnectScreen = new Scene (serverConnectScreen.getValue());
         this.serverConnectScreenCtrl = serverConnectScreen.getKey();
+
+
+        this.gameScreenCtrl = gameScreen.getKey();
+        this.gameScreen = new Scene(gameScreen.getValue());
 
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
         showServerConnectScreen();

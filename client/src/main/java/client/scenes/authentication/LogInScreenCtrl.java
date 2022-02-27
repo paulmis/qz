@@ -75,7 +75,7 @@ public class LogInScreenCtrl implements Initializable {
      */
     public void logInButtonClick () {
         server.connectUser(emailField.getText(), passwordField.getText());
-        mainCtrl.showGameScreen();
+        mainCtrl.showLobbyScreen();
     }
 
     /**
