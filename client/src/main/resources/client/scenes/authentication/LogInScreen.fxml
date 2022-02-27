@@ -48,7 +48,7 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Button>
-            <Button fx:id="createAccountButton" alignment="CENTER" layoutX="20.0" layoutY="355.0" mnemonicParsing="false" onMouseClicked="#creatAccountButtonClick" prefHeight="31.0" prefWidth="161.0" style="-fx-background-color: #DFD93F;" text="I want to create an account" textAlignment="CENTER" textFill="WHITE">
+            <Button fx:id="createAccountButton" alignment="CENTER" layoutX="20.0" layoutY="355.0" mnemonicParsing="false" onMouseClicked="#createAccountButtonClick" prefHeight="31.0" prefWidth="161.0" style="-fx-background-color: #DFD93F;" text="I want to create an account" textAlignment="CENTER" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="11.0" />
                </font>

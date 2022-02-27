@@ -18,7 +18,7 @@ import javafx.scene.control.TextField;
 
 
 /**
- * Estimate Question type controller.
+ * Register Screen controller class.
  */
 public class RegisterScreenCtrl implements Initializable {
 

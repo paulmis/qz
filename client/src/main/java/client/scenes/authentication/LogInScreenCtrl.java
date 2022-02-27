@@ -18,7 +18,7 @@ import javafx.scene.control.TextField;
 
 
 /**
- * Estimate Question type controller.
+ * Log in Screen controller class.
  */
 public class LogInScreenCtrl implements Initializable {
 
@@ -82,7 +82,7 @@ public class LogInScreenCtrl implements Initializable {
      * Function that takes user to login page
      * if they have an account
      */
-    public void creatAccountButtonClick () {
+    public void createAccountButtonClick () {
         mainCtrl.showRegisterScreen();
     }
 

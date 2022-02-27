@@ -17,7 +17,7 @@ import javafx.scene.control.TextField;
 
 
 /**
- * Estimate Question type controller.
+ * ServerConnectScreen controller class.
  */
 public class ServerConnectScreenCtrl implements Initializable {
 
