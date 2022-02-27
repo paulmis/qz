@@ -4,7 +4,6 @@ import commons.entities.game.GameDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.GameStatus;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.NonNull;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
@@ -38,30 +36,6 @@ public class LobbyController {
      */
     @Autowired
     private GameRepository lobbyRepository;
-
-    /**
-     * Endpoint for testing. To be removed.
-     *
-     * @return a list of available lobbies.
-     */
-    @GetMapping(path = {"", "/test/{param}"})
-    ResponseEntity<List<GameDTO>> testEndpoint(
-            @RequestParam(required = false) Integer id, @PathVariable(required = false) Optional<String> param) {
-        if (!param.isPresent()) {
-            System.out.println(id);
-        } else {
-            System.out.println(param.get() + ", " + id);
-        }
-        List<GameDTO> lobbies = lobbyRepository.findAllByStatus(GameStatus.CREATED)
-                .stream().map(g -> g.getDTO()).collect(Collectors.toList());
-        if (id == null) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        if (id.equals(42)) {
-            return new ResponseEntity<>(null, HttpStatus.I_AM_A_TEAPOT);
-        }
-        return new ResponseEntity<>(lobbies, HttpStatus.OK);
-    }
 
     /**
      * Endpoint for available lobbies.
@@ -97,15 +71,15 @@ public class LobbyController {
      * Endpoint to allow a user to join a game.
      *
      * @param playerData information on the player.
-     * @param gameId     UUID of the game to join.
+     * @param lobbyId    UUID of the lobby to join.
      * @return true if the join was successful, false otherwise.
      */
-    @PostMapping(path = {"", "/join/{gameId}"})
+    @PostMapping(path = {"", "/join/{lobbyId}"})
     ResponseEntity<Boolean> joinLobby(
-            @RequestBody @NonNull GamePlayerDTO playerData, @PathVariable @NonNull UUID gameId) {
+            @RequestBody @NonNull GamePlayerDTO playerData, @PathVariable @NonNull UUID lobbyId) {
         // ToDo: it should respond only to authenticated users
         // ToDo: should maybe check whether the user is allowed to join? Or it's the client's job?
-        Game toJoin = lobbyRepository.getById(gameId);
+        Game toJoin = lobbyRepository.getById(lobbyId);
         if (toJoin == null) {
             return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
         }
