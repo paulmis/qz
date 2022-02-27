@@ -16,8 +16,6 @@
 
 package client.scenes;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -35,6 +33,8 @@ public class MainCtrl {
 
     private GameScreenCtrl gameScreenCtrl;
     private Scene gameScreen;
+    private LobbyCtrl lobbyCtrl;
+    private Scene lobbyScene;
 
 
     /**
@@ -42,13 +42,18 @@ public class MainCtrl {
      *
      * @param primaryStage Primary stage of the application
      */
-    public void initialize(Stage primaryStage, Pair<GameScreenCtrl, Parent> gameScreen) {
+    public void initialize(Stage primaryStage,
+                           Pair<LobbyCtrl, Parent> lobbyScreen,
+                           Pair<GameScreenCtrl, Parent> gameScreen) {
         this.primaryStage = primaryStage;
 
+        this.lobbyCtrl = lobbyScreen.getKey();
+        this.lobbyScene = new Scene(lobbyScreen.getValue());
         this.gameScreenCtrl = gameScreen.getKey();
         this.gameScreen = new Scene(gameScreen.getValue());
+
+        showLobbyScreen();
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
-        showGameScreen();
         primaryStage.show();
     }
 
@@ -59,6 +64,17 @@ public class MainCtrl {
     public void showGameScreen() {
         primaryStage.setTitle("Game Screen");
         primaryStage.setScene(gameScreen);
+        primaryStage.sizeToScene();
+        primaryStage.setMinHeight(500);
+        primaryStage.setMinWidth(500);
+    }
+
+    /**
+     * Shows the lobby screen.
+     */
+    public void showLobbyScreen() {
+        primaryStage.setTitle(lobbyCtrl.getName());
+        primaryStage.setScene(lobbyScene);
         primaryStage.sizeToScene();
         primaryStage.setMinHeight(500);
         primaryStage.setMinWidth(500);
