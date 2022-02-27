@@ -20,7 +20,7 @@ import javafx.scene.control.TextField;
 /**
  * Estimate Question type controller.
  */
-public class RegisterScreenCtrl implements Initializable {
+public class LogInScreenCtrl implements Initializable {
 
     private final String email;
     private final String password;
@@ -29,10 +29,10 @@ public class RegisterScreenCtrl implements Initializable {
     private final MainCtrl mainCtrl;
 
     @FXML
-    private Button signUpButton;
+    private Button logInButton;
 
     @FXML
-    private Button haveAccountButton;
+    private Button createAccountButton;
 
     @FXML
     private CheckBox rememberMe;
@@ -50,7 +50,7 @@ public class RegisterScreenCtrl implements Initializable {
      * @param password The password of the user.
      */
     @Inject
-    public RegisterScreenCtrl(String email, String password, ServerUtils server, MainCtrl mainCtrl) {
+    public LogInScreenCtrl(String email, String password, ServerUtils server, MainCtrl mainCtrl) {
         this.email = email;
         this.password = password;
         this.mainCtrl = mainCtrl;
@@ -73,9 +73,8 @@ public class RegisterScreenCtrl implements Initializable {
      * Function that sends new account credentials to server
      * after a button click
      */
-    public void signUpButtonClick () {
-        server.register(emailField.getText(), passwordField.getText());
-        System.out.print("Registering new account credentials...");
+    public void logInButtonClick () {
+        server.connectUser(emailField.getText(), passwordField.getText());
         mainCtrl.showGameScreen();
     }
 
@@ -83,9 +82,8 @@ public class RegisterScreenCtrl implements Initializable {
      * Function that takes user to login page
      * if they have an account
      */
-    public void haveAccountButtonClick () {
-        mainCtrl.showLogInScreen();
-        System.out.print("Registering new account credentials...");
+    public void creatAccountButtonClick () {
+        mainCtrl.showRegisterScreen();
     }
 
     /**

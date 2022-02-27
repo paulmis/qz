@@ -12,12 +12,12 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.authentication.RegisterScreenCtrl">
    <opaqueInsets>
       <Insets />
    </opaqueInsets>
    <children>
-      <ImageView fitHeight="400.0" fitWidth="329.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="415.0" fitWidth="614.0" layoutX="-7.0" layoutY="-8.0" pickOnBounds="true">
          <image>
             <Image url="@/client/images/appolinary-kalashnikova-WYGhTLym344-unsplash-stroke-and-fill 1.jpg" />
          </image>
@@ -31,27 +31,27 @@
                         <Image url="@/client/images/logo.png" />
                      </image>
                   </ImageView>
-                  <TextField layoutX="16.0" layoutY="181.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
+                  <TextField fx:id="emailField" layoutX="16.0" layoutY="181.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </TextField>
-                  <TextField layoutX="16.0" layoutY="232.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
+                  <TextField fx:id="passwordField" layoutX="16.0" layoutY="232.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </TextField>
-                  <CheckBox layoutX="16.0" layoutY="261.0" mnemonicParsing="false" text="Remember me">
+                  <CheckBox fx:id="rememberMe" layoutX="16.0" layoutY="261.0" mnemonicParsing="false" onMouseClicked="#rememberMeTick" text="Remember me">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </CheckBox>
-                  <Button alignment="CENTER" layoutX="107.0" layoutY="287.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="84.0" style="-fx-background-color: #6EB26C;" text="Sign Up" textAlignment="CENTER" textFill="WHITE">
+                  <Button fx:id="signUpButton" alignment="CENTER" layoutX="107.0" layoutY="287.0" mnemonicParsing="false" onMouseClicked="#signUpButtonClick" prefHeight="22.0" prefWidth="84.0" style="-fx-background-color: #6EB26C;" text="Sign Up" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Button>
-                  <Button alignment="CENTER" layoutX="25.0" layoutY="355.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="161.0" style="-fx-background-color: #DFD93F;" text="I already have an account" textAlignment="CENTER" textFill="WHITE">
+                  <Button fx:id="haveAccountButton" alignment="CENTER" layoutX="25.0" layoutY="355.0" mnemonicParsing="false" onMouseClicked="#haveAccountButtonClick" prefHeight="31.0" prefWidth="161.0" style="-fx-background-color: #DFD93F;" text="I already have an account" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
