@@ -38,17 +38,20 @@ public class LobbyController {
     /**
      * Repository of the games.
      */
-    @Autowired private GameRepository gameRepository;
+    @Autowired
+    private GameRepository gameRepository;
 
     /**
      * Repository of the users.
      */
-    @Autowired private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * Repository of the players.
      */
-    @Autowired private GamePlayerRepository gamePlayerRepository;
+    @Autowired
+    private GamePlayerRepository gamePlayerRepository;
 
     /**
      * Endpoint for available lobbies.
