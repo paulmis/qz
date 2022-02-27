@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.User;
+import server.database.entities.auth.config.AuthContext;
 import server.database.repositories.UserRepository;
 
 /**
@@ -26,8 +27,10 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<User> getUser() {
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> user = userRepository.findByEmail(email);
+        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        if (user.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(user.get());
     }
 }
