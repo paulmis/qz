@@ -6,6 +6,7 @@ import commons.entities.game.GameStatus;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,24 +33,15 @@ made following https://spring.io/guides/tutorials/rest/
  * Lobbies are games that haven't started yet.
  */
 @RestController
-@RequestMapping("/api/lobbies")
+@RequestMapping("/api/lobby")
 public class LobbyController {
 
-    /**
-     * Repository of the games.
-     */
     @Autowired
     private GameRepository gameRepository;
 
-    /**
-     * Repository of the users.
-     */
     @Autowired
     private UserRepository userRepository;
 
-    /**
-     * Repository of the players.
-     */
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
 
@@ -58,13 +50,13 @@ public class LobbyController {
      *
      * @return a list of available lobbies.
      */
-    @GetMapping(path = {"", "/available"})
+    @GetMapping("/available")
     ResponseEntity<List<GameDTO>> availableLobbies() {
         // ToDo: it should respond only to authenticated users
         // It returns games with status Created
         List<GameDTO> lobbies = gameRepository.findAllByStatus(GameStatus.CREATED)
                 .stream().map(g -> g.getDTO()).collect(Collectors.toList());
-        return new ResponseEntity<>(lobbies, HttpStatus.OK);
+        return ResponseEntity.ok(lobbies);
     }
 
     /**
@@ -76,11 +68,13 @@ public class LobbyController {
     @GetMapping(path = {"", "/{lobbyId}"})
     ResponseEntity<GameDTO> lobbyInfo(@PathVariable @NonNull UUID lobbyId) {
         // ToDo: it should respond only to authenticated users
-        Game lobby = gameRepository.getById(lobbyId);
-        if (lobby == null) {
+        Game lobby = null;
+        try {
+            lobby = gameRepository.getById(lobbyId);
+        } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(lobby.getDTO(), HttpStatus.OK);
+        return ResponseEntity.ok(lobby.getDTO());
     }
 
     /**
@@ -92,7 +86,7 @@ public class LobbyController {
      * @return true if the join was successful, false otherwise.
      */
     @PutMapping(path = {"", "/{lobbyId}/join/{userId}"})
-    ResponseEntity<Boolean> joinLobby(
+    ResponseEntity joinLobby(
             @RequestBody @NonNull GamePlayerDTO playerData,
             @PathVariable @NonNull UUID lobbyId,
             @PathVariable @NonNull UUID userId) {
@@ -100,21 +94,25 @@ public class LobbyController {
         // ToDo: it should maybe check whether the user is allowed to join? Or is it the client's job?
 
         // Find lobby to join
-        Game toJoin = gameRepository.getById(lobbyId);
-        if (toJoin == null) {
+        Game toJoin;
+        try {
+            toJoin = gameRepository.getById(lobbyId);
+        } catch (EntityNotFoundException e) {
             // No lobby.
-            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         if (toJoin.getStatus() != GameStatus.CREATED) {
             // Game already started.
-            return new ResponseEntity<>(false, HttpStatus.CONFLICT);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
         // Find user trying to join
-        User joiningUser = userRepository.getById(userId);
-        if (joiningUser == null) {
+        User joiningUser;
+        try {
+            joiningUser = userRepository.getById(userId);
+        } catch (EntityNotFoundException e) {
             // No user.
-            return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         // Create player
@@ -122,13 +120,11 @@ public class LobbyController {
         player.setUser(joiningUser);
 
         // Try to join the game
-        boolean success = toJoin.add(player);
-        if (success) {
+        if (toJoin.add(player)) {
             // Update repositories
             gameRepository.save(toJoin);
-            gamePlayerRepository.save(player);
-            userRepository.save(joiningUser);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        return new ResponseEntity<>(success, success ? HttpStatus.OK : HttpStatus.CONFLICT);
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 }
