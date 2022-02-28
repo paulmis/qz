@@ -1,7 +1,6 @@
 package server.api;
 
 import static org.hamcrest.Matchers.equalToObject;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -16,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,10 +40,10 @@ class LobbyControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private GameRepository gameRepoMock;
+    private GameRepository gameRepository;
 
     @MockBean
-    private UserRepository userRepoMock;
+    private UserRepository userRepository;
 
     // ToDo: remove this class when a subclass of game is implemented
     private class MockGame extends Game {
@@ -52,16 +53,34 @@ class LobbyControllerTest {
         }
     }
 
+    private @NonNull UUID getUUID(int id) {
+        return UUID.fromString("00000000-0000-0000-0000-00000000000" + (id % 10));
+    }
+
+    private Game mockLobby;
+    private User john;
+
+    @BeforeEach
+    private void init() {
+        // Mock a working gameId
+        mockLobby = new MockGame();
+        mockLobby.setId(getUUID(0));
+        mockLobby.setStatus(GameStatus.CREATED);
+        when(gameRepository.findById(mockLobby.getId())).thenReturn(Optional.of(mockLobby));
+
+        // Mock a working userId
+        john = new User();
+        john.setId(getUUID(0));
+        when(userRepository.findById(john.getId())).thenReturn(Optional.of(john));
+    }
+
     @Test
     public void getAvailableLobbiesTest() throws Exception {
         // Mock a list of lobbies
-        Game mockLobby = new MockGame();
-        mockLobby.setId(UUID.randomUUID());
-        mockLobby.setStatus(GameStatus.CREATED);
         Game mockLobby2 = new MockGame();
-        mockLobby2.setId(UUID.randomUUID());
+        mockLobby2.setId(getUUID(1));
         mockLobby2.setStatus(GameStatus.CREATED);
-        when(gameRepoMock.findAllByStatus(GameStatus.CREATED))
+        when(gameRepository.findAllByStatus(GameStatus.CREATED))
                 .thenReturn(new ArrayList<>(List.of(mockLobby, mockLobby2)));
 
         // Request
@@ -74,138 +93,81 @@ class LobbyControllerTest {
 
     @Test
     public void lobbyInfoTest() throws Exception {
-        // Mock a working gameId
-        UUID lobbyId = UUID.randomUUID();
-        Optional<Game> mockLobby = Optional.of(new MockGame());
-        mockLobby.get().setId(lobbyId);
-        mockLobby.get().setStatus(GameStatus.CREATED);
-        when(gameRepoMock.findById(lobbyId)).thenReturn(mockLobby);
-
         // Request
-        this.mockMvc.perform(get("/api/lobby/" + lobbyId))
+        this.mockMvc.perform(get("/api/lobby/" + mockLobby.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(equalToObject(
-                        objectMapper.writeValueAsString(mockLobby.get().getDTO())
+                        objectMapper.writeValueAsString(mockLobby.getDTO())
                 )));
     }
 
     @Test
     public void lobbyNotFoundInfoTest() throws Exception {
         // Request
-        this.mockMvc.perform(get("/api/lobby/" + UUID.randomUUID())).andExpect(status().isNotFound());
+        this.mockMvc
+                .perform(get("/api/lobby/" + getUUID(1)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     public void joinOkTest() throws Exception {
-        // Mock a working gameId
-        UUID lobbyId = UUID.randomUUID();
-        Optional<Game> mockLobby = Optional.of(new MockGame());
-        mockLobby.get().setId(lobbyId);
-        mockLobby.get().setStatus(GameStatus.CREATED);
-        when(gameRepoMock.findById(lobbyId)).thenReturn(mockLobby);
-
-        // Mock a working userId
-        UUID userId = UUID.randomUUID();
-        Optional<User> mockUser = Optional.of(new User());
-        when(userRepoMock.findById(userId)).thenReturn(mockUser);
-
-        // Mock a repository update
-        when(gameRepoMock.save(any(Game.class))).thenReturn(null);
-
         // Request
         UserDTO player = new UserDTO();
-        this.mockMvc.perform(
-                put("/api/lobby/" + lobbyId + "/join/" + userId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(player))
-        ).andExpect(status().isOk());
+        this.mockMvc
+                .perform(put("/api/lobby/" + mockLobby.getId() + "/join/" + john.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(player)))
+                .andExpect(status().isOk());
     }
 
     @Test
     public void lobbyNotFoundJoinTest() throws Exception {
-        // Mock a working userId
-        UUID userId = UUID.randomUUID();
-        Optional<User> mockUser = Optional.of(new User());
-        when(userRepoMock.findById(userId)).thenReturn(mockUser);
-
         // Request
         GamePlayerDTO player = new GamePlayerDTO();
-        this.mockMvc.perform(
-                put("/api/lobby/" + UUID.randomUUID() + "/join/" + userId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(player))
-        ).andExpect(status().isNotFound());
+        this.mockMvc
+                .perform(put("/api/lobby/" + getUUID(1) + "/join/" + john.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(player)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     public void userNotFoundJoinTest() throws Exception {
-        // Mock a working gameId
-        UUID lobbyId = UUID.randomUUID();
-        Optional<Game> mockLobby = Optional.of(new MockGame());
-        mockLobby.get().setId(lobbyId);
-        mockLobby.get().setStatus(GameStatus.CREATED);
-        when(gameRepoMock.findById(lobbyId)).thenReturn(mockLobby);
-
         // Request
         GamePlayerDTO player = new GamePlayerDTO();
-        this.mockMvc.perform(
-                put("/api/lobby/" + UUID.randomUUID() + "/join/" + UUID.randomUUID())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(player))
-        ).andExpect(status().isNotFound());
+        this.mockMvc
+                .perform(put("/api/lobby/" + mockLobby.getId() + "/join/" + getUUID(1))
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(player)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     public void joinAlreadyPresentTest() throws Exception {
-        // Mock a working gameId
-        UUID lobbyId = UUID.randomUUID();
-        Optional<Game> mockLobby = Optional.of(new MockGame());
-        mockLobby.get().setId(lobbyId);
-        mockLobby.get().setStatus(GameStatus.CREATED);
-        when(gameRepoMock.findById(lobbyId)).thenReturn(mockLobby);
-
-        // Mock a working userId
-        UUID userId = UUID.randomUUID();
-        Optional<User> mockUser = Optional.of(new User());
-        when(userRepoMock.findById(userId)).thenReturn(mockUser);
-
         // Mock a joined player
         GamePlayerDTO player = new GamePlayerDTO();
-        GamePlayer playerObj = new GamePlayer(player);
-        playerObj.setUser(mockUser.get());
-        mockLobby.get().add(playerObj);
+        GamePlayer playerJohn = new GamePlayer(player);
+        playerJohn.setUser(john);
+        mockLobby.add(playerJohn);
 
         // Request
-        this.mockMvc.perform(
-                put("/api/lobby/" + lobbyId + "/join/" + userId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(player))
-        ).andExpect(status().isConflict());
+        this.mockMvc
+                .perform(put("/api/lobby/" + mockLobby.getId() + "/join/" + john.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(player)))
+                .andExpect(status().isConflict());
     }
 
     @Test
     public void joinStartedGameTest() throws Exception {
-        // Mock a working gameId
-        UUID lobbyId = UUID.randomUUID();
-        Optional<Game> mockLobby = Optional.of(new MockGame());
-        mockLobby.get().setId(lobbyId);
-        mockLobby.get().setStatus(GameStatus.ONGOING);
-        when(gameRepoMock.findById(lobbyId)).thenReturn(mockLobby);
-
-        // Mock a working userId
-        UUID userId = UUID.randomUUID();
-        Optional<User> mockUser = Optional.of(new User());
-        when(userRepoMock.findById(userId)).thenReturn(mockUser);
-
-        // Mock a repository update
-        when(gameRepoMock.save(any(Game.class))).thenReturn(null);
+        // Mock a started game
+        mockLobby.setStatus(GameStatus.ONGOING);
 
         // Request
         UserDTO player = new UserDTO();
-        this.mockMvc.perform(
-                put("/api/lobby/" + lobbyId + "/join/" + userId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(player))
-        ).andExpect(status().isConflict());
+        this.mockMvc
+                .perform(put("/api/lobby/" + mockLobby.getId() + "/join/" + john.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(player)))
+                .andExpect(status().isConflict());
     }
 }
