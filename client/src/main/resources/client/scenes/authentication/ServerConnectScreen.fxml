@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
@@ -11,8 +12,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<?import com.jfoenix.controls.JFXButton?>
-<AnchorPane fx:id="authenticationAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="1024.0" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.authentication.ServerConnectScreenCtrl">
+<AnchorPane fx:id="authenticationAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="1024.0" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.authentication.ServerConnectScreenCtrl">
    <opaqueInsets>
       <Insets />
    </opaqueInsets>
@@ -21,27 +21,12 @@
          <right>
             <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
                <children>
-                  <TextField fx:id="urlField" layoutX="15.0" layoutY="222.0" prefHeight="29.0" prefWidth="170.0" style="-fx-background-color: C4C4C4;">
-                     <font>
-                        <Font size="13.0" />
-                     </font>
-                  </TextField>
                   <ImageView fitHeight="135.0" fitWidth="139.0" layoutX="34.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@/client/images/logo.png" />
                      </image>
                   </ImageView>
-                  <CheckBox layoutX="14.0" layoutY="261.0" mnemonicParsing="false" text="Remember the server">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                  </CheckBox>
-                  <JFXButton fx:id="connectButton" alignment="CENTER" layoutX="18.0" layoutY="296.0" mnemonicParsing="false" onMouseClicked="#clickConnectButton" prefHeight="22.0" prefWidth="170.0" style="-fx-background-color: #6EB26C;" text="Connect" textAlignment="CENTER" textFill="WHITE">
-                     <font>
-                        <Font name="System Bold" size="15.0" />
-                     </font>
-                  </JFXButton>
-                  <Label layoutX="22.0" layoutY="167.0" text="Connect to the server">
+                  <Label layoutX="23.0" layoutY="149.0" text="Connect to the server">
                      <font>
                         <Font name="System Bold" size="16.0" />
                      </font>
@@ -51,6 +36,21 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
+                  <TextField fx:id="urlField" layoutX="15.0" layoutY="222.0" prefHeight="29.0" prefWidth="170.0" style="-fx-background-color: C4C4C4;">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </TextField>
+                  <CheckBox layoutX="14.0" layoutY="261.0" mnemonicParsing="false" text="Remember the server">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </CheckBox>
+                  <JFXButton fx:id="connectButton" alignment="CENTER" layoutX="15.0" layoutY="296.0" mnemonicParsing="false" onMouseClicked="#clickConnectButton" prefHeight="22.0" prefWidth="170.0" style="-fx-background-color: #6EB26C;" text="Connect" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </JFXButton>
                </children>
             </Pane>
          </right>
