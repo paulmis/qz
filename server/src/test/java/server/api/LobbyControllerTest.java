@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +52,7 @@ class LobbyControllerTest {
         }
     }
 
-    private @NonNull UUID getUUID(int id) {
+    private UUID getUUID(int id) {
         return UUID.fromString("00000000-0000-0000-0000-00000000000" + (id % 10));
     }
 
