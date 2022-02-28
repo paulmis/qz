@@ -1,0 +1,11 @@
+.jfx-slider > .thumb {
+    -fx-background-color: thirdColor;
+}
+
+.jfx-slider > .colored-track {
+    -fx-background-color: primaryColor;
+}
+
+.jfx-slider > .animated-thumb {
+    -fx-background-color: thirdColor;
+}

@@ -1,0 +1,13 @@
+.jfx-toggle-button {
+    -jfx-toggle-color: primaryColor;
+    -jfx-toggle-line-color: primaryColor;
+    -fx-text-fill: primaryColor;
+}
+
+.jfx-toggle-button .jfx-rippler {
+    -jfx-rippler-fill: primaryColor;
+}
+
+.jfx-toggle-button:selected .jfx-rippler {
+    -jfx-rippler-fill: primaryColor;
+}
