@@ -81,6 +81,6 @@ public class LogInScreenCtrl implements Initializable {
      */
     public void rememberMeTick() {
         rememberMe.getUserData();
-        System.out.print("User wants to be registered...");
+        System.out.print("User wants to be remembered...\n");
     }
 }

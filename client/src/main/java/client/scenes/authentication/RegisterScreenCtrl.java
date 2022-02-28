@@ -73,7 +73,6 @@ public class RegisterScreenCtrl implements Initializable {
      */
     public void haveAccountButtonClick() {
         mainCtrl.showLogInScreen();
-        System.out.print("Registering new account credentials...");
     }
 
     /**
@@ -81,8 +80,11 @@ public class RegisterScreenCtrl implements Initializable {
      * wants to be remembered locally or not.
      */
     public void rememberMeTick() {
-        rememberMe.getUserData();
-        System.out.print("User wants to be registered...");
+        if (rememberMe.isSelected())
+            System.out.print("User wants to be remembered...\n");
+        else
+            System.out.print("User does not want to be remembered...\n");
+
     }
 
 }

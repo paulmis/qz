@@ -1,4 +1,4 @@
-.root{
+#authenticationAnchor{
     -fx-background-image: url("/client/images/background.jpg");
     -fx-background-size: cover;
 }
