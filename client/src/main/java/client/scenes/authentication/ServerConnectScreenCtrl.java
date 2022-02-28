@@ -1,17 +1,13 @@
 package client.scenes.authentication;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import client.scenes.MainCtrl;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
-import javafx.event.EventHandler;
+import java.net.URL;
+import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 
@@ -25,7 +21,7 @@ public class ServerConnectScreenCtrl implements Initializable {
     private final MainCtrl mainCtrl;
 
     @FXML
-    private Button connectButton;
+    private JFXButton connectButton;
 
     @FXML
     private TextField urlField;
@@ -34,10 +30,9 @@ public class ServerConnectScreenCtrl implements Initializable {
     /**
      * Constructor for the estimate question control.
      *
-     * @param url The url of the server
      */
     @Inject
-    public ServerConnectScreenCtrl(String url, ServerUtils server, MainCtrl mainCtrl) {
+    public ServerConnectScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
     }
@@ -54,11 +49,10 @@ public class ServerConnectScreenCtrl implements Initializable {
     }
 
     /**
-     * Function that connects the user to the server based on the url
+     * Function that connects the user to the server based on the url.
      */
-    public void clickConnectButton () {
-        var url = urlField.getText();
-        System.out.print("Connecting to server....");
+    public void clickConnectButton() {
+        System.out.print("Connecting to server...." + urlField.getText());
         server.connect();
         mainCtrl.showLogInScreen();
     }

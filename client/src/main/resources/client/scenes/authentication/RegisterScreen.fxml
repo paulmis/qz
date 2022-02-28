@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
@@ -12,16 +11,12 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.authentication.RegisterScreenCtrl">
+<?import com.jfoenix.controls.JFXButton?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="1024.0" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.authentication.RegisterScreenCtrl">
    <opaqueInsets>
       <Insets />
    </opaqueInsets>
    <children>
-      <ImageView fitHeight="587.0" fitWidth="1033.0" layoutX="-7.0" layoutY="-8.0" pickOnBounds="true">
-         <image>
-            <Image url="@/client/images/appolinary-kalashnikova-WYGhTLym344-unsplash-stroke-and-fill 1.jpg" />
-         </image>
-      </ImageView>
       <BorderPane prefHeight="576.0" prefWidth="1024.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <right>
             <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
@@ -46,16 +41,16 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </CheckBox>
-                  <Button fx:id="signUpButton" alignment="CENTER" layoutX="107.0" layoutY="287.0" mnemonicParsing="false" onMouseClicked="#signUpButtonClick" prefHeight="22.0" prefWidth="84.0" style="-fx-background-color: #6EB26C;" text="Sign Up" textAlignment="CENTER" textFill="WHITE">
+                  <JFXButton fx:id="signUpButton" alignment="CENTER" layoutX="107.0" layoutY="287.0" mnemonicParsing="false" onMouseClicked="#signUpButtonClick" prefHeight="22.0" prefWidth="84.0" style="-fx-background-color: #6EB26C;" text="Sign Up" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
-                  </Button>
-                  <Button fx:id="haveAccountButton" alignment="CENTER" layoutX="25.0" layoutY="355.0" mnemonicParsing="false" onMouseClicked="#haveAccountButtonClick" prefHeight="31.0" prefWidth="161.0" style="-fx-background-color: #DFD93F;" text="I already have an account" textAlignment="CENTER" textFill="WHITE">
+                  </JFXButton>
+                  <JFXButton fx:id="haveAccountButton" alignment="CENTER" layoutX="25.0" layoutY="355.0" mnemonicParsing="false" onMouseClicked="#haveAccountButtonClick" prefHeight="31.0" prefWidth="161.0" style="-fx-background-color: #DFD93F;" text="I already have an account" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
-                  </Button>
+                  </JFXButton>
                   <Label alignment="CENTER" layoutX="19.0" layoutY="133.0" prefHeight="21.0" prefWidth="128.0" text="Register">
                      <font>
                         <Font name="Arial Bold" size="19.0" />

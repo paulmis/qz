@@ -65,18 +65,17 @@ public class MainCtrl {
         this.lobbyCtrl = lobbyScreen.getKey();
         this.lobbyScene = new Scene(lobbyScreen.getValue());
 
-        this.logInScreen = new Scene (logInScreen.getValue());
+        this.logInScreen = new Scene(logInScreen.getValue());
         this.logInScreenCtrl = logInScreen.getKey();
 
-        this.registerScreen = new Scene (registerScreen.getValue());
+        this.registerScreen = new Scene(registerScreen.getValue());
         this.registerScreenCtrl = registerScreen.getKey();
 
-        this.serverConnectScreen = new Scene (serverConnectScreen.getValue());
+        this.serverConnectScreen = new Scene(serverConnectScreen.getValue());
         this.serverConnectScreenCtrl = serverConnectScreen.getKey();
 
-
-        this.gameScreenCtrl = gameScreen.getKey();
         this.gameScreen = new Scene(gameScreen.getValue());
+        this.gameScreenCtrl = gameScreen.getKey();
 
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
         showServerConnectScreen();

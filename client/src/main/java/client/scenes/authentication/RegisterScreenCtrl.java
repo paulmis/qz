@@ -1,18 +1,14 @@
 package client.scenes.authentication;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import client.scenes.MainCtrl;
 import client.utils.ServerUtils;
-import com.jfoenix.controls.JFXButton;
 import com.google.inject.Inject;
-import javafx.event.EventHandler;
+import com.jfoenix.controls.JFXButton;
+import java.net.URL;
+import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 
@@ -26,10 +22,10 @@ public class RegisterScreenCtrl implements Initializable {
     private final MainCtrl mainCtrl;
 
     @FXML
-    private Button signUpButton;
+    private JFXButton signUpButton;
 
     @FXML
-    private Button haveAccountButton;
+    private JFXButton haveAccountButton;
 
     @FXML
     private CheckBox rememberMe;
@@ -63,9 +59,9 @@ public class RegisterScreenCtrl implements Initializable {
 
     /**
      * Function that sends new account credentials to server
-     * after a button click
+     * after a button click.
      */
-    public void signUpButtonClick () {
+    public void signUpButtonClick() {
         server.register(emailField.getText(), passwordField.getText());
         System.out.print("Registering new account credentials...");
         mainCtrl.showLobbyScreen();
@@ -73,22 +69,20 @@ public class RegisterScreenCtrl implements Initializable {
 
     /**
      * Function that takes user to login page
-     * if they have an account
+     * if they have an account.
      */
-    public void haveAccountButtonClick () {
+    public void haveAccountButtonClick() {
         mainCtrl.showLogInScreen();
         System.out.print("Registering new account credentials...");
     }
 
     /**
      * Function that keeps track if user
-     * wants to be remembered locally or not
+     * wants to be remembered locally or not.
      */
-    public void rememberMeTick () {
+    public void rememberMeTick() {
+        rememberMe.getUserData();
         System.out.print("User wants to be registered...");
     }
 
-    public void rememberMeUntick () {
-        System.out.print("User wants to not be registered...");
-    }
 }
