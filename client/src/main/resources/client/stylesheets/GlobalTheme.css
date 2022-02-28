@@ -17,3 +17,4 @@
 @import "screens/GameScreen.css";
 @import "questions/MultipleChoiceQuestion.css";
 @import "questions/EstimateQuestion.css";
+@import "AuthenticationScreen.css";
