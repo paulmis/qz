@@ -19,53 +19,53 @@
    <children>
       <BorderPane prefHeight="576.0" prefWidth="1024.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <left>
-            <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
+            <Pane prefHeight="576.0" prefWidth="262.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
                <children>
-                  <ImageView fitHeight="135.0" fitWidth="139.0" layoutX="26.0" layoutY="19.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@/client/images/logo.png" />
-                     </image>
-                  </ImageView>
-                  <TextField fx:id="emailField" layoutX="10.0" layoutY="234.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
+                  <TextField fx:id="emailField" layoutX="53.0" layoutY="239.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </TextField>
-                  <TextField fx:id="passwordField" layoutX="10.0" layoutY="285.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
+                  <TextField fx:id="passwordField" layoutX="53.0" layoutY="290.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </TextField>
-                  <CheckBox fx:id="rememberMe" layoutX="9.0" layoutY="324.0" mnemonicParsing="false" onMouseClicked="#rememberMeTick" text="Remember me">
+                  <CheckBox fx:id="rememberMe" layoutX="52.0" layoutY="329.0" mnemonicParsing="false" onMouseClicked="#rememberMeTick" text="Remember me">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </CheckBox>
-                  <JFXButton fx:id="logInButton" alignment="CENTER" layoutX="107.0" layoutY="356.0" mnemonicParsing="false" onMouseClicked="#logInButtonClick" prefHeight="22.0" prefWidth="84.0" style="-fx-background-color: #6EB26C;" text="Log in" textAlignment="CENTER" textFill="WHITE">
+                  <JFXButton fx:id="logInButton" alignment="CENTER" layoutX="150.0" layoutY="361.0" mnemonicParsing="false" onMouseClicked="#logInButtonClick" prefHeight="22.0" prefWidth="84.0" style="-fx-background-color: #6EB26C;" text="Log in" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton fx:id="createAccountButton" alignment="CENTER" layoutX="18.0" layoutY="409.0" mnemonicParsing="false" onMouseClicked="#createAccountButtonClick" prefHeight="31.0" prefWidth="161.0" style="-fx-background-color: #DFD93F;" text="I want to create an account" textAlignment="CENTER" textFill="WHITE">
+                  <JFXButton fx:id="createAccountButton" alignment="CENTER" layoutX="61.0" layoutY="414.0" mnemonicParsing="false" onMouseClicked="#createAccountButtonClick" prefHeight="31.0" prefWidth="161.0" style="-fx-background-color: #DFD93F;" text="I want to create an account" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="11.0" />
                      </font>
                   </JFXButton>
-                  <Label alignment="CENTER" layoutX="10.0" layoutY="182.0" prefHeight="25.0" prefWidth="161.0" text="Log In">
+                  <Label alignment="CENTER" layoutX="60.0" layoutY="187.0" prefHeight="25.0" prefWidth="142.0" text="Log In">
                      <font>
                         <Font name="System Bold" size="16.0" />
                      </font>
                   </Label>
-                  <Label layoutX="10.0" layoutY="213.0" prefHeight="21.0" prefWidth="103.0" text="Email">
+                  <Label layoutX="53.0" layoutY="218.0" prefHeight="21.0" prefWidth="103.0" text="Email">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="12.0" layoutY="267.0" prefHeight="21.0" prefWidth="161.0" text="Password">
+                  <Label layoutX="55.0" layoutY="272.0" prefHeight="21.0" prefWidth="161.0" text="Password">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
+                  <ImageView fitHeight="135.0" fitWidth="139.0" layoutX="52.0" layoutY="31.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@/client/images/logo.png" />
+                     </image>
+                  </ImageView>
                </children>
             </Pane>
          </left>

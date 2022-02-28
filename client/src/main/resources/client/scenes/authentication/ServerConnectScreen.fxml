@@ -19,38 +19,38 @@
    <children>
       <BorderPane prefHeight="576.0" prefWidth="1024.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <right>
-            <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
+            <Pane prefHeight="576.0" prefWidth="262.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
                <children>
-                  <ImageView fitHeight="135.0" fitWidth="139.0" layoutX="34.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@/client/images/logo.png" />
-                     </image>
-                  </ImageView>
-                  <Label layoutX="23.0" layoutY="149.0" text="Connect to the server">
+                  <Label layoutX="48.0" layoutY="187.0" text="Connect to the server">
                      <font>
                         <Font name="System Bold" size="16.0" />
                      </font>
                   </Label>
-                  <Label layoutX="14.0" layoutY="200.0" prefHeight="21.0" prefWidth="166.0" text="Server url">
+                  <Label layoutX="46.0" layoutY="218.0" prefHeight="21.0" prefWidth="166.0" text="Server url">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="urlField" layoutX="15.0" layoutY="222.0" prefHeight="29.0" prefWidth="170.0" style="-fx-background-color: C4C4C4;">
+                  <TextField fx:id="urlField" layoutX="47.0" layoutY="238.0" prefHeight="29.0" prefWidth="170.0" style="-fx-background-color: C4C4C4;">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </TextField>
-                  <CheckBox layoutX="14.0" layoutY="261.0" mnemonicParsing="false" text="Remember the server">
+                  <CheckBox layoutX="46.0" layoutY="277.0" mnemonicParsing="false" text="Remember the server">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </CheckBox>
-                  <JFXButton fx:id="connectButton" alignment="CENTER" layoutX="15.0" layoutY="296.0" mnemonicParsing="false" onMouseClicked="#clickConnectButton" prefHeight="22.0" prefWidth="170.0" style="-fx-background-color: #6EB26C;" text="Connect" textAlignment="CENTER" textFill="WHITE">
+                  <JFXButton fx:id="connectButton" alignment="CENTER" layoutX="47.0" layoutY="312.0" mnemonicParsing="false" onMouseClicked="#clickConnectButton" prefHeight="22.0" prefWidth="170.0" style="-fx-background-color: #6EB26C;" text="Connect" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>
                   </JFXButton>
+                  <ImageView fitHeight="135.0" fitWidth="139.0" layoutX="62.0" layoutY="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@/client/images/logo.png" />
+                     </image>
+                  </ImageView>
                </children>
             </Pane>
          </right>
