@@ -80,11 +80,11 @@ public class RegisterScreenCtrl implements Initializable {
      * wants to be remembered locally or not.
      */
     public void rememberMeTick() {
-        if (rememberMe.isSelected())
+        if (rememberMe.isSelected()) {
             System.out.print("User wants to be remembered...\n");
-        else
+        } else {
             System.out.print("User does not want to be remembered...\n");
-
+        }
     }
 
 }
