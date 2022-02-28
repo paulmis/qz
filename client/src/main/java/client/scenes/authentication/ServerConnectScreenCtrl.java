@@ -21,8 +21,6 @@ import javafx.scene.control.TextField;
  */
 public class ServerConnectScreenCtrl implements Initializable {
 
-    private final String url;
-
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
@@ -40,7 +38,6 @@ public class ServerConnectScreenCtrl implements Initializable {
      */
     @Inject
     public ServerConnectScreenCtrl(String url, ServerUtils server, MainCtrl mainCtrl) {
-        this.url = url;
         this.mainCtrl = mainCtrl;
         this.server = server;
     }

@@ -100,7 +100,7 @@ public class ServerUtils {
         return "200";
     }
 
-    public String connectUser (String email, String password) {
+    public String logIn (String email, String password) {
         System.out.println("Verifying  User Credentials...");
         return "200";
     }

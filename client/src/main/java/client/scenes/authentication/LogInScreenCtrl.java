@@ -22,9 +22,6 @@ import javafx.scene.control.TextField;
  */
 public class LogInScreenCtrl implements Initializable {
 
-    private final String email;
-    private final String password;
-
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
@@ -46,13 +43,9 @@ public class LogInScreenCtrl implements Initializable {
     /**
      * Constructor for the estimate question control.
      *
-     * @param email The email of the user
-     * @param password The password of the user.
      */
     @Inject
-    public LogInScreenCtrl(String email, String password, ServerUtils server, MainCtrl mainCtrl) {
-        this.email = email;
-        this.password = password;
+    public LogInScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
     }
@@ -74,7 +67,7 @@ public class LogInScreenCtrl implements Initializable {
      * after a button click
      */
     public void logInButtonClick () {
-        server.connectUser(emailField.getText(), passwordField.getText());
+        server.logIn(emailField.getText(), passwordField.getText());
         mainCtrl.showLobbyScreen();
     }
 
