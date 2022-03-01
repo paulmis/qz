@@ -1,30 +1,20 @@
 package commons.entities;
 
-import commons.entities.utils.DTO;
-import java.util.UUID;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 /**
- * Data transfer object for the user entity.
+ * DTO for authentication.
  */
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
-public class UserDTO implements DTO {
-
-    /**
-     * The user's ID.
-     */
-    protected UUID id;
-
-    /**
-     * User's name.
-     */
+@AllArgsConstructor
+public class AuthDTO {
+    @Email
     @NonNull
     protected String username;
 
@@ -41,14 +31,4 @@ public class UserDTO implements DTO {
     @Size(min = 8)
     @NonNull
     protected String password;
-
-    /**
-     * User's global score.
-     */
-    protected int score;
-
-    /**
-     * Number of games played by the user.
-     */
-    protected int gamesPlayed;
 }

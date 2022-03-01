@@ -6,47 +6,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import server.database.entities.User;
+import server.database.repositories.UserRepository;
 
 /**
  * Handles security policies.
  */
 @Generated
-@Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(
+        securedEnabled = true,
+        jsr250Enabled = true,
+        prePostEnabled = true
+)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired private UserRepository userRepository;
     @Autowired private AuthFilter authFilter;
-    @Autowired private CustomUserDetailsService customUserDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .httpBasic().disable()
-                .cors()
-                .and()
+                .cors().and().csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeHttpRequests()
-                .antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/api/**").hasRole("USER")
-                .and()
-                .userDetailsService(customUserDetailsService)
-                .exceptionHandling()
-                .authenticationEntryPoint(
-                        // Rejecting request as unauthorized when entry point is reached
-                        // If this point is reached it means that the current request requires authentication
-                        // and no JWT token was found attached to the Authorization header of the current request.
-                        (request, response, authException) ->
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
-                )
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .antMatchers("/api/auth/**").permitAll()
+                    .antMatchers("/api/**").hasRole("USER")
                 .and()
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(new CustomUserDetailsService(this.userRepository));
     }
 
     /**
@@ -60,13 +62,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * Provides an authentication management bean.
+     * Provides an authentication manager bean.
      *
-     * @return authentication management bean
-     * @throws Exception unspecified
+     * @return authentication manager bean
+     * @throws Exception undefined
      */
-    @Bean
     @Override
+    @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }

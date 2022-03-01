@@ -4,10 +4,12 @@ import com.google.common.reflect.TypeToken;
 import commons.entities.utils.DTO;
 import java.lang.reflect.Type;
 import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
 import org.modelmapper.ModelMapper;
 
 /**
@@ -22,6 +24,9 @@ public abstract class BaseEntity<D extends DTO> {
      * id - random unique uuid assigned to a certain player.
      */
     @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", updatable = false, nullable = false)
     protected UUID id;
 
     /**

@@ -16,7 +16,11 @@ import server.database.repositories.UserRepository;
  */
 @Component
 public class CustomUserDetailsService implements UserDetailsService {
-    @Autowired private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     /**
      * Creates an authentication DAO from given user's mail.

@@ -1,5 +1,7 @@
 package server.database.entities;
 
+import commons.entities.AuthDTO;
+import commons.entities.UserDTO;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,6 +18,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.utils.BaseEntity;
 
@@ -37,6 +41,15 @@ public class User extends BaseEntity<UserDTO> {
      * @param dto DTO to map to entity.
      */
     public User(UserDTO dto) {
+        new ModelMapper().map(dto, this);
+    }
+
+    /**
+     * Construct a new entity from a DTO.
+     *
+     * @param dto DTO to map to entity.
+     */
+    public User(AuthDTO dto) {
         new ModelMapper().map(dto, this);
     }
 
