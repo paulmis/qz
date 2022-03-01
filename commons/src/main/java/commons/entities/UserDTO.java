@@ -1,5 +1,6 @@
 package commons.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import commons.entities.utils.DTO;
 import java.util.UUID;
 import javax.validation.constraints.Email;

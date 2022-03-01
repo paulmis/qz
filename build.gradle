@@ -48,6 +48,8 @@ subprojects {
 	dependencies {
 		implementation 'org.apache.commons:commons-lang3:3.12.0'
 		implementation group: 'com.auth0', name: 'java-jwt', version: '3.18.3'
+		implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.1'
+		implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.13.1'
 		testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.22.0'
 		testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
 		testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'

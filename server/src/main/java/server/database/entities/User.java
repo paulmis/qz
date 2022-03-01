@@ -51,14 +51,13 @@ public class User extends BaseEntity<UserDTO> {
      * email - string used for authentication purposes representing the email of the user.
      */
     @Column(nullable = false, unique = true)
-    private String email;
+    @NonNull private String email;
 
     /**
      * password - string representing user's salted password.
      */
-    @ToString.Exclude
     @Column(nullable = false)
-    private String password;
+    @NonNull private String password;
 
     /**
      * score - integer representing a player's total score.
