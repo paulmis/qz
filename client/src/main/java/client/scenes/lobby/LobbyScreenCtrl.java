@@ -1,16 +1,22 @@
-package client.scenes;
+package client.scenes.lobby;
 
+import client.scenes.MainCtrl;
+import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
+import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import lombok.Getter;
 
 /**
  * Lobby controller.
  */
 @Getter
-public class LobbyCtrl {
+public class LobbyScreenCtrl {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
@@ -36,7 +42,7 @@ public class LobbyCtrl {
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public LobbyCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public LobbyScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
     }
@@ -46,5 +52,15 @@ public class LobbyCtrl {
      */
     public void startButtonClick() {
         this.mainCtrl.showGameScreen();
+    }
+
+    /**
+     * Fired when the lobby settings button is clicked.
+     */
+    public void lobbySettingsButtonClick() {
+        var config = new SurvivalGameConfigurationDTO();
+        config.setSpeedModifier(1.5f);
+        config.setAnswerTime(15);
+        mainCtrl.openLobbySettings(config, System.out::println);
     }
 }

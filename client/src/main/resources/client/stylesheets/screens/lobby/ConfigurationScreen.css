@@ -1,0 +1,4 @@
+#saveButton {
+    -fx-background-color: primaryColor;
+    -fx-text-fill: white;
+}

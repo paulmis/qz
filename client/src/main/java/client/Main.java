@@ -19,11 +19,11 @@ package client;
 import static com.google.inject.Guice.createInjector;
 
 import client.scenes.GameScreenCtrl;
-import client.scenes.LobbyCtrl;
 import client.scenes.MainCtrl;
 import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
+import client.scenes.lobby.LobbyScreenCtrl;
 import com.google.inject.Injector;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -53,8 +53,8 @@ public class Main extends Application {
                 "client", "scenes", "authentication", "ServerConnectScreen.fxml");
         var logInScreen = FXML.load(LogInScreenCtrl.class,
                 "client", "scenes", "authentication", "LogInScreen.fxml");
-        var lobbyScreen = FXML.load(LobbyCtrl.class,
-                "client", "scenes", "LobbyScreen.fxml");
+        var lobbyScreen = FXML.load(LobbyScreenCtrl.class,
+                "client", "scenes", "lobby", "LobbyScreen.fxml");
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, serverConnectScreen, logInScreen, registerScreen, lobbyScreen, gameScreen);
