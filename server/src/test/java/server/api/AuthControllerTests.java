@@ -7,7 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import commons.entities.AuthDTO;
+import commons.entities.UserDTO;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ public class AuthControllerTests {
     private UserRepository userRepository;
 
     User joe;
-    AuthDTO joeDTO;
+    UserDTO joeDTO;
 
     /**
      * Initializes the test suite.
@@ -54,7 +55,7 @@ public class AuthControllerTests {
 
     @BeforeEach
     void init() {
-        joeDTO = new AuthDTO("joe", "joe@joe.com", "joesuperpassword");
+        joeDTO = new UserDTO("joe", "joe@joe.com", "joesuperpassword");
         joe = new User(joeDTO);
         joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         joe.setPassword(passwordEncoder.encode(joeDTO.getPassword()));
@@ -71,8 +72,7 @@ public class AuthControllerTests {
                 .perform(
                         post("/api/auth/register")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(joeDTO))
-                            .accept(MediaType.ALL))
+                            .content(objectMapper.writeValueAsString(joeDTO)))
                 .andExpect(status().isOk());
     }
 
@@ -86,8 +86,35 @@ public class AuthControllerTests {
                 .perform(
                         post("/api/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(joeDTO))
-                                .accept(MediaType.ALL))
+                                .content(objectMapper.writeValueAsString(joeDTO)))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    void loginOk() throws Exception {
+        // Mock the repository
+        when(userRepository.findByEmail(joe.getEmail())).thenReturn(Optional.of(joe));
+
+        // Perform the request
+        this.mvc
+                .perform(
+                        post("/api/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(joeDTO)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void loginUnauthorized() throws Exception {
+        // Mock the repository
+        when(userRepository.findByEmail(joe.getEmail())).thenReturn(Optional.empty());
+
+        // Perform the request
+        this.mvc
+                .perform(
+                        post("/api/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(joeDTO)))
+                .andExpect(status().isUnauthorized());
     }
 }

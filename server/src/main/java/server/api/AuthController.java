@@ -1,6 +1,5 @@
 package server.api;
 
-import commons.entities.AuthDTO;
 import commons.entities.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +34,7 @@ public class AuthController {
      * @return 409 if the user with this data already exists, 200 and the auth token otherwise
      */
     @PostMapping("register")
-    public ResponseEntity<String> register(@RequestBody AuthDTO userData) {
+    public ResponseEntity<String> register(@RequestBody UserDTO userData) {
         // If a user with this email or username already exists, return 409
         if (userRepository.existsByEmailOrUsername(userData.getEmail(), userData.getUsername())) {
             return ResponseEntity.status(409).build();
@@ -57,7 +56,7 @@ public class AuthController {
      *      200 and the auth token otherwise
      */
     @PostMapping("login")
-    public ResponseEntity<String> login(@RequestBody AuthDTO userData) {
+    public ResponseEntity<String> login(@RequestBody UserDTO userData) {
         try {
             // TODO: allow authentication with both mail and username
             // Authenticate the user
