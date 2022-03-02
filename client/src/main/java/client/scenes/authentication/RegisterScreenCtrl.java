@@ -64,7 +64,7 @@ public class RegisterScreenCtrl implements Initializable {
     public void signUpButtonClick() {
         server.register(emailField.getText(), passwordField.getText());
         System.out.print("Registering new account credentials...");
-        mainCtrl.showLobbyScreen();
+        mainCtrl.showNicknameScreen();
     }
 
     /**
