@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -31,6 +32,10 @@ public class NicknameScreenCtrl implements Initializable {
 
     @FXML
     private ImageView profilePicture;
+
+
+    @FXML
+    private Label uploadImage;
 
     @FXML
     private FileChooser selectFile;
@@ -77,6 +82,7 @@ public class NicknameScreenCtrl implements Initializable {
         selectFile.getExtensionFilters().add(imageFilter);
         File pictureFile = selectFile.showOpenDialog(mainCtrl.getPrimaryStage());
         if (pictureFile != null) {
+            uploadImage.setVisible(false);
             profilePicture.setImage(new Image(pictureFile.getAbsolutePath()));
         }
     }
@@ -86,7 +92,8 @@ public class NicknameScreenCtrl implements Initializable {
      * in case of logouts.
      */
     public void reset() {
-        profilePicture.setImage(new Image("/client/images/gray.png"));
+        profilePicture.setImage(new Image("/client/images/gray.jpg"));
+        uploadImage.setVisible(true);
         nicknameField.clear();
     }
 }

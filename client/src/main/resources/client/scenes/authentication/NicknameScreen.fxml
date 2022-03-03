@@ -48,16 +48,17 @@
                               <Font name="System Bold" size="15.0" />
                            </font>
                         </JFXButton>
-                        <ImageView fitHeight="135.0" fitWidth="139.0" layoutX="62.0" layoutY="30.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="135.0" fitWidth="139.0" layoutX="59.0" layoutY="30.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@/client/images/logo.png" />
                            </image>
                         </ImageView>
-                        <ImageView fx:id="profilePicture" fitHeight="150.0" fitWidth="165.0" layoutX="46.0" layoutY="185.0" onMouseClicked="#setPicture" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="profilePicture" fitHeight="152.0" fitWidth="165.0" layoutX="46.0" layoutY="185.0" onMouseClicked="#setPicture" pickOnBounds="true">
                            <image>
-                              <Image url="@/client/images/gray.png" />
+                              <Image url="@/client/images/gray.jpg" />
                            </image>
                         </ImageView>
+                        <Label fx:id="uploadImage" layoutX="83.0" layoutY="252.0" onMouseClicked="#setPicture" text="Upload an Image" />
                      </children>
                   </Pane>
                </children>
