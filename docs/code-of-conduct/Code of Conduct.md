@@ -19,7 +19,7 @@ Each member must be satisfied with the methodology and deliverables of this proj
 
 In order to make sure each group member finishes everything on time we will establish an aggressive schedule where the scrum master will have the responsibility every week to contact a person in case they’re delaying their work and to warn them to finish before the deadline.
 
-## Behavior
+## Behaviour
 
 We try to be supportive of each other. We make an effort to be respectful, and we try to listen to each other. However when disagreements happen we try to form a vote collectively and ask for our teacher assistant’s advice on the matter in order to reach consent. If someone is late during a group meeting we keep notes and try to update the person with everything that has been discussed in the time the person was absent.
 
