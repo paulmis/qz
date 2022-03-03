@@ -17,6 +17,7 @@ Each member must be satisfied with the methodology and deliverables of this proj
 
 The delivered product will consist of the following:
  - A working java project following the specifications of the client.
+ - Tests for all the project functionalities.
  - Documentation for the aforementioned project. Specifically:
    - Javadoc.
    - Gitlab wiki.
@@ -27,10 +28,10 @@ The delivered product will consist of the following:
    - Minutes of each group meeting.
    - Reports of retrospective meetings.
 
-<!--
-Are the standards concretely mentioned? (not just generic description)
-What kind of standards are we using?
--->
+The code will adhere to a precise style standard to improve readability and maintainability. The style will be automatically checked and the pipeline will fail if the style requirements are not fulfilled.  
+We defined a standard starting from the [Google Style Guide](https://github.com/checkstyle/checkstyle/blob/master/src/main/resources/google_checks.xml) and tweaked a few settings. The specific implementation can be found [here](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/blob/main/checkstyle.xml).
+
+Testing will be performed on all components of the project, with unit and integration testing. Additional or more advanced tests may be performed as the project increases in complexity.
 
 ## Planning
 
@@ -88,7 +89,6 @@ We handle conflicts within the group by trying to remain open and understanding.
 We believe that it's important to listen to everyone's perspective, and that everyone should be treated with respect.
 If we can't resolve a conflict ourselves, we might bring in the Teaching Assistant to help us out.
 
-<!-- How specific should this be? -->
 In general, problems and conflicts that can't be solved autonomously should be brought to the attention of the week's scrum master, they will act as intermediary between the two parts.
 If this is not possible, the teaching assistant will take this role instead.
 
