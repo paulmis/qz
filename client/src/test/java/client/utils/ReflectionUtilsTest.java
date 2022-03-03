@@ -1,19 +1,22 @@
 package client.utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 import jdk.jfr.Description;
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
-
+/**
+ * The tests for the helper methods
+ * found inside the RelfectionUtils class.
+ */
 public class ReflectionUtilsTest {
 
     @AllArgsConstructor
@@ -40,7 +43,8 @@ public class ReflectionUtilsTest {
 
     @BeforeEach
     void createPersonObject() {
-        personObj = new Person("Andy Zaidman", 69, 189f, (float)(1<<20),0);
+        personObj =
+                new Person("Andy Zaidman", 69,  189f, (float) (1 << 20), 0);
     }
 
     @Test
@@ -48,7 +52,7 @@ public class ReflectionUtilsTest {
         var annotatedFieldsName = ReflectionUtils.getAnnotatedFields(personObj, Description.class)
                 .stream().map(Field::getName).collect(Collectors.toList());
 
-        assertEquals(List.of("fullName","age","height","balance"), annotatedFieldsName);
+        assertEquals(List.of("fullName", "age", "height", "balance"), annotatedFieldsName);
     }
 
     @Test
