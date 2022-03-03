@@ -1,5 +1,6 @@
 package server.api;
 
+import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import java.util.Optional;
 import java.util.UUID;
