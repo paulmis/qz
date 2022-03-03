@@ -1,7 +1,7 @@
 package server.api;
 
 import commons.entities.QuestionDTO;
-import lombok.Generated;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +13,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * QuestionController, controller for all api endpoints of question creation
+ * QuestionController, controller for all api endpoints of question
  */
 @RestController
 @RequestMapping("api/questions")
-@Generated
 public class QuestionController {
 
     /**
@@ -27,13 +26,17 @@ public class QuestionController {
     private QuestionRepository questionRepository;
 
     /**
-     * Endpoint for current question
+     * Endpoint for retrieving the current question
      *
-     * @return the current question object
+     * @param questionId the UUID of the current question
+     * @return information/object of the current question
      */
-    @GetMapping(path = {"","/questions/{num}"})
-    ResponseEntity<QuestionDTO> currentQuestion(@PathVariable UUID id) {
-        QuestionDTO currentQuestion = questionRepository.findById(id).get().getDTO();
-        return new ResponseEntity<>(currentQuestion, HttpStatus.OK);
+    @GetMapping("/{questionId}")
+    ResponseEntity<QuestionDTO> currentQuestion(@PathVariable @NonNull UUID questionId) {
+        Optional<Question> question = questionRepository.findById(questionId);
+        if(!question.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        return ResponseEntity.ok(question.get().getDTO());
     }
 }
