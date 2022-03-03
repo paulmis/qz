@@ -165,7 +165,8 @@ public class MainCtrl {
     }
 
     /**
-     * This function returns the primary stage
+     * This function returns the primary stage.
+     *
      * @return stage that is shown
      */
     public Stage getPrimaryStage() {

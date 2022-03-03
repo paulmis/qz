@@ -33,7 +33,6 @@ public class NicknameScreenCtrl implements Initializable {
     @FXML
     private ImageView profilePicture;
 
-
     @FXML
     private Label uploadImage;
 
@@ -72,8 +71,8 @@ public class NicknameScreenCtrl implements Initializable {
     }
 
     /**
-     * Function that takes user to lobby list page
-     * after they set a nickname.
+     * Function that lets the user
+     * upload a picture.
      */
     public void setPicture() {
         selectFile = new FileChooser();
