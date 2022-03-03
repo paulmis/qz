@@ -1,4 +1,10 @@
+#rootPane {
+    -fx-background-color: backgroundColor;
+    -fx-background-radius: 20 20 20 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}
+
 #saveButton {
     -fx-background-color: primaryColor;
-    -fx-text-fill: white;
+    -fx-text-fill: buttonTextColor;
 }

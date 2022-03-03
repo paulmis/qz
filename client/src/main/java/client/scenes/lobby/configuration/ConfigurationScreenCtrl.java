@@ -1,12 +1,10 @@
 package client.scenes.lobby.configuration;
 
+import client.utils.ReflectionUtils;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
@@ -14,8 +12,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
 import jdk.jfr.Description;
 import lombok.NonNull;
 
@@ -41,16 +37,14 @@ public class ConfigurationScreenCtrl implements Initializable {
     private boolean editable;
     private SaveHandler saveHandler;
 
-    @FXML
-    private FlowPane mainPane;
-
-    @FXML
-    private JFXButton saveButton;
+    @FXML private FlowPane mainPane;
+    @FXML private JFXButton saveButton;
 
     public ConfigurationScreenCtrl(GameConfigurationDTO gameConfig) {
         this.gameConfig = gameConfig;
         this.editable = false;
     }
+
 
     /**
      * The constructor for the ConfigurationScreen controller.
@@ -64,69 +58,7 @@ public class ConfigurationScreenCtrl implements Initializable {
         this.saveHandler = saveHandler;
     }
 
-    /**
-     * This function returns all the fields
-     * inside the config object that have
-     * the Description annotation applied.
-     * Using reflection.
-     *
-     * @param config the game config
-     * @return the list of annotated fields
-     */
-    private List<Field> getAnnotatedFields(@NonNull GameConfigurationDTO config) {
-        var fields = new ArrayList<Field>();
-        Class currentClass = config.getClass();
-        while (currentClass != Object.class) {
-            fields.addAll(Arrays.asList(currentClass.getDeclaredFields()));
-            currentClass = currentClass.getSuperclass();
-        }
 
-        return fields.stream()
-                .filter(field -> field.isAnnotationPresent(Description.class))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Helper method to get the text
-     * description from a field by accessing the
-     * Description annotation.
-     *
-     * @param field the requested field.
-     * @return the string description of the field.
-     */
-    private String getTextDescription(@NonNull Field field) {
-        return field.getAnnotation(Description.class).value();
-    }
-
-    /**
-     * Helper method to get the minimum value
-     * that a field can hold by accessing the
-     * DecimalMin annotation.
-     *
-     * @param field the requested field.
-     * @return the minimum value that this field can hold.
-     */
-    private Float getMinValue(@NonNull Field field) {
-        if (!field.isAnnotationPresent(DecimalMin.class)) {
-            throw new IllegalArgumentException();
-        }
-        return Float.parseFloat(field.getAnnotation(DecimalMin.class).value());
-    }
-
-    /**
-     * Helper method to get the maximum value
-     * that a field can hold by accessing the
-     * DecimalMax annotation.
-     *
-     * @param field the requested field.
-     * @return the maximum value that this field can hold.
-     */
-    private Float getMaxValue(@NonNull Field field) {
-        if (!field.isAnnotationPresent(DecimalMax.class)) {
-            throw new IllegalArgumentException();
-        }
-        return Float.parseFloat(field.getAnnotation(DecimalMax.class).value());
-    }
 
     /**
      * This function generates a ConfigurationElement
@@ -142,10 +74,10 @@ public class ConfigurationScreenCtrl implements Initializable {
             field.setAccessible(true);
 
             // This calls the constructor of the element with the extracted annotations and data.
-            var ele = new ConfigurationElementPane(getTextDescription(field),
+            var ele = new ConfigurationElementPane(ReflectionUtils.getTextDescription(field),
                     Float.parseFloat(field.get(gameConfig).toString()),
-                    getMinValue(field),
-                    getMaxValue(field),
+                    ReflectionUtils.getMinValue(field),
+                    ReflectionUtils.getMaxValue(field),
                     editable,
                     field.getType()
             );
@@ -184,7 +116,7 @@ public class ConfigurationScreenCtrl implements Initializable {
     private void initializeChildren() {
         mainPane.getChildren().clear();
         mainPane.getChildren().addAll(
-                getAnnotatedFields(gameConfig)
+                ReflectionUtils.getAnnotatedFields(gameConfig, Description.class)
                         .stream()
                         .map(this::generateElementFromField)
                         .collect(Collectors.toList()));

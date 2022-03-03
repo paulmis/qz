@@ -24,11 +24,14 @@ import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
+import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import lombok.Generated;
 
@@ -54,6 +57,8 @@ public class MainCtrl {
 
     private LogInScreenCtrl logInScreenCtrl;
     private Scene logInScreen;
+
+    private Popup lobbySettingsPopUp;
 
     /**
      * Initialize the main controller.
@@ -85,6 +90,7 @@ public class MainCtrl {
 
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
+        lobbySettingsPopUp = new Popup();
         showServerConnectScreen();
         primaryStage.show();
     }
@@ -150,26 +156,41 @@ public class MainCtrl {
     }
 
     /**
-     * This function opens a modal window with
+     * This function opens a popup with
      * the game config settings.
      *
      * @param config the config of the game.
      * @param saveHandler the action that is to be performed on config save.
      */
     public void openLobbySettings(GameConfigurationDTO config, ConfigurationScreenCtrl.SaveHandler saveHandler) {
+
+        lobbySettingsPopUp = new Popup();
+        lobbySettingsPopUp.setOnShown(e -> {
+            lobbySettingsPopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - lobbySettingsPopUp.getWidth() / 2);
+
+            lobbySettingsPopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - lobbySettingsPopUp.getHeight() / 2);
+        });
+
+        lobbySettingsPopUp.setAutoFix(true);
+        lobbySettingsPopUp.setAutoHide(true);
+        lobbySettingsPopUp.setHideOnEscape(true);
+
         var configPane = new ConfigurationScreenPane(config, saveHandler);
-        var scene = new Scene(configPane);
-        var stage = new Stage();
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setScene(scene);
 
-        stage.setMinWidth(650);
-        stage.setMinHeight(500);
+        configPane.setPrefWidth(primaryStage.getWidth() / 2);
+        configPane.setPrefHeight(primaryStage.getHeight() / 2);
 
-        stage.setMaxHeight(stage.getMinHeight());
-        stage.setMaxWidth(stage.getMinWidth());
+        lobbySettingsPopUp.getContent().add(configPane);
 
-        stage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
-        stage.show();
+        lobbySettingsPopUp.show(primaryStage);
+    }
+
+    /**
+     * This function closes the lobby settings popUp.
+     */
+    public void closeLobbySettings() {
+        lobbySettingsPopUp.hide();
     }
 }

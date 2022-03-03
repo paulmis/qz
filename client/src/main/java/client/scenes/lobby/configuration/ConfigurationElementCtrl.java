@@ -16,14 +16,9 @@ import javafx.util.StringConverter;
  */
 public class ConfigurationElementCtrl implements Initializable {
 
-    @FXML
-    private Label elementLabel;
-
-    @FXML
-    private Spinner<Double> valueSpinner;
-
-    @FXML
-    private Label viewLabel;
+    @FXML private Label elementLabel;
+    @FXML private Spinner<Double> valueSpinner;
+    @FXML private Label viewLabel;
 
     private final SimpleFloatProperty value;
 
@@ -48,11 +43,7 @@ public class ConfigurationElementCtrl implements Initializable {
      * @param editable True if the control should be able to edit the property and false if not.
      * @param type The type of the underlying property.
      */
-    public ConfigurationElementCtrl(String text,
-                                    Float value,
-                                    Float minValue,
-                                    Float maxValue,
-                                    boolean editable,
+    public ConfigurationElementCtrl(String text, Float value, Float minValue, Float maxValue, boolean editable,
                                     Class type) {
         this.value = new SimpleFloatProperty(value);
         this.editable = editable;
@@ -70,13 +61,11 @@ public class ConfigurationElementCtrl implements Initializable {
         // Makes sure no extra decimals are shown.
         this.viewLabel.setText((
                 type == Integer.class
-                        ?
-                        Integer.valueOf(initialValue.intValue()).toString() :
-                        initialValue.toString()
+                        ? Integer.valueOf(initialValue.intValue()).toString()
+                        : initialValue.toString()
                 ));
 
         this.elementLabel.setText(this.text);
-
 
         // Hides/ Shows the view/ editing controls.
         this.valueSpinner.setVisible(editable);
