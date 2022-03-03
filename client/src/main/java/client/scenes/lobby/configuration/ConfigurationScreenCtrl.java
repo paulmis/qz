@@ -33,18 +33,16 @@ public class ConfigurationScreenCtrl implements Initializable {
         void handle(GameConfigurationDTO config);
     }
 
+    @FXML private FlowPane mainPane;
+    @FXML private JFXButton saveButton;
     private GameConfigurationDTO gameConfig;
     private boolean editable;
     private SaveHandler saveHandler;
-
-    @FXML private FlowPane mainPane;
-    @FXML private JFXButton saveButton;
 
     public ConfigurationScreenCtrl(GameConfigurationDTO gameConfig) {
         this.gameConfig = gameConfig;
         this.editable = false;
     }
-
 
     /**
      * The constructor for the ConfigurationScreen controller.
@@ -57,8 +55,6 @@ public class ConfigurationScreenCtrl implements Initializable {
         this.editable = true;
         this.saveHandler = saveHandler;
     }
-
-
 
     /**
      * This function generates a ConfigurationElement
@@ -100,7 +96,6 @@ public class ConfigurationScreenCtrl implements Initializable {
             return new StackPane();
         }
     }
-
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

@@ -19,17 +19,12 @@ public class ConfigurationElementCtrl implements Initializable {
     @FXML private Label elementLabel;
     @FXML private Spinner<Double> valueSpinner;
     @FXML private Label viewLabel;
-
     private final SimpleFloatProperty value;
-
     private final boolean editable;
-
     private final Float initialValue;
     private final Float minValue;
     private final Float maxValue;
-
     private final String text;
-
     private final Class type;
 
 

@@ -28,7 +28,6 @@ public class ConfigurationElementPane extends StackPane {
      */
     public ConfigurationElementPane(String text, Float value, Float minValue, Float maxValue, boolean editable,
                                     Class type) {
-
         // Creates the fxml loader
         FXMLLoader fxmlLoader =
                 new FXMLLoader(getClass().getResource("/client/scenes/lobby/configuration/ConfigurationElement.fxml"));
