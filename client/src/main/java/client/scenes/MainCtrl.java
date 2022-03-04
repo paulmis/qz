@@ -87,7 +87,7 @@ public class MainCtrl {
         this.gameScreenCtrl = gameScreen.getKey();
 
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
-        showNicknameScreen();
+        showServerConnectScreen();
         primaryStage.show();
     }
 
