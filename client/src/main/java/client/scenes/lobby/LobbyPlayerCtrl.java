@@ -1,4 +1,4 @@
-package client.scenes;
+package client.scenes.lobby;
 
 /**
  * Lobby player controller.

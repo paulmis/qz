@@ -21,20 +21,11 @@ public class RegisterScreenCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
-    @FXML
-    private JFXButton signUpButton;
-
-    @FXML
-    private JFXButton haveAccountButton;
-
-    @FXML
-    private CheckBox rememberMe;
-
-    @FXML
-    private TextField emailField;
-
-    @FXML
-    private TextField passwordField;
+    @FXML private JFXButton signUpButton;
+    @FXML private JFXButton haveAccountButton;
+    @FXML private CheckBox rememberMe;
+    @FXML private TextField emailField;
+    @FXML private TextField passwordField;
 
     /**
      * Constructor for the estimate question control.
