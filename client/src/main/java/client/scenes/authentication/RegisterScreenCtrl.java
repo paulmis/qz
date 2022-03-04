@@ -12,7 +12,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 
 
-
 /**
  * Register Screen controller class.
  */

@@ -7,7 +7,6 @@ import com.jfoenix.controls.JFXButton;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
