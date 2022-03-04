@@ -62,7 +62,7 @@ class QuestionControllerTest {
         mockQuestion = new MockQuestion();
         mockQuestion.setId(getUUID(0));
         mockQuestion.setText("Test Question");
-        //mockQuestion.setActivities();
+        mockQuestion.setActivities(activities);
         when(questionRepository.findById(mockQuestion.getId())).thenReturn(Optional.of(mockQuestion));
     }
 
