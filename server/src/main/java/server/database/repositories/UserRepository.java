@@ -1,5 +1,6 @@
 package server.database.repositories;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,4 +30,11 @@ public interface UserRepository extends JpaRepository<User, UUID> {
      * @return whether the email or username already exists in the database
      */
     boolean existsByEmailOrUsername(String email, String username);
+
+    /**
+     * Get the list of all users ordered by their score.
+     *
+     * @return a list of all users ordered by their score.
+     */
+    List<User> findAllByOrderByScoreDesc();
 }
