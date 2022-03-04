@@ -21,20 +21,11 @@ public class LogInScreenCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
-    @FXML
-    private JFXButton logInButton;
-
-    @FXML
-    private JFXButton createAccountButton;
-
-    @FXML
-    private CheckBox rememberMe;
-
-    @FXML
-    private TextField emailField;
-
-    @FXML
-    private TextField passwordField;
+    @FXML private JFXButton logInButton;
+    @FXML private JFXButton createAccountButton;
+    @FXML private CheckBox rememberMe;
+    @FXML private TextField emailField;
+    @FXML private TextField passwordField;
 
     /**
      * Constructor for the estimate question control.

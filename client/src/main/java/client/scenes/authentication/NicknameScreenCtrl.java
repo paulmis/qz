@@ -7,37 +7,33 @@ import com.jfoenix.controls.JFXButton;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 
 
+
 /**
- * Log in Screen controller class.
+ * Nickname Selecting Screen controller class.
  */
 public class NicknameScreenCtrl implements Initializable {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
-    @FXML
-    private JFXButton nicknameSetButton;
-
-    @FXML
-    private TextField nicknameField;
-
-    @FXML
-    private ImageView profilePicture;
-
-    @FXML
-    private Label uploadImage;
-
-    @FXML
-    private FileChooser selectFile;
+    @FXML private JFXButton nicknameSetButton;
+    @FXML private TextField nicknameField;
+    @FXML private ImageView profilePicture;
+    @FXML private ImageView logo;
+    @FXML private Label uploadImage;
+    @FXML private FileChooser selectFile;
+    @FXML private Pane pane;
 
     /**
      * Constructor for the estimate question control.

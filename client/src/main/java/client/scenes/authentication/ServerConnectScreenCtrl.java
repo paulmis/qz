@@ -20,12 +20,8 @@ public class ServerConnectScreenCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
-    @FXML
-    private JFXButton connectButton;
-
-    @FXML
-    private TextField urlField;
-
+    @FXML private JFXButton connectButton;
+    @FXML private TextField urlField;
 
     /**
      * Constructor for the estimate question control.

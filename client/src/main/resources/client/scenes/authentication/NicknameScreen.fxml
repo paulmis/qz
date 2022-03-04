@@ -31,7 +31,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Pane prefHeight="576.0" prefWidth="278.0" style="-fx-background-color: white;" GridPane.columnIndex="1">
+                  <Pane fx:id="pane" prefHeight="576.0" prefWidth="278.0" style="-fx-background-color: white;" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
                      <children>
                         <Label layoutX="46.0" layoutY="348.0" prefHeight="21.0" prefWidth="166.0" text="Nickname">
                            <font>
@@ -48,7 +48,7 @@
                               <Font name="System Bold" size="15.0" />
                            </font>
                         </JFXButton>
-                        <ImageView fitHeight="135.0" fitWidth="139.0" layoutX="59.0" layoutY="30.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="logo" fitHeight="135.0" fitWidth="139.0" layoutX="59.0" layoutY="30.0" pickOnBounds="true">
                            <image>
                               <Image url="@/client/images/logo.png" />
                            </image>
