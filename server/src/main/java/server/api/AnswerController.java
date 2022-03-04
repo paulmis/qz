@@ -35,18 +35,16 @@ public class AnswerController {
      * @param gameId This is the gameId of the game being played
      * @return ok status if successful, not found status if game doesn't exist
      */
-    @PostMapping("game/{gameId}/answer")
-    public ResponseEntity<List<AnswerDTO>> answerQuestion(@RequestBody AnswerDTO answerData,
+    @PostMapping("/game/{gameId}/answer")
+    public ResponseEntity<List<AnswerDTO>> userAnswer(@RequestBody AnswerDTO answerData,
                                                           @PathVariable @NonNull UUID gameId) {
         //Check if game exists.
         Optional<Game> game = gameRepository.findById(gameId);
         if (!game.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        // ToDo: send answer data to server
+        // ToDo: send answerData/payload to server using SSE.
         //Send 200 status if answer is sent successfully.
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 }
