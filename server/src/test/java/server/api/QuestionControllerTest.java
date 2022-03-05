@@ -4,6 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.AnswerDTO;
 import commons.entities.UserDTO;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +25,7 @@ import server.database.entities.question.Activity;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.question.QuestionRepository;
-
-import java.util.*;
-
 import static org.hamcrest.Matchers.equalToObject;
-
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
