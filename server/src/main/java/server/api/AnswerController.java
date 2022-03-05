@@ -36,8 +36,9 @@ public class AnswerController {
      * @return ok status if successful, not found status if game doesn't exist
      */
     @PostMapping("/game/{gameId}/answer")
-    public ResponseEntity<HttpStatus> userAnswer(@RequestBody AnswerDTO answerData,
-                                                 @PathVariable @NonNull UUID gameId) {
+    public ResponseEntity<HttpStatus> userAnswer(
+            @RequestBody AnswerDTO answerData,
+            @PathVariable @NonNull UUID gameId) {
         //Check if game exists.
         Optional<Game> game = gameRepository.findById(gameId);
         if (!game.isPresent()) {
