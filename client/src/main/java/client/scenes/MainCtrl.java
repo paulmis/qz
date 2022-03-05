@@ -129,7 +129,7 @@ public class MainCtrl {
     }
 
     /**
-     * This function displays the register screen.
+     * This function displays the nickname selection screen.
      * It also sets it min width and height
      */
     public void showNicknameScreen() {

@@ -27,7 +27,7 @@ public class LogInScreenCtrl implements Initializable {
     @FXML private TextField passwordField;
 
     /**
-     * Constructor for the estimate question control.
+     * Constructor for the log in screen control.
      *
      */
     @Inject

@@ -13,7 +13,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 
 
@@ -35,7 +38,7 @@ public class NicknameScreenCtrl implements Initializable {
     @FXML private Pane pane;
 
     /**
-     * Constructor for the estimate question control.
+     * Constructor for the nickname screen control.
      *
      */
     @Inject
@@ -60,16 +63,23 @@ public class NicknameScreenCtrl implements Initializable {
      * Function that takes user to lobby list page
      * after they set a nickname.
      */
-    public void setNickname() {
-        System.out.print("Welcome " + nicknameField.getText() + " !");
-        mainCtrl.showLobbyScreen();
+    @FXML
+    private void setNickname() {
+        if (nicknameField.getText().length() > 0) {
+            System.out.print("Welcome " + nicknameField.getText() + " !");
+            mainCtrl.showLobbyScreen();
+        } else {
+            System.out.print("No nickname set !");
+        }
     }
 
     /**
      * Function that lets the user
      * upload a picture.
      */
-    public void setPicture() {
+    @FXML
+    private void setPicture() {
+        nicknameSetButton.setDisable(false);
         selectFile = new FileChooser();
         FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.png");
         selectFile.setTitle("Select your Profile Picture");
@@ -81,12 +91,22 @@ public class NicknameScreenCtrl implements Initializable {
         }
     }
 
+    private Image generateImage(int red, int green, int blue, double opacity) {
+        WritableImage img = new WritableImage(1, 1);
+        PixelWriter pw = img.getPixelWriter();
+
+        Color color = Color.rgb(red, green, blue, opacity);
+        pw.setColor(0, 0, color);
+        return img;
+    }
+
     /**
      * Function that resets picture and username
      * in case of logouts.
      */
     public void reset() {
-        profilePicture.setImage(new Image("/client/images/gray.jpg"));
+        nicknameSetButton.setDisable(true);
+        profilePicture.setImage(generateImage(200, 200, 200, 1.0));
         uploadImage.setVisible(true);
         nicknameField.clear();
     }

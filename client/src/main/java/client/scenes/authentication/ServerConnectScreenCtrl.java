@@ -24,7 +24,7 @@ public class ServerConnectScreenCtrl implements Initializable {
     @FXML private TextField urlField;
 
     /**
-     * Constructor for the estimate question control.
+     * Constructor for the server connect screen control.
      *
      */
     @Inject
