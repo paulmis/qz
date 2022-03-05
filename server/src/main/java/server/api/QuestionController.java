@@ -34,13 +34,14 @@ public class QuestionController {
      * @return information/object of the current question
      */
     @GetMapping("/{questionId}")
-    ResponseEntity<QuestionDTO> currentQuestion(@PathVariable @NonNull UUID questionId) {
+    ResponseEntity<QuestionDTO> currentQuestion(
+            @PathVariable @NonNull UUID questionId) {
         Optional<Question> question = questionRepository.findById(questionId);
         //Check if question exists.
         if (!question.isPresent()) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        //Send 200 status if question exists and sends the question payload back.
+        //Send 200 status and payload if question exists.
         return ResponseEntity.ok(question.get().getDTO());
     }
 }
