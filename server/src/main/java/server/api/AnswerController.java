@@ -47,6 +47,7 @@ public class AnswerController {
         if (!game.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        
         //Send 200 status if answer is sent successfully.
         return new ResponseEntity<>(HttpStatus.OK);
     }
