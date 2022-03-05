@@ -5,11 +5,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import commons.entities.game.GameStatus;
 import commons.entities.AnswerDTO;
 import commons.entities.UserDTO;
+import commons.entities.game.GameStatus;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -72,8 +73,6 @@ class QuestionControllerTest {
     private Question mockQuestion;
     User joe;
     UserDTO joeDTO;
-
-
 
     @Autowired
     public QuestionControllerTest(MockMvc mockMvc) {
