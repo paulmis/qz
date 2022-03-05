@@ -14,17 +14,20 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
+import server.database.entities.User;
 import server.database.entities.game.Game;
 import server.database.entities.question.Activity;
 import server.database.entities.question.Question;
+import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.QuestionRepository;
 
@@ -44,6 +47,9 @@ class AnswerControllerTest {
     @MockBean
     private GameRepository gameRepository;
 
+    @MockBean
+    private UserRepository userRepository;
+
     // ToDo: remove this class when a subclass of game is implemented
     private class MockGame extends Game {
         @Override
@@ -57,6 +63,8 @@ class AnswerControllerTest {
     }
 
     private Game mockLobby;
+    User joe;
+    UserDTO joeDTO;
 
     @Autowired
     public AnswerControllerTest(MockMvc mockMvc) {
@@ -71,9 +79,20 @@ class AnswerControllerTest {
         mockLobby.setId(getUUID(0));
         mockLobby.setStatus(GameStatus.CREATED);
         when(gameRepository.findById(mockLobby.getId())).thenReturn(Optional.of(mockLobby));
+
+        //Set up random test user
+        joe = new User("joe", "joe@doe.com", "stinkywinky");
+        joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        joeDTO = joe.getDTO();
+
+        // Set the context user
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        joe.getEmail(),
+                        joe.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
     }
 
-    // ToDo: test failing as of now
     @Test
     public void userAnswerOkTest() throws Exception {
         // Request
@@ -85,7 +104,6 @@ class AnswerControllerTest {
                         .andExpect(status().isOk());
     }
 
-    // ToDo: test failing as of now
     @Test
     public void userAnswerNotFoundTest() throws Exception {
         // Request
@@ -96,5 +114,4 @@ class AnswerControllerTest {
                         .content(objectMapper.writeValueAsString(userAnswer)))
                 .andExpect(status().isNotFound());
     }
-
 }
