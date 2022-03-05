@@ -3,16 +3,22 @@ package server.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.AnswerDTO;
+import commons.entities.UserDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import server.database.entities.User;
 import server.database.entities.question.Activity;
 import server.database.entities.question.Question;
+import server.database.repositories.UserRepository;
 import server.database.repositories.question.QuestionRepository;
 
 import java.util.*;
@@ -42,11 +48,16 @@ class QuestionControllerTest {
     @MockBean
     private QuestionRepository questionRepository;
 
+    @MockBean
+    private UserRepository userRepository;
+
     private UUID getUUID(int id) {
         return UUID.fromString("00000000-0000-0000-0000-00000000000" + (id % 10));
     }
 
     private Question mockQuestion;
+    User joe;
+    UserDTO joeDTO;
 
     @Autowired
     public QuestionControllerTest(MockMvc mockMvc) {
@@ -64,9 +75,20 @@ class QuestionControllerTest {
         mockQuestion.setText("Test Question");
         mockQuestion.setActivities(activities);
         when(questionRepository.findById(mockQuestion.getId())).thenReturn(Optional.of(mockQuestion));
+
+        //Set up random test user
+        joe = new User("joe", "joe@doe.com", "stinkywinky");
+        joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        joeDTO = joe.getDTO();
+
+        // Set the context user
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        joe.getEmail(),
+                        joe.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
     }
 
-    // ToDo: test failing as of now
     @Test
     public void questionFoundTest() throws Exception {
         // Request question object -> expect a ok status and mock question object
@@ -78,7 +100,6 @@ class QuestionControllerTest {
                 )));
     }
 
-    // ToDo: test failing as of now
     @Test
     public void questionNotFoundTest() throws Exception {
         // Request question object -> expect a conflict status
