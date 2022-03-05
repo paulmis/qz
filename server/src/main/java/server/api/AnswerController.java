@@ -44,7 +44,6 @@ public class AnswerController {
         if (!game.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        // ToDo: send answerData/payload to server using SSE.
         //Send 200 status if answer is sent successfully.
         return new ResponseEntity<>(HttpStatus.OK);
     }
