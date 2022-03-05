@@ -1,13 +1,16 @@
 package server.api;
 
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.AnswerDTO;
 import commons.entities.UserDTO;
 import commons.entities.game.GameStatus;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +29,6 @@ import server.database.entities.game.Game;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
