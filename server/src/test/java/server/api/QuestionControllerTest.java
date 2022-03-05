@@ -12,9 +12,10 @@ import commons.entities.AnswerDTO;
 import commons.entities.UserDTO;
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
+
+import commons.entities.game.GameStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import server.database.entities.User;
-import server.database.entities.question.Activity;
+import server.database.entities.game.Game;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
+import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.QuestionRepository;
 
 @SpringBootTest
@@ -40,12 +42,8 @@ class QuestionControllerTest {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
 
-    private class MockQuestion extends Question {
-        @Override
-        public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
-            return null;
-        }
-    }
+    @MockBean
+    private GameRepository gameRepository;
 
     @MockBean
     private QuestionRepository questionRepository;
@@ -53,13 +51,31 @@ class QuestionControllerTest {
     @MockBean
     private UserRepository userRepository;
 
+    // ToDo: remove this class when a subclass of game is implemented
+    private class MockGame extends Game {
+        @Override
+        public Optional<Question> getNextQuestion() {
+            return Optional.empty();
+        }
+    }
+
+    private class MockQuestion extends Question {
+        @Override
+        public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
+            return null;
+        }
+    }
+
     private UUID getUUID(int id) {
         return UUID.fromString("00000000-0000-0000-0000-00000000000" + (id % 10));
     }
 
+    private Game mockGame;
     private Question mockQuestion;
     User joe;
     UserDTO joeDTO;
+
+
 
     @Autowired
     public QuestionControllerTest(MockMvc mockMvc) {
@@ -69,6 +85,11 @@ class QuestionControllerTest {
 
     @BeforeEach
     private void init() {
+        mockGame = new QuestionControllerTest.MockGame();
+        mockGame.setId(getUUID(0));
+        mockGame.setStatus(GameStatus.ONGOING);
+        when(gameRepository.findById(mockGame.getId())).thenReturn(Optional.of(mockGame));
+
         // Setup mock question
         mockQuestion = new MockQuestion();
         mockQuestion.setId(getUUID(0));
@@ -92,7 +113,7 @@ class QuestionControllerTest {
     public void questionFoundTest() throws Exception {
         // Request question object -> expect a ok status and mock question object
         this.mockMvc
-                .perform(get("/api/questions/" + mockQuestion.getId()))
+                .perform(get("/api/game/" + mockGame.getId() + "/question/" + mockQuestion.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(equalToObject(
                         objectMapper.writeValueAsString(mockQuestion.getDTO())
@@ -103,7 +124,15 @@ class QuestionControllerTest {
     public void questionNotFoundTest() throws Exception {
         // Request question object -> expect a conflict status
         this.mockMvc
-                .perform(get("/api/questions/" + getUUID(1)))
+                .perform(get("/api/game/" + mockGame.getId() + "/question/" + getUUID(1)))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    public void gameNotFoundTest() throws Exception {
+        // Request question object -> expect a not found status
+        this.mockMvc
+                .perform(get("/api/game/" + getUUID(1) + "/question/" + mockQuestion.getId()))
+                .andExpect(status().isNotFound());
     }
 }
