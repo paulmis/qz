@@ -1,7 +1,8 @@
 package commons.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.utils.DTO;
+import commons.entities.utils.Views;
 import java.util.UUID;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
@@ -21,12 +22,14 @@ public class UserDTO implements DTO {
     /**
      * The user's ID.
      */
+    @JsonView(Views.Public.class)
     protected UUID id;
 
     /**
      * User's name.
      */
     @NonNull
+    @JsonView(Views.Public.class)
     protected String username;
 
     /**
@@ -34,6 +37,7 @@ public class UserDTO implements DTO {
      */
     @Email
     @NonNull
+    @JsonView(Views.Private.class)
     protected String email;
 
     /**
@@ -41,15 +45,18 @@ public class UserDTO implements DTO {
      */
     @Size(min = 8)
     @NonNull
+    @JsonView(Views.Internal.class)
     protected String password;
 
     /**
      * User's global score.
      */
+    @JsonView(Views.Public.class)
     protected int score;
 
     /**
      * Number of games played by the user.
      */
+    @JsonView(Views.Public.class)
     protected int gamesPlayed;
 }
