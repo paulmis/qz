@@ -32,15 +32,14 @@ public class SSEManager {
      *
      * @param userId User ID to add SSE emitter for.
      */
-    public boolean register(UUID userId, SseEmitter emitter) {
+    public void register(UUID userId, SseEmitter emitter) {
         if (emitters.containsKey(userId)) {
             emitters.get(userId).complete();
-            emitters.remove(userId);
+            unregister(userId);
             log.debug("Removed existing SSE emitter for user {}", userId);
         }
 
         emitters.put(userId, emitter);
-        return true;
     }
 
     /**
@@ -50,12 +49,7 @@ public class SSEManager {
      * @return Whether the SSE emitter was successfully removed or not.
      */
     public boolean unregister(UUID userId) {
-        if (!emitters.containsKey(userId)) {
-            log.debug("Cannot unregister: user {} has no registered emitter", userId);
-            return false;
-        }
-        emitters.remove(userId);
-        return true;
+        return emitters.remove(userId) != null;
     }
 
     /**
