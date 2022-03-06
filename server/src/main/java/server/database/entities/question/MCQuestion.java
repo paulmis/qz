@@ -5,10 +5,7 @@ import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,8 +17,8 @@ import org.modelmapper.ModelMapper;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@MappedSuperclass
 @Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class MCQuestion extends Question {
 
     /**
@@ -103,5 +100,10 @@ public class MCQuestion extends Question {
             }
         }
         return points;
+    }
+
+    @Override
+    public QuestionDTO getDTO() {
+        return new ModelMapper().map(this, QuestionDTO.class);
     }
 }

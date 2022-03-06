@@ -1,5 +1,6 @@
 package commons.entities.game.configuration;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import commons.entities.utils.DTO;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
@@ -15,7 +16,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class StandardGameConfigurationDTO extends GameConfigurationDTO implements DTO {
+@JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
+public class NormalGameConfigurationDTO extends GameConfigurationDTO {
     /**
      * Number of questions in the game.
      */
