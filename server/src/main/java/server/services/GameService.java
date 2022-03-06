@@ -4,6 +4,7 @@ import commons.entities.game.GameStatus;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.entities.game.DefiniteGame;
@@ -28,16 +29,20 @@ public class GameService {
      * @throws IllegalStateException If the amount of questions to return is greater than the amount of
      *      questions in the database.
      */
-    List<Question> provideQuestions(int count, List<Question> usedQuestions) throws IllegalStateException {
+    public List<Question> provideQuestions(int count, List<Question> usedQuestions) throws IllegalStateException {
         // Check that there are enough questions
         if (questionRepository.count() < count + usedQuestions.size()) {
             throw new IllegalStateException("Not enough questions in the database.");
         }
 
         // Create a list of all the available questions
-        List<Question> questions = new ArrayList<>(
+        List<Question> questions =
                 questionRepository
-                    .findAll());
+                    .findByIdNotIn(
+                            usedQuestions
+                                    .stream()
+                                    .map(Question::getId)
+                                    .collect(Collectors.toList()));
 
         // Randomize the list and return the requested amount of questions
         Collections.shuffle(questions);
@@ -49,7 +54,7 @@ public class GameService {
      *
      * @param game the game to start
      */
-    void startGame(Game game) {
+    public void startGame(Game game) {
         // Initialize the questions
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;

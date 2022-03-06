@@ -9,4 +9,5 @@ import server.database.entities.question.Question;
  * JPA repository for accessing question data.
  */
 public interface QuestionRepository extends JpaRepository<Question, UUID> {
+    List<Question> findByIdNotIn(List<UUID> questionIds);
 }
