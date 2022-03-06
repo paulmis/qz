@@ -51,6 +51,22 @@ class EstimateQuestionTest {
     }
 
     @Test
+    void getRightAnswerTest() {
+        int costTest = 50;
+        Question myQuestion = new EstimateQuestion(q);
+        List<Activity> components = new ArrayList<>();
+        Activity a = getActivity(costTest);
+        components.add(a);
+        myQuestion.setActivities(components);
+
+        // Only one correct activity
+        assertEquals(1, myQuestion.getRightAnswer().getUserChoice().size());
+
+        // Correct activity has right cost
+        assertEquals(costTest, myQuestion.getRightAnswer().getUserChoice().get(0).getCost());
+    }
+
+    @Test
     void checkAnswerTest() {
         List<AnswerDTO> userGuesses = new ArrayList<>(Arrays.asList(
                 getAnswer(90), // #2
