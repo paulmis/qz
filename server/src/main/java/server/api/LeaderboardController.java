@@ -1,6 +1,8 @@
 package server.api;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.UserDTO;
+import commons.entities.utils.Views;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +25,11 @@ public class LeaderboardController {
      *
      * @return a list of users sorted by their score in descending order.
      */
+    @JsonView(Views.Public.class)
     @RequestMapping("/score")
     public ResponseEntity<List<UserDTO>> getScoreLeaderboard() {
         List<UserDTO> userLeaderboard = userRepository.findAllByOrderByScoreDesc().stream().map(u -> {
-            UserDTO dto = u.getDTO();
-            u.setEmail(null);
-            u.setPassword(null);
-            return dto;
+            return u.getDTO();
         }).collect(Collectors.toList());
         return ResponseEntity.ok(userLeaderboard);
     }
@@ -39,13 +39,11 @@ public class LeaderboardController {
      *
      * @return a list of users sorted by their score in descending order.
      */
-    @RequestMapping("/score")
+    @JsonView(Views.Public.class)
+    @RequestMapping("/games")
     public ResponseEntity<List<UserDTO>> getGamesLeaderboard() {
         List<UserDTO> userLeaderboard = userRepository.findAllByOrderByGamesPlayedDesc().stream().map(u -> {
-            UserDTO dto = u.getDTO();
-            u.setEmail(null);
-            u.setPassword(null);
-            return dto;
+            return u.getDTO();
         }).collect(Collectors.toList());
         return ResponseEntity.ok(userLeaderboard);
     }
