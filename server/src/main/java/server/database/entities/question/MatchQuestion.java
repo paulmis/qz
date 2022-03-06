@@ -5,6 +5,7 @@ import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -90,6 +91,13 @@ public class MatchQuestion extends Question {
         return points;
     }
 
+    @Override
+    public AnswerDTO getRightAnswer() {
+        AnswerDTO rightAnswer = new AnswerDTO();
+        rightAnswer.setUserChoice(getActivities().stream().map(a -> a.getDTO()).collect(Collectors.toList()));
+        return rightAnswer;
+    }
+    
     @Override
     public QuestionDTO getDTO() {
         return new ModelMapper().map(this, QuestionDTO.class);
