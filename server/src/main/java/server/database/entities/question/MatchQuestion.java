@@ -5,6 +5,7 @@ import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 import lombok.Data;
@@ -86,5 +87,12 @@ public class MatchQuestion extends Question {
             points.add(currentPoints);
         }
         return points;
+    }
+
+    @Override
+    public AnswerDTO getRightAnswer() {
+        AnswerDTO rightAnswer = new AnswerDTO();
+        rightAnswer.setUserChoice(getActivities().stream().map(a -> a.getDTO()).collect(Collectors.toList()));
+        return rightAnswer;
     }
 }

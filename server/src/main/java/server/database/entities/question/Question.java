@@ -69,4 +69,11 @@ public abstract class Question extends BaseEntity<QuestionDTO> {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     public abstract List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException;
+
+    /**
+     * getRightAnswer, returns the correct answer for the question.
+     *
+     * @return the right answer
+     */
+    public abstract AnswerDTO getRightAnswer();
 }

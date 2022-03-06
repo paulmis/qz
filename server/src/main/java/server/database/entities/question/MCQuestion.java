@@ -104,4 +104,11 @@ public class MCQuestion extends Question {
         }
         return points;
     }
+
+    @Override
+    public AnswerDTO getRightAnswer() {
+        AnswerDTO rightAnswer = new AnswerDTO();
+        rightAnswer.setUserChoice(List.of(getAnswer().getDTO()));
+        return rightAnswer;
+    }
 }
