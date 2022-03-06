@@ -14,5 +14,5 @@ import server.database.entities.game.Game;
 public interface GameRepository extends JpaRepository<Game, UUID> {
     List<Game> findAllByStatus(GameStatus status);
 
-    Optional<Game> findByPlayers_User_EmailEqualsIgnoreCaseAndStatus(@NonNull String email, @NonNull GameStatus status);
+    Optional<Game> findByPlayers_User_IdEqualsAndStatus(@NonNull UUID id, @NonNull GameStatus status);
 }
