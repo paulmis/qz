@@ -97,7 +97,7 @@ class SSEControllerTest {
         Game game = new MockGame();
         game.setStatus(GameStatus.ONGOING);         // Set the game to ongoing
 
-        when(gameRepository.findByPlayers_User_EmailEqualsIgnoreCaseAndStatus(user.getEmail(), GameStatus.ONGOING))
+        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(user.getId(), GameStatus.ONGOING))
                 .thenReturn(Optional.of(game));
 
         MvcResult mvcResult = this.mockMvc.perform(get("/api/sse/open"))
