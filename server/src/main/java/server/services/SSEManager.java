@@ -33,7 +33,6 @@ public class SSEManager {
      * Add a new SSE emitter.
      *
      * @param userId User ID to add SSE emitter for.
-     * @return The SSE emitter.
      */
     public void register(UUID userId, SseEmitter emitter) {
         if (emitters.containsKey(userId)) {
