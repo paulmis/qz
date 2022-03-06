@@ -157,7 +157,7 @@ public class MainCtrl {
      * Shows the lobby screen.
      */
     public void showLobbyScreen() {
-        primaryStage.setTitle(lobbyCtrl.getName());
+        primaryStage.setTitle(lobbyScreenCtrl.getName());
         primaryStage.setScene(lobbyScene);
         primaryStage.sizeToScene();
         primaryStage.setMinHeight(500);
@@ -184,15 +184,15 @@ public class MainCtrl {
     public Stage getPrimaryStage() {
         return primaryStage;
     }
-
+    /**
      * This function opens a popup with
      * the game config settings.
      *
      * @param config the config of the game.
      * @param saveHandler the action that is to be performed on config save.
      */
-    public void openLobbySettings(GameConfigurationDTO config, ConfigurationScreenCtrl.SaveHandler saveHandler) {
 
+    public void openLobbySettings(GameConfigurationDTO config, ConfigurationScreenCtrl.SaveHandler saveHandler) {
         lobbySettingsPopUp = new Popup();
         lobbySettingsPopUp.setOnShown(e -> {
             lobbySettingsPopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
