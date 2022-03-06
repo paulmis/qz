@@ -25,7 +25,7 @@ import server.utils.EasyRandom;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * ID of the game shown to the user.

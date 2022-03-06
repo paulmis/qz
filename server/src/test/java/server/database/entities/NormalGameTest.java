@@ -6,11 +6,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.game.NormalGameDTO;
-import java.util.UUID;
-
 import commons.entities.utils.DTO;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
-import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 

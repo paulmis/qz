@@ -15,7 +15,7 @@ import server.database.entities.game.configuration.NormalGameConfiguration;
  */
 @Entity
 @NoArgsConstructor
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Data

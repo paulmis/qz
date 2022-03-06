@@ -2,9 +2,7 @@ package server.database.entities.game.configuration;
 
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,8 +18,8 @@ import org.modelmapper.ModelMapper;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@Inheritance(strategy = InheritanceType.JOINED)
 @Entity
-@MappedSuperclass
 public class SurvivalGameConfiguration extends GameConfiguration {
 
     /**

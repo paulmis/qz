@@ -18,7 +18,7 @@ import server.database.entities.utils.BaseEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 @Entity
 public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO> {
     /**

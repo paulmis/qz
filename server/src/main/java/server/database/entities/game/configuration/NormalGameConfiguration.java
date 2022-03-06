@@ -1,9 +1,7 @@
 package server.database.entities.game.configuration;
 
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -15,8 +13,8 @@ import org.modelmapper.ModelMapper;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Inheritance(strategy = InheritanceType.JOINED)
 @Entity
-@MappedSuperclass
 public class NormalGameConfiguration extends GameConfiguration {
 
     /**
