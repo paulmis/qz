@@ -19,10 +19,19 @@ package client.scenes;
 import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
+import client.scenes.lobby.LobbyScreenCtrl;
+import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
+import client.scenes.lobby.configuration.ConfigurationScreenPane;
+import commons.entities.game.configuration.GameConfigurationDTO;
+import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
+import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import lombok.Generated;
 
@@ -36,7 +45,7 @@ public class MainCtrl {
 
     private GameScreenCtrl gameScreenCtrl;
     private Scene gameScreen;
-    private LobbyCtrl lobbyCtrl;
+    private LobbyScreenCtrl lobbyScreenCtrl;
     private Scene lobbyScene;
 
 
@@ -49,6 +58,8 @@ public class MainCtrl {
     private LogInScreenCtrl logInScreenCtrl;
     private Scene logInScreen;
 
+    private Popup lobbySettingsPopUp;
+
     /**
      * Initialize the main controller.
      *
@@ -58,11 +69,11 @@ public class MainCtrl {
                            Pair<ServerConnectScreenCtrl, Parent> serverConnectScreen,
                            Pair<LogInScreenCtrl, Parent> logInScreen,
                            Pair<RegisterScreenCtrl, Parent> registerScreen,
-                           Pair<LobbyCtrl, Parent> lobbyScreen,
+                           Pair<LobbyScreenCtrl, Parent> lobbyScreen,
                            Pair<GameScreenCtrl, Parent> gameScreen) {
         this.primaryStage = primaryStage;
 
-        this.lobbyCtrl = lobbyScreen.getKey();
+        this.lobbyScreenCtrl = lobbyScreen.getKey();
         this.lobbyScene = new Scene(lobbyScreen.getValue());
 
         this.logInScreen = new Scene(logInScreen.getValue());
@@ -78,6 +89,8 @@ public class MainCtrl {
         this.gameScreenCtrl = gameScreen.getKey();
 
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
+
+        lobbySettingsPopUp = new Popup();
         showServerConnectScreen();
         primaryStage.show();
     }
@@ -111,7 +124,7 @@ public class MainCtrl {
      * Shows the lobby screen.
      */
     public void showLobbyScreen() {
-        primaryStage.setTitle(lobbyCtrl.getName());
+        primaryStage.setTitle(lobbyScreenCtrl.getName());
         primaryStage.setScene(lobbyScene);
         primaryStage.sizeToScene();
         primaryStage.setMinHeight(500);
@@ -140,5 +153,44 @@ public class MainCtrl {
         primaryStage.sizeToScene();
         primaryStage.setMinHeight(500);
         primaryStage.setMinWidth(500);
+    }
+
+    /**
+     * This function opens a popup with
+     * the game config settings.
+     *
+     * @param config the config of the game.
+     * @param saveHandler the action that is to be performed on config save.
+     */
+    public void openLobbySettings(GameConfigurationDTO config, ConfigurationScreenCtrl.SaveHandler saveHandler) {
+
+        lobbySettingsPopUp = new Popup();
+        lobbySettingsPopUp.setOnShown(e -> {
+            lobbySettingsPopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - lobbySettingsPopUp.getWidth() / 2);
+
+            lobbySettingsPopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - lobbySettingsPopUp.getHeight() / 2);
+        });
+
+        lobbySettingsPopUp.setAutoFix(true);
+        lobbySettingsPopUp.setAutoHide(true);
+        lobbySettingsPopUp.setHideOnEscape(true);
+
+        var configPane = new ConfigurationScreenPane(config, saveHandler);
+
+        configPane.setPrefWidth(primaryStage.getWidth() / 2);
+        configPane.setPrefHeight(primaryStage.getHeight() / 2);
+
+        lobbySettingsPopUp.getContent().add(configPane);
+
+        lobbySettingsPopUp.show(primaryStage);
+    }
+
+    /**
+     * This function closes the lobby settings popUp.
+     */
+    public void closeLobbySettings() {
+        lobbySettingsPopUp.hide();
     }
 }

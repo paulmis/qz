@@ -60,3 +60,11 @@
 #settingsIconView {
     -fx-fill: gray;
 }
+
+#timerLabel {
+    -fx-text-fill: primaryColor;
+}
+
+#questionNumberLabel {
+    -fx-text-fill: primaryColor;
+}
