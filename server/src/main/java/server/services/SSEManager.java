@@ -14,7 +14,20 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Service
 @Slf4j
 public class SSEManager {
-    private Map<UUID, SseEmitter> emitters = new ConcurrentHashMap<>();
+    /**
+     * The Map which maps user IDs to SSE emitters.
+     * As this class can be called from different threads, we need to use a concurrent map.
+     */
+    private final Map<UUID, SseEmitter> emitters = new ConcurrentHashMap<>();
+
+    /**
+     * Get the number of registered SSE emitters.
+     *
+     * @return The number of registered SSE emitters.
+     */
+    public int getNumberOfEmitters() {
+        return emitters.size();
+    }
 
     /**
      * Add a new SSE emitter.
@@ -22,15 +35,13 @@ public class SSEManager {
      * @param userId User ID to add SSE emitter for.
      * @return The SSE emitter.
      */
-    public SseEmitter register(UUID userId, SseEmitter emitter) {
+    public void register(UUID userId, SseEmitter emitter) {
         if (emitters.containsKey(userId)) {
             emitters.get(userId).complete();
             emitters.remove(userId);
             log.debug("Removed existing SSE emitter for user {}", userId);
         }
-
         emitters.put(userId, emitter);
-        return emitter;
     }
 
     /**
