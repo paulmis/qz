@@ -40,12 +40,12 @@
                         <Image url="@/client/images/logo.png" />
                      </image>
                   </ImageView>
-                  <ImageView fx:id="profilePicture" fitHeight="152.0" fitWidth="165.0" layoutX="46.0" layoutY="185.0" onMouseClicked="#setPicture" pickOnBounds="true">
+                  <ImageView fx:id="profilePicture" fitHeight="152.0" fitWidth="165.0" layoutX="46.0" layoutY="185.0" onMouseClicked="#uploadPicture" pickOnBounds="true">
                      <image>
                         <Image url="@/client/images/gray.jpg" />
                      </image>
                   </ImageView>
-                  <Label fx:id="uploadImage" layoutX="83.0" layoutY="252.0" onMouseClicked="#setPicture" text="Upload an Image" />
+                  <Label fx:id="uploadImage" layoutX="83.0" layoutY="252.0" onMouseClicked="#uploadPicture" text="Upload an Image" />
                </children>
             </Pane>
          </right>

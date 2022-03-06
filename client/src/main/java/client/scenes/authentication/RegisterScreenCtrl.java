@@ -52,9 +52,13 @@ public class RegisterScreenCtrl implements Initializable {
      * after a button click.
      */
     public void signUpButtonClick() {
-        server.register(emailField.getText(), passwordField.getText());
-        System.out.print("Registering new account credentials...");
-        mainCtrl.showNicknameScreen();
+        if (emailField.getText().length() > 0 && passwordField.getText().length() > 0) {
+            server.register(emailField.getText(), passwordField.getText());
+            System.out.print("Registering new account credentials...");
+            mainCtrl.showNicknameScreen();
+        } else {
+            System.out.print("Can't have empty username or password ! Try again");
+        }
     }
 
     /**

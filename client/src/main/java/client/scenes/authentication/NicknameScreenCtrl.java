@@ -78,14 +78,14 @@ public class NicknameScreenCtrl implements Initializable {
      * upload a picture.
      */
     @FXML
-    private void setPicture() {
-        nicknameSetButton.setDisable(false);
+    private void uploadPicture() {
         selectFile = new FileChooser();
         FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.png");
         selectFile.setTitle("Select your Profile Picture");
         selectFile.getExtensionFilters().add(imageFilter);
         File pictureFile = selectFile.showOpenDialog(mainCtrl.getPrimaryStage());
         if (pictureFile != null) {
+            nicknameSetButton.setDisable(false);
             uploadImage.setVisible(false);
             profilePicture.setImage(new Image(pictureFile.getAbsolutePath()));
         }
