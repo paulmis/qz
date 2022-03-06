@@ -17,6 +17,7 @@
 package client.scenes;
 
 import client.scenes.authentication.LogInScreenCtrl;
+import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
@@ -43,20 +44,23 @@ public class MainCtrl {
 
     private Stage primaryStage;
 
-    private GameScreenCtrl gameScreenCtrl;
-    private Scene gameScreen;
-    private LobbyScreenCtrl lobbyScreenCtrl;
-    private Scene lobbyScene;
-
+    private ServerConnectScreenCtrl serverConnectScreenCtrl;
+    private Scene serverConnectScreen;
+    
+    private LogInScreenCtrl logInScreenCtrl;
+    private Scene logInScreen;
 
     private RegisterScreenCtrl registerScreenCtrl;
     private Scene registerScreen;
 
-    private ServerConnectScreenCtrl serverConnectScreenCtrl;
-    private Scene serverConnectScreen;
+    private NicknameScreenCtrl nicknameScreenCtrl;
+    private Scene nicknameScreen;
 
-    private LogInScreenCtrl logInScreenCtrl;
-    private Scene logInScreen;
+    private LobbyScreenCtrl lobbyScreenCtrl;
+    private Scene lobbyScene;
+
+    private GameScreenCtrl gameScreenCtrl;
+    private Scene gameScreen;
 
     private Popup lobbySettingsPopUp;
 
@@ -69,12 +73,13 @@ public class MainCtrl {
                            Pair<ServerConnectScreenCtrl, Parent> serverConnectScreen,
                            Pair<LogInScreenCtrl, Parent> logInScreen,
                            Pair<RegisterScreenCtrl, Parent> registerScreen,
+                           Pair<NicknameScreenCtrl, Parent> nicknameScreen,
                            Pair<LobbyScreenCtrl, Parent> lobbyScreen,
                            Pair<GameScreenCtrl, Parent> gameScreen) {
         this.primaryStage = primaryStage;
 
-        this.lobbyScreenCtrl = lobbyScreen.getKey();
-        this.lobbyScene = new Scene(lobbyScreen.getValue());
+        this.serverConnectScreen = new Scene(serverConnectScreen.getValue());
+        this.serverConnectScreenCtrl = serverConnectScreen.getKey();
 
         this.logInScreen = new Scene(logInScreen.getValue());
         this.logInScreenCtrl = logInScreen.getKey();
@@ -82,8 +87,11 @@ public class MainCtrl {
         this.registerScreen = new Scene(registerScreen.getValue());
         this.registerScreenCtrl = registerScreen.getKey();
 
-        this.serverConnectScreen = new Scene(serverConnectScreen.getValue());
-        this.serverConnectScreenCtrl = serverConnectScreen.getKey();
+        this.nicknameScreen = new Scene(nicknameScreen.getValue());
+        this.nicknameScreenCtrl = nicknameScreen.getKey();
+        
+        this.lobbyScreenCtrl = lobbyScreen.getKey();
+        this.lobbyScene = new Scene(lobbyScreen.getValue());
 
         this.gameScreen = new Scene(gameScreen.getValue());
         this.gameScreenCtrl = gameScreen.getKey();
@@ -121,23 +129,36 @@ public class MainCtrl {
     }
 
     /**
-     * Shows the lobby screen.
-     */
-    public void showLobbyScreen() {
-        primaryStage.setTitle(lobbyScreenCtrl.getName());
-        primaryStage.setScene(lobbyScene);
-        primaryStage.sizeToScene();
-        primaryStage.setMinHeight(500);
-        primaryStage.setMinWidth(500);
-    }
-
-    /**
      * This function displays the register screen.
      * It also sets it min width and height
      */
     public void showRegisterScreen() {
         primaryStage.setTitle("Register Screen");
         primaryStage.setScene(registerScreen);
+        primaryStage.sizeToScene();
+        primaryStage.setMinHeight(500);
+        primaryStage.setMinWidth(500);
+    }
+
+    /**
+     * This function displays the nickname selection screen.
+     * It also sets it min width and height
+     */
+    public void showNicknameScreen() {
+        nicknameScreenCtrl.reset();
+        primaryStage.setTitle("Nickname Screen");
+        primaryStage.setScene(nicknameScreen);
+        primaryStage.sizeToScene();
+        primaryStage.setMinHeight(500);
+        primaryStage.setMinWidth(500);
+    }
+
+    /**
+     * Shows the lobby screen.
+     */
+    public void showLobbyScreen() {
+        primaryStage.setTitle(lobbyScreenCtrl.getName());
+        primaryStage.setScene(lobbyScene);
         primaryStage.sizeToScene();
         primaryStage.setMinHeight(500);
         primaryStage.setMinWidth(500);
@@ -156,14 +177,22 @@ public class MainCtrl {
     }
 
     /**
+     * This function returns the primary stage.
+     *
+     * @return stage that is shown
+     */
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
+    /**
      * This function opens a popup with
      * the game config settings.
      *
      * @param config the config of the game.
      * @param saveHandler the action that is to be performed on config save.
      */
-    public void openLobbySettings(GameConfigurationDTO config, ConfigurationScreenCtrl.SaveHandler saveHandler) {
 
+    public void openLobbySettings(GameConfigurationDTO config, ConfigurationScreenCtrl.SaveHandler saveHandler) {
         lobbySettingsPopUp = new Popup();
         lobbySettingsPopUp.setOnShown(e -> {
             lobbySettingsPopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2

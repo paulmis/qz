@@ -23,9 +23,8 @@ public class ServerConnectScreenCtrl implements Initializable {
     @FXML private JFXButton connectButton;
     @FXML private TextField urlField;
 
-
     /**
-     * Constructor for the estimate question control.
+     * Constructor for the server connect screen control.
      *
      */
     @Inject
@@ -48,7 +47,8 @@ public class ServerConnectScreenCtrl implements Initializable {
     /**
      * Function that connects the user to the server based on the url.
      */
-    public void clickConnectButton() {
+    @FXML
+    private void clickConnectButton() {
         System.out.print("Connecting to server....\n" + urlField.getText());
         server.connect();
         mainCtrl.showLogInScreen();
