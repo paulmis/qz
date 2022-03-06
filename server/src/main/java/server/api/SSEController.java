@@ -1,7 +1,7 @@
 package server.api;
 
 import commons.entities.game.GameStatus;
-import java.security.Principal;
+import java.io.IOException;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import server.database.entities.User;
+import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.repositories.UserRepository;
+import server.database.repositories.game.GamePlayerRepository;
+import server.database.repositories.game.GameRepository;
 
 /**
  * The SSE endpoint - opens new SSE connections.
@@ -24,23 +27,26 @@ public class SSEController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private GameRepository gameRepository;
+
     /**
      * Open a new SSE connection.
      *
-     * @param principal the security principal of current user.
      * @return the response entity.
      */
     @GetMapping("/open")
-    public ResponseEntity<SseEmitter> open(Principal principal) {
+    public ResponseEntity<SseEmitter> open() {
         // Create a new SSE emitter
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         try {
             // Get current user
-            User user = userRepository.findByEmail(principal.getName()).orElseThrow(NoSuchElementException::new);
+            User user = userRepository.findByEmail(AuthContext.get())
+                    .orElseThrow(() -> new NoSuchElementException("User not found"));
 
             // The user must currently be in a game
-            Game game = user.getGamePlayers().stream().filter(gp -> gp.getGame().getStatus() == GameStatus.ONGOING)
-                    .findFirst().orElseThrow(IllegalStateException::new).getGame();
+            Game game = gameRepository.findByPlayers_User_EmailEqualsIgnoreCaseAndStatus(user.getEmail(),
+                    GameStatus.ONGOING).orElseThrow(() -> new IllegalStateException("User not in a game"));
 
             // Register emitter callbacks.
             emitter.onCompletion(() -> game.emitters.unregister(user.getId()));
@@ -58,12 +64,19 @@ public class SSEController {
 
             return ResponseEntity.ok(emitter);
         } catch (NoSuchElementException e) {
+            // This should never happen
             log.error("Failed to fetch user information: " + e.getMessage());
             // If for some reason we cannot fetch user information, close the emitter
             emitter.complete();
             return ResponseEntity.internalServerError().body(emitter);
         } catch (IllegalStateException e) {
-            log.debug("Failed to register emitter: user is not in the game");
+            log.debug("Failed to create SSE connection: " + e.getMessage());
+            // Try to notify the user that they are not in a game.
+            try {
+                emitter.send(e.getMessage());
+            } catch (IOException e1) {
+                log.error("Failed to send error message to client: " + e1.getMessage());
+            }
             emitter.complete();
             return ResponseEntity.badRequest().body(emitter);
         }

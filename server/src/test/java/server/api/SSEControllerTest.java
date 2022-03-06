@@ -34,16 +34,20 @@ import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
+import server.database.repositories.game.GameRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @EnableWebMvc
 class SSEControllerTest {
     private final MockMvc mockMvc;
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @MockBean
     private UserRepository userRepository;
+
+    @MockBean
+    private GameRepository gameRepository;
 
     @Autowired
     public SSEControllerTest(MockMvc mockMvc) {
@@ -93,13 +97,8 @@ class SSEControllerTest {
         Game game = new MockGame();
         game.setStatus(GameStatus.ONGOING);         // Set the game to ongoing
 
-        // Create a game player
-        GamePlayer gamePlayer = new GamePlayer();   // Set the game player to the current user
-        gamePlayer.setGame(game);
-        gamePlayer.setUser(user);
-
-        game.add(gamePlayer);
-        user.getGamePlayers().add(gamePlayer);
+        when(gameRepository.findByPlayers_User_EmailEqualsIgnoreCaseAndStatus(user.getEmail(), GameStatus.ONGOING))
+                .thenReturn(Optional.of(game));
 
         MvcResult mvcResult = this.mockMvc.perform(get("/api/sse/open"))
                 .andExpect(request().asyncStarted())

@@ -83,7 +83,7 @@ class SSEManagerTest {
      * Try unregistering one emitter.
      */
     @Test
-    void testUnregisterOne() throws IOException {
+    void testUnregisterOne() {
         sseManager.register(getUUID(1), new SseEmitter());
         sseManager.register(getUUID(2), new SseEmitter());
         sseManager.register(getUUID(3), new SseEmitter());
@@ -106,7 +106,7 @@ class SSEManagerTest {
      * Try getting emitters by user ID.
      */
     @Test
-    void testGet() throws IOException {
+    void testGet() {
         SseEmitter emitter1 = new SseEmitter();
         SseEmitter emitter2 = new SseEmitter();
         SseEmitter emitter3 = new SseEmitter();
@@ -138,11 +138,14 @@ class SSEManagerTest {
      */
     @Test
     void testSendOne() throws IOException {
+        // Define the emitters.
         SseEmitter emitter1 = Mockito.spy(new SseEmitter());
         SseEmitter emitter2 = Mockito.spy(new SseEmitter());
+        // Register the emitters.
         sseManager.register(getUUID(1), emitter1);
         sseManager.register(getUUID(2), emitter2);
 
+        // Send a message to the first emitter.
         assertTrue(sseManager.send(getUUID(1), "test"));
 
         // Verify that the `send()` function was called only for the emitter with the given ID.
@@ -157,17 +160,21 @@ class SSEManagerTest {
      */
     @Test
     void testSendMultiple() throws IOException {
+        // Define the emitters.
         SseEmitter emitter1 = Mockito.spy(new SseEmitter());
         SseEmitter emitter2 = Mockito.spy(new SseEmitter());
         SseEmitter emitter3 = Mockito.spy(new SseEmitter());
+        // Register the emitters.
         sseManager.register(getUUID(1), emitter1);
         sseManager.register(getUUID(2), emitter2);
         sseManager.register(getUUID(3), emitter3);
 
+        // Get the list of targeted emitters.
         Set<UUID> uuids = Set.of(getUUID(1), getUUID(2));
-
+        // Send the message to the targeted emitters, verify that it was successful.
         assertTrue(sseManager.send(uuids, "test"));
 
+        // Verify that the `send()` function was called only for the targeted emitters.
         verify(emitter1, times(1)).send(any());
         verify(emitter2, times(1)).send(any());
         verify(emitter3, never()).send(any());
@@ -180,15 +187,19 @@ class SSEManagerTest {
      */
     @Test
     void testSendAll() throws IOException {
+        // Define the emitters.
         SseEmitter emitter1 = Mockito.spy(new SseEmitter());
         SseEmitter emitter2 = Mockito.spy(new SseEmitter());
         SseEmitter emitter3 = Mockito.spy(new SseEmitter());
+        // Register the emitters.
         sseManager.register(getUUID(1), emitter1);
         sseManager.register(getUUID(2), emitter2);
         sseManager.register(getUUID(3), emitter3);
 
+        // Send the message to all emitters.
         sseManager.sendAll("test");
 
+        // Verify that the `send()` function was called for all emitters.
         verify(emitter1, times(1)).send(any());
         verify(emitter2, times(1)).send(any());
         verify(emitter3, times(1)).send(any());
@@ -212,13 +223,16 @@ class SSEManagerTest {
      */
     @Test
     void testSendMultipleUnknown() throws IOException {
+        // Define the emitters.
         SseEmitter emitter1 = Mockito.spy(new SseEmitter());
         SseEmitter emitter3 = Mockito.spy(new SseEmitter());
         SseEmitter emitter4 = Mockito.spy(new SseEmitter());
+        // Register the emitters.
         sseManager.register(getUUID(1), emitter1);
         sseManager.register(getUUID(3), emitter3);
         sseManager.register(getUUID(4), emitter4);
 
+        // Get the list of targeted emitters.
         Set<UUID> uuids = Set.of(getUUID(1), getUUID(2), getUUID(3));
 
         // Function call should return false, because we have a user without an emitter in the set.
@@ -240,15 +254,19 @@ class SSEManagerTest {
 
     @Test
     void testDisconnectAll() {
+        // Define the emitters.
         SseEmitter emitter1 = Mockito.spy(new SseEmitter());
         SseEmitter emitter2 = Mockito.spy(new SseEmitter());
         SseEmitter emitter3 = Mockito.spy(new SseEmitter());
+        // Register the emitters.
         sseManager.register(getUUID(1), emitter1);
         sseManager.register(getUUID(2), emitter2);
         sseManager.register(getUUID(3), emitter3);
 
+        // Disconnect all emitters.
         sseManager.disconnectAll();
 
+        // Verify that the `complete()` function was called for all emitters.
         verify(emitter1, times(1)).complete();
         verify(emitter2, times(1)).complete();
         verify(emitter3, times(1)).complete();
