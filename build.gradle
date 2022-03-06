@@ -1,5 +1,5 @@
 plugins {
-    id 'org.kordamp.gradle.jacoco' version '0.43.0'
+    id 'jacoco'
 }
 
 allprojects {
@@ -29,6 +29,10 @@ subprojects {
 	tasks.named('test') {
 		useJUnitPlatform()
 		finalizedBy jacocoTestReport 
+	}
+
+	jacoco {
+		toolVersion = "0.8.7"
 	}
 
 	jacocoTestReport {
