@@ -1,10 +1,8 @@
 package server.database.entities.game.configuration;
 
 import commons.entities.game.configuration.GameConfigurationDTO;
-import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import lombok.AllArgsConstructor;
@@ -20,7 +18,7 @@ import server.database.entities.utils.BaseEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 @Entity
 public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO> {
     /**
@@ -29,4 +27,13 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
      */
     @Column(nullable = false)
     private Integer answerTime = 10;
+
+    /**
+     * Creates a new game configuration from a DTO.
+     *
+     * @param dto source DTO
+     */
+    public GameConfiguration(GameConfigurationDTO dto) {
+        this.answerTime = dto.getAnswerTime();
+    }
 }
