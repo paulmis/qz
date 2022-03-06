@@ -6,11 +6,13 @@ import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-
+import javafx.scene.layout.Pane;
+import javafx.util.Duration;
 
 
 /**
@@ -26,9 +28,10 @@ public class LogInScreenCtrl implements Initializable {
     @FXML private CheckBox rememberMe;
     @FXML private TextField emailField;
     @FXML private TextField passwordField;
+    @FXML private Pane pane;
 
     /**
-     * Constructor for the estimate question control.
+     * Constructor for the log in screen control.
      *
      */
     @Inject
@@ -53,7 +56,8 @@ public class LogInScreenCtrl implements Initializable {
      * Function that sends new account credentials to server.
      * after a button click
      */
-    public void logInButtonClick() {
+    @FXML
+    private void logInButtonClick() {
         server.logIn(emailField.getText(), passwordField.getText());
         mainCtrl.showLobbyScreen();
     }
@@ -62,16 +66,33 @@ public class LogInScreenCtrl implements Initializable {
      * Function that takes user to login page
      * if they have an account.
      */
-    public void createAccountButtonClick() {
-        mainCtrl.showRegisterScreen();
+    @FXML
+    private void createAccountButtonClick() {
+        panelTransition();
     }
 
     /**
      * Function that keeps track if user
      * wants to be remembered locally or not.
      */
-    public void rememberMeTick() {
+    @FXML
+    private void rememberMeTick() {
         rememberMe.getUserData();
         System.out.print("User wants to be remembered...\n");
+    }
+
+    /**
+     * Function that translates the panel to the right
+     * for the register screen.
+     */
+    private void panelTransition() {
+        TranslateTransition panelTranslate = new TranslateTransition();
+        panelTranslate.setByX(mainCtrl.getPrimaryStage().getScene().getWidth() - pane.getWidth());
+        panelTranslate.setNode(pane);
+        panelTranslate.setDuration(Duration.millis(1000));
+        panelTranslate.setCycleCount(1);
+        panelTranslate.setAutoReverse(false);
+        panelTranslate.setOnFinished(e -> mainCtrl.showRegisterScreen());
+        panelTranslate.play();
     }
 }
