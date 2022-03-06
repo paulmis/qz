@@ -103,6 +103,13 @@ public class MCQuestion extends Question {
     }
 
     @Override
+    public AnswerDTO getRightAnswer() {
+        AnswerDTO rightAnswer = new AnswerDTO();
+        rightAnswer.setUserChoice(List.of(getAnswer().getDTO()));
+        return rightAnswer;
+    }
+    
+    @Override
     public QuestionDTO getDTO() {
         return new ModelMapper().map(this, QuestionDTO.class);
     }

@@ -1,5 +1,6 @@
 package server.database.entities.question;
 
+import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
@@ -105,6 +106,17 @@ public class EstimateQuestion extends Question {
         }
 
         return points;
+    }
+
+    @Override
+    public AnswerDTO getRightAnswer() {
+        AnswerDTO rightAnswer = new AnswerDTO();
+        Activity toEstimate = new Activity();
+        toEstimate.setCost(getActivities().get(0).getCost());
+        List<ActivityDTO> correctChoice = new ArrayList<>();
+        correctChoice.add(toEstimate.getDTO());
+        rightAnswer.setUserChoice(correctChoice);
+        return rightAnswer;
     }
 
     @Override
