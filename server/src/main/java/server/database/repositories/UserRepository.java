@@ -37,4 +37,11 @@ public interface UserRepository extends JpaRepository<User, UUID> {
      * @return a list of all users ordered by their score.
      */
     List<User> findAllByOrderByScoreDesc();
+
+    /**
+     * Get the list of all users ordered by the number of games played.
+     *
+     * @return a list of all users ordered by the number of games played.
+     */
+    List<User> findAllByOrderByGamesPlayedDesc();
 }

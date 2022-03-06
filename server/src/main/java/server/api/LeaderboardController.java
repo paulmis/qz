@@ -31,7 +31,22 @@ public class LeaderboardController {
             u.setPassword(null);
             return dto;
         }).collect(Collectors.toList());
+        return ResponseEntity.ok(userLeaderboard);
+    }
 
+    /**
+     * Get the  users sorted by score.
+     *
+     * @return a list of users sorted by their score in descending order.
+     */
+    @RequestMapping("/score")
+    public ResponseEntity<List<UserDTO>> getGamesLeaderboard() {
+        List<UserDTO> userLeaderboard = userRepository.findAllByOrderByGamesPlayedDesc().stream().map(u -> {
+            UserDTO dto = u.getDTO();
+            u.setEmail(null);
+            u.setPassword(null);
+            return dto;
+        }).collect(Collectors.toList());
         return ResponseEntity.ok(userLeaderboard);
     }
 }
