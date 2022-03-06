@@ -3,19 +3,9 @@ package server.database.entities.question;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import lombok.Data;
-import lombok.Generated;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import javax.persistence.*;
+import lombok.*;
+import server.database.entities.game.Game;
 
 /*
 I followed this guide to handle inheritance:
@@ -27,14 +17,15 @@ https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
  */
 @Data
 @NoArgsConstructor
-@Entity
+@AllArgsConstructor
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Generated
+@Entity
 public abstract class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    protected UUID id;
 
     /**
      * List of activities used to generate the question.
@@ -45,12 +36,18 @@ public abstract class Question {
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "activity_id"))
     @ToString.Exclude
-    public List<Activity> activities = new ArrayList<>();
+    protected List<Activity> activities = new ArrayList<>();
+
+    /**
+     * List of games where this question has been asked.
+     */
+    @ManyToMany
+    protected List<Game> games = new ArrayList<>();
 
     /**
      * Question asked the user.
      */
-    public String text;
+    protected String text;
 
     /**
      * Copy constructor for the Question class.
@@ -61,6 +58,7 @@ public abstract class Question {
         this.id = q.id;
         this.activities = q.activities;
         this.text = q.text;
+        this.games = q.games;
     }
 
     /**

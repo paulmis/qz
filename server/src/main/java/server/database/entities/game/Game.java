@@ -1,39 +1,21 @@
 package server.database.entities.game;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import java.util.*;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import org.hibernate.annotations.CreationTimestamp;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.question.Question;
-import server.utils.EasyRandom;
 
 /**
  * Game entity which represents a game and its state.
  */
-@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Game {
     @Id
@@ -75,24 +57,16 @@ public abstract class Game {
     private Integer currentQuestion = 0;
 
     /**
-     * State of the PRNG.
-     */
-    @NonNull @Embedded
-    private EasyRandom random = new EasyRandom();
-
-    /**
      * List of players currently in the game.
      */
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
     private Set<GamePlayer> players = Collections.synchronizedSet(new HashSet<>());
 
-
     /**
-     * Get the next question in the game.
-     *
-     * @return The current question.
+     * List of questions assigned to this game.
      */
-    public abstract Optional<Question> getNextQuestion();
+    @ManyToMany
+    protected List<Question> questions = new ArrayList<>();
 
     /**
      * Add a player to the game.
@@ -112,6 +86,28 @@ public abstract class Game {
      */
     public boolean remove(GamePlayer player) {
         return this.players.remove(player);
+    }
+
+    /**
+     * Adds questions to the game.
+     *
+     * @param questions The questions to add.
+     */
+    public void addQuestions(List<Question> questions) {
+        this.questions.addAll(questions);
+    }
+
+    /**
+     * Returns the current question. If no questions are available, returns empty optional.
+     *
+     * @return The current question or empty optional if none are available.
+     */
+    public Optional<Question> getCurrentQuestion() {
+        try {
+            return Optional.of(this.questions.get(this.currentQuestion));
+        } catch (IndexOutOfBoundsException e) {
+            return Optional.empty();
+        }
     }
 
     /**
