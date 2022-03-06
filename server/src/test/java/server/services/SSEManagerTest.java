@@ -8,6 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.base.Strings;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
@@ -35,7 +36,8 @@ class SSEManagerTest {
      * @return Generated UUID.
      */
     private UUID getUUID(int id) {
-        return UUID.fromString("00000000-0000-0000-0000-00000000000" + id);
+        return UUID.fromString(String.format("00000000-0000-0000-0000-%s",
+                Strings.padStart(String.valueOf(id), 11, '0')));
     }
 
     /**
@@ -45,7 +47,7 @@ class SSEManagerTest {
     void testRegisterOne() {
         sseManager.register(getUUID(1), new SseEmitter());
         // Verify that one emitter is registered.
-        assertEquals(1, sseManager.getNumberOfEmitters());
+        assertEquals(1, sseManager.size());
     }
 
     /**
@@ -57,7 +59,7 @@ class SSEManagerTest {
         sseManager.register(getUUID(2), new SseEmitter());
         sseManager.register(getUUID(3), new SseEmitter());
         // Verify that all emitters are registered.
-        assertEquals(3, sseManager.getNumberOfEmitters());
+        assertEquals(3, sseManager.size());
     }
 
     /**
@@ -74,14 +76,14 @@ class SSEManagerTest {
         // Verify that the old emitter was closed.
         verify(emitter1, times(1)).complete();
         // Verify that only one emitter is registered for the user.
-        assertEquals(1, sseManager.getNumberOfEmitters());
+        assertEquals(1, sseManager.size());
     }
 
     /**
      * Try unregistering one emitter.
      */
     @Test
-    void testUnregisterOne() {
+    void testUnregisterOne() throws IOException {
         sseManager.register(getUUID(1), new SseEmitter());
         sseManager.register(getUUID(2), new SseEmitter());
         sseManager.register(getUUID(3), new SseEmitter());
@@ -89,7 +91,7 @@ class SSEManagerTest {
         // Verify that emitter has been unregistered successfully.
         assertTrue(sseManager.unregister(getUUID(2)));
         // Verify that the number of emitters is correct.
-        assertEquals(2, sseManager.getNumberOfEmitters());
+        assertEquals(2, sseManager.size());
     }
 
     /**
@@ -104,7 +106,7 @@ class SSEManagerTest {
      * Try getting emitters by user ID.
      */
     @Test
-    void testGet() {
+    void testGet() throws IOException {
         SseEmitter emitter1 = new SseEmitter();
         SseEmitter emitter2 = new SseEmitter();
         SseEmitter emitter3 = new SseEmitter();
@@ -231,8 +233,24 @@ class SSEManagerTest {
     @Test
     void testGetNumberOfEmitters() {
         sseManager.register(getUUID(1), new SseEmitter());
-        assertEquals(1, sseManager.getNumberOfEmitters());
+        assertEquals(1, sseManager.size());
         sseManager.register(getUUID(2), new SseEmitter());
-        assertEquals(2, sseManager.getNumberOfEmitters());
+        assertEquals(2, sseManager.size());
+    }
+
+    @Test
+    void testDisconnectAll() {
+        SseEmitter emitter1 = Mockito.spy(new SseEmitter());
+        SseEmitter emitter2 = Mockito.spy(new SseEmitter());
+        SseEmitter emitter3 = Mockito.spy(new SseEmitter());
+        sseManager.register(getUUID(1), emitter1);
+        sseManager.register(getUUID(2), emitter2);
+        sseManager.register(getUUID(3), emitter3);
+
+        sseManager.disconnectAll();
+
+        verify(emitter1, times(1)).complete();
+        verify(emitter2, times(1)).complete();
+        verify(emitter3, times(1)).complete();
     }
 }

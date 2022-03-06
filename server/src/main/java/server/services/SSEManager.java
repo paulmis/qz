@@ -5,13 +5,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * Manager class to handle SSE emitters.
  */
-@Service
 @Slf4j
 public class SSEManager {
     /**
@@ -25,7 +23,7 @@ public class SSEManager {
      *
      * @return The number of registered SSE emitters.
      */
-    public int getNumberOfEmitters() {
+    public int size() {
         return emitters.size();
     }
 
@@ -34,13 +32,15 @@ public class SSEManager {
      *
      * @param userId User ID to add SSE emitter for.
      */
-    public void register(UUID userId, SseEmitter emitter) {
+    public boolean register(UUID userId, SseEmitter emitter) {
         if (emitters.containsKey(userId)) {
             emitters.get(userId).complete();
             emitters.remove(userId);
             log.debug("Removed existing SSE emitter for user {}", userId);
         }
+
         emitters.put(userId, emitter);
+        return true;
     }
 
     /**
@@ -122,5 +122,15 @@ public class SSEManager {
         for (SseEmitter emitter : emitters.values()) {
             emitter.send(message);
         }
+    }
+
+    /**
+     * Disconnect all registered SSE emitters and clear the map.
+     */
+    public void disconnectAll() {
+        for (SseEmitter emitter : emitters.values()) {
+            emitter.complete();
+        }
+        emitters.clear();
     }
 }
