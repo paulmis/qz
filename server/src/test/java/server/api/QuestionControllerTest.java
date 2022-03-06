@@ -95,7 +95,7 @@ class QuestionControllerTest {
 
         //Set up random test user
         joe = new User("joe", "joe@doe.com", "stinkywinky");
-        joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        joe.setId(getUUID(0));
         joeDTO = joe.getDTO();
 
         // Set the context user
