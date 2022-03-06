@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import server.database.entities.utils.BaseEntity;
 import server.database.repositories.UserRepository;
 
 /**
@@ -28,9 +29,8 @@ public class LeaderboardController {
     @JsonView(Views.Public.class)
     @RequestMapping("/score")
     public ResponseEntity<List<UserDTO>> getScoreLeaderboard() {
-        List<UserDTO> userLeaderboard = userRepository.findAllByOrderByScoreDesc().stream().map(u -> {
-            return u.getDTO();
-        }).collect(Collectors.toList());
+        List<UserDTO> userLeaderboard = userRepository.findAllByOrderByScoreDesc().stream()
+                .map(BaseEntity::getDTO).collect(Collectors.toList());
         return ResponseEntity.ok(userLeaderboard);
     }
 
@@ -42,9 +42,8 @@ public class LeaderboardController {
     @JsonView(Views.Public.class)
     @RequestMapping("/games")
     public ResponseEntity<List<UserDTO>> getGamesLeaderboard() {
-        List<UserDTO> userLeaderboard = userRepository.findAllByOrderByGamesPlayedDesc().stream().map(u -> {
-            return u.getDTO();
-        }).collect(Collectors.toList());
+        List<UserDTO> userLeaderboard = userRepository.findAllByOrderByGamesPlayedDesc().stream()
+                .map(BaseEntity::getDTO).collect(Collectors.toList());
         return ResponseEntity.ok(userLeaderboard);
     }
 }
