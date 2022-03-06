@@ -47,6 +47,15 @@ class MCQuestionTest {
     }
 
     @Test
+    void getRightAnswerTest() {
+        int rightAnswerIdx = 2;
+        ((MCQuestion) q).setAnswer(q.getActivities().get(rightAnswerIdx));
+        AnswerDTO rightAnswer = new AnswerDTO();
+        rightAnswer.setUserChoice(new ArrayList<>(List.of(q.getActivities().get(rightAnswerIdx).getDTO())));
+        assertEquals(rightAnswer, q.getRightAnswer());
+    }
+
+    @Test
     void checkAnswerTest() {
         List<AnswerDTO> userAnswers = new ArrayList<>();
         for (int idx = 0; idx < 6; idx++) {
