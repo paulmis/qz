@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.hibernate.annotations.GenericGenerator;
 import org.modelmapper.ModelMapper;
 
@@ -19,6 +21,7 @@ import org.modelmapper.ModelMapper;
  */
 @Data
 @MappedSuperclass
+@NoArgsConstructor
 public abstract class BaseEntity<D extends DTO> {
     /**
      * id - random unique uuid assigned to a certain player.
@@ -34,9 +37,5 @@ public abstract class BaseEntity<D extends DTO> {
      *
      * @return DTO for the specific entity.
      */
-    public D getDTO() {
-        TypeToken<D> typeToken = new TypeToken<D>(getClass()) {};
-        Type type = typeToken.getType();
-        return new ModelMapper().map(this, type);
-    }
+    public abstract D getDTO();
 }

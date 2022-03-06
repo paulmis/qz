@@ -1,6 +1,7 @@
 package server.database.entities.game.configuration;
 
 import commons.entities.game.configuration.GameConfigurationDTO;
+import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
@@ -24,9 +25,9 @@ import org.modelmapper.ModelMapper;
 public class SurvivalGameConfiguration extends GameConfiguration {
 
     /**
-     * Convert a DTO to an entity.
+     * Creates a new game configuration from a DTO.
      *
-     * @param dto DTO to convert to entity.
+     * @param dto source DTO
      */
     public SurvivalGameConfiguration(GameConfigurationDTO dto) {
         new ModelMapper().map(dto, this);
@@ -37,4 +38,9 @@ public class SurvivalGameConfiguration extends GameConfiguration {
      */
     @Column(nullable = false)
     Float speedModifier = 1.0f;
+
+    @Override
+    public SurvivalGameConfigurationDTO getDTO() {
+        return new ModelMapper().map(this, SurvivalGameConfigurationDTO.class);
+    }
 }

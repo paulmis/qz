@@ -76,4 +76,9 @@ public class User extends BaseEntity<UserDTO> {
      */
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<GamePlayer> gamePlayers = Collections.synchronizedSet(new HashSet<>());
+
+    @Override
+    public UserDTO getDTO() {
+        return new ModelMapper().map(this, UserDTO.class);
+    }
 }

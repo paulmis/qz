@@ -1,8 +1,8 @@
 package server.api;
 
-import commons.entities.game.GameDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.GameStatus;
+import commons.entities.utils.DTO;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.User;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
+import server.database.entities.utils.BaseEntity;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
 
@@ -47,11 +48,14 @@ public class LobbyController {
      * @return a list of available lobbies.
      */
     @GetMapping("/available")
-    ResponseEntity<List<GameDTO>> availableLobbies() {
+    ResponseEntity<List<DTO>> availableLobbies() {
         // ToDo: it should respond only to authenticated users
         // It returns games with status Created
-        List<GameDTO> lobbies = gameRepository.findAllByStatus(GameStatus.CREATED)
-                .stream().map(g -> g.getDTO()).collect(Collectors.toList());
+        List<DTO> lobbies = gameRepository
+                .findAllByStatus(GameStatus.CREATED)
+                .stream()
+                .map(BaseEntity::getDTO)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(lobbies);
     }
 
@@ -62,12 +66,14 @@ public class LobbyController {
      * @return information on the requested lobby.
      */
     @GetMapping("/{lobbyId}")
-    ResponseEntity<GameDTO> lobbyInfo(@PathVariable @NonNull UUID lobbyId) {
+    ResponseEntity<DTO> lobbyInfo(@PathVariable @NonNull UUID lobbyId) {
         // ToDo: it should respond only to authenticated users
         Optional<Game> lobby = gameRepository.findById(lobbyId);
+
         if (!lobby.isPresent()) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
+
         return ResponseEntity.ok(lobby.get().getDTO());
     }
 
@@ -106,7 +112,7 @@ public class LobbyController {
         }
 
         // Create player
-        GamePlayer player = new GamePlayer(playerData);
+        GamePlayer player = new GamePlayer(playerData, joiningUser.get());
         player.setUser(joiningUser.get());
 
         // Try to join the game

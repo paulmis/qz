@@ -7,15 +7,15 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * Data transfer object for the survival-mode game configuration.
+ * Data transfer object for the standard-mode game configuration.
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
-public class SurvivalGameConfigurationDTO extends GameConfigurationDTO {
+public class NormalGameConfigurationDTO extends GameConfigurationDTO {
     /**
-     * Speed modifier for the game.
+     * Number of questions in the game.
      */
-    protected Float speedModifier;
+    protected Integer numQuestions;
 }
