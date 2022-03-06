@@ -35,9 +35,9 @@ public class LeaderboardController {
     }
 
     /**
-     * Get the  users sorted by score.
+     * Get the  users sorted by number of played games.
      *
-     * @return a list of users sorted by their score in descending order.
+     * @return a list of users sorted by the number of played games in descending order.
      */
     @JsonView(Views.Public.class)
     @RequestMapping("/games")
