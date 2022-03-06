@@ -57,7 +57,8 @@ public class LogInScreenCtrl implements Initializable {
      * Function that sends new account credentials to server.
      * after a button click
      */
-    public void logInButtonClick() {
+    @FXML
+    private void logInButtonClick() {
         server.logIn(emailField.getText(), passwordField.getText());
         mainCtrl.showLobbyScreen();
     }
@@ -66,7 +67,8 @@ public class LogInScreenCtrl implements Initializable {
      * Function that takes user to login page
      * if they have an account.
      */
-    public void createAccountButtonClick() {
+    @FXML
+    private void createAccountButtonClick() {
         panelTransition();
     }
 
@@ -74,7 +76,8 @@ public class LogInScreenCtrl implements Initializable {
      * Function that keeps track if user
      * wants to be remembered locally or not.
      */
-    public void rememberMeTick() {
+    @FXML
+    private void rememberMeTick() {
         rememberMe.getUserData();
         System.out.print("User wants to be remembered...\n");
     }
@@ -83,7 +86,7 @@ public class LogInScreenCtrl implements Initializable {
      * Function that translates the panel to the right
      * for the register screen.
      */
-    public void panelTransition() {
+    private void panelTransition() {
         TranslateTransition panelTranslate = new TranslateTransition();
         panelTranslate.setByX(mainCtrl.getPrimaryStage().getScene().getWidth() - pane.getWidth());
         panelTranslate.setNode(pane);

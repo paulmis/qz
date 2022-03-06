@@ -51,7 +51,8 @@ public class RegisterScreenCtrl implements Initializable {
      * Function that sends new account credentials to server
      * after a button click.
      */
-    public void signUpButtonClick() {
+    @FXML
+    private void signUpButtonClick() {
         if (emailField.getText().length() > 0 && passwordField.getText().length() > 0) {
             server.register(emailField.getText(), passwordField.getText());
             System.out.print("Registering new account credentials...");
@@ -65,7 +66,8 @@ public class RegisterScreenCtrl implements Initializable {
      * Function that takes user to login page
      * if they have an account.
      */
-    public void haveAccountButtonClick() {
+    @FXML
+    private void haveAccountButtonClick() {
         mainCtrl.showLogInScreen();
     }
 
@@ -73,7 +75,8 @@ public class RegisterScreenCtrl implements Initializable {
      * Function that keeps track if user
      * wants to be remembered locally or not.
      */
-    public void rememberMeTick() {
+    @FXML
+    private void rememberMeTick() {
         if (rememberMe.isSelected()) {
             System.out.print("User wants to be remembered...\n");
         } else {
