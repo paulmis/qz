@@ -167,4 +167,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
                 this.currentQuestion,
                 this.players.stream().map(GamePlayer::getDTO).collect(Collectors.toSet()));
     }
+
+    public abstract T getDTO();
 }

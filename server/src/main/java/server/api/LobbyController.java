@@ -51,13 +51,12 @@ public class LobbyController {
      * @return a list of available lobbies.
      */
     @GetMapping("/available")
-    ResponseEntity<List<DTO>> availableLobbies() {
-        // ToDo: it should respond only to authenticated users
+    ResponseEntity<List<GameDTO>> availableLobbies() {
         // It returns games with status Created
-        List<DTO> lobbies = gameRepository
+        List<GameDTO> lobbies = gameRepository
                 .findAllByStatus(GameStatus.CREATED)
                 .stream()
-                .map(BaseEntity::getDTO)
+                .map(Game::getDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(lobbies);
     }
@@ -70,9 +69,7 @@ public class LobbyController {
      */
     @GetMapping("/{lobbyId}")
     ResponseEntity<DTO> lobbyInfo(@PathVariable @NonNull UUID lobbyId) {
-        // ToDo: it should respond only to authenticated users
         Optional<Game> lobby = gameRepository.findById(lobbyId);
-
         if (!lobby.isPresent()) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
@@ -93,7 +90,6 @@ public class LobbyController {
             @RequestBody @NonNull GamePlayerDTO playerData,
             @PathVariable @NonNull UUID lobbyId,
             @PathVariable @NonNull UUID userId) {
-        // ToDo: it should respond only to authenticated users
         // ToDo: it should maybe check whether the user is allowed to join? Or is it the client's job?
 
         // Find lobby to join

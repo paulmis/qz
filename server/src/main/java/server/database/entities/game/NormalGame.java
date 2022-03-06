@@ -21,10 +21,20 @@ import lombok.ToString;
 @Data
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 public class NormalGame extends DefiniteGame<NormalGameDTO> {
+    /**
+     * Creates a new game from a DTO.
+     *
+     * @param dto source DTO
+     */
     public NormalGame(NormalGameDTO dto) {
         super(dto);
     }
 
+    /**
+     * Returns the DTO of this game.
+     *
+     * @return the DTO of this game
+     */
     @Override
     public NormalGameDTO getDTO() {
         return new NormalGameDTO(super.toDTO());
