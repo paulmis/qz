@@ -46,6 +46,17 @@ class OrderQuestionTest {
     }
 
     @Test
+    void getRightAnswerTest() {
+        List<ActivityDTO> expectedRightChoice = new ArrayList<>();
+        for (int idx = 0; idx < q.getActivities().size(); idx++) {
+            expectedRightChoice.add(getActivity(idx).getDTO());
+        }
+        AnswerDTO expectedRightAnswer = new AnswerDTO();
+        expectedRightAnswer.setUserChoice(expectedRightChoice);
+        assertEquals(expectedRightAnswer, q.getRightAnswer());
+    }
+
+    @Test
     void checkAnswerTest() {
         // first user is right
         List<ActivityDTO> answerAct = List.of(
