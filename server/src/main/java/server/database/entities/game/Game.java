@@ -13,6 +13,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.modelmapper.ModelMapper;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
+import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
 import server.database.entities.utils.BaseEntity;
 import server.utils.EasyRandom;
@@ -33,7 +34,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     // TODO: add a custom generation strategy
     @Column(nullable = false, unique = true)
-    private String gameId;
+    protected String gameId;
 
     /**
      * Timestamp of game creation.
@@ -45,41 +46,47 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Whether the game is public or not.
      */
-    private GameType gameType = GameType.PUBLIC;
+    protected GameType gameType = GameType.PUBLIC;
 
     /**
      * The game configuration.
      */
     @OneToOne(cascade = CascadeType.ALL)
-    private GameConfiguration configuration;
+    protected GameConfiguration configuration;
 
     /**
      * Current status of the game.
      */
-    private GameStatus status = GameStatus.CREATED;
+    protected GameStatus status = GameStatus.CREATED;
 
     /**
      * Current question number.
      */
-    private int currentQuestion = 0;
+    protected int currentQuestion = 0;
 
     /**
      * State of the PRNG.
      */
     @NonNull @Embedded @JsonIgnore
-    private EasyRandom random = new EasyRandom();
+    protected EasyRandom random = new EasyRandom();
 
     /**
      * List of players currently in the game.
      */
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<GamePlayer> players = Collections.synchronizedSet(new HashSet<>());
+    protected Set<GamePlayer> players = Collections.synchronizedSet(new HashSet<>());
+
+    /**
+     * The head of the lobby - person in charge with special privileges.
+     */
+    @OneToOne
+    protected GamePlayer head;
 
     /**
      * Questions assigned to this game.
      */
     @ManyToMany
-    private List<Question> questions = new ArrayList<>();
+    protected List<Question> questions = new ArrayList<>();
 
     /**
      * Creates a new game from a DTO. Doesn't copy players.
@@ -97,17 +104,26 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         this.status = dto.getStatus();
         this.currentQuestion = dto.getCurrentQuestion();
         this.gameType = dto.getGameType();
-        this.players = new HashSet<>();
     }
 
     /**
-     * Add a player to the game.
+     * Add a player to the game. Returns false if the lobby is already full or the player is already in this game.
      *
-     * @param player The player to add.
-     * @return Whether the player was added (and not already in the game).
+     * @param player the player to add
+     * @return whether the player was added
      */
     public boolean add(GamePlayer player) {
-        return this.players.add(player);
+        // Check if the player can be added
+        System.out.println(this.players.size());
+        if (this.players.size() >= this.configuration.getCapacity() || !this.players.add(player)) {
+            return false;
+        }
+
+        // If the lobby is empty, add this player as the head of the lobby
+        if (this.players.size() == 1) {
+            this.head = player;
+        }
+        return true;
     }
 
     /**
@@ -116,8 +132,25 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * @param player The player to remove.
      * @return Whether the player was removed.
      */
-    public boolean remove(GamePlayer player) {
-        return this.players.remove(player);
+    public boolean remove(GamePlayer player) throws LastPlayerRemovedException {
+        // Remove the player from the game
+        if (!this.players.remove(player)) {
+            return false;
+        }
+
+        // If the head left, replace them
+        if (this.head == player) {
+            this.head = this.players.stream()
+                    .min(Comparator.comparing(GamePlayer::getJoinDate))
+                    .orElse(null);
+
+            // If the last player left, throw an exception
+            if (this.head == null) {
+                throw new LastPlayerRemovedException();
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -165,7 +198,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
                 this.configuration.getDTO(),
                 this.status,
                 this.currentQuestion,
-                this.players.stream().map(GamePlayer::getDTO).collect(Collectors.toSet()));
+                this.players.stream().map(GamePlayer::getDTO).collect(Collectors.toSet()),
+                this.head == null ? null : this.head.getDTO());
     }
 
     public abstract T getDTO();

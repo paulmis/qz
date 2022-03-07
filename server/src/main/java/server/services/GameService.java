@@ -53,8 +53,11 @@ public class GameService {
      * Starts a new game, by verifying the starting conditions and creating a questions set.
      *
      * @param game the game to start
+     * @throws UnsupportedOperationException if a game other than a definite game is started
+     * @throws IllegalStateException if the game is already started or there aren't enough questions
      */
-    public void startGame(Game game) {
+    public void startGame(Game game)
+            throws UnsupportedOperationException, IllegalStateException {
         // Initialize the questions
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;
@@ -64,6 +67,9 @@ public class GameService {
         }
 
         // Set the game status to started
+        if (game.getStatus() != GameStatus.CREATED) {
+            throw new IllegalStateException("Game is already started.");
+        }
         game.setStatus(GameStatus.ONGOING);
     }
 }

@@ -56,9 +56,9 @@ public class GameServiceTest {
         usedQuestionIds = Arrays.asList(questionB.getId(), questionA.getId());
 
         game = new NormalGame();
-        game.add(joe);
         game.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
-        game.setConfiguration(new NormalGameConfiguration(3, 13));
+        game.setConfiguration(new NormalGameConfiguration(3, 13, 6));
+        game.add(joe);
 
         // Mock the repository
         when(questionRepository.count()).thenReturn(4L);

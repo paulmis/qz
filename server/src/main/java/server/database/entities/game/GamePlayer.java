@@ -1,13 +1,8 @@
 package server.database.entities.game;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import commons.entities.QuestionDTO;
 import commons.entities.game.GamePlayerDTO;
-import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import java.util.Date;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +10,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
 import org.modelmapper.ModelMapper;
 import server.database.entities.User;
 import server.database.entities.utils.BaseEntity;
@@ -53,6 +49,13 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
      * The streak of correct answers in a row.
      */
     private Integer streak = 0;
+
+    /**
+     * The date the player joined the lobby.
+     */
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    protected Date joinDate;
 
     /**
      * The game the player is in.
