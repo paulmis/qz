@@ -85,7 +85,7 @@ class QuestionControllerTest {
         mockGame = new QuestionControllerTest.MockGame();
         mockGame.setId(getUUID(0));
         mockGame.setStatus(GameStatus.ONGOING);
-        when(gameRepository.findById(mockGame.getId())).thenReturn(Optional.of(mockGame));
+        when(gameRepository.existsById(mockGame.getId())).thenReturn(true);
 
         // Setup mock question
         mockQuestion = new MockQuestion();
@@ -119,10 +119,10 @@ class QuestionControllerTest {
 
     @Test
     public void questionNotFoundTest() throws Exception {
-        // Request question object -> expect a conflict status
+        // Request question object -> expect a not found status
         this.mockMvc
                 .perform(get("/api/game/" + mockGame.getId() + "/question/" + getUUID(1)))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 
     @Test

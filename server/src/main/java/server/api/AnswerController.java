@@ -43,8 +43,7 @@ public class AnswerController {
             @RequestBody AnswerDTO answerData,
             @PathVariable @NonNull UUID gameId) {
         //Check if game exists.
-        Optional<Game> game = gameRepository.findById(gameId);
-        if (!game.isPresent()) {
+        if (!gameRepository.existsById(gameId)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         

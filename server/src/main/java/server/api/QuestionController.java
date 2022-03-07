@@ -48,15 +48,14 @@ public class QuestionController {
     ResponseEntity<QuestionDTO> currentQuestion(
             @PathVariable @NonNull UUID gameId,
             @PathVariable @NonNull UUID questionId) {
-        Optional<Game> game = gameRepository.findById(gameId);
         //Check if game exists.
-        if (!game.isPresent()) {
+        if (!gameRepository.existsById(gameId)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         Optional<Question> question = questionRepository.findById(questionId);
         //Check if question exists.
         if (!question.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         //Send 200 status and payload if question exists.
         return ResponseEntity.ok(question.get().getDTO());
