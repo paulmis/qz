@@ -1,6 +1,7 @@
 package server.services;
 
 import commons.entities.AnswerDTO;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class AnswerService {
      *
      * @param gameId id of the game that needs the answer.
      */
-    public void sendAnswer(UUID gameId) {
+    public void sendAnswer(UUID gameId) throws IOException {
         Optional<Game> myGame = gameRepository.findById(gameId);
         if (myGame.isPresent()) {
             // Retrieve current question
@@ -33,8 +34,9 @@ public class AnswerService {
                 return;
             }
             AnswerDTO answer = currentQuestion.get().getRightAnswer();
-            // ToDo: get SSEManager to have access to sending methods
-            //myGame.get().getEmitters().sendAll(answer);
+
+            // Get SSEManager to have access to sending methods
+            myGame.get().getEmitters().sendAll(answer);
         }
     }
 }
