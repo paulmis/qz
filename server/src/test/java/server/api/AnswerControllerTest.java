@@ -71,7 +71,7 @@ class AnswerControllerTest {
         mockLobby = new AnswerControllerTest.MockGame();
         mockLobby.setId(getUUID(0));
         mockLobby.setStatus(GameStatus.CREATED);
-        when(gameRepository.findById(mockLobby.getId())).thenReturn(Optional.of(mockLobby));
+        when(gameRepository.existsById(mockLobby.getId())).thenReturn(true);
 
         //Set up random test user
         joe = new User("joe", "joe@doe.com", "stinkywinky");
