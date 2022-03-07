@@ -50,5 +50,8 @@ public class Activity extends BaseEntity<ActivityDTO> {
      */
     private String icon;
 
-
+    @Override
+    public ActivityDTO getDTO() {
+        return new ModelMapper().map(this, ActivityDTO.class);
+    }
 }

@@ -1,10 +1,10 @@
 package commons.entities;
 
 import commons.entities.utils.DTO;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 /**
@@ -21,7 +21,7 @@ public class QuestionDTO implements DTO {
     /**
      * List of activities related to the question.
      */
-    protected List<ActivityDTO> activities;
+    protected List<ActivityDTO> activities = new ArrayList<>();
 
     /**
      * Question text.

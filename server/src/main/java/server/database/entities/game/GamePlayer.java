@@ -1,5 +1,6 @@
 package server.database.entities.game;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import commons.entities.QuestionDTO;
 import commons.entities.game.GamePlayerDTO;
 import java.util.UUID;
@@ -32,13 +33,16 @@ import server.database.entities.utils.BaseEntity;
 public class GamePlayer extends BaseEntity<GamePlayerDTO> {
 
     /**
-     * Construct a new entity from a DTO.
-     *
-     * @param dto DTO to map to entity.
+     * The user the player is.
      */
-    public GamePlayer(GamePlayerDTO dto) {
-        new ModelMapper().map(dto, this);
-    }
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    /**
+     * The player's nickname within the game.
+     */
+    private String nickname;
 
     /**
      * Player's score.
@@ -51,11 +55,6 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     private Integer streak = 0;
 
     /**
-     * The player's nickname within the game.
-     */
-    private String nickname;
-
-    /**
      * The game the player is in.
      */
     @ManyToOne(optional = false)
@@ -63,9 +62,19 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     @NonNull private Game game;
 
     /**
-     * The user the player is.
+     * Creates a new game player from the DTO.
+     *
+     * @param dto the DTO to create the game player from.
+     * @param user user the player is.
      */
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    public GamePlayer(GamePlayerDTO dto, User user) {
+        this.user = user;
+        this.nickname = dto.getNickname();
+        this.score = dto.getScore();
+        this.streak = dto.getStreak();
+    }
+
+    public GamePlayerDTO getDTO() {
+        return new ModelMapper().map(this, GamePlayerDTO.class);
+    }
 }

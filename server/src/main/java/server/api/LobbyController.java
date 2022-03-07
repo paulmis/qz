@@ -3,6 +3,8 @@ package server.api;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.GameStatus;
+import commons.entities.game.NormalGameDTO;
+import commons.entities.utils.DTO;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,16 +13,15 @@ import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import server.database.entities.User;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
+import server.database.entities.game.NormalGame;
+import server.database.entities.game.configuration.NormalGameConfiguration;
+import server.database.entities.utils.BaseEntity;
 import server.database.repositories.UserRepository;
+import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GameRepository;
 
 /*
@@ -41,6 +42,9 @@ public class LobbyController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private GameConfigurationRepository gameConfigurationRepository;
+
     /**
      * Endpoint for available lobbies.
      *
@@ -48,10 +52,12 @@ public class LobbyController {
      */
     @GetMapping("/available")
     ResponseEntity<List<GameDTO>> availableLobbies() {
-        // ToDo: it should respond only to authenticated users
         // It returns games with status Created
-        List<GameDTO> lobbies = gameRepository.findAllByStatus(GameStatus.CREATED)
-                .stream().map(g -> g.getDTO()).collect(Collectors.toList());
+        List<GameDTO> lobbies = gameRepository
+                .findAllByStatus(GameStatus.CREATED)
+                .stream()
+                .map(Game::getDTO)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(lobbies);
     }
 
@@ -62,12 +68,12 @@ public class LobbyController {
      * @return information on the requested lobby.
      */
     @GetMapping("/{lobbyId}")
-    ResponseEntity<GameDTO> lobbyInfo(@PathVariable @NonNull UUID lobbyId) {
-        // ToDo: it should respond only to authenticated users
+    ResponseEntity<DTO> lobbyInfo(@PathVariable @NonNull UUID lobbyId) {
         Optional<Game> lobby = gameRepository.findById(lobbyId);
         if (!lobby.isPresent()) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
+
         return ResponseEntity.ok(lobby.get().getDTO());
     }
 
@@ -84,7 +90,6 @@ public class LobbyController {
             @RequestBody @NonNull GamePlayerDTO playerData,
             @PathVariable @NonNull UUID lobbyId,
             @PathVariable @NonNull UUID userId) {
-        // ToDo: it should respond only to authenticated users
         // ToDo: it should maybe check whether the user is allowed to join? Or is it the client's job?
 
         // Find lobby to join
@@ -106,7 +111,7 @@ public class LobbyController {
         }
 
         // Create player
-        GamePlayer player = new GamePlayer(playerData);
+        GamePlayer player = new GamePlayer(playerData, joiningUser.get());
         player.setUser(joiningUser.get());
 
         // Try to join the game

@@ -4,10 +4,7 @@ import commons.entities.UserDTO;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +28,7 @@ import server.database.entities.utils.BaseEntity;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Data
 @Entity
+@Table(name = "user_details")
 public class User extends BaseEntity<UserDTO> {
     /**
      * Construct a new entity from a DTO.
@@ -76,4 +74,9 @@ public class User extends BaseEntity<UserDTO> {
      */
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<GamePlayer> gamePlayers = Collections.synchronizedSet(new HashSet<>());
+
+    @Override
+    public UserDTO getDTO() {
+        return new ModelMapper().map(this, UserDTO.class);
+    }
 }

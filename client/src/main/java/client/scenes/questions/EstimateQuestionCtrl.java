@@ -32,11 +32,8 @@ public class EstimateQuestionCtrl implements Initializable {
     private final String questionText;
     private final AnswerHandler answerHandler;
 
-    @FXML
-    private Label questionLabel;
-
-    @FXML
-    private TextField guessField;
+    @FXML private Label questionLabel;
+    @FXML private TextField guessField;
 
 
     /**

@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,8 +22,8 @@ import org.modelmapper.ModelMapper;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@MappedSuperclass
 @Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class EstimateQuestion extends Question {
 
     /**
@@ -103,5 +105,10 @@ public class EstimateQuestion extends Question {
         }
 
         return points;
+    }
+
+    @Override
+    public QuestionDTO getDTO() {
+        return new ModelMapper().map(this, QuestionDTO.class);
     }
 }
