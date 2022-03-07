@@ -26,7 +26,10 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
      * In the future, we could switch to a Duration datatype, but JPA/Hibernate doesn't support it out of the box.
      */
     @Column(nullable = false)
-    private Integer answerTime = 10;
+    protected int answerTime = 10;
+
+    @Column(nullable = false)
+    protected int capacity = 6;
 
     /**
      * Creates a new game configuration from a DTO.

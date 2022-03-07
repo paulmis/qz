@@ -31,10 +31,9 @@ public class NormalGameTest {
         questionB = new MCQuestion();
 
         game = new NormalGame();
-        game.add(joe);
-        game.addQuestions(Arrays.asList(questionA, questionB));
         game.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
-        game.setConfiguration(new NormalGameConfiguration(17, 13));
+        game.setConfiguration(new NormalGameConfiguration(17, 13, 6));
+        game.addQuestions(Arrays.asList(questionA, questionB));
     }
 
     @Test
@@ -74,6 +73,7 @@ public class NormalGameTest {
 
     @Test
     void size() {
+        game.add(joe);
         assertEquals(1, game.size());
     }
 }
