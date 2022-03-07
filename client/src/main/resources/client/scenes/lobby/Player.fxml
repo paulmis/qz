@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="50.0" prefWidth="400.0" style="-fx-background-color: #F2F2F2;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.LobbyPlayerCtrl">
+<AnchorPane prefHeight="50.0" prefWidth="400.0" style="-fx-background-color: #F2F2F2;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.lobby.LobbyPlayerCtrl">
    <children>
       <HBox prefHeight="100.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -19,7 +19,7 @@
                      </font>
                   </Label>
                   <ImageView fitHeight="20.0" fitWidth="20.0">
-                     <Image url="@../images/lobby/crown.png"/>
+                     <Image url="@../../images/lobby/crown.png"/>
                   </ImageView>
                </children>
             </HBox>

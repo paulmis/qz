@@ -1,9 +1,8 @@
 package server.database.entities.game.configuration;
 
 import commons.entities.game.configuration.GameConfigurationDTO;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
+import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,14 +18,14 @@ import org.modelmapper.ModelMapper;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@Inheritance(strategy = InheritanceType.JOINED)
 @Entity
-@MappedSuperclass
 public class SurvivalGameConfiguration extends GameConfiguration {
 
     /**
-     * Convert a DTO to an entity.
+     * Creates a new game configuration from a DTO.
      *
-     * @param dto DTO to convert to entity.
+     * @param dto source DTO
      */
     public SurvivalGameConfiguration(GameConfigurationDTO dto) {
         new ModelMapper().map(dto, this);
@@ -37,4 +36,9 @@ public class SurvivalGameConfiguration extends GameConfiguration {
      */
     @Column(nullable = false)
     Float speedModifier = 1.0f;
+
+    @Override
+    public SurvivalGameConfigurationDTO getDTO() {
+        return new ModelMapper().map(this, SurvivalGameConfigurationDTO.class);
+    }
 }

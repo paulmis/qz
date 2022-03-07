@@ -41,62 +41,25 @@ public class GameScreenCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
-    @FXML
-    private BorderPane mainBorderPane;
-
-    @FXML
-    private HBox avatarHBox;
-
-    @FXML
-    private HBox emojiHBox;
-
-    @FXML
-    private HBox powerUpHBox;
-
-    @FXML
-    private JFXButton quitButton;
-
-    @FXML
-    private JFXButton settingsButton;
-
-    @FXML
-    private Label timerLabel;
-
-    @FXML
-    private Label questionNumberLabel;
-
-    @FXML
-    private Button emojiBarButton;
-
-    @FXML
-    private Button powerUpBarButton;
-
-    @FXML
-    private ImageView emojiBarIcon;
-
-    @FXML
-    private ImageView powerUpBarIcon;
-
-    @FXML
-    private ScrollPane emojiScrollPane;
-
-    @FXML
-    private ScrollPane powerUpScrollPane;
-
-    @FXML
-    private AnchorPane settingsPanel;
-
-    @FXML
-    private JFXButton volumeButton;
-
-    @FXML
-    private JFXSlider volumeSlider;
-
-    @FXML
-    private JFXToggleButton muteEveryoneToggleButton;
-
-    @FXML
-    private FontAwesomeIconView volumeIconView;
+    @FXML private BorderPane mainBorderPane;
+    @FXML private HBox avatarHBox;
+    @FXML private HBox emojiHBox;
+    @FXML private HBox powerUpHBox;
+    @FXML private JFXButton quitButton;
+    @FXML private JFXButton settingsButton;
+    @FXML private Label timerLabel;
+    @FXML private Label questionNumberLabel;
+    @FXML private Button emojiBarButton;
+    @FXML private Button powerUpBarButton;
+    @FXML private ImageView emojiBarIcon;
+    @FXML private ImageView powerUpBarIcon;
+    @FXML private ScrollPane emojiScrollPane;
+    @FXML private ScrollPane powerUpScrollPane;
+    @FXML private AnchorPane settingsPanel;
+    @FXML private JFXButton volumeButton;
+    @FXML private JFXSlider volumeSlider;
+    @FXML private JFXToggleButton muteEveryoneToggleButton;
+    @FXML private FontAwesomeIconView volumeIconView;
 
     private SimpleIntegerProperty volume;
 

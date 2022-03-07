@@ -19,7 +19,7 @@
    <children>
       <BorderPane prefHeight="576.0" prefWidth="1024.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <left>
-            <Pane prefHeight="576.0" prefWidth="262.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
+            <Pane fx:id="pane" prefHeight="576.0" prefWidth="262.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
                <children>
                   <TextField fx:id="emailField" layoutX="53.0" layoutY="239.0" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
                      <font>

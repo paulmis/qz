@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.google.common.base.Strings;
+import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import java.util.Collections;
 import java.util.Optional;
@@ -70,8 +71,8 @@ class SSEControllerTest {
 
     static class MockGame extends Game {
         @Override
-        public Optional<Question> getNextQuestion() {
-            return Optional.empty();
+        public GameDTO getDTO() {
+            return null;
         }
     }
 
