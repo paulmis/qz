@@ -5,22 +5,44 @@ import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
-import javax.persistence.*;
-import lombok.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.hibernate.annotations.CreationTimestamp;
 import org.modelmapper.ModelMapper;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.question.Question;
 import server.database.entities.utils.BaseEntity;
+import server.services.SSEManager;
 import server.utils.SaveableRandom;
 
 /**
  * Game entity which represents a game and its state.
  */
-@EqualsAndHashCode(callSuper = true, exclude = {"random"})
+@EqualsAndHashCode(callSuper = true, exclude = {"random", "emitters"})
 @Entity
 @Data
 @AllArgsConstructor
@@ -74,6 +96,13 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<GamePlayer> players = Collections.synchronizedSet(new HashSet<>());
+
+    /**
+     * Mapping between game players and their corresponding SSE emitters.
+     */
+    @Transient
+    @JsonIgnore
+    public SSEManager emitters = new SSEManager();
 
     /**
      * Questions assigned to this game.
