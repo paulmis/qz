@@ -40,6 +40,7 @@ public class SaveableRandom extends Random {
      *
      * @return a random number between 0 and 2^48.
      */
+    @Override
     public int next(int bits) {
         this.state = (this.state * multiplier + increment) % modulo;
         return (int) (this.state >>> (48 - bits));
