@@ -15,7 +15,7 @@ import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.question.Question;
 import server.database.entities.utils.BaseEntity;
-import server.utils.EasyRandom;
+import server.utils.SaveableRandom;
 
 /**
  * Game entity which represents a game and its state.
@@ -67,7 +67,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * State of the PRNG.
      */
     @NonNull @Embedded @JsonIgnore
-    private EasyRandom random = new EasyRandom();
+    private SaveableRandom random = new SaveableRandom();
 
     /**
      * List of players currently in the game.
