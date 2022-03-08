@@ -115,7 +115,7 @@ public class MainCtrl {
         Stretch,
         Letterbox,
     }
-    
+
     private void showScreenLetterBox(Parent parent, StageScalingStrategy strategy) {
         if(primaryStage.getScene()==null)
             primaryStage.setScene(new Scene(new Group(new StackPane(parent))));

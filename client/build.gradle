@@ -7,10 +7,6 @@ application {
     mainClass = 'client.Main'
 }
 
-repositories {
-	maven { url 'https://jitpack.io' }
-}
-
 javafx {
     version = "17.0.2"
     modules = [ 'javafx.controls', 'javafx.fxml' ]
@@ -26,8 +22,6 @@ dependencies {
 	
 	implementation 'com.google.inject:guice:5.0.1'
 
-	implementation 'com.github.Oshan96:CustomStage:v1.3.1'
-	
 	implementation 'org.openjfx:javafx-controls:17.0.2'
 	implementation 'org.openjfx:javafx-fxml:17.0.2'
 
