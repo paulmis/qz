@@ -9,7 +9,6 @@ import commons.entities.AnswerDTO;
 import commons.entities.UserDTO;
 import commons.entities.game.GameStatus;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +25,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import server.database.entities.User;
 import server.database.entities.game.Game;
-import server.database.entities.question.Question;
+import server.database.entities.game.NormalGame;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
 
@@ -42,14 +41,6 @@ class AnswerControllerTest {
 
     @MockBean
     private UserRepository userRepository;
-
-    // ToDo: remove this class when a subclass of game is implemented
-    private class MockGame extends Game {
-        @Override
-        public Optional<Question> getNextQuestion() {
-            return Optional.empty();
-        }
-    }
 
     private UUID getUUID(int id) {
         return UUID.fromString("00000000-0000-0000-0000-00000000000" + (id % 10));
@@ -68,7 +59,7 @@ class AnswerControllerTest {
     @BeforeEach
     private void init() {
         // Mock a working gameId
-        mockLobby = new AnswerControllerTest.MockGame();
+        mockLobby = new NormalGame();
         mockLobby.setId(getUUID(0));
         mockLobby.setStatus(GameStatus.CREATED);
         when(gameRepository.existsById(mockLobby.getId())).thenReturn(true);

@@ -9,8 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.AnswerDTO;
+import commons.entities.QuestionDTO;
 import commons.entities.UserDTO;
 import commons.entities.game.GameStatus;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import server.database.entities.User;
 import server.database.entities.game.Game;
+import server.database.entities.game.NormalGame;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
@@ -50,17 +53,14 @@ class QuestionControllerTest {
     @MockBean
     private UserRepository userRepository;
 
-    // ToDo: remove this class when a subclass of game is implemented
-    private class MockGame extends Game {
-        @Override
-        public Optional<Question> getNextQuestion() {
-            return Optional.empty();
-        }
-    }
-
     private class MockQuestion extends Question {
         @Override
         public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
+            return null;
+        }
+
+        @Override
+        public QuestionDTO getDTO() {
             return null;
         }
     }
@@ -82,16 +82,14 @@ class QuestionControllerTest {
 
     @BeforeEach
     private void init() {
-        mockGame = new QuestionControllerTest.MockGame();
-        mockGame.setId(getUUID(0));
-        mockGame.setStatus(GameStatus.ONGOING);
-        when(gameRepository.existsById(mockGame.getId())).thenReturn(true);
-
         // Setup mock question
         mockQuestion = new MockQuestion();
-        mockQuestion.setId(getUUID(0));
-        mockQuestion.setText("Test Question");
-        when(questionRepository.findById(mockQuestion.getId())).thenReturn(Optional.of(mockQuestion));
+        //when(questionRepository.findById(mockQuestion.getId())).thenReturn(Optional.of(mockQuestion));
+
+        mockGame = new NormalGame();
+        mockGame.setId(getUUID(0));
+        mockGame.setStatus(GameStatus.ONGOING);
+        when(gameRepository.findById(mockGame.getId())).thenReturn(Optional.of(mockGame));
 
         //Set up random test user
         joe = new User("joe", "joe@doe.com", "stinkywinky");
@@ -109,8 +107,10 @@ class QuestionControllerTest {
     @Test
     public void questionFoundTest() throws Exception {
         // Request question object -> expect a ok status and mock question object
+        mockGame.addQuestions(new ArrayList<>(List.of(mockQuestion)));
+        mockGame.setCurrentQuestion(0);
         this.mockMvc
-                .perform(get("/api/game/" + mockGame.getId() + "/question/" + mockQuestion.getId()))
+                .perform(get("/api/game/" + mockGame.getId() + "/question/"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(equalToObject(
                         objectMapper.writeValueAsString(mockQuestion.getDTO())
@@ -118,18 +118,18 @@ class QuestionControllerTest {
     }
 
     @Test
-    public void questionNotFoundTest() throws Exception {
-        // Request question object -> expect a not found status
+    public void questionEmptyTest() throws Exception {
+        // Request question object -> expect a conflict status
         this.mockMvc
-                .perform(get("/api/game/" + mockGame.getId() + "/question/" + getUUID(1)))
-                .andExpect(status().isNotFound());
+                .perform(get("/api/game/" + mockGame.getId() + "/question/"))
+                .andExpect(status().isConflict());
     }
 
     @Test
     public void gameNotFoundTest() throws Exception {
         // Request question object -> expect a not found status
         this.mockMvc
-                .perform(get("/api/game/" + getUUID(1) + "/question/" + mockQuestion.getId()))
+                .perform(get("/api/game/" + getUUID(1) + "/question/"))
                 .andExpect(status().isNotFound());
     }
 }

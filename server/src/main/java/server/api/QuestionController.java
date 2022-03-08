@@ -4,9 +4,6 @@ import commons.entities.QuestionDTO;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
-import java.util.Optional;
-import java.util.UUID;
-import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,29 +30,23 @@ public class QuestionController {
     private GameRepository gameRepository;
 
     /**
-     * Question repository import.
-     */
-    @Autowired
-    private QuestionRepository questionRepository;
-
-    /**
      * Endpoint for retrieving the current question.
      *
      * @param gameId the UUID of the current game
      * @return information/object of the current question
      */
-    @GetMapping("/game/{gameId}/question/{questionId}")
+    @GetMapping("/game/{gameId}/question/")
     ResponseEntity<QuestionDTO> currentQuestion(
-            @PathVariable @NonNull UUID gameId,
-            @PathVariable @NonNull UUID questionId) {
+            @PathVariable @NonNull UUID gameId) {
         //Check if game exists.
-        if (!gameRepository.existsById(gameId)) {
+        Optional<Game> game = gameRepository.findById(gameId);
+        if (game.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        Optional<Question> question = questionRepository.findById(questionId);
-        //Check if question exists.
-        if (!question.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Optional<Question> question = game.get().getQuestion();
+        //Check if question is not empty;
+        if (question.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         //Send 200 status and payload if question exists.
         return ResponseEntity.ok(question.get().getDTO());
