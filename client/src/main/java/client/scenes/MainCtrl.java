@@ -34,6 +34,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
@@ -114,6 +115,8 @@ public class MainCtrl {
         Identity,
         Stretch,
         Letterbox,
+        ScaledIdentity,
+        ForcedScaled
     }
 
     private void showScreenLetterBox(Parent parent, StageScalingStrategy strategy) {
@@ -122,14 +125,38 @@ public class MainCtrl {
 
         primaryStage.setTitle("Quizzzzz");
         var scene = primaryStage.getScene();
-        var group = ((Group)scene.getRoot());
-        var pane = (StackPane)group.getChildren().get(0);
-        pane.getChildren().set(0,parent);
-        StackPane.setAlignment(pane, Pos.CENTER_LEFT);
-        primaryStage.setMinHeight(576);
-        primaryStage.setMinWidth(1024);
-        primaryStage.show();
-        scaling(scene, pane, 1024,576, strategy);
+        var topGroup = ((Group)scene.getRoot());
+
+        switch (strategy) {
+            case Identity:
+            case ScaledIdentity:
+                var anchor = new AnchorPane(parent);
+                AnchorPane.setBottomAnchor(parent, 0d);
+                AnchorPane.setTopAnchor(parent, 0d);
+                AnchorPane.setLeftAnchor(parent, 0d);
+                AnchorPane.setRightAnchor(parent, 0d);
+                topGroup.getChildren().set(0, new Group(anchor));
+
+                primaryStage.show();
+                scaling(scene, anchor, 1024, 576, strategy);
+            break;
+            case Stretch:
+            case Letterbox:
+                var stac = new StackPane(parent);
+                topGroup.getChildren().set(0, new Group(stac));
+
+                primaryStage.show();
+                scaling(scene, stac, 1024, 576, strategy);
+            break;
+            case ForcedScaled:
+                var stac = new StackPane(parent);
+                topGroup.getChildren().set(0, new Group(stac));
+
+                primaryStage.show();
+                scaling(scene, stac, 1024, 576, strategy);
+            break;
+        }
+
     }
 
     /**
@@ -176,7 +203,7 @@ public class MainCtrl {
      * It also sets it min width and height.
      */
     public void showGameScreen() {
-        this.showScreenLetterBox(gameScreen, StageScalingStrategy.Identity);
+        this.showScreenLetterBox(gameScreen, StageScalingStrategy.ScaledIdentity);
     }
 
     /**
@@ -260,6 +287,7 @@ public class MainCtrl {
             this.initWidth = initWidth;
             this.contentPane = contentPane;
             this.strategy = strategy;
+            changed(null, scene.getWidth(), scene.getWidth());
         }
 
         @Override
@@ -268,11 +296,11 @@ public class MainCtrl {
             final double newWidth = scene.getWidth();
             final double newHeight = scene.getHeight();
 
-            switch(strategy) {
+            switch (strategy) {
                 case Identity:
-                    contentPane.setPrefWidth(newWidth);
-                    contentPane.setPrefHeight(newHeight);
-                    break;
+                    contentPane.setMinWidth(newWidth);
+                    contentPane.setMinHeight(newHeight);
+                break;
                 case Stretch:
                     Scale scaling = new Scale(newWidth / initWidth, newHeight / initHeight);
                     scaling.setPivotX(0);
@@ -280,8 +308,9 @@ public class MainCtrl {
                     scene.getRoot().getTransforms().setAll(scaling);
                     contentPane.setPrefWidth(newWidth / (newWidth / initWidth));
                     contentPane.setPrefHeight(newHeight / (newHeight / initHeight));
-                    break;
+                break;
                 case Letterbox:
+                case ScaledIdentity:
                     double scaleFactor =
                             newWidth / newHeight > ratio
                                     ? newHeight / initHeight
@@ -292,7 +321,7 @@ public class MainCtrl {
                     scene.getRoot().getTransforms().setAll(letterScale);
                     contentPane.setPrefWidth(newWidth / scaleFactor);
                     contentPane.setPrefHeight(newHeight / scaleFactor);
-                    break;
+                break;
             }
         }
     }
