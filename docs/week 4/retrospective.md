@@ -1,30 +1,56 @@
-| Stories                                            | Tasks                                                             | Assignees      | Estimated time | Time spent | Done    |
-|----------------------------------------------------|-------------------------------------------------------------------|----------------|----------------|------------|---------|
-| Users must be able to create and join game lobbies | Create the lobby UI                                               | Paul           | 4              | 5          | Yes     |
-|                                                    | Game joining on the front-end                                     | Paul           | 4              | 0          | No      |
-|                                                    | API Endpoints for joining/ getting lobbies                        | Giacomo        | 6              | 6          | No      |
-|                                                    | Implement DTOs (#67)                                              | Rok            | 5              | 12         | Yes     |
-|                                                    | Implement playing a singleplayer game                             | David          | 5              | 0          | No      |
-| Setup authentication                               | Create Authentification screen UI                                 |  Alex          | 2              | 4          |  Review |
-|                                                    | API endpoints for authentification                                | Paul           | 4              | 8          | No      |
-|                                                    | Implement authentification on the client-side                     | Alex           | 4              | 0          | No      |
-|                                                    | Design nickname and profile image selection screen                | Alex           | 2              | 2          | Yes     |
-|                                                    | Design authentification screen UI                                 | David          | 2              | 2          | Yes     |
-| User must be able to set their name                | Create server connect screen UI                                   | Alex           | 5              | 5          | Review  |
-|                                                    | Create register screen UI                                         | Alex           | 5              | 5          | Review  |
-|                                                    | File hierarchy improvements                                       |                |                |            |         |
-|                                                    | API design                                                        | Everyone       | 10             | 15         | Yes     |
-| Users must be able to answer questions             | API endpoints for answering and getting a question                | Aakanksh       | 3              | 2          | No      |
-|                                                    | Update design of game screen                                      | David          | 2              | 3          | Yes     |
-|                                                    | MVP for Single Player game (Client)                               |                |                |            |         |
-| Dynamic question generation                        | Question generation                                               | Rok            | 5              | 5          | No      |
-|                                                    | Add constructor tests for child question classes                  | Giacomo        | 2              | 5          | Yes     |
-|                                                    | Create nickname and profile picture selection screen              | Alex           | 2              | 0          | No      |
-|                                                    | Spawn a default multiplayer room indefinitely                     | Aakanksh, Paul | 3              | 0          | No      |
-| Documentation                                      | ReadMe doc                                                        | Aakanksh       | 1              | 1          | Review  |
-|                                                    | Make figma prototype for HCI draft                                | David          | 2              | 2          | Yes     |
-|                                                    | Add client and server readme badges for build status and coverage | Alex           | 2              | 0          | No      |
-|                                                    | Add documents for week 3                                          | Aakanksh       | 1              | 1          | Done    |
-|                                                    | HCI Assignment draft                                              | Everyone       | 4              | 4          | Done    |
-| Bug                                                | Repository id not matching Entity id                              | Giacomo        | 1              | 1          | Yes     |
-|                                                    | Set Question entity id to UUID                                    | Giacomo        |                |            | Yes     |
+# W4 retrospective
+
+|   |   |
+|---|---|
+| Location  | Online (Discord) |
+| Date		| 6/03/2022 |
+| Time		| 17:00 - 18:00 |
+| Attendees	| Paul Misterka  <br> Giacomo Pezzali<br> Alexandru Cojocaru (Note taker) <br> David Dinucu-Jianu<br>  Aakanksh Singh<br>Rok Štular (Chairman) |
+
+Our goal for this week was to have a playable singleplayer game.
+We haven't managed to reach our goal but we made great strides towards achieving it.
+
+We managed to produce a lot of quality work this week like:
+1. We finished a lot of API endpoints for our application.
+2. We finished our HCI report and implemented the design feedback that we received.
+3. We implemented SSE in our back-end which we anticipated to be one of the more difficult tasks we would have to do.
+4. A lot of progress has been done in the front-end and the HCI design is almost fully implemented.
+
+Below is our final tasks list with estimated and actual time spent, completion level and notes.
+
+| Stories                                                                                                                                                                  | Tasks                                                                                                                                                                 | Assignees                                 | Estimated time | Time spent | Done | Notes                             |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | -------------- | ---------- | ---- | --------------------------------- |
+| [Games must consist of a set of questions](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/7)               | [Question generation](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/21)                                | Paul                                      | 5              | 5          | Yes  |                                   |
+| [Games must consist of a set of questions](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/7)               | [Implement a SSE controler](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/105)                         | Rok                                       | 4              | 10         | Yes  |                                   |
+| [Games must consist of a set of questions](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/7)               | Notify clients whether the answer is correct or not                                                                                                                   | Giacomo                                   | 4              | 3          | No   | Waiting for SSE management        |
+| [Setup authentication](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/31)                                  | [API endpoints for authentication](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/77)                   | Paul                                      | 4              | 3          | Yes  | Issue mostly implemented in W3    |
+| [Users must be able to set their name](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/4)                   | [Nickname and picture screen](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/62)                        | Alex                                      | 5              | 3          | Yes  | Functionality to be done in W5    |
+| [Users must be able to create and join game lobbies](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/5)     | [Game creation endpoint](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/96)                             | Paul                                      | 3              | 1          | No   |                                   |
+| Users must be able to create and join game lobbies                                                                                                                       | [Game joining on front-end](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/79)                          | Paul                                      | 4              | 0          | No   | Pre-requisites unfinished         |
+| [Game should contain a leaderboard](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/40)                     | [Implement global leaderboard API endpoints](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/89)         | Rok                                       | 1              | 4          | No   | In review                         |
+| Game should contain a leaderboard                                                                                                                                        | [Create global leaderboard UI](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/90)                       | David                                     | 2              | 1          | Yes  |                                   |
+| Game should contain a leaderboard                                                                                                                                        | [Implement Global leaderboard in client](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/103)            | David                                     | 2              | 3          | No   |                                   |
+| [Support for player-determined configuration](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/36)           | [Game configuration UI](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/97)                              | David                                     | 3              | 5          | Yes  |                                   |
+| Documentation                                                                                                                                                            | [Update CoC](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/merge_requests/39)                                 | Giacomo                                   | 3              | 3          | Yes  |                                   |
+| Documentation                                                                                                                                                            | [HCI final version](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/95)                                  | Aakanksh, Alex, David, Giacomo, Paul, Rok | 15             | 15         | Yes  |                                   |
+| Documentation                                                                                                                                                            | [Lucid charts to repo](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/94)                               | Aakanksh                                  | 2              | 1          | No   | Issue might be deleted            |
+| Test                                                                                                                                                                     | [Implement front end testing](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/101)                       | Aakanksh                                  | 5              | 0          | No   |                                   |
+| [Users should be able to apply custom configs to rooms](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/32) | [Game configuration endpoint](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/98)                        | Aakanksh                                  | 4              | 0          | No   |                                   |
+| [Users must be able to answer questions](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/7)                 | [API endpoints for answering and getting a question](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/76) | Aakanksh                                  | 4              | 6          | No   | Integrating other issue into this |
+| API                                                                                                                                                                      | [API design](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/82)                                         | Everyone                                  |                |            |      |                                   |
+| API                                                                                                                                                                      | [Spawn a default multiplayer room indefinitely](https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template/-/issues/16)      | Aakanksh, Paul                            | 4              | 0          | No   |                                   |
+
+## Encountered problems
+
+We've created an `EasyRetro` [dashboard](https://easyretro.io/publicboard/mV7haDuRvLSZpCleo2fjyLEhdzF3/367a5542-66f8-4bd1-abcd-f8c491f3178c) where everybody contributed their retrospective for the week.
+
+### We had a lot of open merge requests at the same time
+There were a lot of open merge requests at the end of the week. This is undesirable since we would need to rush the reviews and the quality will go down significantly.
+
+### We still haven't started using the gitlab wiki
+Unfortunately, we didn't start using the gitlab wiki even though it has been a goal since week 2.
+
+## Adjustments for the next sprint plan
+- we should start using the gitlab wiki
+- we should avoid having a lot of open merge requests at the end of the week
+- the chairman should plan the meetings in advance
