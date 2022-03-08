@@ -1,7 +1,7 @@
-## Backlog
+# Backlog
 The backlog follows a MoSCoW-style prioritization.
 
-### Must have
+## Must have
 - Users must be able to set their name when entering the application
 - Users must be able to create and join game lobbies that:
   - can be either singleplayer or multiplayer
@@ -18,7 +18,7 @@ The backlog follows a MoSCoW-style prioritization.
   - get question hints / remove one wrong answer
   - increasing/decreasing the amount of points for the question
   - displaying current answers to the question (given by other players)
-### Should have
+## Should have
 - Users should be able to authenticate themselves with a username and password
 - Users should be able to create their own, password-protected game rooms
 - Users should be able to spectate games without partaking
@@ -47,7 +47,7 @@ The backlog follows a MoSCoW-style prioritization.
 - Users should be able to select reactions to the questions
 - Users should be able to leave a room safely
 
-### Could have
+## Could have
 - Users could have an option to see a map with players performance around the world
 - Users could be able to recover their authentication details
 - Users could be able to use text chat while in the lobby/game
@@ -72,7 +72,7 @@ The backlog follows a MoSCoW-style prioritization.
   - each room is assigned an elo based on the elo of the players in the room,
   - based on their elo and rank users are granted or subtracted points
 
-### Won’t have
+## Won’t have
 - Users won’t be able to play games offline
 - Users won’t be able to play other games in the app
 - Users won’t be given roles with special privileges
@@ -80,7 +80,7 @@ The backlog follows a MoSCoW-style prioritization.
 - Users won’t be able to friend other users
 - Questions won’t have answers that do not pertain to energy consumption estimation
 
-### Non-functional requirements
+## Non-functional requirements
 - the backend utilizes Java X with Spring on Gradle
 - the frontend utilizes OpenJFX for the UI/UX
 - the server-side application exposes a REST api
