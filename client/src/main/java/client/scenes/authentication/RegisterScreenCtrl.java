@@ -12,7 +12,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 
 
-
 /**
  * Register Screen controller class.
  */
@@ -21,23 +20,14 @@ public class RegisterScreenCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
-    @FXML
-    private JFXButton signUpButton;
-
-    @FXML
-    private JFXButton haveAccountButton;
-
-    @FXML
-    private CheckBox rememberMe;
-
-    @FXML
-    private TextField emailField;
-
-    @FXML
-    private TextField passwordField;
+    @FXML private JFXButton signUpButton;
+    @FXML private JFXButton haveAccountButton;
+    @FXML private CheckBox rememberMe;
+    @FXML private TextField emailField;
+    @FXML private TextField passwordField;
 
     /**
-     * Constructor for the estimate question control.
+     * Constructor for the register screen control.
      *
      */
     @Inject
@@ -61,17 +51,23 @@ public class RegisterScreenCtrl implements Initializable {
      * Function that sends new account credentials to server
      * after a button click.
      */
-    public void signUpButtonClick() {
-        server.register(emailField.getText(), passwordField.getText());
-        System.out.print("Registering new account credentials...");
-        mainCtrl.showLobbyScreen();
+    @FXML
+    private void signUpButtonClick() {
+        if (emailField.getText().length() > 0 && passwordField.getText().length() > 0) {
+            server.register(emailField.getText(), passwordField.getText());
+            System.out.print("Registering new account credentials...");
+            mainCtrl.showNicknameScreen();
+        } else {
+            System.out.print("Can't have empty username or password ! Try again");
+        }
     }
 
     /**
      * Function that takes user to login page
      * if they have an account.
      */
-    public void haveAccountButtonClick() {
+    @FXML
+    private void haveAccountButtonClick() {
         mainCtrl.showLogInScreen();
     }
 
@@ -79,7 +75,8 @@ public class RegisterScreenCtrl implements Initializable {
      * Function that keeps track if user
      * wants to be remembered locally or not.
      */
-    public void rememberMeTick() {
+    @FXML
+    private void rememberMeTick() {
         if (rememberMe.isSelected()) {
             System.out.print("User wants to be remembered...\n");
         } else {

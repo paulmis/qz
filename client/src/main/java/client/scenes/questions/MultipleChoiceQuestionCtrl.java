@@ -31,40 +31,20 @@ public class MultipleChoiceQuestionCtrl implements Initializable {
         void handle();
     }
 
-    @FXML
-    private Label questionLabel;
-
-    @FXML
-    private ImageView imageOptionA;
-    @FXML
-    private ImageView imageOptionB;
-    @FXML
-    private ImageView imageOptionC;
-    @FXML
-    private ImageView imageOptionD;
-
-
-    @FXML
-    private Label labelOptionA;
-    @FXML
-    private Label labelOptionB;
-    @FXML
-    private Label labelOptionC;
-    @FXML
-    private Label labelOptionD;
-
-    @FXML
-    private JFXButton buttonOptionA;
-    @FXML
-    private JFXButton buttonOptionB;
-    @FXML
-    private JFXButton buttonOptionC;
-    @FXML
-    private JFXButton buttonOptionD;
-
-
-    @FXML
-    private VBox imageVBox;
+    @FXML private Label questionLabel;
+    @FXML private ImageView imageOptionA;
+    @FXML private ImageView imageOptionB;
+    @FXML private ImageView imageOptionC;
+    @FXML private ImageView imageOptionD;
+    @FXML private Label labelOptionA;
+    @FXML private Label labelOptionB;
+    @FXML private Label labelOptionC;
+    @FXML private Label labelOptionD;
+    @FXML private JFXButton buttonOptionA;
+    @FXML private JFXButton buttonOptionB;
+    @FXML private JFXButton buttonOptionC;
+    @FXML private JFXButton buttonOptionD;
+    @FXML private VBox imageVBox;
 
     private final String questionText;
     private final List<URL> answersImages;
