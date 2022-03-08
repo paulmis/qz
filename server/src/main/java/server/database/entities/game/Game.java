@@ -1,6 +1,7 @@
 package server.database.entities.game;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
@@ -73,13 +74,15 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * List of players currently in the game.
      */
+    @JsonManagedReference
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     protected Set<GamePlayer> players = Collections.synchronizedSet(new HashSet<>());
 
     /**
      * The head of the lobby - person in charge with special privileges.
      */
-    @OneToOne
+    @JsonManagedReference
+    @OneToOne(mappedBy = "headGame", fetch = FetchType.LAZY)
     protected GamePlayer head;
 
     /**
@@ -114,7 +117,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public boolean add(GamePlayer player) {
         // Check if the player can be added
-        System.out.println(this.players.size());
         if (this.players.size() >= this.configuration.getCapacity() || !this.players.add(player)) {
             return false;
         }
@@ -129,17 +131,17 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Remove a player from the game.
      *
-     * @param player The player to remove.
+     * @param playerId The id of the player to remove
      * @return Whether the player was removed.
      */
-    public boolean remove(GamePlayer player) throws LastPlayerRemovedException {
+    public boolean remove(UUID playerId) throws LastPlayerRemovedException {
         // Remove the player from the game
-        if (!this.players.remove(player)) {
+        if (!this.players.removeIf(player -> player.getId().equals(playerId))) {
             return false;
         }
 
         // If the head left, replace them
-        if (this.head == player) {
+        if (this.head.getUser().getId() == playerId) {
             this.head = this.players.stream()
                     .min(Comparator.comparing(GamePlayer::getJoinDate))
                     .orElse(null);

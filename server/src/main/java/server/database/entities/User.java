@@ -72,7 +72,7 @@ public class User extends BaseEntity<UserDTO> {
     /**
      * Relation to player entities for each individual game.
      */
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<GamePlayer> gamePlayers = Collections.synchronizedSet(new HashSet<>());
 
     @Override
