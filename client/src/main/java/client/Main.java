@@ -19,11 +19,12 @@ package client;
 import static com.google.inject.Guice.createInjector;
 
 import client.scenes.GameScreenCtrl;
-import client.scenes.LobbyCtrl;
 import client.scenes.MainCtrl;
 import client.scenes.authentication.LogInScreenCtrl;
+import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
+import client.scenes.lobby.LobbyScreenCtrl;
 import com.google.inject.Injector;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -45,18 +46,21 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        var gameScreen = FXML.load(GameScreenCtrl.class,
-                "client", "scenes", "GameScreen.fxml");
-        var registerScreen = FXML.load(RegisterScreenCtrl.class,
-                "client", "scenes", "authentication", "RegisterScreen.fxml");
         var serverConnectScreen = FXML.load(ServerConnectScreenCtrl.class,
                 "client", "scenes", "authentication", "ServerConnectScreen.fxml");
         var logInScreen = FXML.load(LogInScreenCtrl.class,
                 "client", "scenes", "authentication", "LogInScreen.fxml");
-        var lobbyScreen = FXML.load(LobbyCtrl.class,
-                "client", "scenes", "LobbyScreen.fxml");
+        var registerScreen = FXML.load(RegisterScreenCtrl.class,
+                "client", "scenes", "authentication", "RegisterScreen.fxml");
+        var nicknameScreen = FXML.load(NicknameScreenCtrl.class,
+                "client", "scenes", "authentication", "NicknameScreen.fxml");
+        var lobbyScreen = FXML.load(LobbyScreenCtrl.class,
+                "client", "scenes", "lobby", "LobbyScreen.fxml");
+        var gameScreen = FXML.load(GameScreenCtrl.class,
+                "client", "scenes", "GameScreen.fxml");
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, serverConnectScreen, logInScreen, registerScreen, lobbyScreen, gameScreen);
+        mainCtrl.initialize(primaryStage, serverConnectScreen, logInScreen, registerScreen, nicknameScreen,
+                lobbyScreen, gameScreen);
     }
 }

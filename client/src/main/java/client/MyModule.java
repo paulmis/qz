@@ -18,9 +18,13 @@ package client;
 
 import client.scenes.GameScreenCtrl;
 import client.scenes.MainCtrl;
+import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
+import client.utils.ReflectionUtils;
+import client.utils.ServerUtils;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
+import com.google.inject.name.Names;
 import lombok.Generated;
 
 /**

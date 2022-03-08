@@ -8,49 +8,48 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.UserDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.GameStatus;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import server.database.entities.User;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
+import server.database.entities.game.NormalGame;
+import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
 
-@WebMvcTest(LobbyController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@EnableWebMvc
 class LobbyControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper;
 
     @MockBean
     private GameRepository gameRepository;
 
     @MockBean
     private UserRepository userRepository;
-
-    // ToDo: remove this class when a subclass of game is implemented
-    private class MockGame extends Game {
-        @Override
-        public Optional<Question> getNextQuestion() {
-            return Optional.empty();
-        }
-    }
 
     private UUID getUUID(int id) {
         return UUID.fromString("00000000-0000-0000-0000-00000000000" + (id % 10));
@@ -59,26 +58,41 @@ class LobbyControllerTest {
     private Game mockLobby;
     private User john;
 
+    @Autowired
+    public LobbyControllerTest(MockMvc mockMvc) {
+        this.mockMvc = mockMvc;
+        this.objectMapper = new ObjectMapper().registerModule(new Jdk8Module());
+    }
+
     @BeforeEach
     private void init() {
         // Mock a working gameId
-        mockLobby = new MockGame();
+        mockLobby = new NormalGame();
         mockLobby.setId(getUUID(0));
         mockLobby.setStatus(GameStatus.CREATED);
+        mockLobby.setConfiguration(new NormalGameConfiguration());
         when(gameRepository.findById(mockLobby.getId())).thenReturn(Optional.of(mockLobby));
 
         // Mock a working userId
         john = new User();
         john.setId(getUUID(0));
         when(userRepository.findById(john.getId())).thenReturn(Optional.of(john));
+
+        // Set the context user
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        john.getEmail(),
+                        john.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
     }
 
     @Test
     public void getAvailableLobbiesTest() throws Exception {
         // Mock a list of lobbies
-        Game mockLobby2 = new MockGame();
+        Game mockLobby2 = new NormalGame();
         mockLobby2.setId(getUUID(1));
         mockLobby2.setStatus(GameStatus.CREATED);
+        mockLobby2.setConfiguration(new NormalGameConfiguration());
         when(gameRepository.findAllByStatus(GameStatus.CREATED))
                 .thenReturn(new ArrayList<>(List.of(mockLobby, mockLobby2)));
 
@@ -144,8 +158,7 @@ class LobbyControllerTest {
     public void joinAlreadyPresentTest() throws Exception {
         // Mock a joined player
         GamePlayerDTO player = new GamePlayerDTO();
-        GamePlayer playerJohn = new GamePlayer(player);
-        playerJohn.setUser(john);
+        GamePlayer playerJohn = new GamePlayer(player, john);
         mockLobby.add(playerJohn);
 
         // Request

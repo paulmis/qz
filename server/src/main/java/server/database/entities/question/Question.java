@@ -4,18 +4,9 @@ import commons.entities.AnswerDTO;
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Generated;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import javax.persistence.*;
+import lombok.*;
+import server.database.entities.game.Game;
 import server.database.entities.utils.BaseEntity;
 
 /*
@@ -29,10 +20,10 @@ https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-@Generated
 @Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Question extends BaseEntity<QuestionDTO> {
 
     /**
@@ -44,12 +35,20 @@ public abstract class Question extends BaseEntity<QuestionDTO> {
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "activity_id"))
     @ToString.Exclude
-    protected List<Activity> activities = new ArrayList<>();
+    @NonNull
+    protected List<Activity> activities;
 
     /**
      * Question asked the user.
      */
+    @NonNull
     protected String text;
+
+    /**
+     * Games where this question is asked.
+     */
+    @ManyToMany
+    protected List<Game> games = new ArrayList<>();
 
     /**
      * Copy constructor for the Question class.
@@ -60,6 +59,7 @@ public abstract class Question extends BaseEntity<QuestionDTO> {
         this.id = q.id;
         this.activities = q.activities;
         this.text = q.text;
+        this.games = q.games;
     }
 
     /**

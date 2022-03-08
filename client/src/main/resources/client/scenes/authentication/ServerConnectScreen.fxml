@@ -18,7 +18,7 @@
    </opaqueInsets>
    <children>
       <BorderPane prefHeight="576.0" prefWidth="1024.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <right>
+         <left>
             <Pane prefHeight="576.0" prefWidth="262.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
                <children>
                   <Label layoutX="48.0" layoutY="187.0" text="Connect to the server">
@@ -53,7 +53,7 @@
                   </ImageView>
                </children>
             </Pane>
-         </right>
+         </left>
       </BorderPane>
    </children>
 </AnchorPane>
