@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.PersistenceException;
+import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,7 @@ public class LobbyController {
      * @return 400 if the game constraints were violated, 404 if the user doesn't exist, 409 if the founder is
      *      already in a lobby or a game, 201 and the game otherwise
      */
+    @Transactional
     @PostMapping
     ResponseEntity<NormalGameDTO> create(@RequestBody NormalGameDTO gameDTO) {
         // If the user doesn't exist, return 404
@@ -88,6 +90,7 @@ public class LobbyController {
             game.setConfiguration(config);
 
             // Save the game
+            game.add(new GamePlayer(founder.get()));
             game = gameRepository.save(game);
         } catch (ConstraintViolationException | PersistenceException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -132,47 +135,28 @@ public class LobbyController {
     /**
      * Endpoint to allow a user to join a game.
      *
-     * @param playerData information on the joining player (e.g. their nickname).
      * @param lobbyId    UUID of the lobby to join.
-     * @param userId     UUID of the user that has to join.
      * @return true if the join was successful, false otherwise.
      */
-    @PutMapping("/{lobbyId}/join/{userId}")
-    ResponseEntity joinLobby(
-            @RequestBody @NonNull GamePlayerDTO playerData,
-            @PathVariable @NonNull UUID lobbyId,
-            @PathVariable @NonNull UUID userId) {
-        // ToDo: it should maybe check whether the user is allowed to join? Or is it the client's job?
-
-        // Find lobby to join
-        Optional<Game> toJoin = gameRepository.findById(lobbyId);
-        if (!toJoin.isPresent()) {
-            // No lobby
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+    @PutMapping("/{lobbyId}/join")
+    @Transactional
+    ResponseEntity join(@PathVariable @NonNull UUID lobbyId) {
+        // If the user or the game doesn't exist, return 404
+        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
+        if (user.isEmpty() || lobbyOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        if (toJoin.get().getStatus() != GameStatus.CREATED) {
-            // Game already started
+        Game lobby = lobbyOptional.get();
+
+        // Check that the game hasn't started yet and add the player
+        if (lobby.getStatus() != GameStatus.CREATED
+            || !lobby.add(new GamePlayer(user.get()))) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
-        // Find user trying to join
-        Optional<User> joiningUser = userRepository.findById(userId);
-        if (!joiningUser.isPresent()) {
-            // No user
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        // Create player
-        GamePlayer player = new GamePlayer(playerData, joiningUser.get());
-        player.setUser(joiningUser.get());
-
-        // Try to join the game
-        if (toJoin.get().add(player)) {
-            // Update repositories
-            gameRepository.save(toJoin.get());
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+        lobby = gameRepository.save(lobby);
+        return ResponseEntity.ok(lobby.getDTO());
     }
 
     /**

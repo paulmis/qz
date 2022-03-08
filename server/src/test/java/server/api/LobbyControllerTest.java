@@ -1,9 +1,8 @@
 package server.api;
 
 import static org.hamcrest.Matchers.equalToObject;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -17,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import javax.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +33,13 @@ import server.database.entities.User;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
+import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
-import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
+import server.database.repositories.game.GameConfigurationRepository;
+import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
+import server.services.GameService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -49,6 +52,15 @@ class LobbyControllerTest {
     private GameRepository gameRepository;
 
     @MockBean
+    private GameService gameService;
+
+    @MockBean
+    private GamePlayerRepository gamePlayerRepository;
+
+    @MockBean
+    private GameConfigurationRepository gameConfigurationRepository;
+
+    @MockBean
     private UserRepository userRepository;
 
     private UUID getUUID(int id) {
@@ -56,7 +68,12 @@ class LobbyControllerTest {
     }
 
     private Game mockLobby;
+    private GameConfiguration mockLobbyConfiguration;
     private User john;
+    private User susanne;
+    private User sally;
+    private GamePlayer johnPlayer;
+    private GamePlayer susannePlayer;
 
     @Autowired
     public LobbyControllerTest(MockMvc mockMvc) {
@@ -66,17 +83,38 @@ class LobbyControllerTest {
 
     @BeforeEach
     private void init() {
-        // Mock a working gameId
-        mockLobby = new NormalGame();
-        mockLobby.setId(getUUID(0));
-        mockLobby.setStatus(GameStatus.CREATED);
-        mockLobby.setConfiguration(new NormalGameConfiguration());
-        when(gameRepository.findById(mockLobby.getId())).thenReturn(Optional.of(mockLobby));
-
-        // Mock a working userId
-        john = new User();
+        // Mock users
+        john = new User("John", "john@upon.com", "stinkydonkey");
         john.setId(getUUID(0));
         when(userRepository.findById(john.getId())).thenReturn(Optional.of(john));
+        when(userRepository.findByEmail(john.getEmail())).thenReturn(Optional.of(john));
+
+        susanne = new User("Susanne", "susanne@louisiane.com", "stinkymonkey");
+        susanne.setId(getUUID(1));
+        when(userRepository.findById(susanne.getId())).thenReturn(Optional.of(susanne));
+        when(userRepository.findByEmail(susanne.getEmail())).thenReturn(Optional.of(susanne));
+
+        sally = new User("Sally", "sally@wally.com", "stinkybinky");
+        sally.setId(getUUID(2));
+        when(userRepository.findById(sally.getId())).thenReturn(Optional.of(sally));
+        when(userRepository.findByEmail(sally.getEmail())).thenReturn(Optional.of(sally));
+
+        // Create a lobby
+        mockLobby = new NormalGame();
+        mockLobby.setId(getUUID(3));
+        mockLobby.setStatus(GameStatus.CREATED);
+        mockLobbyConfiguration = new NormalGameConfiguration();
+        mockLobby.setConfiguration(mockLobbyConfiguration);
+
+        // Add players
+        johnPlayer = new GamePlayer(john);
+        susannePlayer = new GamePlayer(susanne);
+        mockLobby.add(johnPlayer);
+        mockLobby.add(susannePlayer);
+
+        // Mock the lobby
+        when(gameRepository.findById(mockLobby.getId())).thenReturn(Optional.of(mockLobby));
+        when(gameRepository.save(any(NormalGame.class))).thenReturn((NormalGame) mockLobby);
 
         // Set the context user
         SecurityContextHolder.getContext().setAuthentication(
@@ -124,48 +162,30 @@ class LobbyControllerTest {
 
     @Test
     public void joinOkTest() throws Exception {
+        // Set the context user to a user that isn't in the game
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        sally.getEmail(),
+                        sally.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+
         // Request
-        UserDTO player = new UserDTO();
         this.mockMvc
-                .perform(put("/api/lobby/" + mockLobby.getId() + "/join/" + john.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(player)))
+                .perform(put("/api/lobby/" + mockLobby.getId() + "/join"))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void lobbyNotFoundJoinTest() throws Exception {
-        // Request
-        GamePlayerDTO player = new GamePlayerDTO();
         this.mockMvc
-                .perform(put("/api/lobby/" + getUUID(1) + "/join/" + john.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(player)))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void userNotFoundJoinTest() throws Exception {
-        // Request
-        GamePlayerDTO player = new GamePlayerDTO();
-        this.mockMvc
-                .perform(put("/api/lobby/" + mockLobby.getId() + "/join/" + getUUID(1))
-                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(player)))
+                .perform(put("/api/lobby/" + getUUID(1) + "/join"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void joinAlreadyPresentTest() throws Exception {
-        // Mock a joined player
-        GamePlayerDTO player = new GamePlayerDTO();
-        GamePlayer playerJohn = new GamePlayer(player, john);
-        mockLobby.add(playerJohn);
-
-        // Request
         this.mockMvc
-                .perform(put("/api/lobby/" + mockLobby.getId() + "/join/" + john.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(player)))
+                .perform(put("/api/lobby/" + mockLobby.getId() + "/join"))
                 .andExpect(status().isConflict());
     }
 
@@ -175,11 +195,80 @@ class LobbyControllerTest {
         mockLobby.setStatus(GameStatus.ONGOING);
 
         // Request
-        UserDTO player = new UserDTO();
         this.mockMvc
-                .perform(put("/api/lobby/" + mockLobby.getId() + "/join/" + john.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(player)))
+                .perform(put("/api/lobby/" + mockLobby.getId() + "/join"))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    void createCreated() throws Exception {
+        // Mock the repositories
+        when(gamePlayerRepository.existsByUserIdAndGameStatusNot(john.getId(), GameStatus.FINISHED))
+                .thenReturn(false);
+        when(gameConfigurationRepository.save(mockLobbyConfiguration))
+                .thenReturn(mockLobbyConfiguration);
+
+        // Request
+        this.mockMvc
+                .perform(post("/api/lobby")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(mockLobby.getDTO())))
+                .andExpect(status().isCreated())
+                .andExpect(content().string(objectMapper.writeValueAsString(mockLobby.getDTO())));
+    }
+
+    @Test
+    void createUserNotFound() throws Exception {
+        // Override the user repository response
+        when(userRepository.findByEmail(john.getEmail())).thenReturn(Optional.empty());
+
+        // Request
+        this.mockMvc
+                .perform(post("/api/lobby")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(mockLobby.getDTO())))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void createUserAlreadyInGame() throws Exception {
+        // Mock the repositories
+        when(gamePlayerRepository.existsByUserIdAndGameStatusNot(john.getId(), GameStatus.FINISHED))
+                .thenReturn(true);
+
+        // Request
+        this.mockMvc
+                .perform(post("/api/lobby")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(mockLobby.getDTO())))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void createBadRequest() throws Exception {
+        // Mock the repositories
+        when(gamePlayerRepository.existsByUserIdAndGameStatusNot(john.getId(), GameStatus.FINISHED))
+                .thenReturn(false);
+        when(gameConfigurationRepository.save(mockLobbyConfiguration))
+                .thenThrow(ConstraintViolationException.class);
+
+        // Request
+        this.mockMvc
+                .perform(post("/api/lobby")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(mockLobby.getDTO())))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void startOk() throws Exception {
+        // Request
+        this.mockMvc
+                .perform(put("/api/lobby/" + mockLobby.getId() + "/start"))
+                .andExpect(status().isOk());
+
+        // Verify the game status
+        verify(gameService).startGame(mockLobby);
+        verifyNoMoreInteractions(gameService);
     }
 }

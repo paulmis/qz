@@ -20,13 +20,16 @@ import server.database.entities.question.MCQuestion;
  */
 public class NormalGameTest {
     NormalGame game;
-    GamePlayer joe;
+    User joe;
+    GamePlayer joePlayer;
     MCQuestion questionA;
     MCQuestion questionB;
 
     @BeforeEach
     void init() {
-        joe = new GamePlayer();
+        joe = new User("joe", "joe@doe.com", "stinkywinky");
+        joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        joePlayer = new GamePlayer(joe);
         questionA = new MCQuestion();
         questionB = new MCQuestion();
 
@@ -73,7 +76,7 @@ public class NormalGameTest {
 
     @Test
     void size() {
-        game.add(joe);
+        game.add(joePlayer);
         assertEquals(1, game.size());
     }
 }

@@ -1,15 +1,10 @@
 package server.database.entities.game;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import commons.entities.game.GamePlayerDTO;
 import java.util.Date;
 import javax.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.modelmapper.ModelMapper;
 import server.database.entities.User;
@@ -19,13 +14,12 @@ import server.database.entities.utils.BaseEntity;
  * Player entity, which represents an instance of a player in a specific game.
  * It has a many-to-one relationship to the User entity, and a one-to-one relationship to the Game entity.
  */
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
-@ToString
 public class GamePlayer extends BaseEntity<GamePlayerDTO> {
 
     /**
@@ -33,6 +27,7 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
      */
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
+    @NonNull
     private User user;
 
     /**
@@ -60,9 +55,27 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     /**
      * The game the player is in.
      */
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "game_id", nullable = false)
-    @NonNull private Game game;
+    @JsonBackReference
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @MapsId
+    protected Game game;
+
+    /**
+     * The game the player is head of.
+     */
+    @JsonBackReference
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    protected Game headGame;
+
+    /**
+     * Returns player's nickname. If one isn't set, returns their username.
+     *
+     * @return player's nickname
+     */
+    public String getNickname() {
+        return nickname == null ? user.getUsername() : nickname;
+    }
 
     /**
      * Creates a new game player from the DTO.

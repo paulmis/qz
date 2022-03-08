@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import server.database.entities.User;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
@@ -35,7 +36,8 @@ public class GameServiceTest {
     private GameService gameService;
 
     NormalGame game;
-    GamePlayer joe;
+    User joe;
+    GamePlayer joePlayer;
     MCQuestion questionA;
     MCQuestion questionB;
     MCQuestion questionC;
@@ -44,7 +46,9 @@ public class GameServiceTest {
 
     @BeforeEach
     void init() {
-        joe = new GamePlayer();
+        joe = new User("joe", "joe@doe.com", "stinkywinky");
+        joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        joePlayer = new GamePlayer(joe);
         questionA = new MCQuestion();
         questionA.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         questionB = new MCQuestion();
@@ -58,7 +62,7 @@ public class GameServiceTest {
         game = new NormalGame();
         game.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         game.setConfiguration(new NormalGameConfiguration(3, 13, 6));
-        game.add(joe);
+        game.add(joePlayer);
 
         // Mock the repository
         when(questionRepository.count()).thenReturn(4L);
