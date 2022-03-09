@@ -20,7 +20,7 @@ import server.database.repositories.question.QuestionRepository;
  * QuestionController, controller for all api endpoints of question.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/game")
 public class QuestionController {
 
     /**
@@ -35,7 +35,7 @@ public class QuestionController {
      * @param gameId the UUID of the current game
      * @return information/object of the current question
      */
-    @GetMapping("/game/{gameId}/question/")
+    @GetMapping("/{gameId}/question/")
     ResponseEntity<QuestionDTO> currentQuestion(
             @PathVariable @NonNull UUID gameId) {
         //Check if game exists.

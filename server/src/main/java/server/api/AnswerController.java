@@ -17,7 +17,7 @@ import server.database.repositories.game.GameRepository;
  * AnswerController, controller for all api endpoints of question answers.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/game")
 public class AnswerController {
 
     /**
@@ -33,7 +33,7 @@ public class AnswerController {
      * @param gameId This is the gameId of the game being played
      * @return ok status if successful, not found status if game doesn't exist
      */
-    @PostMapping("/game/{gameId}/answer")
+    @PostMapping("/{gameId}/answer")
     public ResponseEntity<HttpStatus> userAnswer(
             @RequestBody AnswerDTO answerData,
             @PathVariable @NonNull UUID gameId) {
