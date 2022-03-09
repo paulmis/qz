@@ -1,50 +1,59 @@
 package server.database.entities.game;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
+import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.hibernate.annotations.CreationTimestamp;
+import org.modelmapper.ModelMapper;
 import server.database.entities.game.configuration.GameConfiguration;
+import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.question.Question;
 import server.database.entities.utils.BaseEntity;
-import server.utils.EasyRandom;
+import server.services.SSEManager;
+import server.utils.SaveableRandom;
 
 /**
  * Game entity which represents a game and its state.
  */
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"random", "emitters"})
 @Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class Game extends BaseEntity<GameDTO> {
+@NoArgsConstructor
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * ID of the game shown to the user.
      * Should be randomly generated.
      */
+    // TODO: add a custom generation strategy
     @Column(nullable = false, unique = true)
     private String gameId;
 
@@ -74,13 +83,13 @@ public abstract class Game extends BaseEntity<GameDTO> {
     /**
      * Current question number.
      */
-    private Integer currentQuestion = 0;
+    private int currentQuestion = 0;
 
     /**
      * State of the PRNG.
      */
-    @NonNull @Embedded
-    private EasyRandom random = new EasyRandom();
+    @NonNull @Embedded @JsonIgnore
+    private SaveableRandom random = new SaveableRandom();
 
     /**
      * List of players currently in the game.
@@ -88,13 +97,37 @@ public abstract class Game extends BaseEntity<GameDTO> {
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<GamePlayer> players = Collections.synchronizedSet(new HashSet<>());
 
+    /**
+     * Mapping between game players and their corresponding SSE emitters.
+     */
+    @Transient
+    @JsonIgnore
+    public SSEManager emitters = new SSEManager();
 
     /**
-     * Get the next question in the game.
-     *
-     * @return The current question.
+     * Questions assigned to this game.
      */
-    public abstract Optional<Question> getNextQuestion();
+    @ManyToMany
+    private List<Question> questions = new ArrayList<>();
+
+    /**
+     * Creates a new game from a DTO. Doesn't copy players.
+     *
+     * @param dto source DTO
+     */
+    public Game(GameDTO dto) {
+        ModelMapper mapper = new ModelMapper();
+        this.id = dto.getId();
+        this.gameId = dto.getGameId();
+        this.createDate = dto.getCreateDate();
+        if (dto.getConfiguration() instanceof NormalGameConfigurationDTO) {
+            this.configuration = mapper.map(dto.getConfiguration(), NormalGameConfiguration.class);
+        }
+        this.status = dto.getStatus();
+        this.currentQuestion = dto.getCurrentQuestion();
+        this.gameType = dto.getGameType();
+        this.players = new HashSet<>();
+    }
 
     /**
      * Add a player to the game.
@@ -117,6 +150,28 @@ public abstract class Game extends BaseEntity<GameDTO> {
     }
 
     /**
+     * Adds questions to the game.
+     *
+     * @param questions The questions to add.
+     */
+    public void addQuestions(List<Question> questions) {
+        this.questions.addAll(questions);
+    }
+
+    /**
+     * Returns the current question. If no questions are available, returns empty optional.
+     *
+     * @return The current question or empty optional if none are available.
+     */
+    public Optional<Question> getQuestion() {
+        try {
+            return Optional.of(this.questions.get(this.currentQuestion));
+        } catch (IndexOutOfBoundsException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Get the number of players in the game.
      *
      * @return The number of players.
@@ -124,4 +179,23 @@ public abstract class Game extends BaseEntity<GameDTO> {
     public int size() {
         return players.size();
     }
+
+    /**
+     * Converts the game superclass to a DTO.
+     *
+     * @return the game superclass DTO
+     */
+    protected GameDTO toDTO() {
+        return new GameDTO(
+                this.id,
+                this.gameId,
+                this.createDate,
+                this.gameType,
+                this.configuration.getDTO(),
+                this.status,
+                this.currentQuestion,
+                this.players.stream().map(GamePlayer::getDTO).collect(Collectors.toSet()));
+    }
+
+    public abstract T getDTO();
 }

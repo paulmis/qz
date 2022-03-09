@@ -18,6 +18,11 @@ public class GamePlayerDTO implements DTO {
     protected UUID id;
 
     /**
+     * Associated user.
+     */
+    protected UUID userId;
+
+    /**
      * Current score of the player.
      */
     protected Integer score;
@@ -31,9 +36,4 @@ public class GamePlayerDTO implements DTO {
      * Nickname of the player.
      */
     protected String nickname;
-
-    /**
-     * Associated user.
-     */
-    protected UserDTO user;
 }
