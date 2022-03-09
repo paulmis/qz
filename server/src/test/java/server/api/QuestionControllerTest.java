@@ -8,8 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import commons.entities.AnswerDTO;
-import commons.entities.QuestionDTO;
 import commons.entities.UserDTO;
 import commons.entities.game.GameStatus;
 import java.util.ArrayList;
@@ -33,9 +31,7 @@ import server.database.entities.game.Game;
 import server.database.entities.game.NormalGame;
 import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
-import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
-import server.database.repositories.question.QuestionRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -47,24 +43,6 @@ class QuestionControllerTest {
 
     @MockBean
     private GameRepository gameRepository;
-
-    @MockBean
-    private QuestionRepository questionRepository;
-
-    @MockBean
-    private UserRepository userRepository;
-
-//    private class MockQuestion extends Question {
-//        @Override
-//        public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
-//            return null;
-//        }
-//
-//        @Override
-//        public QuestionDTO getDTO() {
-//            return null;
-//        }
-//    }
 
     private UUID getUUID(int id) {
         return UUID.fromString("00000000-0000-0000-0000-00000000000" + (id % 10));
@@ -85,7 +63,6 @@ class QuestionControllerTest {
     private void init() {
         // Setup mock question
         mockQuestion = new MCQuestion();
-        //when(questionRepository.findById(mockQuestion.getId())).thenReturn(Optional.of(mockQuestion));
 
         mockGame = new NormalGame();
         mockGame.setId(getUUID(0));
