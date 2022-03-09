@@ -47,8 +47,8 @@ class AnswerControllerTest {
     }
 
     private Game mockLobby;
-    User joe;
-    UserDTO joeDTO;
+    private User joe;
+    private UserDTO joeDTO;
 
     @Autowired
     public AnswerControllerTest(MockMvc mockMvc) {
@@ -63,7 +63,7 @@ class AnswerControllerTest {
         mockLobby.setId(getUUID(0));
         mockLobby.setStatus(GameStatus.CREATED);
         when(gameRepository.existsById(mockLobby.getId())).thenReturn(true);
-        
+
         //Set up random test user
         joe = new User("joe", "joe@doe.com", "stinkywinky");
         joe.setId(getUUID(0));
@@ -82,7 +82,7 @@ class AnswerControllerTest {
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
         this.mockMvc
-                .perform(MockMvcRequestBuilders.post("/api/game/" + mockLobby.getId() + "/answer")
+                .perform(MockMvcRequestBuilders.put("/api/game/" + mockLobby.getId() + "/answer")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userAnswer)))
                         .andExpect(status().isOk());
@@ -93,7 +93,7 @@ class AnswerControllerTest {
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
         this.mockMvc
-                .perform(MockMvcRequestBuilders.post("/api/game/" + getUUID(1) + "/answer")
+                .perform(MockMvcRequestBuilders.put("/api/game/" + getUUID(1) + "/answer")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userAnswer)))
                 .andExpect(status().isNotFound());

@@ -50,8 +50,8 @@ class QuestionControllerTest {
 
     private Game mockGame;
     private Question mockQuestion;
-    User joe;
-    UserDTO joeDTO;
+    private User joe;
+    private UserDTO joeDTO;
 
     @Autowired
     public QuestionControllerTest(MockMvc mockMvc) {
