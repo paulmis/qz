@@ -1,10 +1,6 @@
 package server.api;
 
 import commons.entities.AnswerDTO;
-import java.util.Optional;
-import java.util.UUID;
-import lombok.NonNull;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import server.database.entities.game.Game;
 import server.database.repositories.game.GameRepository;
 
 /**

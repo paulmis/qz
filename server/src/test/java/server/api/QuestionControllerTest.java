@@ -31,6 +31,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import server.database.entities.User;
 import server.database.entities.game.Game;
 import server.database.entities.game.NormalGame;
+import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
@@ -53,17 +54,17 @@ class QuestionControllerTest {
     @MockBean
     private UserRepository userRepository;
 
-    private class MockQuestion extends Question {
-        @Override
-        public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
-            return null;
-        }
-
-        @Override
-        public QuestionDTO getDTO() {
-            return null;
-        }
-    }
+//    private class MockQuestion extends Question {
+//        @Override
+//        public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
+//            return null;
+//        }
+//
+//        @Override
+//        public QuestionDTO getDTO() {
+//            return null;
+//        }
+//    }
 
     private UUID getUUID(int id) {
         return UUID.fromString("00000000-0000-0000-0000-00000000000" + (id % 10));
@@ -83,7 +84,7 @@ class QuestionControllerTest {
     @BeforeEach
     private void init() {
         // Setup mock question
-        mockQuestion = new MockQuestion();
+        mockQuestion = new MCQuestion();
         //when(questionRepository.findById(mockQuestion.getId())).thenReturn(Optional.of(mockQuestion));
 
         mockGame = new NormalGame();
