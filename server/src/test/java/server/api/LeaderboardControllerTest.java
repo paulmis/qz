@@ -1,17 +1,18 @@
 package server.api;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static server.TestHelpers.getUUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import commons.entities.utils.Views;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import server.database.entities.User;
+import server.database.entities.utils.BaseEntity;
 import server.database.repositories.UserRepository;
 
 @SpringBootTest
@@ -32,6 +34,7 @@ import server.database.repositories.UserRepository;
 @EnableWebMvc
 class LeaderboardControllerTest {
     private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper;
 
     @MockBean
     private UserRepository userRepository;
@@ -42,6 +45,7 @@ class LeaderboardControllerTest {
     @Autowired
     public LeaderboardControllerTest(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
+        this.objectMapper = new ObjectMapper().registerModule(new Jdk8Module());
     }
 
     private User getUser(int id, int gamesPlayed, int score) {
@@ -98,34 +102,11 @@ class LeaderboardControllerTest {
         List<User> users = List.of(getUser(1, 2, 3));
         when(userRepository.findAllByOrderByScoreDesc(any(Pageable.class))).thenReturn(users);
 
-        this.mockMvc.perform(get("/api/leaderboard/score"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)))
-                // Test that the score field is present.
-                .andExpect(jsonPath("$[0].score").isNotEmpty())
-                // Test that the gamesPlayed field is present.
-                .andExpect(jsonPath("$[0].gamesPlayed").isNotEmpty())
-                // Test that the username field is present.
-                .andExpect(jsonPath("$[0].username").isNotEmpty())
-                // Test that the id field is present.
-                .andExpect(jsonPath("$[0].id").isNotEmpty());
-    }
-
-    /**
-     * Ensure that sensitive fields are hidden (e-mail, password) in /score endpoint.
-     *
-     * @throws Exception if the test fails.
-     */
-    @Test
-    public void testSensitiveFieldsHiddenScore() throws Exception {
-        List<User> users = List.of(getUser(1, 2, 3));
-        when(userRepository.findAllByOrderByScoreDesc(any(Pageable.class))).thenReturn(users);
+        String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(
+                users.stream().map(BaseEntity::getDTO).collect(Collectors.toList()));
 
         this.mockMvc.perform(get("/api/leaderboard/score"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)))
-                // Test that the email field is hidden.
-                .andExpect(jsonPath("$[0].email").doesNotExist())
-                // Test that the password field is hidden.
-                .andExpect(jsonPath("$[0].password").doesNotExist());
+                .andExpect(status().isOk()).andExpect(content().json(expectedResponse));
     }
 
     /**
@@ -138,34 +119,11 @@ class LeaderboardControllerTest {
         List<User> users = List.of(getUser(1, 2, 3));
         when(userRepository.findAllByOrderByGamesPlayedDesc(any(Pageable.class))).thenReturn(users);
 
-        this.mockMvc.perform(get("/api/leaderboard/games"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)))
-                // Test that the score field is present.
-                .andExpect(jsonPath("$[0].score").isNotEmpty())
-                // Test that the gamesPlayed field is present.
-                .andExpect(jsonPath("$[0].gamesPlayed").isNotEmpty())
-                // Test that the username field is present.
-                .andExpect(jsonPath("$[0].username").isNotEmpty())
-                // Test that the id field is present.
-                .andExpect(jsonPath("$[0].id").isNotEmpty());
-    }
-
-    /**
-     * Ensure that sensitive fields are hidden (e-mail, password) in /games endpoint.
-     *
-     * @throws Exception if the test fails.
-     */
-    @Test
-    public void testSensitiveFieldsHiddenGamesPlayed() throws Exception {
-        List<User> users = List.of(getUser(1, 2, 3));
-        when(userRepository.findAllByOrderByGamesPlayedDesc(any(Pageable.class))).thenReturn(users);
+        String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(
+                users.stream().map(BaseEntity::getDTO).collect(Collectors.toList()));
 
         this.mockMvc.perform(get("/api/leaderboard/games"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)))
-                // Test that the email field is hidden.
-                .andExpect(jsonPath("$[0].email").doesNotExist())
-                // Test that the password field is hidden.
-                .andExpect(jsonPath("$[0].password").doesNotExist());
+                .andExpect(status().isOk()).andExpect(content().json(expectedResponse));
     }
 
     /**
@@ -180,14 +138,11 @@ class LeaderboardControllerTest {
                 .collect(Collectors.toCollection(ArrayList::new));
         when(userRepository.findAllByOrderByScoreDesc(any(Pageable.class))).thenReturn(users);
 
+        String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(
+                users.stream().map(BaseEntity::getDTO).collect(Collectors.toList()));
+
         this.mockMvc.perform(get("/api/leaderboard/score"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(3)))
-                // Test that the score field for first user is correct.
-                .andExpect(jsonPath("$[0].score").value(9))
-                // Test that the score field for second user is correct.
-                .andExpect(jsonPath("$[1].score").value(6))
-                // Test that the score field for third user is correct.
-                .andExpect(jsonPath("$[2].score").value(3));
+                .andExpect(status().isOk()).andExpect(content().json(expectedResponse));
     }
 
     /**
@@ -202,28 +157,11 @@ class LeaderboardControllerTest {
                 .collect(Collectors.toCollection(ArrayList::new));
         when(userRepository.findAllByOrderByGamesPlayedDesc(any(Pageable.class))).thenReturn(users);
 
-        this.mockMvc.perform(get("/api/leaderboard/games"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(3)))
-                // Test that the gamesPlayed field for first user is correct.
-                .andExpect(jsonPath("$[0].gamesPlayed").value(6))
-                // Test that the gamesPlayed field for second user is correct.
-                .andExpect(jsonPath("$[1].gamesPlayed").value(4))
-                // Test that the gamesPlayed field for third user is correct.
-                .andExpect(jsonPath("$[2].gamesPlayed").value(2));
-    }
-
-    /**
-     * Verify the behavior of the /score endpoint when no players are found.
-     *
-     * @throws Exception if the test fails.
-     */
-    @Test
-    public void testNoPlayersGamesPlayed() throws Exception {
-        when(userRepository.findAllByOrderByGamesPlayedDesc(any(Pageable.class))).thenReturn(new ArrayList<>());
+        String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(
+                users.stream().map(BaseEntity::getDTO).collect(Collectors.toList()));
 
         this.mockMvc.perform(get("/api/leaderboard/games"))
-                // Test that the response is an empty array.
-                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(status().isOk()).andExpect(content().json(expectedResponse));
     }
 
     /**
@@ -232,11 +170,27 @@ class LeaderboardControllerTest {
      * @throws Exception if the test fails.
      */
     @Test
+    public void testNoPlayersGamesPlayed() throws Exception {
+        when(userRepository.findAllByOrderByGamesPlayedDesc(any(Pageable.class))).thenReturn(new ArrayList<>());
+
+        String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(new ArrayList<>());
+
+        this.mockMvc.perform(get("/api/leaderboard/games"))
+                .andExpect(status().isOk()).andExpect(content().json(expectedResponse));
+    }
+
+    /**
+     * Verify the behavior of the /score endpoint when no players are found.
+     *
+     * @throws Exception if the test fails.
+     */
+    @Test
     public void testNoPlayersScore() throws Exception {
         when(userRepository.findAllByOrderByGamesPlayedDesc(any())).thenReturn(new ArrayList<>());
 
+        String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(new ArrayList<>());
+
         this.mockMvc.perform(get("/api/leaderboard/score"))
-                // Test that the response is an empty array.
-                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(status().isOk()).andExpect(content().json(expectedResponse));
     }
 }
