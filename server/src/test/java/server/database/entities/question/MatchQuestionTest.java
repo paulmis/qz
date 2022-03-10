@@ -3,8 +3,6 @@ package server.database.entities.question;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import commons.entities.ActivityDTO;
-import commons.entities.AnswerDTO;
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import server.database.entities.Answer;
 
 class MatchQuestionTest {
     static Question q;
@@ -44,11 +43,11 @@ class MatchQuestionTest {
 
     @Test
     void getRightAnswerTest() {
-        List<ActivityDTO> expectedRightChoice = new ArrayList<>();
+        List<Activity> expectedRightChoice = new ArrayList<>();
         for (int idx = 0; idx < q.getActivities().size(); idx++) {
-            expectedRightChoice.add(getActivity(idx).getDTO());
+            expectedRightChoice.add(getActivity(idx));
         }
-        AnswerDTO expectedRightAnswer = new AnswerDTO();
+        Answer expectedRightAnswer = new Answer();
         expectedRightAnswer.setUserChoice(expectedRightChoice);
         assertEquals(expectedRightAnswer, q.getRightAnswer());
     }
@@ -56,36 +55,36 @@ class MatchQuestionTest {
     @Test
     void checkAnswerTest() {
         // first user has all correct
-        List<ActivityDTO> answerAct = List.of(
-                getActivity(0).getDTO(),
-                getActivity(1).getDTO(),
-                getActivity(2).getDTO(),
-                getActivity(3).getDTO()
+        List<Activity> answerAct = List.of(
+                getActivity(0),
+                getActivity(1),
+                getActivity(2),
+                getActivity(3)
         );
-        AnswerDTO a = new AnswerDTO();
+        Answer a = new Answer();
         a.setUserChoice(answerAct);
-        List<AnswerDTO> userAnswers = new ArrayList<>();
+        List<Answer> userAnswers = new ArrayList<>();
         userAnswers.add(a);
 
         // second user has all wrong
         answerAct = List.of(
-                getActivity(3).getDTO(),
-                getActivity(2).getDTO(),
-                getActivity(1).getDTO(),
-                getActivity(0).getDTO()
+                getActivity(3),
+                getActivity(2),
+                getActivity(1),
+                getActivity(0)
         );
-        a = new AnswerDTO();
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
         // third user has two switched (2/4 of points)
         answerAct = List.of(
-                getActivity(0).getDTO(),
-                getActivity(2).getDTO(),
-                getActivity(1).getDTO(),
-                getActivity(3).getDTO()
+                getActivity(0),
+                getActivity(2),
+                getActivity(1),
+                getActivity(3)
         );
-        a = new AnswerDTO();
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
@@ -95,37 +94,37 @@ class MatchQuestionTest {
     @Test
     void checkAnswerMismatchingSize() {
         // first user has 4 activities
-        List<ActivityDTO> answerAct = List.of(
-                getActivity(0).getDTO(),
-                getActivity(1).getDTO(),
-                getActivity(2).getDTO(),
-                getActivity(3).getDTO()
+        List<Activity> answerAct = List.of(
+                getActivity(0),
+                getActivity(1),
+                getActivity(2),
+                getActivity(3)
         );
-        AnswerDTO a = new AnswerDTO();
+        Answer a = new Answer();
         a.setUserChoice(answerAct);
-        List<AnswerDTO> userAnswers = new ArrayList<>();
+        List<Answer> userAnswers = new ArrayList<>();
         userAnswers.add(a);
 
         // second user has 5 activities
         answerAct = List.of(
-                getActivity(3).getDTO(),
-                getActivity(2).getDTO(),
-                getActivity(1).getDTO(),
-                getActivity(0).getDTO(),
-                getActivity(12).getDTO()
+                getActivity(3),
+                getActivity(2),
+                getActivity(1),
+                getActivity(0),
+                getActivity(12)
         );
-        a = new AnswerDTO();
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 
         // third user has 4 activities
         answerAct = List.of(
-                getActivity(0).getDTO(),
-                getActivity(2).getDTO(),
-                getActivity(1).getDTO(),
-                getActivity(3).getDTO()
+                getActivity(0),
+                getActivity(2),
+                getActivity(1),
+                getActivity(3)
         );
-        a = new AnswerDTO();
+        a = new Answer();
         a.setUserChoice(answerAct);
         userAnswers.add(a);
 

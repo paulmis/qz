@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
+import server.database.entities.Answer;
 import server.database.entities.utils.BaseEntity;
 
 /**
@@ -34,6 +35,13 @@ public class Activity extends BaseEntity<ActivityDTO> {
      */
     @ManyToMany(mappedBy = "activities")
     private List<Question> usedIn;
+
+    /**
+     * List of answers in which the activity is used.
+     * Needed for the many-to-many relation.
+     */
+    @ManyToMany
+    private List<Answer> answeredIn;
 
     /**
      * Description of the activity.

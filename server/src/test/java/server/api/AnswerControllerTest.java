@@ -141,21 +141,58 @@ class AnswerControllerTest {
 
     @Test
     public void getCorrectAnswerTest() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/correct"))
-                .andExpect(content()
-                        .string(equalToObject(objectMapper.writeValueAsString(mockQuestion.getRightAnswer()))));
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/answer"))
+                .andExpect(content().string(equalToObject(
+                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer().getDTO()))));
+    }
+
+    @Test
+    public void getCorrectAnswerDifferentIdxTest() throws Exception {
+        // Setup additional mock question
+        Question secondQuestion = new MCQuestion();
+        secondQuestion.setActivities(List.of(
+                getActivity(10),
+                getActivity(20),
+                getActivity(30),
+                getActivity(40)));
+        ((MCQuestion) secondQuestion).setAnswer(secondQuestion.getActivities().get(0));
+        mockLobby.setQuestions(List.of(mockQuestion, secondQuestion));
+        mockLobby.setCurrentQuestion(0);
+
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/answer?idx=1"))
+                .andExpect(content().string(equalToObject(
+                        objectMapper.writeValueAsString(secondQuestion.getRightAnswer().getDTO()))));
+    }
+
+    @Test
+    public void getCorrectAnswerOutOfIndexTest() throws Exception {
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/answer?idx=1"))
+                .andExpect(content().string(equalToObject(
+                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer().getDTO()))));
+    }
+
+    @Test
+    public void getCorrectAnswerNegativeIndexTest() throws Exception {
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/answer?idx=-1"))
+                .andExpect(content().string(equalToObject(
+                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer().getDTO()))));
     }
 
     @Test
     public void getCorrectAnswerNoQuestionTest() throws Exception {
         mockLobby.setCurrentQuestion(1);
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/correct"))
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/answer"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void getCorrectAnswerWrongGameTest() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/game/" + getUUID(1) + "/correct"))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/game/" + getUUID(1) + "/answer"))
                 .andExpect(status().isNotFound());
     }
 
@@ -173,7 +210,8 @@ class AnswerControllerTest {
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
         when(userRepository.findByEmail(susan.getEmail())).thenReturn(Optional.of(susan));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/correct"))
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/answer"))
                 .andExpect(status().isForbidden());
     }
 }

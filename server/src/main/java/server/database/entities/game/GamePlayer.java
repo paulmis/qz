@@ -1,13 +1,13 @@
 package server.database.entities.game;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import commons.entities.QuestionDTO;
 import commons.entities.game.GamePlayerDTO;
-import java.util.UUID;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.modelmapper.ModelMapper;
+import server.database.entities.Answer;
 import server.database.entities.User;
 import server.database.entities.utils.BaseEntity;
 
@@ -60,6 +61,12 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     @ManyToOne(optional = false)
     @JoinColumn(name = "game_id", nullable = false)
     @NonNull private Game game;
+
+    /**
+     * Relation to answer entities for each individual question.
+     */
+    @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Answer> answers = new LinkedHashSet<>();
 
     /**
      * Creates a new game player from the DTO.

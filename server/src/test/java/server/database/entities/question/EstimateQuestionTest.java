@@ -3,8 +3,6 @@ package server.database.entities.question;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import commons.entities.ActivityDTO;
-import commons.entities.AnswerDTO;
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import server.database.entities.Answer;
 
 class EstimateQuestionTest {
 
@@ -33,10 +32,10 @@ class EstimateQuestionTest {
         q.setActivities(components);
     }
 
-    private AnswerDTO getAnswer(int estimate) {
-        AnswerDTO ans = new AnswerDTO();
-        List<ActivityDTO> answerActivities = new ArrayList<>();
-        answerActivities.add(getActivity(estimate).getDTO());
+    private Answer getAnswer(int estimate) {
+        Answer ans = new Answer();
+        List<Activity> answerActivities = new ArrayList<>();
+        answerActivities.add(getActivity(estimate));
         ans.setUserChoice(answerActivities);
         return ans;
     }
@@ -68,7 +67,7 @@ class EstimateQuestionTest {
 
     @Test
     void checkAnswerTest() {
-        List<AnswerDTO> userGuesses = new ArrayList<>(Arrays.asList(
+        List<Answer> userGuesses = new ArrayList<>(Arrays.asList(
                 getAnswer(90), // #2
                 getAnswer(50), // #4
                 getAnswer(107), // #1
@@ -80,7 +79,7 @@ class EstimateQuestionTest {
 
     @Test
     void checkAnswerSameRankTest() {
-        List<AnswerDTO> userGuesses = new ArrayList<>(Arrays.asList(
+        List<Answer> userGuesses = new ArrayList<>(Arrays.asList(
                 getAnswer(90), // #2
                 getAnswer(50), // #3
                 getAnswer(107), // #1
@@ -93,19 +92,19 @@ class EstimateQuestionTest {
 
     @Test
     void checkAnswerMismatchingSize() {
-        List<AnswerDTO> userGuesses = new ArrayList<>(Arrays.asList(
+        List<Answer> userGuesses = new ArrayList<>(Arrays.asList(
                 getAnswer(90), // #2
                 getAnswer(50), // #3
                 getAnswer(107), // #1
                 getAnswer(0))); // #4
 
-        List<ActivityDTO> answerAct = List.of(
-                getActivity(0).getDTO(),
-                getActivity(1).getDTO(),
-                getActivity(2).getDTO(),
-                getActivity(3).getDTO()
+        List<Activity> answerAct = List.of(
+                getActivity(0),
+                getActivity(1),
+                getActivity(2),
+                getActivity(3)
         );
-        AnswerDTO a = new AnswerDTO();
+        Answer a = new Answer();
         a.setUserChoice(answerAct);
         userGuesses.add(a);
 

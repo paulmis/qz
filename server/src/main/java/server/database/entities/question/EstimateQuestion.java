@@ -1,7 +1,5 @@
 package server.database.entities.question;
 
-import commons.entities.ActivityDTO;
-import commons.entities.AnswerDTO;
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +13,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
+import server.database.entities.Answer;
 
 /**
  * EstimateQuestion data structure - describes an estimate question.
@@ -64,7 +63,7 @@ public class EstimateQuestion extends Question {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     @Override
-    public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
+    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
         if (userAnswers == null) {
             throw new IllegalArgumentException("NULL input");
         }
@@ -77,7 +76,7 @@ public class EstimateQuestion extends Question {
 
         // Get all estimation errors
         int target = getActivities().get(0).getCost();
-        for (AnswerDTO ans : userAnswers) {
+        for (Answer ans : userAnswers) {
             if (ans.getUserChoice().size() != 1) {
                 throw new IllegalArgumentException("There should be a single activity per answer.");
             }
@@ -108,13 +107,11 @@ public class EstimateQuestion extends Question {
     }
 
     @Override
-    public AnswerDTO getRightAnswer() {
-        AnswerDTO rightAnswer = new AnswerDTO();
+    public Answer getRightAnswer() {
+        Answer rightAnswer = new Answer();
         Activity toEstimate = new Activity();
         toEstimate.setCost(getActivities().get(0).getCost());
-        List<ActivityDTO> correctChoice = new ArrayList<>();
-        correctChoice.add(toEstimate.getDTO());
-        rightAnswer.setUserChoice(correctChoice);
+        rightAnswer.setUserChoice(List.of(toEstimate));
         return rightAnswer;
     }
 

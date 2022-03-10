@@ -3,6 +3,7 @@ package server.api;
 import commons.entities.AnswerDTO;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
@@ -58,13 +60,18 @@ public class AnswerController {
     }
 
     /**
-     * Returns the correct answer to the current question.
+     * Returns the correct answer to a question.
      *
      * @param gameId id of the game being played
+     * @param questionIdx index of the question to get the answer of.
+     *                    If null, the answer to the current question is sent
      * @return correct answer to the current question
      */
-    @GetMapping("/{gameId}/correct")
-    ResponseEntity<AnswerDTO> getCorrectAnswer(@PathVariable UUID gameId) {
+    @GetMapping("/{gameId}/answer")
+    ResponseEntity<AnswerDTO> getCorrectAnswer(
+            @PathVariable UUID gameId,
+            @RequestParam(name = "idx") Optional<Integer> questionIdx) {
+
         Optional<Game> game = gameRepository.findById(gameId);
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
 
@@ -79,11 +86,16 @@ public class AnswerController {
         }
 
         // Retrieve current question
-        Optional<Question> currentQuestion = game.get().getQuestion();
+        Optional<Question> toAnswer = game.get().getQuestion();
+
+        // If questionIdx is present and valid, select the requested question
+        if (questionIdx.isPresent() && questionIdx.get() >= 0 && questionIdx.get() < game.get().getQuestions().size()) {
+            toAnswer = Optional.of((Question) game.get().getQuestions().get(questionIdx.get()));
+        }
 
         // Check if game is active
-        return currentQuestion
-                .map(question -> ResponseEntity.ok(question.getRightAnswer()))
+        return toAnswer
+                .map(question -> ResponseEntity.ok(question.getRightAnswer().getDTO()))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
     }
 }
