@@ -86,10 +86,16 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     private int currentQuestion = 0;
 
     /**
-     * State of the PRNG.
+     * Seed used to generate the random numbers.
      */
-    @NonNull @Embedded @JsonIgnore
-    private SaveableRandom random = new SaveableRandom();
+    @JsonIgnore
+    protected long seed;
+
+    /**
+     * PRNG.
+     */
+    @Transient
+    private SaveableRandom random = new SaveableRandom(this.seed);
 
     /**
      * List of players currently in the game.
