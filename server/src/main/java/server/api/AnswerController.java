@@ -1,7 +1,6 @@
 package server.api;
 
 import commons.entities.AnswerDTO;
-import commons.entities.game.GameStatus;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
-import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
