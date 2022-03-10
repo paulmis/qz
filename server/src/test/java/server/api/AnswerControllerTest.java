@@ -150,7 +150,7 @@ class AnswerControllerTest {
     public void getCorrectAnswerNoQuestionTest() throws Exception {
         mockLobby.setCurrentQuestion(1);
         this.mockMvc.perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/correct"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

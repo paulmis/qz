@@ -84,6 +84,6 @@ public class AnswerController {
         // Check if game is active
         return currentQuestion
                 .map(question -> ResponseEntity.ok(question.getRightAnswer()))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.CONFLICT).build());
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
     }
 }
