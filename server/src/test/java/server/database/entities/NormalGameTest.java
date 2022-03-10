@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
+import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.MCQuestion;
 
 /**
@@ -21,6 +22,7 @@ import server.database.entities.question.MCQuestion;
  */
 public class NormalGameTest {
     NormalGame game;
+    NormalGameConfiguration config;
     User joe;
     User susanne;
     GamePlayer joePlayer;
@@ -47,12 +49,16 @@ public class NormalGameTest {
         questionA = new MCQuestion();
         questionB = new MCQuestion();
 
+        // Create config
+        config = new NormalGameConfiguration(17, 13, 2);
+
         // Create the game
         game = new NormalGame();
         game.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
-        game.setConfiguration(new NormalGameConfiguration(17, 13, 2));
+        game.setConfiguration(config);
         game.addQuestions(Arrays.asList(questionA, questionB));
         game.add(joePlayer);
+        game.add(susannePlayer);
     }
 
     @Test
@@ -94,19 +100,49 @@ public class NormalGameTest {
     }
 
     @Test
+    void addAlreadyJoined() {
+        assertFalse(game.add(joePlayer));
+    }
+
+    @Test
     void size() {
-        assertEquals(1, game.size());
+        assertEquals(2, game.size());
     }
 
     @Test
     void isNotFull() {
+        // Expand the lobby capacity and check that it is no longer full
+        config.setCapacity(3);
         assertFalse(game.isFull());
     }
 
     @Test
     void isFull() {
-        // Add a player and check that the lobby is now full
-        game.add(susannePlayer);
         assertTrue(game.isFull());
+    }
+
+    @Test
+    void removeOk() throws LastPlayerRemovedException {
+        assertTrue(game.remove(susanne.getId()));
+        assertFalse(game.getPlayers().contains(susannePlayer));
+    }
+
+    @Test
+    void removeNotFound() throws LastPlayerRemovedException {
+        assertFalse(game.remove(UUID.fromString("73246234-2364-2364-2364-236423642364")));
+    }
+
+    @Test
+    void removeHead() throws LastPlayerRemovedException {
+        assertTrue(game.remove(joe.getId()));
+        assertEquals(game.getHead(), susannePlayer);
+    }
+
+    @Test
+    void removeLastPlayer()  {
+        assertThrows(LastPlayerRemovedException.class, () -> {
+            game.remove(joe.getId());
+            game.remove(susanne.getId());
+        });
     }
 }
