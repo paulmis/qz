@@ -59,7 +59,7 @@ public class GameDTO implements DTO {
     /**
      * The head of the lobby - person in charge with special privileges.
      */
-    protected GamePlayerDTO head;
+    protected UUID head;
 
     /**
      * Copy constructor.
