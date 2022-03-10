@@ -136,7 +136,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public boolean remove(UUID playerId) throws LastPlayerRemovedException {
         // Remove the player from the game
-        if (!this.players.removeIf(player -> player.getId().equals(playerId))) {
+        if (!this.players.removeIf(player -> player.getUser().getId().equals(playerId))) {
             return false;
         }
 
@@ -180,10 +180,19 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Get the number of players in the game.
      *
-     * @return The number of players.
+     * @return the number of players
      */
     public int size() {
         return players.size();
+    }
+
+    /**
+     * Checks if the lobby is full.
+     *
+     * @return whether the lobby is full
+     */
+    public boolean isFull() {
+        return size() == configuration.getCapacity();
     }
 
     /**

@@ -1,7 +1,7 @@
 package commons.entities.game;
 
 import commons.entities.utils.DTO;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,5 +40,5 @@ public class GamePlayerDTO implements DTO {
     /**
      * The date the player joined the lobby.
      */
-    protected Date joinDate;
+    protected LocalDateTime joinDate;
 }

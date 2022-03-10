@@ -267,8 +267,38 @@ class LobbyControllerTest {
                 .perform(put("/api/lobby/" + mockLobby.getId() + "/start"))
                 .andExpect(status().isOk());
 
-        // Verify the game status
+        // Verify that the game has been started
         verify(gameService).startGame(mockLobby);
         verifyNoMoreInteractions(gameService);
+    }
+
+    @Test
+    void startNotFound() throws Exception {
+        // Request
+        this.mockMvc
+                .perform(put("/api/lobby/" + getUUID(1) + "/start"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void startHeadMismatchForbidden() throws Exception {
+        // Change the head
+        mockLobby.setHead(susannePlayer);
+
+        // Request
+        this.mockMvc
+                .perform(put("/api/lobby/" + mockLobby.getId() + "/start"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void startServiceException() throws Exception {
+        // Mock the game service to throw an exception (e.g. due to violated constraints)
+        doThrow(IllegalStateException.class).when(gameService).startGame(mockLobby);
+
+        // Request
+        this.mockMvc
+                .perform(put("/api/lobby/" + mockLobby.getId() + "/start"))
+                .andExpect(status().isConflict());
     }
 }
