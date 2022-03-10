@@ -42,7 +42,7 @@ public class NormalGameConfiguration extends GameConfiguration {
      * The number of questions in the game.
      */
     @Column(nullable = false)
-    Integer numQuestions = 10;
+    protected int numQuestions = 10;
 
     @Override
     public NormalGameConfigurationDTO getDTO() {

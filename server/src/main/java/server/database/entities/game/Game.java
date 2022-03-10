@@ -100,7 +100,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     protected List<Question> questions = new ArrayList<>();
 
     /**
-     * Creates a new game from a DTO. Doesn't copy players.
+     * Creates a new game from a DTO.
+     * Only an empty lobby (no players or questions) can be initialized.
      *
      * @param dto source DTO
      */
@@ -218,7 +219,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
                 this.status,
                 this.currentQuestion,
                 this.players.stream().map(GamePlayer::getDTO).collect(Collectors.toSet()),
-                this.head == null ? null : this.head.getDTO());
+                this.head == null ? null : this.head.getId());
     }
 
     public abstract T getDTO();

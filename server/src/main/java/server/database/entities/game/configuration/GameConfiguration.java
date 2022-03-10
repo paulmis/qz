@@ -28,6 +28,9 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
     @Column(nullable = false)
     protected int answerTime = 10;
 
+    /**
+     * Capacity of the lobby.
+     */
     @Column(nullable = false)
     protected int capacity = 6;
 
