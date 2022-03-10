@@ -123,13 +123,11 @@ public class LobbyController {
      * @return information on the requested lobby.
      */
     @GetMapping("/{lobbyId}")
-    ResponseEntity<DTO> get(@PathVariable @NonNull UUID lobbyId) {
-        Optional<Game> lobby = gameRepository.findById(lobbyId);
-        if (!lobby.isPresent()) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-
-        return ResponseEntity.ok(lobby.get().getDTO());
+    ResponseEntity<GameDTO> get(@PathVariable UUID lobbyId) {
+        return gameRepository
+                .findById(lobbyId)
+                .map(game -> ResponseEntity.ok(game.getDTO()))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -140,7 +138,7 @@ public class LobbyController {
      */
     @PutMapping("/{lobbyId}/join")
     @Transactional
-    ResponseEntity join(@PathVariable @NonNull UUID lobbyId) {
+    ResponseEntity join(@PathVariable UUID lobbyId) {
         // If the user or the game doesn't exist, return 404
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
         Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
@@ -167,7 +165,7 @@ public class LobbyController {
      *      404 if the lobby doesn't exist, 403 if the player isn't the lobby head, 200 otherwise
      */
     @PutMapping("/{lobbyId}/start")
-    ResponseEntity start(@PathVariable @NonNull UUID lobbyId) {
+    ResponseEntity start(@PathVariable UUID lobbyId) {
         // If the user or the game don't exist, return 404
         Optional<User> founder = userRepository.findByEmail(AuthContext.get());
         Optional<Game> lobby = gameRepository.findById(lobbyId);

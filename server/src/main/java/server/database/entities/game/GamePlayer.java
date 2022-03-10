@@ -2,10 +2,9 @@ package server.database.entities.game;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import commons.entities.game.GamePlayerDTO;
-import java.util.Date;
+import java.time.LocalDateTime;
 import javax.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.modelmapper.ModelMapper;
 import server.database.entities.User;
 import server.database.entities.utils.BaseEntity;
@@ -33,24 +32,26 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     /**
      * The player's nickname within the game.
      */
+    @Column
     private String nickname;
 
     /**
      * Player's score.
      */
+    @Column
     private Integer score = 0;
 
     /**
      * The streak of correct answers in a row.
      */
+    @Column
     private Integer streak = 0;
 
     /**
      * The date the player joined the lobby.
      */
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    protected Date joinDate;
+    @Column
+    protected LocalDateTime joinDate;
 
     /**
      * The game the player is in.
@@ -67,6 +68,14 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     protected Game headGame;
+
+    /**
+     * Automatically sets the join date to when the entity is first persisted.
+     */
+    @PrePersist
+    void onCreate() {
+        joinDate = LocalDateTime.now();
+    }
 
     /**
      * Returns player's nickname. If one isn't set, returns their username.

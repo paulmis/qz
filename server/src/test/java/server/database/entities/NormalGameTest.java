@@ -79,4 +79,9 @@ public class NormalGameTest {
         game.add(joePlayer);
         assertEquals(1, game.size());
     }
+
+    @Test
+    void isFull() {
+
+    }
 }

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import commons.entities.game.GameStatus;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +20,7 @@ import server.database.entities.User;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
+import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
 import server.database.repositories.question.QuestionRepository;
@@ -37,7 +39,9 @@ public class GameServiceTest {
 
     NormalGame game;
     User joe;
+    User susanne;
     GamePlayer joePlayer;
+    GamePlayer susannePlayer;
     MCQuestion questionA;
     MCQuestion questionB;
     MCQuestion questionC;
@@ -46,9 +50,18 @@ public class GameServiceTest {
 
     @BeforeEach
     void init() {
+        // Create users
         joe = new User("joe", "joe@doe.com", "stinkywinky");
         joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         joePlayer = new GamePlayer(joe);
+        joePlayer.setJoinDate(LocalDateTime.parse("2020-03-04T00:00:00"));
+
+        susanne = new User("Susanne", "susanne@louisiane.com", "stinkymonkey");
+        susanne.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        susannePlayer = new GamePlayer(susanne);
+        susannePlayer.setJoinDate(LocalDateTime.parse("2022-03-03T00:00:00"));
+
+        // Create questions
         questionA = new MCQuestion();
         questionA.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         questionB = new MCQuestion();
@@ -59,13 +72,15 @@ public class GameServiceTest {
         questionD.setId(UUID.fromString("11111111-4444-4444-4444-444444444444"));
         usedQuestionIds = Arrays.asList(questionB.getId(), questionA.getId());
 
+        // Create the game
         game = new NormalGame();
         game.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
-        game.setConfiguration(new NormalGameConfiguration(3, 13, 6));
+        game.setConfiguration(new NormalGameConfiguration(3, 13, 2));
         game.add(joePlayer);
+        game.add(susannePlayer);
 
         // Mock the repository
-        when(questionRepository.count()).thenReturn(4L);
+        lenient().when(questionRepository.count()).thenReturn(4L);
     }
 
     @Test
@@ -97,7 +112,7 @@ public class GameServiceTest {
     }
 
     @Test
-    void startGameNormal() {
+    void startNormal() {
         // Mock the repository
         when(questionRepository.findByIdNotIn(new ArrayList<>()))
                 .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
@@ -112,6 +127,30 @@ public class GameServiceTest {
         // Verify interactions
         verify(questionRepository).count();
         verify(questionRepository).findByIdNotIn(new ArrayList<>());
+        verifyNoMoreInteractions(questionRepository);
+    }
+
+    @Test
+    void startOngoing() {
+        // Set the mocked game to be already started
+        game.setStatus(GameStatus.ONGOING);
+
+        // Start the game
+        assertThrows(IllegalStateException.class, () -> gameService.startGame(game));
+
+        // Verify interactions
+        verifyNoMoreInteractions(questionRepository);
+    }
+
+    @Test
+    void startNotFull() throws LastPlayerRemovedException {
+        // Remove susanne
+        game.remove(susanne.getId());
+
+        // Start the game
+        assertThrows(IllegalStateException.class, () -> gameService.startGame(game));
+
+        // Verify interactions
         verifyNoMoreInteractions(questionRepository);
     }
 }
