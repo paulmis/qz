@@ -86,4 +86,37 @@ public class AnswerController {
                 .map(question -> ResponseEntity.ok(question.getRightAnswer()))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
     }
+
+    /**
+     * Returns the amount of points gained by the user in the current question.
+     *
+     * @param gameId id of the game being played
+     * @return points gained for the current question
+     */
+    @GetMapping("/{gameId}/score")
+    ResponseEntity<Integer> getScore(@PathVariable UUID gameId) {
+        Optional<Game> game = gameRepository.findById(gameId);
+        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+
+        // Check if game exists
+        if (game.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Check that the user is playing in the game
+        if (!gamePlayerRepository.existsByUserIdAndGameId(user.get().getId(), game.get().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        // Retrieve current question
+        Optional<Question> currentQuestion = game.get().getQuestion();
+
+        // ToDo: use the question to evaluate the player's score
+        Integer tempPoints = 100;
+
+        // Check if game is active
+        return currentQuestion
+                .map(question -> ResponseEntity.ok(tempPoints))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+    }
 }
