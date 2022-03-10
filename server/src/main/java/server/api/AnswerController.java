@@ -31,7 +31,7 @@ import server.database.repositories.game.GameRepository;
 public class AnswerController {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private GameRepository gameRepository;
@@ -59,13 +59,19 @@ public class AnswerController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/{gameId}")
+    /**
+     * Returns the correct answer to the current question.
+     *
+     * @param gameId id of the game being played
+     * @return correct answer to the current question
+     */
+    @GetMapping("/{gameId}/correct")
     ResponseEntity<AnswerDTO> getCorrectAnswer(@PathVariable UUID gameId) {
         Optional<Game> game = gameRepository.findById(gameId);
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
 
-        // Check if game and player both exist
-        if (!game.isPresent() || user.isEmpty()) {
+        // Check if game exists
+        if (game.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
@@ -78,10 +84,8 @@ public class AnswerController {
         Optional<Question> currentQuestion = game.get().getQuestion();
 
         // Check if game is active
-        if (currentQuestion.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-
-        return ResponseEntity.ok(currentQuestion.get().getRightAnswer());
+        return currentQuestion
+                .map(question -> ResponseEntity.ok(question.getRightAnswer()))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.CONFLICT).build());
     }
 }
