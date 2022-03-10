@@ -184,7 +184,7 @@ public class MainCtrl {
      * It also sets it min width and height
      */
     public void showServerConnectScreen() {
-        this.showScreenLetterBox(serverConnectScreen, StageScalingStrategy.Fixed);
+        this.showScreenLetterBox(serverConnectScreen, StageScalingStrategy.Letterbox);
     }
 
     /**
@@ -192,7 +192,7 @@ public class MainCtrl {
      * It also sets it min width and height.
      */
     public void showLogInScreen() {
-        this.showScreenLetterBox(logInScreen, StageScalingStrategy.ForcedScaled);
+        this.showScreenLetterBox(logInScreen, StageScalingStrategy.Letterbox);
     }
 
     /**
@@ -223,7 +223,7 @@ public class MainCtrl {
      * It also sets it min width and height.
      */
     public void showGameScreen() {
-        this.showScreenLetterBox(gameScreen, StageScalingStrategy.ScaledIdentity);
+        this.showScreenLetterBox(gameScreen, StageScalingStrategy.Letterbox);
     }
 
     /**
