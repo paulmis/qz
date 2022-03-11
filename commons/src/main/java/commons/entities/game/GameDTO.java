@@ -57,6 +57,11 @@ public class GameDTO implements DTO {
     protected Set<GamePlayerDTO> players;
 
     /**
+     * The head of the lobby - person in charge with special privileges.
+     */
+    protected UUID host;
+
+    /**
      * Copy constructor.
      *
      * @param gameDTO the game DTO to copy
@@ -70,5 +75,6 @@ public class GameDTO implements DTO {
         this.status = gameDTO.getStatus();
         this.currentQuestion = gameDTO.getCurrentQuestion();
         this.players = gameDTO.getPlayers();
+        this.host = gameDTO.getHost();
     }
 }

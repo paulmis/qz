@@ -1,39 +1,20 @@
 package server.database.entities.game;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import javax.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.modelmapper.ModelMapper;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
+import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
 import server.database.entities.utils.BaseEntity;
 import server.services.SSEManager;
@@ -55,7 +36,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     // TODO: add a custom generation strategy
     @Column(nullable = false, unique = true)
-    private String gameId;
+    protected String gameId;
 
     /**
      * Timestamp of game creation.
@@ -67,23 +48,23 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Whether the game is public or not.
      */
-    private GameType gameType = GameType.PUBLIC;
+    protected GameType gameType = GameType.PUBLIC;
 
     /**
      * The game configuration.
      */
     @OneToOne(cascade = CascadeType.ALL)
-    private GameConfiguration configuration;
+    protected GameConfiguration configuration;
 
     /**
      * Current status of the game.
      */
-    private GameStatus status = GameStatus.CREATED;
+    protected GameStatus status = GameStatus.CREATED;
 
     /**
      * Current question number.
      */
-    private int currentQuestion = 0;
+    protected int currentQuestion = 0;
 
     /**
      * Seed used to generate the random numbers.
@@ -100,8 +81,16 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * List of players currently in the game.
      */
+    @JsonManagedReference
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<GamePlayer> players = Collections.synchronizedSet(new HashSet<>());
+    protected Set<GamePlayer> players = Collections.synchronizedSet(new HashSet<>());
+
+    /**
+     * The head of the lobby - person in charge with special privileges.
+     */
+    @JsonManagedReference
+    @OneToOne(mappedBy = "gameHost", fetch = FetchType.LAZY)
+    protected GamePlayer host;
 
     /**
      * Mapping between game players and their corresponding SSE emitters.
@@ -114,10 +103,11 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * Questions assigned to this game.
      */
     @ManyToMany
-    private List<Question> questions = new ArrayList<>();
+    protected List<Question> questions = new ArrayList<>();
 
     /**
-     * Creates a new game from a DTO. Doesn't copy players.
+     * Creates a new game from a DTO.
+     * Only an empty lobby (no players or questions) can be initialized.
      *
      * @param dto source DTO
      */
@@ -132,27 +122,52 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         this.status = dto.getStatus();
         this.currentQuestion = dto.getCurrentQuestion();
         this.gameType = dto.getGameType();
-        this.players = new HashSet<>();
     }
 
     /**
-     * Add a player to the game.
+     * Add a player to the game. Returns false if the lobby is already full or the player is already in this game.
      *
-     * @param player The player to add.
-     * @return Whether the player was added (and not already in the game).
+     * @param player the player to add
+     * @return whether the player was added
      */
     public boolean add(GamePlayer player) {
-        return this.players.add(player);
+        // Check if the player can be added
+        if (this.players.size() >= this.configuration.getCapacity() || !this.players.add(player)) {
+            return false;
+        }
+
+        // If the lobby is empty, add this player as the head of the lobby
+        if (this.players.size() == 1) {
+            this.host = player;
+        }
+        return true;
     }
 
     /**
      * Remove a player from the game.
      *
-     * @param player The player to remove.
+     * @param playerId The id of the player to remove
      * @return Whether the player was removed.
      */
-    public boolean remove(GamePlayer player) {
-        return this.players.remove(player);
+    public boolean remove(UUID playerId) throws LastPlayerRemovedException {
+        // Remove the player from the game
+        if (!this.players.removeIf(player -> player.getUser().getId().equals(playerId))) {
+            return false;
+        }
+
+        // If the head left, replace them
+        if (this.host.getUser().getId() == playerId) {
+            this.host = this.players.stream()
+                    .min(Comparator.comparing(GamePlayer::getJoinDate))
+                    .orElse(null);
+
+            // If the last player left, throw an exception
+            if (this.host == null) {
+                throw new LastPlayerRemovedException();
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -180,10 +195,19 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Get the number of players in the game.
      *
-     * @return The number of players.
+     * @return the number of players
      */
     public int size() {
         return players.size();
+    }
+
+    /**
+     * Checks if the lobby is full.
+     *
+     * @return whether the lobby is full
+     */
+    public boolean isFull() {
+        return size() == configuration.getCapacity();
     }
 
     /**
@@ -200,7 +224,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
                 this.configuration.getDTO(),
                 this.status,
                 this.currentQuestion,
-                this.players.stream().map(GamePlayer::getDTO).collect(Collectors.toSet()));
+                this.players.stream().map(GamePlayer::getDTO).collect(Collectors.toSet()),
+                this.host == null ? null : this.host.getId());
     }
 
     public abstract T getDTO();

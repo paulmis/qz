@@ -33,8 +33,8 @@ public class NormalGameConfiguration extends GameConfiguration {
      * @param numQuestions number of questions in the game
      * @param answerTime time in seconds for answering a question
      */
-    public NormalGameConfiguration(int numQuestions, int answerTime) {
-        super(answerTime);
+    public NormalGameConfiguration(int numQuestions, int answerTime, int capacity) {
+        super(answerTime, capacity);
         this.numQuestions = numQuestions;
     }
 
@@ -42,7 +42,7 @@ public class NormalGameConfiguration extends GameConfiguration {
      * The number of questions in the game.
      */
     @Column(nullable = false)
-    Integer numQuestions = 10;
+    protected int numQuestions = 10;
 
     @Override
     public NormalGameConfigurationDTO getDTO() {
