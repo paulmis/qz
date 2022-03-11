@@ -174,7 +174,7 @@ public class LobbyController {
         }
 
         // If the user isn't the lobby head, return 403
-        if (lobby.get().getHead().getUser().getId() != founder.get().getId()) {
+        if (lobby.get().getHost().getUser().getId() != founder.get().getId()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 

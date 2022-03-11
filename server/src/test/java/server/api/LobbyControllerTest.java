@@ -283,7 +283,7 @@ class LobbyControllerTest {
     @Test
     void startHeadMismatchForbidden() throws Exception {
         // Change the head
-        mockLobby.setHead(susannePlayer);
+        mockLobby.setHost(susannePlayer);
 
         // Request
         this.mockMvc

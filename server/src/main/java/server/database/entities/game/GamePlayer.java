@@ -67,7 +67,7 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     @JsonBackReference
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    protected Game headGame;
+    protected Game gameHost;
 
     /**
      * Automatically sets the join date to when the entity is first persisted.

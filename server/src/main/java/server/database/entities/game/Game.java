@@ -83,8 +83,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * The head of the lobby - person in charge with special privileges.
      */
     @JsonManagedReference
-    @OneToOne(mappedBy = "headGame", fetch = FetchType.LAZY)
-    protected GamePlayer head;
+    @OneToOne(mappedBy = "gameHost", fetch = FetchType.LAZY)
+    protected GamePlayer host;
 
     /**
      * Mapping between game players and their corresponding SSE emitters.
@@ -132,7 +132,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
 
         // If the lobby is empty, add this player as the head of the lobby
         if (this.players.size() == 1) {
-            this.head = player;
+            this.host = player;
         }
         return true;
     }
@@ -150,13 +150,13 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         }
 
         // If the head left, replace them
-        if (this.head.getUser().getId() == playerId) {
-            this.head = this.players.stream()
+        if (this.host.getUser().getId() == playerId) {
+            this.host = this.players.stream()
                     .min(Comparator.comparing(GamePlayer::getJoinDate))
                     .orElse(null);
 
             // If the last player left, throw an exception
-            if (this.head == null) {
+            if (this.host == null) {
                 throw new LastPlayerRemovedException();
             }
         }
@@ -219,7 +219,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
                 this.status,
                 this.currentQuestion,
                 this.players.stream().map(GamePlayer::getDTO).collect(Collectors.toSet()),
-                this.head == null ? null : this.head.getId());
+                this.host == null ? null : this.host.getId());
     }
 
     public abstract T getDTO();

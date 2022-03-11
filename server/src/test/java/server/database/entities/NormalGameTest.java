@@ -74,11 +74,11 @@ public class NormalGameTest {
         NormalGameDTO dto = om.readValue(string, NormalGameDTO.class);
 
         // Initiate a copy of the game
-        // Exclude players, questions, and head as the created lobby must be empty
+        // Exclude players, questions, and host as the created lobby must be empty
         NormalGame repl = new NormalGame(dto);
         assertThat(game)
                 .usingRecursiveComparison()
-                .ignoringFields("players", "questions", "head", "random")
+                .ignoringFields("players", "questions", "host", "random")
                 .isEqualTo(repl);
     }
 
@@ -135,7 +135,7 @@ public class NormalGameTest {
     @Test
     void removeHead() throws LastPlayerRemovedException {
         assertTrue(game.remove(joe.getId()));
-        assertEquals(game.getHead(), susannePlayer);
+        assertEquals(game.getHost(), susannePlayer);
     }
 
     @Test
