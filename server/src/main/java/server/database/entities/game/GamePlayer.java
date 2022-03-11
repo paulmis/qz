@@ -63,12 +63,6 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     @NonNull private Game game;
 
     /**
-     * Relation to answer entities for each individual question.
-     */
-    @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Answer> answers = new LinkedHashSet<>();
-
-    /**
      * Creates a new game player from the DTO.
      *
      * @param dto the DTO to create the game player from.

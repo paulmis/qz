@@ -192,7 +192,8 @@ class AnswerControllerTest {
 
     @Test
     public void getCorrectAnswerWrongGameTest() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/game/" + getUUID(1) + "/answer"))
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.get("/api/game/" + getUUID(1) + "/answer"))
                 .andExpect(status().isNotFound());
     }
 

@@ -8,12 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.modelmapper.ModelMapper;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Activity;
@@ -23,11 +20,8 @@ import server.database.entities.utils.BaseEntity;
  * Answer entity - describes the answer given by a player to one of the questions of the quiz.
  */
 @EqualsAndHashCode(callSuper = true)
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-@ToString
 @Entity
 public class Answer extends BaseEntity<AnswerDTO> {
     /**

@@ -37,13 +37,6 @@ public class Activity extends BaseEntity<ActivityDTO> {
     private List<Question> usedIn;
 
     /**
-     * List of answers in which the activity is used.
-     * Needed for the many-to-many relation.
-     */
-    @ManyToMany
-    private List<Answer> answeredIn;
-
-    /**
      * Description of the activity.
      */
     private String description;

@@ -3,7 +3,6 @@ package server.api;
 import commons.entities.AnswerDTO;
 import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -64,7 +63,7 @@ public class AnswerController {
      *
      * @param gameId id of the game being played
      * @param questionIdx index of the question to get the answer of.
-     *                    If null, the answer to the current question is sent
+     *                    If empty, the answer to the current question is sent
      * @return correct answer to the current question
      */
     @GetMapping("/{gameId}/answer")
