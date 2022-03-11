@@ -1,5 +1,6 @@
 package server.database.entities;
 
+import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Activity;
 import server.database.entities.utils.BaseEntity;
@@ -36,20 +38,37 @@ public class Answer extends BaseEntity<AnswerDTO> {
     }
 
     /**
-     * The list of activities from the Question given as an answer.
-     */
-    @ManyToMany
-    protected List<Activity> userChoice = new ArrayList<>();
-
-    /**
      * The player that gave the answer.
      */
     @ManyToOne(optional = false)
     @JoinColumn(name = "player_id", nullable = false)
     private GamePlayer player;
 
+    /**
+     * The list of activities from the Question given as an answer.
+     */
+    @ManyToMany
+    protected List<Activity> userChoice = new ArrayList<>();
+
+    /**
+     * Convert user choices to DTO.
+     *
+     * @return a list of ActivityDTOs
+     */
+    protected List<ActivityDTO> getUserChoiceDTO() {
+        return this.userChoice.stream().map(Activity::getDTO).collect(Collectors.toList());
+    }
+
     @Override
     public AnswerDTO getDTO() {
-        return new ModelMapper().map(this, AnswerDTO.class);
+        ModelMapper modelMapper = new ModelMapper();
+        TypeMap<Answer, AnswerDTO> propertyMapper = modelMapper.createTypeMap(Answer.class, AnswerDTO.class);
+
+        // Deep conversion of user choice
+        propertyMapper.addMappings(
+                mapper -> mapper.map(Answer::getUserChoiceDTO, AnswerDTO::setUserChoice)
+        );
+
+        return modelMapper.map(this, AnswerDTO.class);
     }
 }
