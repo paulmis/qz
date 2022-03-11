@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.AnswerDTO;
 import commons.entities.UserDTO;
 import commons.entities.game.GameStatus;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 import server.database.entities.User;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
@@ -117,12 +120,29 @@ class AnswerControllerTest {
         when(userRepository.findByEmail(joe.getEmail())).thenReturn(Optional.of(joe));
     }
 
+    private URI answerEndpoint(UUID gameId, Optional<Integer> questionIdx) {
+        UriBuilder uriBuilder = UriComponentsBuilder
+                .fromPath("/api/game/")
+                .pathSegment(gameId.toString())
+                .pathSegment("answer");
+        if (questionIdx.isPresent()) {
+            uriBuilder.queryParam("idx", questionIdx.get());
+        }
+
+        return uriBuilder.build();
+    }
+
+    private URI answerEndpoint(UUID gameId) {
+        return answerEndpoint(gameId, Optional.empty());
+    }
+
     @Test
     public void userAnswerOkTest() throws Exception {
+
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
         this.mockMvc
-                .perform(MockMvcRequestBuilders.put("/api/game/" + mockLobby.getId() + "/answer")
+                .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userAnswer)))
                 .andExpect(status().isOk());
@@ -133,7 +153,7 @@ class AnswerControllerTest {
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
         this.mockMvc
-                .perform(MockMvcRequestBuilders.put("/api/game/" + getUUID(1) + "/answer")
+                .perform(MockMvcRequestBuilders.put(answerEndpoint(getUUID(1)))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userAnswer)))
                 .andExpect(status().isNotFound());
@@ -142,7 +162,7 @@ class AnswerControllerTest {
     @Test
     public void getCorrectAnswerTest() throws Exception {
         this.mockMvc
-                .perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/answer"))
+                .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId())))
                 .andExpect(content().string(equalToObject(
                         objectMapper.writeValueAsString(mockQuestion.getRightAnswer().getDTO()))));
     }
@@ -161,7 +181,7 @@ class AnswerControllerTest {
         mockLobby.setCurrentQuestion(0);
 
         this.mockMvc
-                .perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/answer?idx=1"))
+                .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId(), Optional.of(1))))
                 .andExpect(content().string(equalToObject(
                         objectMapper.writeValueAsString(secondQuestion.getRightAnswer().getDTO()))));
     }
@@ -169,7 +189,7 @@ class AnswerControllerTest {
     @Test
     public void getCorrectAnswerOutOfIndexTest() throws Exception {
         this.mockMvc
-                .perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/answer?idx=1"))
+                .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId(), Optional.of(1))))
                 .andExpect(content().string(equalToObject(
                         objectMapper.writeValueAsString(mockQuestion.getRightAnswer().getDTO()))));
     }
@@ -177,7 +197,7 @@ class AnswerControllerTest {
     @Test
     public void getCorrectAnswerNegativeIndexTest() throws Exception {
         this.mockMvc
-                .perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/answer?idx=-1"))
+                .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId(), Optional.of(-1))))
                 .andExpect(content().string(equalToObject(
                         objectMapper.writeValueAsString(mockQuestion.getRightAnswer().getDTO()))));
     }
@@ -186,14 +206,14 @@ class AnswerControllerTest {
     public void getCorrectAnswerNoQuestionTest() throws Exception {
         mockLobby.setCurrentQuestion(1);
         this.mockMvc
-                .perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/answer"))
+                .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId())))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void getCorrectAnswerWrongGameTest() throws Exception {
         this.mockMvc
-                .perform(MockMvcRequestBuilders.get("/api/game/" + getUUID(1) + "/answer"))
+                .perform(MockMvcRequestBuilders.get(answerEndpoint(getUUID(1))))
                 .andExpect(status().isNotFound());
     }
 
@@ -212,7 +232,7 @@ class AnswerControllerTest {
         when(userRepository.findByEmail(susan.getEmail())).thenReturn(Optional.of(susan));
 
         this.mockMvc
-                .perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/answer"))
+                .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId())))
                 .andExpect(status().isForbidden());
     }
 }
