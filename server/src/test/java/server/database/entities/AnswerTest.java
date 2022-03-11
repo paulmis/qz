@@ -29,7 +29,7 @@ class AnswerTest {
                 getActivity(4)
         ));
         dto.setUserChoice(choices.stream().map(Activity::getDTO).collect(Collectors.toList()));
-        Answer toTest = new Answer(dto, new GamePlayer());
+        Answer toTest = new Answer(dto);
         assertEquals(choices, toTest.getUserChoice());
     }
 
@@ -43,7 +43,6 @@ class AnswerTest {
         ));
         Answer toTest = new Answer();
         toTest.setUserChoice(choices);
-        toTest.setPlayer(new GamePlayer());
         AnswerDTO dto = toTest.getDTO();
         assertEquals(choices.stream().map(Activity::getDTO).collect(Collectors.toList()), dto.getUserChoice());
     }

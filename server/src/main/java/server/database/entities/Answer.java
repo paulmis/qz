@@ -30,19 +30,10 @@ public class Answer extends BaseEntity<AnswerDTO> {
      * Construct a new answer from a DTO.
      *
      * @param dto    DTO to map to entity.
-     * @param player the player that gave the answer.
      */
-    public Answer(AnswerDTO dto, GamePlayer player) {
-        this.player = player;
+    public Answer(AnswerDTO dto) {
         this.userChoice = dto.getUserChoice().stream().map(Activity::new).collect(Collectors.toList());
     }
-
-    /**
-     * The player that gave the answer.
-     */
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "player_id", nullable = false)
-    private GamePlayer player;
 
     /**
      * The list of activities from the Question given as an answer.
