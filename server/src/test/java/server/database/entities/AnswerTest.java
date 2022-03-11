@@ -3,13 +3,12 @@ package server.database.entities;
 import static org.junit.jupiter.api.Assertions.*;
 
 import commons.entities.AnswerDTO;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import server.database.entities.game.GamePlayer;
-import server.database.entities.question.Activity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Test;
+import server.database.entities.game.GamePlayer;
+import server.database.entities.question.Activity;
 
 class AnswerTest {
 
@@ -23,7 +22,7 @@ class AnswerTest {
     @Test
     void fromDTOConstructorTest() {
         AnswerDTO dto = new AnswerDTO();
-        List<Activity> choices =  new ArrayList<>(List.of(
+        List<Activity> choices = new ArrayList<>(List.of(
                 getActivity(1),
                 getActivity(2),
                 getActivity(3),
@@ -36,7 +35,7 @@ class AnswerTest {
 
     @Test
     void toDTOTest() {
-        List<Activity> choices =  new ArrayList<>(List.of(
+        List<Activity> choices = new ArrayList<>(List.of(
                 getActivity(1),
                 getActivity(2),
                 getActivity(3),
