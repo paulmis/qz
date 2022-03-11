@@ -1,13 +1,9 @@
 package server.database.entities.game;
 
 import commons.entities.game.GamePlayerDTO;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.modelmapper.ModelMapper;
-import server.database.entities.Answer;
 import server.database.entities.User;
 import server.database.entities.utils.BaseEntity;
 
