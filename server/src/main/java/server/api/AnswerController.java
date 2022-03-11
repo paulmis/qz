@@ -42,7 +42,7 @@ public class AnswerController {
      * Sends the users answers to the server.
      *
      * @param answerData Contains the players answer in AnswerDTO format
-     * @param gameId This is the gameId of the game being played
+     * @param gameId     This is the gameId of the game being played
      * @return ok status if successful, not found status if game doesn't exist
      */
     @PutMapping("/{gameId}/answer")
@@ -53,7 +53,7 @@ public class AnswerController {
         if (!gameRepository.existsById(gameId)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        
+
         //Send 200 status if answer is sent successfully.
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -61,7 +61,7 @@ public class AnswerController {
     /**
      * Returns the correct answer to a question.
      *
-     * @param gameId id of the game being played
+     * @param gameId      id of the game being played
      * @param questionIdx index of the question to get the answer of.
      *                    If empty, the answer to the current question is sent
      * @return correct answer to the current question

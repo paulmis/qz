@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Activity;
 
 class AnswerTest {

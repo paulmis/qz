@@ -6,15 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
-import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Activity;
 import server.database.entities.utils.BaseEntity;
 
@@ -29,7 +26,7 @@ public class Answer extends BaseEntity<AnswerDTO> {
     /**
      * Construct a new answer from a DTO.
      *
-     * @param dto    DTO to map to entity.
+     * @param dto DTO to map to entity.
      */
     public Answer(AnswerDTO dto) {
         this.userChoice = dto.getUserChoice().stream().map(Activity::new).collect(Collectors.toList());
