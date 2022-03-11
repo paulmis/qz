@@ -8,4 +8,4 @@ services:
       POSTGRES_PASSWORD: 1234
       POSTGRES_DB: oopp
     ports:
-      - "5555:5432"
+      - "5432:5432"
