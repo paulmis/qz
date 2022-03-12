@@ -83,14 +83,18 @@ public class LobbyController {
         NormalGame game;
         try {
             game = new NormalGame(gameDTO);
+            game.setStatus(GameStatus.CREATED);
 
             // Save the configuration
             NormalGameConfiguration config =
                     gameConfigurationRepository.save((NormalGameConfiguration) game.getConfiguration());
             game.setConfiguration(config);
 
+            // Create the player
+            GamePlayer player = new GamePlayer(founder.get());
+            game.add(player);
+
             // Save the game
-            game.add(new GamePlayer(founder.get()));
             game = gameRepository.save(game);
         } catch (ConstraintViolationException | PersistenceException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -137,7 +141,6 @@ public class LobbyController {
      * @return true if the join was successful, false otherwise.
      */
     @PutMapping("/{lobbyId}/join")
-    @Transactional
     ResponseEntity join(@PathVariable UUID lobbyId) {
         // If the user or the game doesn't exist, return 404
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
@@ -147,9 +150,12 @@ public class LobbyController {
         }
         Game lobby = lobbyOptional.get();
 
+        // Create the player
+        GamePlayer player = new GamePlayer(user.get());
+
         // Check that the game hasn't started yet and add the player
         if (lobby.getStatus() != GameStatus.CREATED
-            || !lobby.add(new GamePlayer(user.get()))) {
+            || !lobby.add(player)) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 

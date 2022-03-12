@@ -82,14 +82,13 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * List of players currently in the game.
      */
     @JsonManagedReference
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
-    protected Set<GamePlayer> players = Collections.synchronizedSet(new HashSet<>());
+    @OneToMany(mappedBy = "game", orphanRemoval = true)
+    protected Set<GamePlayer> players = new HashSet<>();
 
     /**
      * The head of the lobby - person in charge with special privileges.
      */
-    @JsonManagedReference
-    @OneToOne(mappedBy = "gameHost", fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     protected GamePlayer host;
 
     /**
@@ -132,9 +131,10 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public boolean add(GamePlayer player) {
         // Check if the player can be added
-        if (this.players.size() >= this.configuration.getCapacity() || !this.players.add(player)) {
+        if (isFull() || !this.players.add(player)) {
             return false;
         }
+        player.setGame(this);
 
         // If the lobby is empty, add this player as the head of the lobby
         if (this.players.size() == 1) {
@@ -207,7 +207,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * @return whether the lobby is full
      */
     public boolean isFull() {
-        return size() == configuration.getCapacity();
+        return size() >= configuration.getCapacity();
     }
 
     /**

@@ -24,28 +24,27 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     /**
      * The user the player is.
      */
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @NonNull
-    private User user;
+    protected User user;
 
     /**
      * The player's nickname within the game.
      */
     @Column
-    private String nickname;
+    protected String nickname;
 
     /**
      * Player's score.
      */
     @Column
-    private Integer score = 0;
+    protected Integer score = 0;
 
     /**
      * The streak of correct answers in a row.
      */
     @Column
-    private Integer streak = 0;
+    protected Integer streak = 0;
 
     /**
      * The date the player joined the lobby.
@@ -59,15 +58,9 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     @JsonBackReference
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @MapsId
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     protected Game game;
-
-    /**
-     * The game the player is head of.
-     */
-    @JsonBackReference
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    protected Game gameHost;
 
     /**
      * Automatically sets the join date to when the entity is first persisted.
@@ -83,7 +76,7 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
      * @return player's nickname
      */
     public String getNickname() {
-        return nickname == null ? user.getUsername() : nickname;
+        return nickname == null && user != null ? user.getUsername() : nickname;
     }
 
     /**
