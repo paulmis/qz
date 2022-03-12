@@ -1,10 +1,8 @@
 package server.api;
 
 import commons.entities.game.GameDTO;
-import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
-import commons.entities.utils.DTO;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
-import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +21,6 @@ import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
-import server.database.entities.utils.BaseEntity;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;

@@ -75,7 +75,7 @@ public class AnswerController {
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
 
         // Check if game exists
-        if (game.isEmpty()) {
+        if (game.isEmpty() || user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
