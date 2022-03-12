@@ -6,11 +6,11 @@ import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.modelmapper.ModelMapper;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
@@ -41,9 +41,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Timestamp of game creation.
      */
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createDate;
+    @Column(columnDefinition = "TIMESTAMP")
+    protected LocalDateTime createDate;
 
     /**
      * Whether the game is public or not.
@@ -82,7 +81,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * List of players currently in the game.
      */
     @JsonManagedReference
-    @OneToMany(mappedBy = "game", orphanRemoval = true)
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
     protected Set<GamePlayer> players = new HashSet<>();
 
     /**
@@ -103,6 +102,14 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     @ManyToMany
     protected List<Question> questions = new ArrayList<>();
+
+    /**
+     * Automatically sets the create date to when the entity is first persisted.
+     */
+    @PrePersist
+    void onCreate() {
+        createDate = LocalDateTime.now();
+    }
 
     /**
      * Creates a new game from a DTO.

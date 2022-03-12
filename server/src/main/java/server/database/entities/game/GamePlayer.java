@@ -13,7 +13,7 @@ import server.database.entities.utils.BaseEntity;
  * Player entity, which represents an instance of a player in a specific game.
  * It has a many-to-one relationship to the User entity, and a one-to-one relationship to the Game entity.
  */
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @Entity
 @Data
 @AllArgsConstructor
@@ -26,6 +26,7 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
      */
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @NonNull
+    @EqualsAndHashCode.Include
     protected User user;
 
     /**
@@ -49,7 +50,7 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     /**
      * The date the player joined the lobby.
      */
-    @Column
+    @Column(columnDefinition = "TIMESTAMP")
     protected LocalDateTime joinDate;
 
     /**
@@ -57,8 +58,6 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
      */
     @JsonBackReference
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @MapsId
-    @EqualsAndHashCode.Exclude
     @ToString.Exclude
     protected Game game;
 
