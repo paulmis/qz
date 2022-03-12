@@ -10,4 +10,6 @@ import server.database.entities.game.GamePlayer;
  */
 public interface GamePlayerRepository extends JpaRepository<GamePlayer, UUID> {
     boolean existsByUserIdAndGameStatusNot(UUID userId, GameStatus status);
+    
+    boolean existsByUserIdAndGameId(UUID userId, UUID gameId);
 }

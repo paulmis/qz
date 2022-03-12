@@ -1,6 +1,5 @@
 package server.database.entities.question;
 
-import commons.entities.AnswerDTO;
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
+import server.database.entities.Answer;
 
 /**
  * MCQuestion data structure - describes a multiple choice question.
@@ -18,7 +18,7 @@ import org.modelmapper.ModelMapper;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class MCQuestion extends Question {
 
     /**
@@ -82,18 +82,18 @@ public class MCQuestion extends Question {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     @Override
-    public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
+    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
         if (userAnswers == null) {
             throw new IllegalArgumentException("NULL input");
         }
         List<Double> points = new ArrayList<>();
-        for (AnswerDTO ans : userAnswers) {
+        for (Answer ans : userAnswers) {
             // There should be a single activity per answer
-            if (ans.getUserChoice().size() != 1) {
+            if (ans.getResponse().size() != 1) {
                 throw new IllegalArgumentException("There should be a single activity per answer.");
             }
             // Only the cost is compared because different activities might have the same cost unbeknown to the user
-            if (answer.getCost() == ans.getUserChoice().get(0).getCost()) {
+            if (answer.getCost() == ans.getResponse().get(0).getCost()) {
                 points.add(1.0);
             } else {
                 points.add(0.0);
@@ -102,6 +102,13 @@ public class MCQuestion extends Question {
         return points;
     }
 
+    @Override
+    public Answer getRightAnswer() {
+        Answer rightAnswer = new Answer();
+        rightAnswer.setResponse(List.of(getAnswer()));
+        return rightAnswer;
+    }
+    
     @Override
     public QuestionDTO getDTO() {
         return new ModelMapper().map(this, QuestionDTO.class);

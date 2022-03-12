@@ -3,8 +3,6 @@ package server.database.entities.question;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import commons.entities.ActivityDTO;
-import commons.entities.AnswerDTO;
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import server.database.entities.Answer;
 
 class MCQuestionTest {
 
@@ -47,15 +46,24 @@ class MCQuestionTest {
     }
 
     @Test
+    void getRightAnswerTest() {
+        int rightAnswerIdx = 2;
+        ((MCQuestion) q).setAnswer(q.getActivities().get(rightAnswerIdx));
+        Answer rightAnswer = new Answer();
+        rightAnswer.setResponse(new ArrayList<>(List.of(q.getActivities().get(rightAnswerIdx))));
+        assertEquals(rightAnswer, q.getRightAnswer());
+    }
+
+    @Test
     void checkAnswerTest() {
-        List<AnswerDTO> userAnswers = new ArrayList<>();
+        List<Answer> userAnswers = new ArrayList<>();
         for (int idx = 0; idx < 6; idx++) {
-            List<ActivityDTO> answerActivities = new ArrayList<>();
+            List<Activity> answerActivities = new ArrayList<>();
             int choice = idx % 4;
-            ActivityDTO a = getActivity(choice).getDTO();
+            Activity a = getActivity(choice);
             answerActivities.add(a);
-            AnswerDTO ans = new AnswerDTO();
-            ans.setUserChoice(answerActivities);
+            Answer ans = new Answer();
+            ans.setResponse(answerActivities);
             userAnswers.add(ans);
         }
 
@@ -64,18 +72,18 @@ class MCQuestionTest {
 
     @Test
     void checkAnswerMultipleAnswers() {
-        List<AnswerDTO> userAnswers = new ArrayList<>();
+        List<Answer> userAnswers = new ArrayList<>();
         for (int idx = 0; idx < 6; idx++) {
-            List<ActivityDTO> answerActivities = new ArrayList<>();
+            List<Activity> answerActivities = new ArrayList<>();
             int choice = idx % 4;
             Activity a = getActivity(choice);
-            answerActivities.add(a.getDTO());
+            answerActivities.add(a);
             if (idx == 2) {
                 a = getActivity(12);
-                answerActivities.add(a.getDTO());
+                answerActivities.add(a);
             }
-            AnswerDTO ans = new AnswerDTO();
-            ans.setUserChoice(answerActivities);
+            Answer ans = new Answer();
+            ans.setResponse(answerActivities);
             userAnswers.add(ans);
         }
 

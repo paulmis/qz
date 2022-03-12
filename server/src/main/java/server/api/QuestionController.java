@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.game.Game;
 import server.database.entities.question.Question;
 import server.database.repositories.game.GameRepository;
-import server.database.repositories.question.QuestionRepository;
 
 /**
  * QuestionController, controller for all api endpoints of question.
@@ -23,9 +22,6 @@ import server.database.repositories.question.QuestionRepository;
 @RequestMapping("/api/game")
 public class QuestionController {
 
-    /**
-     * Question repository import.
-     */
     @Autowired
     private GameRepository gameRepository;
 
