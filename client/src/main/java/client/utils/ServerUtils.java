@@ -16,16 +16,16 @@
 
 package client.utils;
 
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+
 import commons.entities.UserDTO;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
-import org.glassfish.jersey.client.ClientConfig;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import org.glassfish.jersey.client.ClientConfig;
 
 
 /**
@@ -106,6 +106,16 @@ public class ServerUtils {
         return "200";
     }
 
+    /**
+     * Function that checks user credentials.
+     *
+     * @param email string representing
+     *              the email of the user.
+     * @param password string representing
+     *                 the password of the user.
+     * @return String representing the jwt
+     *          of the user.
+     */
     public String logIn(String email, String password) {
         System.out.println("Verifying  User Credentials...\n");
         UserDTO user = new UserDTO("alex", email, password);

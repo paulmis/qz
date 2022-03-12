@@ -421,6 +421,11 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * Setter for the token.
+     *
+     * @param jwt string that represents the json web token.
+     * */
     public void setJwt(String jwt) {
         this.jwt = jwt;
     }
