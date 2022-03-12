@@ -36,7 +36,7 @@ class EstimateQuestionTest {
         Answer ans = new Answer();
         List<Activity> answerActivities = new ArrayList<>();
         answerActivities.add(getActivity(estimate));
-        ans.setUserChoice(answerActivities);
+        ans.setResponse(answerActivities);
         return ans;
     }
 
@@ -59,10 +59,10 @@ class EstimateQuestionTest {
         myQuestion.setActivities(components);
 
         // Only one correct activity
-        assertEquals(1, myQuestion.getRightAnswer().getUserChoice().size());
+        assertEquals(1, myQuestion.getRightAnswer().getResponse().size());
 
         // Correct activity has right cost
-        assertEquals(costTest, myQuestion.getRightAnswer().getUserChoice().get(0).getCost());
+        assertEquals(costTest, myQuestion.getRightAnswer().getResponse().get(0).getCost());
     }
 
     @Test
@@ -105,7 +105,7 @@ class EstimateQuestionTest {
                 getActivity(3)
         );
         Answer a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         userGuesses.add(a);
 
         assertThrows(IllegalArgumentException.class, () -> {

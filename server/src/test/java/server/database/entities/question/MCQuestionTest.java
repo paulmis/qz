@@ -50,7 +50,7 @@ class MCQuestionTest {
         int rightAnswerIdx = 2;
         ((MCQuestion) q).setAnswer(q.getActivities().get(rightAnswerIdx));
         Answer rightAnswer = new Answer();
-        rightAnswer.setUserChoice(new ArrayList<>(List.of(q.getActivities().get(rightAnswerIdx))));
+        rightAnswer.setResponse(new ArrayList<>(List.of(q.getActivities().get(rightAnswerIdx))));
         assertEquals(rightAnswer, q.getRightAnswer());
     }
 
@@ -63,7 +63,7 @@ class MCQuestionTest {
             Activity a = getActivity(choice);
             answerActivities.add(a);
             Answer ans = new Answer();
-            ans.setUserChoice(answerActivities);
+            ans.setResponse(answerActivities);
             userAnswers.add(ans);
         }
 
@@ -83,7 +83,7 @@ class MCQuestionTest {
                 answerActivities.add(a);
             }
             Answer ans = new Answer();
-            ans.setUserChoice(answerActivities);
+            ans.setResponse(answerActivities);
             userAnswers.add(ans);
         }
 

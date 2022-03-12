@@ -51,7 +51,7 @@ class OrderQuestionTest {
             expectedRightChoice.add(getActivity(idx));
         }
         Answer expectedRightAnswer = new Answer();
-        expectedRightAnswer.setUserChoice(expectedRightChoice);
+        expectedRightAnswer.setResponse(expectedRightChoice);
         assertEquals(expectedRightAnswer, q.getRightAnswer());
     }
 
@@ -65,7 +65,7 @@ class OrderQuestionTest {
                 getActivity(3)
         );
         Answer a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         List<Answer> userAnswers = new ArrayList<>();
         userAnswers.add(a);
 
@@ -77,7 +77,7 @@ class OrderQuestionTest {
                 getActivity(0)
         );
         a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         userAnswers.add(a);
 
         // third user has two inverted (2/3 of points)
@@ -88,7 +88,7 @@ class OrderQuestionTest {
                 getActivity(3)
         );
         a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         userAnswers.add(a);
 
         assertEquals(new ArrayList<>(Arrays.asList(1.0, 0.0, 2.0 / 3)), q.checkAnswer(userAnswers));
@@ -104,7 +104,7 @@ class OrderQuestionTest {
                 getActivity(3)
         );
         Answer a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         List<Answer> userAnswers = new ArrayList<>();
         userAnswers.add(a);
 
@@ -116,7 +116,7 @@ class OrderQuestionTest {
                 getActivity(0)
         );
         a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         userAnswers.add(a);
 
         // third user has two inverted (1/3 of points)
@@ -127,7 +127,7 @@ class OrderQuestionTest {
                 getActivity(3)
         );
         a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         userAnswers.add(a);
 
         ((OrderQuestion) q).setIncreasing(false);
@@ -144,7 +144,7 @@ class OrderQuestionTest {
                 getActivity(3)
         );
         Answer a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         List<Answer> userAnswers = new ArrayList<>();
         userAnswers.add(a);
 
@@ -157,7 +157,7 @@ class OrderQuestionTest {
                 getActivity(12)
         );
         a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         userAnswers.add(a);
 
         // third user has 4 activities
@@ -168,7 +168,7 @@ class OrderQuestionTest {
                 getActivity(3)
         );
         a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         userAnswers.add(a);
 
         assertThrows(IllegalArgumentException.class, () -> q.checkAnswer(userAnswers));

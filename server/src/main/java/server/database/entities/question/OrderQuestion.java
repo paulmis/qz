@@ -78,23 +78,23 @@ public class OrderQuestion extends Question {
         List<Double> points = new ArrayList<>();
 
         for (Answer ans : userAnswers) {
-            if (ans.getUserChoice().size() != getActivities().size()) {
+            if (ans.getResponse().size() != getActivities().size()) {
                 throw new IllegalArgumentException(
                         "The number of activities in the answer must be the same as the question.");
             }
             // Check if the order of answers' costs is correct
-            int currentVal = ans.getUserChoice().get(0).getCost();
+            int currentVal = ans.getResponse().get(0).getCost();
             double currentPoints = 0;
             double pointStep = 1.0 / (getActivities().size() - 1);
             if (increasing) {
                 for (int idx = 1; idx < getActivities().size(); idx++) {
-                    if (ans.getUserChoice().get(idx).getCost() >= ans.getUserChoice().get(idx - 1).getCost()) {
+                    if (ans.getResponse().get(idx).getCost() >= ans.getResponse().get(idx - 1).getCost()) {
                         currentPoints += pointStep;
                     }
                 }
             } else {
                 for (int idx = 1; idx < getActivities().size(); idx++) {
-                    if (ans.getUserChoice().get(idx).getCost() <= ans.getUserChoice().get(idx - 1).getCost()) {
+                    if (ans.getResponse().get(idx).getCost() <= ans.getResponse().get(idx - 1).getCost()) {
                         currentPoints += pointStep;
                     }
                 }
@@ -111,7 +111,7 @@ public class OrderQuestion extends Question {
     @Override
     public Answer getRightAnswer() {
         Answer rightAnswer = new Answer();
-        rightAnswer.setUserChoice(getActivities());
+        rightAnswer.setResponse(getActivities());
         return rightAnswer;
     }
     

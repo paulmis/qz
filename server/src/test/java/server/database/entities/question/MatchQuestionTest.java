@@ -48,7 +48,7 @@ class MatchQuestionTest {
             expectedRightChoice.add(getActivity(idx));
         }
         Answer expectedRightAnswer = new Answer();
-        expectedRightAnswer.setUserChoice(expectedRightChoice);
+        expectedRightAnswer.setResponse(expectedRightChoice);
         assertEquals(expectedRightAnswer, q.getRightAnswer());
     }
 
@@ -62,7 +62,7 @@ class MatchQuestionTest {
                 getActivity(3)
         );
         Answer a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         List<Answer> userAnswers = new ArrayList<>();
         userAnswers.add(a);
 
@@ -74,7 +74,7 @@ class MatchQuestionTest {
                 getActivity(0)
         );
         a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         userAnswers.add(a);
 
         // third user has two switched (2/4 of points)
@@ -85,7 +85,7 @@ class MatchQuestionTest {
                 getActivity(3)
         );
         a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         userAnswers.add(a);
 
         assertEquals(new ArrayList<>(Arrays.asList(1.0, 0.0, 2.0 / 4)), q.checkAnswer(userAnswers));
@@ -101,7 +101,7 @@ class MatchQuestionTest {
                 getActivity(3)
         );
         Answer a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         List<Answer> userAnswers = new ArrayList<>();
         userAnswers.add(a);
 
@@ -114,7 +114,7 @@ class MatchQuestionTest {
                 getActivity(12)
         );
         a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         userAnswers.add(a);
 
         // third user has 4 activities
@@ -125,7 +125,7 @@ class MatchQuestionTest {
                 getActivity(3)
         );
         a = new Answer();
-        a.setUserChoice(answerAct);
+        a.setResponse(answerAct);
         userAnswers.add(a);
 
         assertThrows(IllegalArgumentException.class, () -> {

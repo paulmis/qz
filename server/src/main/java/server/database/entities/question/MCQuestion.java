@@ -89,11 +89,11 @@ public class MCQuestion extends Question {
         List<Double> points = new ArrayList<>();
         for (Answer ans : userAnswers) {
             // There should be a single activity per answer
-            if (ans.getUserChoice().size() != 1) {
+            if (ans.getResponse().size() != 1) {
                 throw new IllegalArgumentException("There should be a single activity per answer.");
             }
             // Only the cost is compared because different activities might have the same cost unbeknown to the user
-            if (answer.getCost() == ans.getUserChoice().get(0).getCost()) {
+            if (answer.getCost() == ans.getResponse().get(0).getCost()) {
                 points.add(1.0);
             } else {
                 points.add(0.0);
@@ -105,7 +105,7 @@ public class MCQuestion extends Question {
     @Override
     public Answer getRightAnswer() {
         Answer rightAnswer = new Answer();
-        rightAnswer.setUserChoice(List.of(getAnswer()));
+        rightAnswer.setResponse(List.of(getAnswer()));
         return rightAnswer;
     }
     

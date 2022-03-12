@@ -77,10 +77,10 @@ public class EstimateQuestion extends Question {
         // Get all estimation errors
         int target = getActivities().get(0).getCost();
         for (Answer ans : userAnswers) {
-            if (ans.getUserChoice().size() != 1) {
+            if (ans.getResponse().size() != 1) {
                 throw new IllegalArgumentException("There should be a single activity per answer.");
             }
-            int userError = Math.abs(ans.getUserChoice().get(0).getCost() - target);
+            int userError = Math.abs(ans.getResponse().get(0).getCost() - target);
             errors.add(userError);
             sortedErrors.add(userError);
         }
@@ -111,7 +111,7 @@ public class EstimateQuestion extends Question {
         Answer rightAnswer = new Answer();
         Activity toEstimate = new Activity();
         toEstimate.setCost(getActivities().get(0).getCost());
-        rightAnswer.setUserChoice(List.of(toEstimate));
+        rightAnswer.setResponse(List.of(toEstimate));
         return rightAnswer;
     }
 

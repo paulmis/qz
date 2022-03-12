@@ -27,9 +27,9 @@ class AnswerTest {
                 getActivity(3),
                 getActivity(4)
         ));
-        dto.setUserChoice(choices.stream().map(Activity::getDTO).collect(Collectors.toList()));
+        dto.setResponse(choices.stream().map(Activity::getDTO).collect(Collectors.toList()));
         Answer toTest = new Answer(dto);
-        assertEquals(choices, toTest.getUserChoice());
+        assertEquals(choices, toTest.getResponse());
     }
 
     @Test
@@ -41,8 +41,8 @@ class AnswerTest {
                 getActivity(4)
         ));
         Answer toTest = new Answer();
-        toTest.setUserChoice(choices);
+        toTest.setResponse(choices);
         AnswerDTO dto = toTest.getDTO();
-        assertEquals(choices.stream().map(Activity::getDTO).collect(Collectors.toList()), dto.getUserChoice());
+        assertEquals(choices.stream().map(Activity::getDTO).collect(Collectors.toList()), dto.getResponse());
     }
 }

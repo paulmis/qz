@@ -29,22 +29,22 @@ public class Answer extends BaseEntity<AnswerDTO> {
      * @param dto DTO to map to entity.
      */
     public Answer(AnswerDTO dto) {
-        this.userChoice = dto.getUserChoice().stream().map(Activity::new).collect(Collectors.toList());
+        this.response = dto.getResponse().stream().map(Activity::new).collect(Collectors.toList());
     }
 
     /**
      * The list of activities from the Question given as an answer.
      */
     @ManyToMany
-    protected List<Activity> userChoice = new ArrayList<>();
+    protected List<Activity> response = new ArrayList<>();
 
     /**
      * Convert user choices to DTO.
      *
      * @return a list of ActivityDTOs
      */
-    protected List<ActivityDTO> getUserChoiceDTO() {
-        return this.userChoice.stream().map(Activity::getDTO).collect(Collectors.toList());
+    protected List<ActivityDTO> getResponseDTO() {
+        return this.response.stream().map(Activity::getDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -54,7 +54,7 @@ public class Answer extends BaseEntity<AnswerDTO> {
 
         // Deep conversion of user choice
         propertyMapper.addMappings(
-                mapper -> mapper.map(Answer::getUserChoiceDTO, AnswerDTO::setUserChoice)
+                mapper -> mapper.map(Answer::getResponseDTO, AnswerDTO::setResponse)
         );
 
         return modelMapper.map(this, AnswerDTO.class);

@@ -68,7 +68,7 @@ public class MatchQuestion extends Question {
         }
         List<Double> points = new ArrayList<>();
         for (Answer ans : userAnswers) {
-            if (ans.getUserChoice().size() != getActivities().size()) {
+            if (ans.getResponse().size() != getActivities().size()) {
                 throw new IllegalArgumentException(
                         "The number of activities in the answer must be the same as the question.");
             }
@@ -76,7 +76,7 @@ public class MatchQuestion extends Question {
             double currentPoints = 0;
             double pointStep = 1.0 / getActivities().size();
             for (int idx = 0; idx < getActivities().size(); idx++) {
-                if (getActivities().get(idx).getCost() == ans.getUserChoice().get(idx).getCost()) {
+                if (getActivities().get(idx).getCost() == ans.getResponse().get(idx).getCost()) {
                     currentPoints += pointStep;
                 }
             }
@@ -92,7 +92,7 @@ public class MatchQuestion extends Question {
     @Override
     public Answer getRightAnswer() {
         Answer rightAnswer = new Answer();
-        rightAnswer.setUserChoice(getActivities());
+        rightAnswer.setResponse(getActivities());
         return rightAnswer;
     }
     
