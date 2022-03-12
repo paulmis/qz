@@ -1,11 +1,9 @@
 package server.database.entities.question;
 
-import commons.entities.AnswerDTO;
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -13,6 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
+import server.database.entities.Answer;
 
 /**
  * MatchQuestion data structure - describes a match question.
@@ -21,7 +20,7 @@ import org.modelmapper.ModelMapper;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class MatchQuestion extends Question {
 
     /**
@@ -63,13 +62,13 @@ public class MatchQuestion extends Question {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     @Override
-    public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
+    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
         if (userAnswers == null) {
             throw new IllegalArgumentException("NULL input");
         }
         List<Double> points = new ArrayList<>();
-        for (AnswerDTO ans : userAnswers) {
-            if (ans.getUserChoice().size() != getActivities().size()) {
+        for (Answer ans : userAnswers) {
+            if (ans.getResponse().size() != getActivities().size()) {
                 throw new IllegalArgumentException(
                         "The number of activities in the answer must be the same as the question.");
             }
@@ -77,7 +76,7 @@ public class MatchQuestion extends Question {
             double currentPoints = 0;
             double pointStep = 1.0 / getActivities().size();
             for (int idx = 0; idx < getActivities().size(); idx++) {
-                if (getActivities().get(idx).getCost() == ans.getUserChoice().get(idx).getCost()) {
+                if (getActivities().get(idx).getCost() == ans.getResponse().get(idx).getCost()) {
                     currentPoints += pointStep;
                 }
             }
@@ -91,9 +90,9 @@ public class MatchQuestion extends Question {
     }
 
     @Override
-    public AnswerDTO getRightAnswer() {
-        AnswerDTO rightAnswer = new AnswerDTO();
-        rightAnswer.setUserChoice(getActivities().stream().map(a -> a.getDTO()).collect(Collectors.toList()));
+    public Answer getRightAnswer() {
+        Answer rightAnswer = new Answer();
+        rightAnswer.setResponse(getActivities());
         return rightAnswer;
     }
     

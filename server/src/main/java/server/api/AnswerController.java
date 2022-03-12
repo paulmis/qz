@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
@@ -41,7 +42,7 @@ public class AnswerController {
      * Sends the users answers to the server.
      *
      * @param answerData Contains the players answer in AnswerDTO format
-     * @param gameId This is the gameId of the game being played
+     * @param gameId     This is the gameId of the game being played
      * @return ok status if successful, not found status if game doesn't exist
      */
     @PutMapping("/{gameId}/answer")
@@ -52,24 +53,29 @@ public class AnswerController {
         if (!gameRepository.existsById(gameId)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        
+
         //Send 200 status if answer is sent successfully.
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
-     * Returns the correct answer to the current question.
+     * Returns the correct answer to a question.
      *
-     * @param gameId id of the game being played
+     * @param gameId      id of the game being played
+     * @param questionIdx index of the question to get the answer of.
+     *                    If empty, the answer to the current question is sent
      * @return correct answer to the current question
      */
-    @GetMapping("/{gameId}/correct")
-    ResponseEntity<AnswerDTO> getCorrectAnswer(@PathVariable UUID gameId) {
+    @GetMapping("/{gameId}/answer")
+    ResponseEntity<AnswerDTO> getCorrectAnswer(
+            @PathVariable UUID gameId,
+            @RequestParam(name = "idx") Optional<Integer> questionIdx) {
+
         Optional<Game> game = gameRepository.findById(gameId);
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
 
         // Check if game exists
-        if (game.isEmpty()) {
+        if (game.isEmpty() || user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
@@ -79,11 +85,16 @@ public class AnswerController {
         }
 
         // Retrieve current question
-        Optional<Question> currentQuestion = game.get().getQuestion();
+        Optional<Question> toAnswer = game.get().getQuestion();
+
+        // If questionIdx is present and valid, select the requested question
+        if (questionIdx.isPresent() && questionIdx.get() >= 0 && questionIdx.get() < game.get().getQuestions().size()) {
+            toAnswer = Optional.of((Question) game.get().getQuestions().get(questionIdx.get()));
+        }
 
         // Check if game is active
-        return currentQuestion
-                .map(question -> ResponseEntity.ok(question.getRightAnswer()))
+        return toAnswer
+                .map(question -> ResponseEntity.ok(question.getRightAnswer().getDTO()))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
     }
 

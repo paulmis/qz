@@ -37,4 +37,11 @@ public abstract class GameConfigurationDTO implements DTO {
     @DecimalMax(value = "60")
     @Description("Seconds per question")
     protected Integer answerTime;
+
+
+    /**
+     * Capacity of the lobby.
+     */
+    @DecimalMin(value = "1")
+    protected int capacity;
 }

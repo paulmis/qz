@@ -2,17 +2,15 @@ package server.utils;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import javax.persistence.Embeddable;
 import javax.persistence.Transient;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 
 /**
  * A simple LCG that generates numbers using Java random parameters.
  * See: https://en.wikipedia.org/wiki/Linear_congruential_generator
  */
-@Embeddable
+@Data
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 public class SaveableRandom extends Random {
     @Transient
@@ -25,7 +23,6 @@ public class SaveableRandom extends Random {
     /**
      * Internal state of the LCG.
      */
-    @Getter
     private long state;
 
     /**
@@ -39,20 +36,12 @@ public class SaveableRandom extends Random {
      * Generates a new random number.
      *
      * @return a random number between 0 and 2^48.
+     * @throws NullPointerException if the state is null.
      */
     @Override
-    public int next(int bits) {
+    public int next(int bits) throws NullPointerException {
         this.state = (this.state * multiplier + increment) % modulo;
         return (int) (this.state >>> (48 - bits));
-    }
-
-    /**
-     * Set the internal state of the generator.
-     *
-     * @param newState the new random state to set.
-     */
-    public void setSeed(@NonNull Long newState) {
-        state = newState;
     }
 }
 

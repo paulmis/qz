@@ -1,7 +1,7 @@
 package commons.entities.game;
 
-import commons.entities.UserDTO;
 import commons.entities.utils.DTO;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,4 +36,9 @@ public class GamePlayerDTO implements DTO {
      * Nickname of the player.
      */
     protected String nickname;
+
+    /**
+     * The date the player joined the lobby.
+     */
+    protected LocalDateTime joinDate;
 }
