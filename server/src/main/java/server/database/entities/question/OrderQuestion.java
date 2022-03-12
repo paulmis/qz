@@ -20,7 +20,7 @@ import server.database.entities.Answer;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class OrderQuestion extends Question {
 
     /**

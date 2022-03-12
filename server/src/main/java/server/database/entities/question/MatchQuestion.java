@@ -20,7 +20,7 @@ import server.database.entities.Answer;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class MatchQuestion extends Question {
 
     /**

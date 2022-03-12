@@ -23,7 +23,7 @@ https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Question extends BaseEntity<QuestionDTO> {
 
     /**
