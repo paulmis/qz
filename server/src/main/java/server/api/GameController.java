@@ -14,14 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.game.Game;
 import server.database.entities.question.Question;
 import server.database.repositories.game.GameRepository;
-import server.database.repositories.question.QuestionRepository;
 
 /**
  * QuestionController, controller for all api endpoints of question.
  */
 @RestController
 @RequestMapping("/api/game")
-public class QuestionController {
+public class GameController {
 
     /**
      * Question repository import.

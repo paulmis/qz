@@ -36,7 +36,7 @@ import server.database.repositories.game.GameRepository;
 @SpringBootTest
 @AutoConfigureMockMvc
 @EnableWebMvc
-class QuestionControllerTest {
+class GameControllerTest {
 
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
@@ -54,7 +54,7 @@ class QuestionControllerTest {
     private UserDTO joeDTO;
 
     @Autowired
-    public QuestionControllerTest(MockMvc mockMvc) {
+    public GameControllerTest(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
         this.objectMapper = new ObjectMapper().registerModule(new Jdk8Module());
     }
