@@ -12,9 +12,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.utils.Views;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -49,13 +49,13 @@ class LeaderboardControllerTest {
     }
 
     private User getUser(int id, int gamesPlayed, int score) {
-        User user = new User();
+        User user = new User("user" + id,
+                "email" + id,
+                "password" + id,
+                score,
+                gamesPlayed,
+                new HashSet<>());
         user.setId(getUUID(id));
-        user.setUsername("user" + id);
-        user.setPassword("password" + id);
-        user.setEmail("email" + id);
-        user.setGamesPlayed(gamesPlayed);
-        user.setScore(score);
         return user;
     }
 
@@ -67,11 +67,12 @@ class LeaderboardControllerTest {
     @Test
     public void testDefaultPagination() throws Exception {
         when(userRepository.findAllByOrderByScoreDesc(pageableCaptor.capture())).thenReturn(new ArrayList<>());
+
         this.mockMvc.perform(get("/api/leaderboard/score"));
         // Test that the page number is correct.
         assertEquals(0, pageableCaptor.getValue().getPageNumber());
         // Test that the page size is correct.
-        assertEquals(Integer.MAX_VALUE, pageableCaptor.getValue().getPageSize());
+        assertEquals(LeaderboardController.MAX_PAGE_SIZE, pageableCaptor.getValue().getPageSize());
     }
 
     /**
@@ -80,7 +81,7 @@ class LeaderboardControllerTest {
      * @throws Exception if the test fails.
      */
     @Test
-    public void testPaginationPropagation() throws Exception {
+    public void testGetPaginationPropagation() throws Exception {
         when(userRepository.findAllByOrderByScoreDesc(pageableCaptor.capture())).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(get("/api/leaderboard/score")
@@ -119,11 +120,16 @@ class LeaderboardControllerTest {
         List<User> users = List.of(getUser(1, 2, 3));
         when(userRepository.findAllByOrderByGamesPlayedDesc(any(Pageable.class))).thenReturn(users);
 
-        String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(
-                users.stream().map(BaseEntity::getDTO).collect(Collectors.toList()));
-
         this.mockMvc.perform(get("/api/leaderboard/games"))
-                .andExpect(status().isOk()).andExpect(content().json(expectedResponse));
+                .andExpect(status().isOk())
+                .andExpect(
+                        content().json(
+                                objectMapper
+                                        .writerWithView(Views.Public.class)
+                                        .writeValueAsString(
+                                                users.stream()
+                                                        .map(BaseEntity::getDTO)
+                                                        .collect(Collectors.toList()))));
     }
 
     /**
@@ -133,9 +139,10 @@ class LeaderboardControllerTest {
      */
     @Test
     public void testScore() throws Exception {
-        ArrayList<User> users = IntStream.iterate(3, i -> i > 0, i -> i - 1)
-                .mapToObj(i -> getUser(i, i * 2, i * 3))
-                .collect(Collectors.toCollection(ArrayList::new));
+        List<User> users = List.of(
+                getUser(3, 6, 9),
+                getUser(2, 4, 6),
+                getUser(1, 2, 3));
         when(userRepository.findAllByOrderByScoreDesc(any(Pageable.class))).thenReturn(users);
 
         String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(
@@ -152,9 +159,11 @@ class LeaderboardControllerTest {
      */
     @Test
     public void testGamesPlayed() throws Exception {
-        ArrayList<User> users = IntStream.iterate(3, i -> i > 0, i -> i - 1)
-                .mapToObj(i -> getUser(i, i * 2, i * 3))
-                .collect(Collectors.toCollection(ArrayList::new));
+        List<User> users = List.of(
+                getUser(3, 6, 9),
+                getUser(2, 4, 6),
+                getUser(1, 2, 3));
+
         when(userRepository.findAllByOrderByGamesPlayedDesc(any(Pageable.class))).thenReturn(users);
 
         String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(
