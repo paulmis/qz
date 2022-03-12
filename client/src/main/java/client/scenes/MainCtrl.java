@@ -46,6 +46,7 @@ import lombok.Generated;
 public class MainCtrl {
 
     private Stage primaryStage;
+    private String jwt;
 
     private ServerConnectScreenCtrl serverConnectScreenCtrl;
     private Parent serverConnectScreen;
@@ -418,5 +419,9 @@ public class MainCtrl {
                     break;
             }
         }
+    }
+
+    public void setJwt(String jwt) {
+        this.jwt = jwt;
     }
 }

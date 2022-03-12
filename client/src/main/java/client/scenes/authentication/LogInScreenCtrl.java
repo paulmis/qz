@@ -58,8 +58,12 @@ public class LogInScreenCtrl implements Initializable {
      */
     @FXML
     private void logInButtonClick() {
-        server.logIn(emailField.getText(), passwordField.getText());
-        mainCtrl.showLobbyScreen();
+        try {
+            mainCtrl.setJwt(server.logIn(emailField.getText(), passwordField.getText()));
+            mainCtrl.showLobbyScreen();
+        } catch (Exception e) {
+            System.out.print("Wrong username or password !");
+        }
     }
 
     /**

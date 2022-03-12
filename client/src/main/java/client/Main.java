@@ -38,6 +38,7 @@ public class Main extends Application {
 
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
+    private String jwt;
 
     public static void main(String[] args) {
         launch();

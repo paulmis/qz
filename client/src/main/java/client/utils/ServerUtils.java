@@ -16,10 +16,16 @@
 
 package client.utils;
 
+import commons.entities.UserDTO;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import org.glassfish.jersey.client.ClientConfig;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 
 /**
@@ -102,7 +108,12 @@ public class ServerUtils {
 
     public String logIn(String email, String password) {
         System.out.println("Verifying  User Credentials...\n");
-        return "200";
+        UserDTO user = new UserDTO("alex", email, password);
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("/api/auth/login")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(user, APPLICATION_JSON), String.class);
     }
 
     public String connect() {
