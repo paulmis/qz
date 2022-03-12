@@ -36,7 +36,7 @@ public class LeaderboardEntryCtrl implements Initializable {
         this.scoreLabel.setText(String.valueOf(user.getScore()));
 
         try {
-            this.imageView.setImage(new Image(String.valueOf(new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50")),true));
+            this.imageView.setImage(new Image(String.valueOf(new URL("https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg")),true));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

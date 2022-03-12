@@ -20,6 +20,7 @@ import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
+import client.scenes.leaderboard.GlobalLeaderboardCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
@@ -65,6 +66,9 @@ public class MainCtrl {
     private GameScreenCtrl gameScreenCtrl;
     private Parent gameScreen;
 
+    private GlobalLeaderboardCtrl globalLeaderboardCtrl;
+    private Parent globalLeaderboardScreen;
+
     private Popup lobbySettingsPopUp;
 
     /**
@@ -78,7 +82,8 @@ public class MainCtrl {
                            Pair<RegisterScreenCtrl, Parent> registerScreen,
                            Pair<NicknameScreenCtrl, Parent> nicknameScreen,
                            Pair<LobbyScreenCtrl, Parent> lobbyScreen,
-                           Pair<GameScreenCtrl, Parent> gameScreen) {
+                           Pair<GameScreenCtrl, Parent> gameScreen,
+                           Pair<GlobalLeaderboardCtrl, Parent> globalLeaderboardScreen) {
         this.primaryStage = primaryStage;
 
         this.serverConnectScreen = serverConnectScreen.getValue();
@@ -99,10 +104,13 @@ public class MainCtrl {
         this.gameScreen = gameScreen.getValue();
         this.gameScreenCtrl = gameScreen.getKey();
 
+        this.globalLeaderboardScreen = globalLeaderboardScreen.getValue();
+        this.globalLeaderboardCtrl = globalLeaderboardScreen.getKey();
+
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
         lobbySettingsPopUp = new Popup();
-        showServerConnectScreen();
+        showGlobalLeaderboardScreen();
     }
 
     enum StageScalingStrategy {
@@ -185,6 +193,14 @@ public class MainCtrl {
      */
     public void showServerConnectScreen() {
         this.showScreenLetterBox(serverConnectScreen, StageScalingStrategy.Letterbox);
+    }
+
+    /**
+     * This function displays the global leaderboard screen.
+     * It also sets it min width and height
+     */
+    public void showGlobalLeaderboardScreen() {
+        this.showScreenLetterBox(globalLeaderboardScreen, StageScalingStrategy.Letterbox);
     }
 
     /**

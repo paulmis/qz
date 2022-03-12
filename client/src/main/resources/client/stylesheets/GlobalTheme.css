@@ -18,5 +18,6 @@
 @import "screens/AuthenticationScreen.css";
 @import "questions/MultipleChoiceQuestion.css";
 @import "questions/EstimateQuestion.css";
-@import "screens/lobby/ConfigurationScreen.css";
-@import "screens/lobby/ConfigurationElement.css";
+@import "screens/lobby/ConfigurationScreen.css"
+@import "screens/lobby/ConfigurationElement.css"
+@import "screens/leaderboard/GlobalLeaderboard.css"
