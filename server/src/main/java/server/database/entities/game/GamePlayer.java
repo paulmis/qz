@@ -13,7 +13,7 @@ import server.database.entities.utils.BaseEntity;
  * Player entity, which represents an instance of a player in a specific game.
  * It has a many-to-one relationship to the User entity, and a one-to-one relationship to the Game entity.
  */
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @Entity
 @Data
 @AllArgsConstructor
@@ -24,33 +24,33 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     /**
      * The user the player is.
      */
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @NonNull
-    private User user;
+    @EqualsAndHashCode.Include
+    protected User user;
 
     /**
      * The player's nickname within the game.
      */
     @Column
-    private String nickname;
+    protected String nickname;
 
     /**
      * Player's score.
      */
     @Column
-    private Integer score = 0;
+    protected Integer score = 0;
 
     /**
      * The streak of correct answers in a row.
      */
     @Column
-    private Integer streak = 0;
+    protected Integer streak = 0;
 
     /**
      * The date the player joined the lobby.
      */
-    @Column
+    @Column(columnDefinition = "TIMESTAMP")
     protected LocalDateTime joinDate;
 
     /**
@@ -58,16 +58,8 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
      */
     @JsonBackReference
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @MapsId
+    @ToString.Exclude
     protected Game game;
-
-    /**
-     * The game the player is head of.
-     */
-    @JsonBackReference
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    protected Game gameHost;
 
     /**
      * Automatically sets the join date to when the entity is first persisted.
@@ -83,7 +75,7 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
      * @return player's nickname
      */
     public String getNickname() {
-        return nickname == null ? user.getUsername() : nickname;
+        return nickname == null && user != null ? user.getUsername() : nickname;
     }
 
     /**

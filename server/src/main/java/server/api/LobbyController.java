@@ -1,10 +1,8 @@
 package server.api;
 
 import commons.entities.game.GameDTO;
-import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
-import commons.entities.utils.DTO;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
-import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +21,6 @@ import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
-import server.database.entities.utils.BaseEntity;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
@@ -83,14 +79,18 @@ public class LobbyController {
         NormalGame game;
         try {
             game = new NormalGame(gameDTO);
+            game.setStatus(GameStatus.CREATED);
 
             // Save the configuration
             NormalGameConfiguration config =
                     gameConfigurationRepository.save((NormalGameConfiguration) game.getConfiguration());
             game.setConfiguration(config);
 
+            // Create the player
+            GamePlayer player = new GamePlayer(founder.get());
+            game.add(player);
+
             // Save the game
-            game.add(new GamePlayer(founder.get()));
             game = gameRepository.save(game);
         } catch (ConstraintViolationException | PersistenceException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -137,7 +137,6 @@ public class LobbyController {
      * @return true if the join was successful, false otherwise.
      */
     @PutMapping("/{lobbyId}/join")
-    @Transactional
     ResponseEntity join(@PathVariable UUID lobbyId) {
         // If the user or the game doesn't exist, return 404
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
@@ -147,9 +146,12 @@ public class LobbyController {
         }
         Game lobby = lobbyOptional.get();
 
+        // Create the player
+        GamePlayer player = new GamePlayer(user.get());
+
         // Check that the game hasn't started yet and add the player
         if (lobby.getStatus() != GameStatus.CREATED
-            || !lobby.add(new GamePlayer(user.get()))) {
+            || !lobby.add(player)) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
@@ -167,14 +169,14 @@ public class LobbyController {
     @PutMapping("/{lobbyId}/start")
     ResponseEntity start(@PathVariable UUID lobbyId) {
         // If the user or the game don't exist, return 404
-        Optional<User> founder = userRepository.findByEmail(AuthContext.get());
+        Optional<User> user = userRepository.findByEmail(AuthContext.get());
         Optional<Game> lobby = gameRepository.findById(lobbyId);
-        if (founder.isEmpty() || lobby.isEmpty()) {
+        if (user.isEmpty() || lobby.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         // If the user isn't the lobby head, return 403
-        if (lobby.get().getHost().getUser().getId() != founder.get().getId()) {
+        if (lobby.get().getHost().getUser().getId() != user.get().getId()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 

@@ -1,9 +1,7 @@
 package server.database.entities.question;
 
 import commons.entities.ActivityDTO;
-import java.util.List;
 import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -27,13 +25,6 @@ public class Activity extends BaseEntity<ActivityDTO> {
     public Activity(ActivityDTO dto) {
         new ModelMapper().map(dto, this);
     }
-
-    /**
-     * List of questions in which the activity is used.
-     * Needed for the many-to-many relation.
-     */
-    @ManyToMany(mappedBy = "activities")
-    private List<Question> usedIn;
 
     /**
      * Description of the activity.
