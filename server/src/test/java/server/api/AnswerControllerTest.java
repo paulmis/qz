@@ -137,6 +137,15 @@ class AnswerControllerTest {
         return answerEndpoint(gameId, Optional.empty());
     }
 
+    private URI scoreEndpoint(UUID gameId) {
+        UriBuilder uriBuilder = UriComponentsBuilder
+                .fromPath("/api/game/")
+                .pathSegment(gameId.toString())
+                .pathSegment("score");
+
+        return uriBuilder.build();
+    }
+
     @Test
     public void userAnswerOkTest() throws Exception {
 
@@ -240,21 +249,23 @@ class AnswerControllerTest {
     @Test
     public void getScoreTest() throws Exception {
         // ToDo: change this to test with real points
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/score"))
-                .andExpect(content()
-                        .string(equalTo("100")));
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.get(scoreEndpoint(mockLobby.getId())))
+                .andExpect(content().string(equalTo("100")));
     }
 
     @Test
     public void getScoreNoQuestionTest() throws Exception {
         mockLobby.setCurrentQuestion(1);
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/score"))
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.get(scoreEndpoint(mockLobby.getId())))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void getScoreWrongGameTest() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/game/" + getUUID(1) + "/score"))
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.get(scoreEndpoint(getUUID(1))))
                 .andExpect(status().isNotFound());
     }
 
@@ -272,7 +283,8 @@ class AnswerControllerTest {
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
         when(userRepository.findByEmail(susan.getEmail())).thenReturn(Optional.of(susan));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/game/" + mockLobby.getId() + "/score"))
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.get(scoreEndpoint(mockLobby.getId())))
                 .andExpect(status().isForbidden());
     }
 }
