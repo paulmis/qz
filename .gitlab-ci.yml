@@ -5,7 +5,7 @@ variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   SPRING_PROPS_POSTGRES_HOST: postgres
   POSTGRES_DB: oopp
-  POSTGRES_USER: postgres
+  POSTGRES_USER: oopp_admin
   POSTGRES_PASSWORD: "1234"
   POSTGRES_HOST_AUTH_METHOD: trust
 
