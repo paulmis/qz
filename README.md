@@ -33,8 +33,8 @@ This project is a quizzz app. The quizzz app is a singleplayer and multiplayer g
 3. Build the project with `gradle build` to verify that the source is valid
 
 Additionally, these tools will aid you in development and are heavily recommended:
-    * [Scene Builder](https://gluonhq.com/products/scene-builder/#download)
-    * [Postman (HTTP Requests Testing Tool)](https://www.postman.com/downloads/)
+- [Scene Builder](https://gluonhq.com/products/scene-builder/#download) - UI builder for `OpenJFX` frameworks
+- [Postman](https://www.postman.com/downloads/) - state of the art API testing tool
 
 
 ### Running the app
@@ -46,15 +46,14 @@ The quizzz app consists of three components: the database, server, and client. E
     4. Verify the connection with `IntelliJ`'s database module, `psql`, or `DBeaver`
         * the connection details are provided in the `docker-compose.yml` file located in the root project directory
 - server:
-    1. Run the `Main` java file in the `server` folder
+    1. Run the `Main` java file in the `/server/src/main/java`
         * This may take a few minutes during the initial build/run
     2. The server has launched successfully if the log ends with `Started Main in ... seconds (JVM running for ...)`
         * if you are getting a `PSQLException` when running the server or the tests, then the database connection is failing
 - client:
-    1. Edit run/debug configuration the `Main` file in the `client` folder
-    2. Click on VM options/arguments and add the following:
-    `--module-path="<LIB PATH IN JAVAFX FOLDER WHICH WAS DOWNLOADED>"--add-modules=javafx.controls,javafx.fxml`
-    3. Run the `Main` java file in the `client` folder
+    1. Edit run/debug configuration the `Main` file in `/client/src/main/java`
+        * Add `--module-path="<LIB PATH IN JAVAFX FOLDER WHICH WAS DOWNLOADED>"--add-modules=javafx.controls,javafx.fxml` to `VM options/arguments`
+    2. Execute `gradle run` (`./gradlew run` on MacOS) or run `Main` in `/client` to launch the client 
         * the client will spawn in the background
 
 ## How to contribute to it
