@@ -46,7 +46,6 @@ import lombok.Generated;
 public class MainCtrl {
 
     private Stage primaryStage;
-    private String jwt;
 
     private ServerConnectScreenCtrl serverConnectScreenCtrl;
     private Parent serverConnectScreen;
@@ -419,14 +418,5 @@ public class MainCtrl {
                     break;
             }
         }
-    }
-
-    /**
-     * Setter for the token.
-     *
-     * @param jwt string that represents the json web token.
-     * */
-    public void setJwt(String jwt) {
-        this.jwt = jwt;
     }
 }
