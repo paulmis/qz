@@ -22,6 +22,7 @@ import commons.entities.UserDTO;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.InvocationCallback;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -110,26 +111,51 @@ public class ServerUtils {
     }
 
     /**
+     * Handler for when the log in succeds.
+     */
+    public interface LogInHandlerSuccess {
+        void handle(String token);
+    }
+
+    /**
+     * Handler for when the log in fails.
+     */
+    public interface LogInHandlerFail {
+        void handle();
+    }
+
+    /**
      * Function that checks user credentials.
      *
      * @param email string representing
      *              the email of the user.
      * @param password string representing
      *                 the password of the user.
-     * @return String representing the jwt
-     *          of the user.
      */
-    public String logIn(String email, String password) {
+    public void logIn(String email, String password,
+                      LogInHandlerSuccess logInHandlerSuccess, LogInHandlerFail logInHandlerFail) {
         client = ClientBuilder.newClient(new ClientConfig());
         UserDTO user = new UserDTO("", email, password);
-        var answer = client
+        var invocation = client
                 .target(SERVER).path("/api/auth/login")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .post(Entity.entity(user, APPLICATION_JSON), String.class);
-        client = client.register(new Authenticator(answer));
-        loggedIn = true;
-        return answer;
+                .buildPost(Entity.entity(user, APPLICATION_JSON));
+        invocation.submit(new InvocationCallback<String>() {
+
+            @Override
+            public void completed(String o) {
+                logInHandlerSuccess.handle(o);
+                client = client.register(new Authenticator(o));
+                loggedIn = true;
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                logInHandlerFail.handle();
+                System.out.println(throwable);
+            }
+        });
     }
 
     public String connect() {

@@ -60,12 +60,13 @@ public class LogInScreenCtrl implements Initializable {
      */
     @FXML
     private void logInButtonClick() {
-        try {
-            server.logIn(emailField.getText(), passwordField.getText());
-            mainCtrl.showLobbyScreen();
-        } catch (Exception e) {
-            wrongCredentials.setOpacity(1.0);
-        }
+        server.logIn(emailField.getText(), passwordField.getText(),
+                (s) -> {
+                    javafx.application.Platform.runLater(mainCtrl::showLobbyScreen);
+                },
+                () -> javafx.application.Platform.runLater(() -> {
+                    wrongCredentials.setVisible(true); })
+        );
     }
 
     /**
@@ -75,6 +76,15 @@ public class LogInScreenCtrl implements Initializable {
     @FXML
     private void createAccountButtonClick() {
         panelTransition();
+    }
+
+    /**
+     * Function that resets the message
+     * when entering a new email / password.
+     */
+    @FXML
+    private void resetMessage() {
+        this.wrongCredentials.setVisible(false);
     }
 
     /**
