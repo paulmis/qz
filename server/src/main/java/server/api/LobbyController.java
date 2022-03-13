@@ -141,7 +141,7 @@ public class LobbyController {
     }
 
     /**
-     * Endpoint to get lobby configuration info.
+     * Endpoint to get lobby configuration.
      *
      * @param lobbyId the UUID of the lobby.
      * @return information on the configuration of the requested lobby.
@@ -168,16 +168,15 @@ public class LobbyController {
     @GetMapping("/{lobbyId}/config")
     ResponseEntity<GameConfigurationDTO> lobbyConfigurationInfo(
             @PathVariable @NonNull UUID lobbyId) {
-        // Check if the lobby exists.
+        //Check if the lobby exists.
         Optional<Game> lobby = gameRepository.findById(lobbyId);
         if (!lobby.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-        // Check if the lobby has been created.
-        if (lobby.get().getStatus() != GameStatus.CREATED) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        //Check if the lobby has been created.
+        if(lobby.get().getStatus() != GameStatus.CREATED) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
-        // Return ok status with configuration payload
         return ResponseEntity.ok(lobby.get().getDTO().getConfiguration());
     }
 
