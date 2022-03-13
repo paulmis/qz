@@ -23,11 +23,15 @@ import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.InvocationCallback;
+import commons.entities.UserDTO;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.glassfish.jersey.client.ClientConfig;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 /**
@@ -161,5 +165,20 @@ public class ServerUtils {
     public String connect() {
         System.out.println("New connection!\n");
         return "200";
+    }
+
+    /**
+     * Gets the global leaderboard from the database(mock function for now).
+     *
+     * @return the list of users that make up the global leaderboard.
+     */
+    public List<UserDTO> getGlobalLeaderboard() {
+        return IntStream.range(0,100).mapToObj(value -> {
+            var user = new UserDTO("a username",
+                    "sdaidoasijsd@fajida.com","asdasdasd");
+            user.setScore(3232);
+            user.setGamesPlayed(123);
+            return user;
+        }).collect(Collectors.toList());
     }
 }

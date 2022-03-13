@@ -7,12 +7,14 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
+import java.util.List;
+
 public class LeaderboardPane extends StackPane {
 
     private Node view;
     private LeaderboardCtrl controller;
 
-    public LeaderboardPane() {
+    public LeaderboardPane(List<UserDTO> leaderboard) {
 
         // We create the loader for the fxml of the question
         FXMLLoader fxmlLoader =
@@ -21,7 +23,7 @@ public class LeaderboardPane extends StackPane {
         // We set the controller of the fxml to our newly created controller
         // we also pass in the question text and the answer handler
         fxmlLoader.setControllerFactory(param ->
-                controller = new LeaderboardCtrl());
+                controller = new LeaderboardCtrl(leaderboard));
         // This loads the fxml
         try {
             view = (Node) fxmlLoader.load();

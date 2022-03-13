@@ -3,6 +3,7 @@ package client.scenes.leaderboard;
 import commons.entities.UserDTO;
 import javafx.geometry.Point3D;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
@@ -17,59 +18,89 @@ import org.fxyz3d.importers.obj.ObjImporter;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class LeaderboardCtrl implements Initializable {
 
-    @FXML
-    private Group group;
-
+    @FXML private Group group;
+    @FXML private ScrollPane scrollPane;
     @FXML private Box firstBox;
     @FXML private Box secondBox;
     @FXML private Box thirdBox;
-
     @FXML private Circle firstImage;
     @FXML private Circle secondImage;
     @FXML private Circle thirdImage;
-
     @FXML private Label firstText;
     @FXML private Label secondText;
     @FXML private Label thirdText;
-
     @FXML private VBox usersBox;
+
+    private final List<UserDTO> leaderboard;
+
+    public LeaderboardCtrl(List<UserDTO> leaderboard) {
+        this.leaderboard = leaderboard;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        PhongMaterial goldMaterial = new PhongMaterial(Color.GOLD);
-        goldMaterial.setDiffuseMap(new Image("https://thumbs.dreamstime.com/b/gold-texture-golden-gradient-smooth-material-background-textured-bright-metal-light-shiny-metallic-blank-backdrop-decorative-131647513.jpg"));
-        firstBox.setMaterial(goldMaterial);
+        var tempImagePattern = new ImagePattern(new Image("https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg"));
 
-        PhongMaterial bronzeMaterial = new PhongMaterial(Color.BROWN);
-        bronzeMaterial.setDiffuseMap(new Image("https://artx.nyc3.cdn.digitaloceanspaces.com/textures/20/11/copper-5fc4cba901b8d-1200.jpg"));
-        thirdBox.setMaterial(bronzeMaterial);
+        firstBox.setVisible(false);
+        secondBox.setVisible(false);
+        thirdBox.setVisible(false);
+        firstImage.setVisible(false);
+        secondImage.setVisible(false);
+        thirdImage.setVisible(false);
+        firstText.setVisible(false);
+        secondText.setVisible(false);
+        thirdText.setVisible(false);
 
-        PhongMaterial silverMaterial = new PhongMaterial(Color.SILVER);
-        silverMaterial.setDiffuseMap(new Image("https://www.myfreetextures.com/wp-content/uploads/2014/10/silver-brushed-metal-texture-900x900.jpg"));
-        secondBox.setMaterial(silverMaterial);
-
-        firstImage.setFill(new ImagePattern(new Image("https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg")));
-        secondImage.setFill(new ImagePattern(new Image("https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg")));
-        thirdImage.setFill(new ImagePattern(new Image("https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg")));
-
-        for(int i = 0;i<100;i++)
-        {
-            var user = new UserDTO();
-            user.setUsername("a really long nameWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
-            user.setGamesPlayed(50);
-            user.setScore(400);
-            usersBox.getChildren().add(new LeaderboardEntryPane(user,i+1));
+        switch(leaderboard.size()) {
+            default:
+            case 3:
+                thirdBox.setVisible(true);
+                thirdImage.setVisible(true);
+                thirdText.setVisible(true);
+                thirdText.setText(leaderboard.get(2).getUsername());
+                thirdImage.setFill(tempImagePattern);
+                PhongMaterial bronzeMaterial = new PhongMaterial(Color.BROWN);
+                bronzeMaterial.setDiffuseMap(new Image("https://artx.nyc3.cdn.digitaloceanspaces.com/textures/20/11/copper-5fc4cba901b8d-1200.jpg"));
+                thirdBox.setMaterial(bronzeMaterial);
+            case 2:
+                secondBox.setVisible(true);
+                secondImage.setVisible(true);
+                secondText.setVisible(true);
+                secondText.setText(leaderboard.get(1).getUsername());
+                secondImage.setFill(tempImagePattern);
+                PhongMaterial silverMaterial = new PhongMaterial(Color.SILVER);
+                silverMaterial.setDiffuseMap(new Image("https://www.myfreetextures.com/wp-content/uploads/2014/10/silver-brushed-metal-texture-900x900.jpg"));
+                secondBox.setMaterial(silverMaterial);
+            case 1:
+                firstBox.setVisible(true);
+                firstImage.setVisible(true);
+                firstText.setVisible(true);
+                firstText.setText(leaderboard.get(0).getUsername());
+                firstImage.setFill(tempImagePattern);
+                PhongMaterial goldMaterial = new PhongMaterial(Color.GOLD);
+                goldMaterial.setDiffuseMap(new Image("https://thumbs.dreamstime.com/b/gold-texture-golden-gradient-smooth-material-background-textured-bright-metal-light-shiny-metallic-blank-backdrop-decorative-131647513.jpg"));
+                firstBox.setMaterial(goldMaterial);
+                break;
         }
+
+        usersBox.getChildren().addAll(
+                IntStream.range(0,leaderboard.size())
+                .mapToObj(value -> new LeaderboardEntryPane(leaderboard.get(value),value+1))
+                .collect(Collectors.toList())
+        );
 
         try {
             ObjImporter importer = new ObjImporter();
-            var model = importer.loadAsPoly(getClass().getResource("/client/models/WinnerCup.obj")).getRoot();
+            var model = importer.loadAsPoly(getClass().getResource("/client/models/WinnerCup.png")).getRoot();
             group.getChildren().add(model);
             model.setTranslateX(500);
             model.setTranslateY(180);
@@ -94,7 +125,7 @@ public class LeaderboardCtrl implements Initializable {
             },0,50);
 
 
-        }catch(IOException e)
+        }catch(IOException ignored)
         {
 
         }

@@ -7,11 +7,13 @@ import com.jfoenix.controls.JFXListView;
 import commons.entities.UserDTO;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
@@ -23,6 +25,9 @@ public class GlobalLeaderboardCtrl implements Initializable {
     private final MainCtrl mainCtrl;
 
     @FXML private AnchorPane anchorPane;
+    @FXML private GridPane gridPane;
+
+    private LeaderboardPane leaderboardPane;
 
     /**
      * Initialize a new controller using dependency injection.
@@ -38,12 +43,24 @@ public class GlobalLeaderboardCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        var leaderboard = new LeaderboardPane();
-        this.anchorPane.getChildren().add(leaderboard);
-        anchorPane.setLeftAnchor(leaderboard,0d);
-        anchorPane.setRightAnchor(leaderboard,0d);
-        anchorPane.setBottomAnchor(leaderboard,0d);
-        anchorPane.setTopAnchor(leaderboard,100d);
-        leaderboard.setViewOrder(999);
+
+    }
+
+    public void resetLeaderboard() {
+        if(leaderboardPane!=null) {
+            this.anchorPane.getChildren().remove(leaderboardPane);
+        }
+        leaderboardPane = new LeaderboardPane(server.getGlobalLeaderboard());
+        this.anchorPane.getChildren().add(leaderboardPane);
+        AnchorPane.setLeftAnchor(leaderboardPane,0d);
+        AnchorPane.setRightAnchor(leaderboardPane,0d);
+        AnchorPane.setBottomAnchor(leaderboardPane,0d);
+        AnchorPane.setTopAnchor(leaderboardPane,100d);
+        leaderboardPane.setViewOrder(999);
+    }
+
+    @FXML
+    private void goBackToLobbies() {
+        mainCtrl.showLobbyScreen();
     }
 }
