@@ -4,7 +4,7 @@ services:
   db:
     image: postgres
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: oopp_admin
       POSTGRES_PASSWORD: 1234
       POSTGRES_DB: oopp
     ports:

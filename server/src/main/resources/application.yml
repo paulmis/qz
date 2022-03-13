@@ -10,7 +10,7 @@ spring:
       mode: always
   datasource:
     url: jdbc:postgresql://${SPRING_PROPS_POSTGRES_HOST:localhost}:5432/oopp
-    username: postgres
+    username: oopp_admin
     password: 1234
     driverClassName: org.postgresql.Driver
   jpa:
