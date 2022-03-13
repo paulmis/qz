@@ -161,7 +161,7 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void lobbyConfigurationFoundTest() throws Exception {
+    public void configGetConfigTest() throws Exception {
         this.mockMvc
                 .perform(get("/api/lobby/" + mockLobby.getId() + "/config"))
                 .andExpect(content().string(equalToObject(
@@ -170,14 +170,15 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void lobbyConfigurationNotFoundTest() throws Exception {
+    public void configGetLobbyNotFoundTest() throws Exception {
         this.mockMvc
                 .perform(get("/api/lobby/" + getUUID(1) + "/config"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void lobbyConfigurationLobbyNotCreatedTest() throws Exception {
+    public void configGetLobbyNotCreatedTest() throws Exception {
+        //Check if the game has started or finished
         mockLobby.setStatus(GameStatus.FINISHED);
         this.mockMvc
                 .perform(get("/api/lobby/" + mockLobby.getId() + "/config"))
@@ -223,6 +224,38 @@ class LobbyControllerTest {
                 .perform(put("/api/lobby/" + mockLobby.getId() + "/join"))
                 .andExpect(status().isConflict());
     }
+
+    //ToDo: Test if lobby configuration is updated in lobbyConfiguration.
+//    @Test
+//    public void configPostLobbyConfigurationUpdatedTest() throws Exception {
+//        // Mock the repositories
+//        mockLobby.setStatus(GameStatus.CREATED);
+//        mockLobby.setHost(johnPlayer);
+//
+//        // Request
+//        this.mockMvc
+//                .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(mockLobbyConfiguration.getDTO())))
+//                .andExpect(status().isOk());
+//    }
+
+    //ToDo: Test if lobby exists in lobbyConfiguration.
+//    @Test
+//    public void configPostLobbyNotFoundTest() throws Exception {
+//    }
+    //ToDo: Test if user exists in lobbyConfiguration.
+//    @Test
+//    public void configPostUserNotFoundTest() throws Exception {
+//    }
+    //ToDo: Test if lobby status is 'CREATED' in lobbyConfiguration.
+//    @Test
+//    public void configPostLobbyNotCreatedTest() throws Exception {
+//    }
+    //ToDo: Test if user is not host in lobbyConfiguration.
+//    @Test
+//    public void configPostUserNotHostTest() throws Exception {
+//    }
 
     @Test
     void createCreated() throws Exception {
