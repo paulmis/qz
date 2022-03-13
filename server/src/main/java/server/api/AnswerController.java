@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import server.database.entities.Answer;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
+import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
@@ -49,12 +51,27 @@ public class AnswerController {
     public ResponseEntity<HttpStatus> userAnswer(
             @RequestBody AnswerDTO answerData,
             @PathVariable @NonNull UUID gameId) {
-        //Check if game exists.
-        if (!gameRepository.existsById(gameId)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        // Retrieve game and user
+        Optional<Game> game = gameRepository.findById(gameId);
+        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+
+        // Check if game exists.
+        if (game.isEmpty() || user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        //Send 200 status if answer is sent successfully.
+        // Find GamePlayer
+        Optional<GamePlayer> player = game.get().getPlayers().stream()
+                .filter(pl -> ((GamePlayer) pl).getUser().getId().equals(user.get().getId())).findFirst();
+        if (player.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Update the answer
+        game.get().addAnswer(new Answer(answerData), player.get());
+
+        // Answer has been received successfully.
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

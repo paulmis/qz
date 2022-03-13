@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.persistence.*;
 import lombok.*;
 import org.modelmapper.ModelMapper;
+import server.database.entities.Answer;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
@@ -104,7 +105,13 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     protected List<Question> questions = new ArrayList<>();
 
     /**
-     * Automatically sets the create date to when the entity is first persisted.
+     * Answers given by each player for each question.
+     */
+    @ManyToMany
+    protected Map<Question, Map<GamePlayer, Answer>> answers = new HashMap<>();
+
+    /**
+     * Automatically sets the creation date to when the entity is first persisted.
      */
     @PrePersist
     void onCreate() {
@@ -147,6 +154,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         if (this.players.size() == 1) {
             this.host = player;
         }
+
+        syncAnswers();
         return true;
     }
 
@@ -174,6 +183,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
             }
         }
 
+        syncAnswers();
         return true;
     }
 
@@ -184,6 +194,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public void addQuestions(List<Question> questions) {
         this.questions.addAll(questions);
+        syncAnswers();
     }
 
     /**
@@ -197,6 +208,86 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         } catch (IndexOutOfBoundsException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Sets the answer of a player to the current question.
+     *
+     * @param answer the answer to set
+     * @param player the player giving the answer
+     */
+    public void addAnswer(Answer answer, GamePlayer player) {
+        // Check if player is actually playing in this game
+        if (!players.contains(player)) {
+            return;
+        }
+
+        // Get current question
+        Optional<Question> question = getQuestion();
+        if (question.isEmpty()) {
+            return;
+        }
+
+        // Get answers to current question
+        Map<GamePlayer, Answer> currentAnswers = answers.get(question.get());
+        if (currentAnswers == null) {
+            return;
+        }
+
+        // Update player's answer
+        currentAnswers.put(player, answer);
+        answers.put(question.get(), currentAnswers);
+    }
+
+    /**
+     * Returns the list of answers given by each player to the current question.
+     *
+     * @return answers given by each player to the current question
+     */
+    public List<Answer> getCurrentAnswers() {
+        // Retrieve current question
+        Optional<Question> question = getQuestion();
+        if (question.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Fill list
+        List<Answer> currentAnswers = new ArrayList<>();
+        for (GamePlayer player : players) {
+            currentAnswers.add(answers.get(question).get(player));
+        }
+        return currentAnswers;
+    }
+
+    /**
+     * Makes sure that every question has an answer from every player.
+     */
+    private void syncAnswers() {
+        // Init
+        Map<Question, Map<GamePlayer, Answer>> newAnswers = new HashMap<>();
+
+        // Sync questions
+        for (Question q : questions) {
+            Map<GamePlayer, Answer> oldPlayerAnswers;
+            if (answers.containsKey(q)) {
+                oldPlayerAnswers = answers.get(q);
+            } else {
+                oldPlayerAnswers = new HashMap<>();
+            }
+
+            // Sync players
+            Map<GamePlayer, Answer> newPlayerAnswers = new HashMap<>();
+            for (GamePlayer p : players) {
+                if (oldPlayerAnswers.containsKey(p)) {
+                    newPlayerAnswers.put(p, oldPlayerAnswers.get(p));
+                } else {
+                    newPlayerAnswers.put(p, new Answer());
+                }
+            }
+
+            newAnswers.put(q, newPlayerAnswers);
+        }
+        this.answers = newAnswers;
     }
 
     /**
