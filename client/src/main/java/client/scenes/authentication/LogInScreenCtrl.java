@@ -10,6 +10,7 @@ import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
@@ -28,6 +29,7 @@ public class LogInScreenCtrl implements Initializable {
     @FXML private CheckBox rememberMe;
     @FXML private TextField emailField;
     @FXML private TextField passwordField;
+    @FXML private Label wrongCredentials;
     @FXML private Pane pane;
 
     /**
@@ -62,7 +64,7 @@ public class LogInScreenCtrl implements Initializable {
             server.logIn(emailField.getText(), passwordField.getText());
             mainCtrl.showLobbyScreen();
         } catch (Exception e) {
-            System.out.print("Wrong username or password !");
+            wrongCredentials.setOpacity(1.0);
         }
     }
 
@@ -82,7 +84,6 @@ public class LogInScreenCtrl implements Initializable {
     @FXML
     private void rememberMeTick() {
         rememberMe.getUserData();
-        System.out.print("User wants to be remembered...\n");
     }
 
     /**
