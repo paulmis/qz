@@ -62,7 +62,6 @@ public class LobbyController {
      * @return 400 if the game constraints were violated, 404 if the user doesn't exist, 409 if the founder is
      *      already in a lobby or a game, 201 and the game otherwise
      */
-    @Transactional
     @PostMapping
     ResponseEntity<NormalGameDTO> create(@RequestBody NormalGameDTO gameDTO) {
         // If the user doesn't exist, return 404
@@ -197,7 +196,7 @@ public class LobbyController {
      *
      * @return 404 if the player isn't in a lobby, 200 otherwise
      */
-    @PutMapping("/leave")
+    @DeleteMapping("/leave")
     ResponseEntity leave() {
         // If the user or the game don't exist, return 404
         Optional<User> user = userRepository.findByEmail(AuthContext.get());

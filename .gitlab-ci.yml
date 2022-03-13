@@ -47,8 +47,6 @@ checkstyle-test:
 test:
   stage: test
   script:
-    - echo "GitLab CI/CD | Print all environment variables"
-    - env
     - ./gradlew AggregateJacocoReport
     # preserve coverage information in an easy-to-reach folder
     - mv build/reports/jacoco/aggregate/html ./coverage
