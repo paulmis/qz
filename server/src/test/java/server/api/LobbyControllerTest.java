@@ -8,8 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import commons.entities.UserDTO;
-import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.GameStatus;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.Null;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,6 +158,30 @@ class LobbyControllerTest {
         this.mockMvc
                 .perform(get("/api/lobby/" + getUUID(1)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void lobbyConfigurationFoundTest() throws Exception {
+        this.mockMvc
+                .perform(get("/api/lobby/" + mockLobby.getId() + "/config"))
+                .andExpect(content().string(equalToObject(
+                        objectMapper.writeValueAsString(mockLobby.getDTO().getConfiguration())
+                )));
+    }
+
+    @Test
+    public void lobbyConfigurationNotFoundTest() throws Exception {
+        this.mockMvc
+                .perform(get("/api/lobby/" + getUUID(1) + "/config"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void lobbyConfigurationLobbyNotCreatedTest() throws Exception {
+        mockLobby.setStatus(GameStatus.FINISHED);
+        this.mockMvc
+                .perform(get("/api/lobby/" + mockLobby.getId() + "/config"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
