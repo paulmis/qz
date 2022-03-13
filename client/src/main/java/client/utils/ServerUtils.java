@@ -121,7 +121,7 @@ public class ServerUtils {
      */
     public String logIn(String email, String password) {
         client = ClientBuilder.newClient(new ClientConfig());
-        UserDTO user = new UserDTO("alex", email, password);
+        UserDTO user = new UserDTO("", email, password);
         var answer = client
                 .target(SERVER).path("/api/auth/login")
                 .request(APPLICATION_JSON)
