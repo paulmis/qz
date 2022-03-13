@@ -23,6 +23,6 @@ public class Authenticator implements ClientRequestFilter {
      */
     public void filter(ClientRequestContext requestContext) {
         MultivaluedMap<String, Object> headers = requestContext.getHeaders();
-        headers.add("token", token);
+        headers.add("Authorization", "Bearer" + token);
     }
 }
