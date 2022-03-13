@@ -108,7 +108,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * Answers given by each player for each question.
      */
     @ManyToMany
-    protected Map<Question, Map<GamePlayer, Answer>> answers = new HashMap<>();
+    protected Set<Answer> answers = new HashSet<>();
 
     /**
      * Automatically sets the creation date to when the entity is first persisted.
@@ -229,33 +229,42 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         }
 
         // Get answers to current question
-        Map<GamePlayer, Answer> currentAnswers = answers.get(question.get());
-        if (currentAnswers == null) {
-            return;
+        for (Answer ans : answers) {
+            if (question.get().equals(ans.getQuestion()) && player.equals(ans.getPlayer())) {
+                ans.setResponse(answer.getResponse());
+                break;
+            }
         }
-
-        // Update player's answer
-        currentAnswers.put(player, answer);
-        answers.put(question.get(), currentAnswers);
     }
 
     /**
      * Returns the list of answers given by each player to the current question.
      *
-     * @return answers given by each player to the current question
+     * @return answers given by each player to the current question, sorted by player id
      */
     public List<Answer> getCurrentAnswers() {
         // Retrieve current question
-        Optional<Question> question = getQuestion();
-        if (question.isEmpty()) {
+        Optional<Question> questionOpt = getQuestion();
+        if (questionOpt.isEmpty()) {
             return new ArrayList<>();
         }
+        Question question = questionOpt.get();
 
         // Fill list
         List<Answer> currentAnswers = new ArrayList<>();
-        for (GamePlayer player : players) {
-            currentAnswers.add(answers.get(question).get(player));
+        for (Answer ans : answers) {
+            if (!question.equals(ans.getQuestion())) {
+                continue;
+            }
+            if (players.contains(ans.getPlayer())) {
+                currentAnswers.add(ans);
+            }
         }
+
+        // Sort list by player id
+        currentAnswers = currentAnswers.stream()
+                .sorted(Comparator.comparing(o -> o.getPlayer().getId()))
+                .collect(Collectors.toList());
         return currentAnswers;
     }
 
@@ -264,29 +273,25 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     private void syncAnswers() {
         // Init
-        Map<Question, Map<GamePlayer, Answer>> newAnswers = new HashMap<>();
+        Set<Answer> newAnswers = new HashSet<>();
 
         // Sync questions
         for (Question q : questions) {
-            Map<GamePlayer, Answer> oldPlayerAnswers;
-            if (answers.containsKey(q)) {
-                oldPlayerAnswers = answers.get(q);
-            } else {
-                oldPlayerAnswers = new HashMap<>();
-            }
-
-            // Sync players
-            Map<GamePlayer, Answer> newPlayerAnswers = new HashMap<>();
             for (GamePlayer p : players) {
-                if (oldPlayerAnswers.containsKey(p)) {
-                    newPlayerAnswers.put(p, oldPlayerAnswers.get(p));
+                Optional<Answer> oldAnswer = answers.stream()
+                        .filter(ans -> q.equals(ans.getQuestion()) && p.equals(ans.getPlayer())).findFirst();
+                if (oldAnswer.isPresent()) {
+                    newAnswers.add(oldAnswer.get());
                 } else {
-                    newPlayerAnswers.put(p, new Answer());
+                    Answer emptyAnswer = new Answer();
+                    emptyAnswer.setQuestion(q);
+                    emptyAnswer.setPlayer(p);
+                    newAnswers.add(emptyAnswer);
                 }
             }
-
-            newAnswers.put(q, newPlayerAnswers);
         }
+
+        // Replace old set
         this.answers = newAnswers;
     }
 

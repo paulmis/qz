@@ -5,14 +5,19 @@ import commons.entities.AnswerDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
+import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Activity;
+import server.database.entities.question.Question;
 import server.database.entities.utils.BaseEntity;
 
 /**
@@ -37,6 +42,20 @@ public class Answer extends BaseEntity<AnswerDTO> {
      */
     @ManyToMany
     protected List<Activity> response = new ArrayList<>();
+
+    /**
+     * The player that gave the answer.
+     */
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "player_id")
+    private GamePlayer player;
+
+    /**
+     * The question the answer is answering.
+     */
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "question_id")
+    private Question question;
 
     /**
      * Convert user choices to DTO.
