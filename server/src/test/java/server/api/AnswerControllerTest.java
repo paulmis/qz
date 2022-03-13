@@ -108,7 +108,7 @@ class AnswerControllerTest {
         // Set up a mock gamePlayer
         joePlayer = new GamePlayer();
         joePlayer.setUser(joe);
-        joePlayer.setGame(mockLobby);
+        mockLobby.add(joePlayer);
         when(gamePlayerRepository.existsByUserIdAndGameId(joe.getId(), mockLobby.getId())).thenReturn(true);
 
         // Set the context user
@@ -138,7 +138,6 @@ class AnswerControllerTest {
 
     @Test
     public void userAnswerOkTest() throws Exception {
-
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
         this.mockMvc
@@ -154,6 +153,29 @@ class AnswerControllerTest {
         AnswerDTO userAnswer = new AnswerDTO();
         this.mockMvc
                 .perform(MockMvcRequestBuilders.put(answerEndpoint(getUUID(1)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userAnswer)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void userAnswerWrongUserTest() throws Exception {
+        // Set up wrong user
+        User susan = new User("susan", "susan@anas.com", "stinkypinky");
+        susan.setId(getUUID(1));
+
+        // Set the context user
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        susan.getEmail(),
+                        susan.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+        when(userRepository.findByEmail(susan.getEmail())).thenReturn(Optional.of(susan));
+
+        // Request
+        AnswerDTO userAnswer = new AnswerDTO();
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userAnswer)))
                 .andExpect(status().isNotFound());

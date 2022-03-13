@@ -78,7 +78,7 @@ public class NormalGameTest {
         NormalGame repl = new NormalGame(dto);
         assertThat(game)
                 .usingRecursiveComparison()
-                .ignoringFields("players", "questions", "host", "random")
+                .ignoringFields("players", "questions", "answers", "host", "random")
                 .isEqualTo(repl);
     }
 
@@ -139,7 +139,7 @@ public class NormalGameTest {
     }
 
     @Test
-    void removeLastPlayer()  {
+    void removeLastPlayer() {
         assertThrows(LastPlayerRemovedException.class, () -> {
             game.remove(joe.getId());
             game.remove(susanne.getId());
