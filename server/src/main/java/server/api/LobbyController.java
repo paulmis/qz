@@ -29,6 +29,7 @@ import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
+import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
