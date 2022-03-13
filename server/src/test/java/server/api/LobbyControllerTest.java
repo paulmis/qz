@@ -221,6 +221,38 @@ class LobbyControllerTest {
                 .andExpect(status().isConflict());
     }
 
+    //ToDo: Test if lobby configuration is updated in lobbyConfiguration.
+//    @Test
+//    public void configPostLobbyConfigurationUpdatedTest() throws Exception {
+//        // Mock the repositories
+//        mockLobby.setStatus(GameStatus.CREATED);
+//        mockLobby.setHost(johnPlayer);
+//
+//        // Request
+//        this.mockMvc
+//                .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(mockLobbyConfiguration.getDTO())))
+//                .andExpect(status().isOk());
+//    }
+
+    //ToDo: Test if lobby exists in lobbyConfiguration.
+//    @Test
+//    public void configPostLobbyNotFoundTest() throws Exception {
+//    }
+    //ToDo: Test if user exists in lobbyConfiguration.
+//    @Test
+//    public void configPostUserNotFoundTest() throws Exception {
+//    }
+    //ToDo: Test if lobby status is 'CREATED' in lobbyConfiguration.
+//    @Test
+//    public void configPostLobbyNotCreatedTest() throws Exception {
+//    }
+    //ToDo: Test if user is not host in lobbyConfiguration.
+//    @Test
+//    public void configPostUserNotHostTest() throws Exception {
+//    }
+
     @Test
     public void configPostLobbyConfigurationUpdateTest() throws Exception {
         mockLobby.setStatus(GameStatus.CREATED);
