@@ -73,7 +73,7 @@ public class AuthControllerTests {
                         post("/api/auth/register")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(joeDTO)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test

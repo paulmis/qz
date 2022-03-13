@@ -2,6 +2,7 @@ package server.api;
 
 import commons.entities.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,30 +23,38 @@ import server.database.repositories.UserRepository;
 @RestController
 @RequestMapping("api/auth")
 public class AuthController {
-    @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private UserRepository userRepository;
-    @Autowired private JWTHandler handler;
-    @Autowired private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JWTHandler handler;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     /**
      * Allows the user to register.
      *
      * @param userData the user data
-     * @return 409 if the user with this data already exists, 200 and the auth token otherwise
+     * @return 409 if the user with this data already exists, 201 and the auth token otherwise
      */
     @PostMapping("register")
     public ResponseEntity<String> register(@RequestBody UserDTO userData) {
         // If a user with this email or username already exists, return 409
         if (userRepository.existsByEmailOrUsername(userData.getEmail(), userData.getUsername())) {
-            return ResponseEntity.status(409).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
         // Salt the password and persist
         userData.setPassword(passwordEncoder.encode(userData.getPassword()));
         User user = userRepository.save(new User(userData));
 
-        // Generate a JWT token and return it with 200
-        return ResponseEntity.ok(handler.generateToken(user.getEmail()));
+        // Generate a JWT token and return it with 201
+        return new ResponseEntity<>(handler.generateToken(user.getEmail()), HttpStatus.CREATED);
     }
 
     /**
@@ -53,7 +62,7 @@ public class AuthController {
      *
      * @param userData user's data
      * @return 400 if the request is malformed, 401 if the user is not found or the password is incorrect,
-     *      200 and the auth token otherwise
+     *     200 and the auth token otherwise
      */
     @PostMapping("login")
     public ResponseEntity<String> login(@RequestBody UserDTO userData) {
@@ -73,7 +82,7 @@ public class AuthController {
             // Generate a JWT token and return it with 200
             return ResponseEntity.ok(handler.generateToken(user.getEmail()));
         } catch (AuthenticationException ex) {
-            return ResponseEntity.status(401).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 }

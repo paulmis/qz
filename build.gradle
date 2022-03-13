@@ -12,7 +12,10 @@ subprojects {
 	apply plugin: 'java'
 	apply plugin: 'checkstyle'
 	apply plugin: 'jacoco'
-	
+
+	jacoco {
+		toolVersion = "0.8.7"
+	}
 	
 	group = 'oopp'
 	version = '0.0.1-SNAPSHOT'

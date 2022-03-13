@@ -2,6 +2,7 @@ package commons.entities.game;
 
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.utils.DTO;
+import java.time.LocalDateTime;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +30,7 @@ public class GameDTO implements DTO {
     /**
      * The creation date of the game.
      */
-    protected Date createDate;
+    protected LocalDateTime createDate;
 
     /**
      * The type of the game.
