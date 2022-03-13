@@ -131,6 +131,27 @@ public class LobbyController {
     }
 
     /**
+     * Endpoint to get lobby configuration.
+     *
+     * @param lobbyId the UUID of the lobby.
+     * @return information on the configuration of the requested lobby.
+     */
+    @GetMapping("/{lobbyId}/config")
+    ResponseEntity<GameConfigurationDTO> lobbyConfiguration(
+            @PathVariable @NonNull UUID lobbyId) {
+        //Check if the lobby exists.
+        Optional<Game> lobby = gameRepository.findById(lobbyId);
+        if (!lobby.isPresent()) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        //Check if the lobby has been created.
+        if(lobby.get().getStatus() != GameStatus.CREATED) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok(lobby.get().getDTO().getConfiguration());
+    }
+
+    /**
      * Endpoint to allow a user to join a game.
      *
      * @param lobbyId    UUID of the lobby to join.
@@ -190,4 +211,40 @@ public class LobbyController {
         // Otherwise, return 200
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Endpoint to allow the host to change configuration.
+     *
+     * @param lobbyId UUID of the lobby to join.
+     * @param userId UUID of the user/host.
+     * @return
+     */
+    @PostMapping("/{lobbyId}/config")
+    ResponseEntity updateConfiguration(
+            @PathVariable @NonNull UUID lobbyId,
+            @PathVariable @NonNull UUID userId) {
+        // Check if the lobby exists.
+        Optional<Game> lobby = gameRepository.findById(lobbyId);
+        if (!lobby.isPresent()) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        // Check if the lobby is created.
+        if (lobby.get().getStatus() != GameStatus.CREATED) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        // Check if the user exists
+        Optional<User> user = userRepository.findById(userId);
+        if (!user.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // Check if the user is in the lobby.
+        if (!lobby.get().getPlayers().contains(user)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        // Check if the user is host.
+        //ToDo: Method to check if the user is the host of the lobby.
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
