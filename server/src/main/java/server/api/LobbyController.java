@@ -133,6 +133,22 @@ public class LobbyController {
      * @return information on the requested lobby.
      */
     @GetMapping("/{lobbyId}")
+        Optional<Game> lobby = gameRepository.findById(lobbyId);
+        if (!lobby.isPresent()) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * Endpoint to get lobby configuration.
+     *
+     * @param lobbyId the UUID of the lobby.
+     * @return information on the configuration of the requested lobby.
+     */
+    @GetMapping("/{lobbyId}/config")
+    ResponseEntity<GameConfigurationDTO> lobbyConfiguration(
+            @PathVariable @NonNull UUID lobbyId) {
+        //Check if the lobby exists.
     ResponseEntity<GameDTO> get(@PathVariable UUID lobbyId) {
         return gameRepository
                 .findById(lobbyId)
@@ -236,6 +252,11 @@ public class LobbyController {
     ResponseEntity<GameConfigurationDTO> lobbyConfiguration(
             @PathVariable @NonNull UUID lobbyId) {
         //Check if the lobby exists.
+        //Check if the lobby has been created.
+        if(lobby.get().getStatus() != GameStatus.CREATED) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok(lobby.get().getDTO().getConfiguration());
         Optional<Game> lobby = gameRepository.findById(lobbyId);
         if (!lobby.isPresent()) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
