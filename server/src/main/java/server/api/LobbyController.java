@@ -27,6 +27,7 @@ import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
+import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
@@ -194,6 +195,39 @@ public class LobbyController {
         }
 
         // Otherwise, return 200
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Endpoint to allow a player to leave the lobby.
+     *
+     * @return 404 if the player isn't in a lobby, 200 otherwise
+     */
+    @PutMapping("/leave")
+    ResponseEntity leave() {
+        // If the user or the game don't exist, return 404
+        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        if (user.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Check that the user is in a lobby
+        Optional<Game> lobbyOptional =
+                gameRepository.findByPlayers_User_IdEqualsAndStatus(user.get().getId(), GameStatus.CREATED);
+        if (lobbyOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Remove the player from the lobby
+        // If this was the last player, delete the lobby
+        Game lobby = lobbyOptional.get();
+        try {
+            lobby.remove(user.get().getId());
+            gameRepository.save(lobby);
+        } catch (LastPlayerRemovedException ex) {
+            gameRepository.delete(lobby);
+        }
+
         return ResponseEntity.ok().build();
     }
 }
