@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import lombok.NonNull;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
@@ -218,7 +217,7 @@ public class LobbyController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         // Check if the lobby has been created.
-        if(lobby.get().getStatus() != GameStatus.CREATED) {
+        if (lobby.get().getStatus() != GameStatus.CREATED) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         // Return ok status with configuration payload
