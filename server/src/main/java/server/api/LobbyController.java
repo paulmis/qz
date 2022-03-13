@@ -226,34 +226,29 @@ public class LobbyController {
      * Endpoint to allow the host to change configuration.
      *
      * @param lobbyId UUID of the lobby to join.
-     * @param userId UUID of the user/host.
      * @param gameConfigurationData The new configuration data.
      * @return An ok status if successful.
      */
     @PostMapping("/{lobbyId}/config")
     ResponseEntity updateConfiguration(
             @PathVariable @NonNull UUID lobbyId,
-            @PathVariable @NonNull UUID userId,
-            @PathVariable @NonNull GameConfiguration gameConfigurationData) {
-        // Check if the lobby exists.
-        Optional<Game> lobby = gameRepository.findById(lobbyId);
-        if (!lobby.isPresent()) {
+            @RequestBody GameConfigurationDTO gameConfigurationData) {
+        Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
+        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        // Check if the lobby exists and user exists.
+        if (!lobbyOptional.isPresent() || !user.isPresent()) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
+        Game lobby = lobbyOptional.get();
         // Check if the lobby is created.
-        if (lobby.get().getStatus() != GameStatus.CREATED) {
+        if (lobby.getStatus() != GameStatus.CREATED) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        // Check if the user exists
-        Optional<User> user = userRepository.findById(userId);
-        if (!user.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         // Check if the user is host.
-        if (lobby.get().getHost().getUser().getId() != user.get().getId()) {
+        if (lobby.getHost().getUser().getId() != user.get().getId()) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        lobby.get().setConfiguration(gameConfigurationData);
+        // ToDo: lobby.setConfiguration(gameConfigurationData.get());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
