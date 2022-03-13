@@ -2,6 +2,7 @@ package server.api;
 
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
+import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import java.net.URI;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.NonNull;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
@@ -27,6 +29,9 @@ import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
+import server.database.entities.game.NormalGame;
+import server.database.entities.game.configuration.GameConfiguration;
+import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
@@ -129,22 +134,6 @@ public class LobbyController {
      * @return information on the requested lobby.
      */
     @GetMapping("/{lobbyId}")
-        Optional<Game> lobby = gameRepository.findById(lobbyId);
-        if (!lobby.isPresent()) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    /**
-     * Endpoint to get lobby configuration.
-     *
-     * @param lobbyId the UUID of the lobby.
-     * @return information on the configuration of the requested lobby.
-     */
-    @GetMapping("/{lobbyId}/config")
-    ResponseEntity<GameConfigurationDTO> lobbyConfiguration(
-            @PathVariable @NonNull UUID lobbyId) {
-        //Check if the lobby exists.
     ResponseEntity<GameDTO> get(@PathVariable UUID lobbyId) {
         return gameRepository
                 .findById(lobbyId)
@@ -221,22 +210,18 @@ public class LobbyController {
      * @return information on the configuration of the requested lobby.
      */
     @GetMapping("/{lobbyId}/config")
-    ResponseEntity<GameConfigurationDTO> lobbyConfiguration(
+    ResponseEntity<GameConfigurationDTO> lobbyConfigurationInfo(
             @PathVariable @NonNull UUID lobbyId) {
-        //Check if the lobby exists.
-        //Check if the lobby has been created.
-        if(lobby.get().getStatus() != GameStatus.CREATED) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        return ResponseEntity.ok(lobby.get().getDTO().getConfiguration());
+        // Check if the lobby exists.
         Optional<Game> lobby = gameRepository.findById(lobbyId);
         if (!lobby.isPresent()) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        //Check if the lobby has been created.
+        // Check if the lobby has been created.
         if(lobby.get().getStatus() != GameStatus.CREATED) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        // Return ok status with configuration payload
         return ResponseEntity.ok(lobby.get().getDTO().getConfiguration());
     }
 
