@@ -2,12 +2,12 @@ package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static server.TestHelpers.getUUID;
 
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import server.database.entities.Answer;
@@ -103,8 +103,7 @@ class MCQuestionTest {
     void allArgsConstructorTest() {
         // Test setup
         Question mcNoArgs = new MCQuestion();
-        UUID anId = UUID.randomUUID();
-        mcNoArgs.setId(anId);
+        mcNoArgs.setId(getUUID(0));
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
         mcNoArgs.setActivities(List.copyOf(activities));
@@ -114,7 +113,7 @@ class MCQuestionTest {
         ((MCQuestion) mcNoArgs).setAnswer(answer);
         boolean guessConsumption = true;
         ((MCQuestion) mcNoArgs).setGuessConsumption(guessConsumption);
-        Question mcAllArgs = new MCQuestion(anId, activities, questionText, answer, guessConsumption);
+        Question mcAllArgs = new MCQuestion(getUUID(0), activities, questionText, answer, guessConsumption);
 
         // Constructor comparison
         assertEquals(mcNoArgs.getId(), mcAllArgs.getId());
@@ -130,10 +129,9 @@ class MCQuestionTest {
         String questionText = "aQuestion";
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        UUID anId = UUID.randomUUID();
         Activity answer = getActivity(2);
         boolean guessConsumption = true;
-        Question mcAllArgs = new MCQuestion(anId, activities, questionText, answer, guessConsumption);
+        Question mcAllArgs = new MCQuestion(getUUID(0), activities, questionText, answer, guessConsumption);
         Question mcCopy = new MCQuestion(mcAllArgs, answer, guessConsumption);
 
         // Constructor comparison

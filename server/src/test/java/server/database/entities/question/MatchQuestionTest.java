@@ -2,12 +2,12 @@ package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static server.TestHelpers.getUUID;
 
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import server.database.entities.Answer;
@@ -146,12 +146,11 @@ class MatchQuestionTest {
         String questionText = "aQuestion";
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        UUID anId = UUID.randomUUID();
         Question matchNoArgs = new MatchQuestion();
-        matchNoArgs.setId(anId);
+        matchNoArgs.setId(getUUID(0));
         matchNoArgs.setActivities(List.copyOf(activities));
         matchNoArgs.setText(questionText);
-        Question matchAllArgs = new MatchQuestion(anId, activities, questionText);
+        Question matchAllArgs = new MatchQuestion(getUUID(0), activities, questionText);
 
         // Constructor comparison
         assertEquals(matchNoArgs.getId(), matchAllArgs.getId());
@@ -165,8 +164,7 @@ class MatchQuestionTest {
         String questionText = "aQuestion";
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        UUID anId = UUID.randomUUID();
-        Question matchAllArgs = new MatchQuestion(anId, activities, questionText);
+        Question matchAllArgs = new MatchQuestion(getUUID(0), activities, questionText);
         Question matchCopy = new MatchQuestion(matchAllArgs);
 
         // Constructor comparison

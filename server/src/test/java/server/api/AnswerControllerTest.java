@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalToObject;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static server.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -58,10 +59,6 @@ class AnswerControllerTest {
 
     @MockBean
     private GamePlayerRepository gamePlayerRepository;
-
-    private UUID getUUID(int id) {
-        return UUID.fromString("00000000-0000-0000-0000-00000000000" + (id % 10));
-    }
 
     private static Activity getActivity(int id) {
         Activity a = new Activity();

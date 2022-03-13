@@ -3,6 +3,7 @@ package server.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static server.TestHelpers.getUUID;
 
 import commons.entities.game.GameStatus;
 import java.time.LocalDateTime;
@@ -51,29 +52,29 @@ public class GameServiceTest {
     void init() {
         // Create users
         joe = new User("joe", "joe@doe.com", "stinkywinky");
-        joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        joe.setId(getUUID(0));
         joePlayer = new GamePlayer(joe);
         joePlayer.setJoinDate(LocalDateTime.parse("2020-03-04T00:00:00"));
 
         susanne = new User("Susanne", "susanne@louisiane.com", "stinkymonkey");
-        susanne.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        susanne.setId(getUUID(1));
         susannePlayer = new GamePlayer(susanne);
         susannePlayer.setJoinDate(LocalDateTime.parse("2022-03-03T00:00:00"));
 
         // Create questions
         questionA = new MCQuestion();
-        questionA.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        questionA.setId(getUUID(1));
         questionB = new MCQuestion();
-        questionB.setId(UUID.fromString("11111111-2222-2222-2222-222222222222"));
+        questionB.setId(getUUID(2));
         questionC = new MCQuestion();
-        questionC.setId(UUID.fromString("11111111-3333-3333-3333-333333333333"));
+        questionC.setId(getUUID(3));
         questionD = new MCQuestion();
-        questionD.setId(UUID.fromString("11111111-4444-4444-4444-444444444444"));
+        questionD.setId(getUUID(4));
         usedQuestionIds = Arrays.asList(questionB.getId(), questionA.getId());
 
         // Create the game
         game = new NormalGame();
-        game.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        game.setId(getUUID(0));
         game.setConfiguration(new NormalGameConfiguration(3, 13, 2));
         game.add(joePlayer);
         game.add(susannePlayer);

@@ -7,8 +7,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static server.TestHelpers.getUUID;
 
-import com.google.common.base.Strings;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
@@ -27,17 +27,6 @@ class SSEManagerTest {
     void setUp() {
         // We want a new SSEManager for each test run.
         sseManager = new SSEManager();
-    }
-
-    /**
-     * Convert an integer to a UUID.
-     *
-     * @param id ID to convert to UUID.
-     * @return Generated UUID.
-     */
-    private UUID getUUID(int id) {
-        return UUID.fromString(String.format("00000000-0000-0000-0000-%s",
-                Strings.padStart(String.valueOf(id), 11, '0')));
     }
 
     /**
