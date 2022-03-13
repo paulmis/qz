@@ -35,11 +35,9 @@ public class QuestionController {
     public ResponseEntity<HttpStatus> mcCreate() {
         List<Activity> activities = activityService.getActivities(4);
 
-        Question question = new MCQuestion(UUID.randomUUID(),
-                activities,
+        Question question = new MCQuestion(activities,
                 "Question X",
-                activities.get(0),
-                true);
+                activities.get(0));
 
         questionRepository.save(question);
 
