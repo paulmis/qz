@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.Null;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,6 +160,30 @@ class LobbyControllerTest {
         this.mockMvc
                 .perform(get("/api/lobby/" + getUUID(1)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void lobbyConfigurationFoundTest() throws Exception {
+        this.mockMvc
+                .perform(get("/api/lobby/" + mockLobby.getId() + "/config"))
+                .andExpect(content().string(equalToObject(
+                        objectMapper.writeValueAsString(mockLobby.getDTO().getConfiguration())
+                )));
+    }
+
+    @Test
+    public void lobbyConfigurationNotFoundTest() throws Exception {
+        this.mockMvc
+                .perform(get("/api/lobby/" + getUUID(1) + "/config"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void lobbyConfigurationLobbyNotCreatedTest() throws Exception {
+        mockLobby.setStatus(GameStatus.FINISHED);
+        this.mockMvc
+                .perform(get("/api/lobby/" + mockLobby.getId() + "/config"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
