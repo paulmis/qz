@@ -77,6 +77,7 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
      * @return player's nickname
      */
     public String getNickname() {
+        // the user != null is necessary
         return nickname == null && user != null ? user.getUsername() : nickname;
     }
 

@@ -124,7 +124,7 @@ public class NormalGameTest {
     @Test
     void removeOk() throws LastPlayerRemovedException {
         assertTrue(game.remove(susanne.getId()));
-        assertFalse(game.getPlayers().contains(susannePlayer));
+        assertFalse(game.getPlayers().containsKey(susanne.getId()));
     }
 
     @Test

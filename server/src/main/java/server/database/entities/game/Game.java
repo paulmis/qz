@@ -78,11 +78,11 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     private SaveableRandom random = new SaveableRandom(this.seed);
 
     /**
-     * List of players currently in the game.
+     * List of players currently in the game mapped by their user IDs.
      */
     @JsonManagedReference
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
-    protected Set<GamePlayer> players = new HashSet<>();
+    protected Map<UUID, GamePlayer> players = new HashMap<>();
 
     /**
      * The head of the lobby - person in charge with special privileges.
@@ -138,9 +138,12 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public boolean add(GamePlayer player) {
         // Check if the player can be added
-        if (isFull() || !this.players.add(player)) {
+        if (isFull() || players.containsKey(player.getUser().getId())) {
             return false;
         }
+
+        // Add the player
+        this.players.put(player.getUser().getId(), player);
         player.setGame(this);
 
         // If the lobby is empty, add this player as the head of the lobby
@@ -151,30 +154,48 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
-     * Remove a player from the game.
+     * Remove a player from the game. If the game is ongoing, the player will only be marked as abandoned.
+     * If the game has concluded nothing will happen and the function will return false.
      *
-     * @param playerId The id of the player to remove
-     * @return Whether the player was removed.
+     * @param userId the user id of the player to remove
+     * @return whether the player was removed/marked as abandoned
      */
-    public boolean remove(UUID playerId) throws LastPlayerRemovedException {
-        // Remove the player from the game
-        if (!this.players.removeIf(player -> player.getUser().getId().equals(playerId))) {
-            return false;
+    public boolean remove(UUID userId) throws LastPlayerRemovedException {
+        switch (this.status) {
+            case CREATED:
+                // Remove the player from the game
+                if (this.players.remove(userId) == null) {
+                    return false;
+                }
+
+                // If the head left, replace them
+                if (this.host.getUser().getId() == userId) {
+                    this.host = this.players
+                            .values().stream()
+                            .min(Comparator.comparing(GamePlayer::getJoinDate))
+                            .orElse(null);
+
+                    // If the last player left, throw an exception
+                    if (this.host == null) {
+                        throw new LastPlayerRemovedException();
+                    }
+                }
+
+                return true;
+
+            case ONGOING:
+                // If the player had already abandoned the game, return false
+                if (!this.players.get(userId).isAbandoned()) {
+                    return false;
+                }
+
+                // Mark the player as abandoned
+                this.players.get(userId).setAbandoned(true);
+                return true;
+
+            default:
+                return false;
         }
-
-        // If the head left, replace them
-        if (this.host.getUser().getId() == playerId) {
-            this.host = this.players.stream()
-                    .min(Comparator.comparing(GamePlayer::getJoinDate))
-                    .orElse(null);
-
-            // If the last player left, throw an exception
-            if (this.host == null) {
-                throw new LastPlayerRemovedException();
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -231,7 +252,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
                 this.configuration.getDTO(),
                 this.status,
                 this.currentQuestion,
-                this.players.stream().map(GamePlayer::getDTO).collect(Collectors.toSet()),
+                this.players.values().stream().map(GamePlayer::getDTO).collect(Collectors.toSet()),
                 this.host == null ? null : this.host.getId());
     }
 
