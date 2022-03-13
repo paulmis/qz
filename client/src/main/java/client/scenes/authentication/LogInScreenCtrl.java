@@ -51,7 +51,7 @@ public class LogInScreenCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        this.wrongCredentials.setVisible(false);
     }
 
     /**
