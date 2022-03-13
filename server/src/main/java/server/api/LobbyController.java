@@ -3,6 +3,7 @@ package server.api;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
+import commons.entities.game.configuration.GameConfigurationDTO;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,7 @@ import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
+import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
@@ -137,6 +139,28 @@ public class LobbyController {
     }
 
     /**
+     * Endpoint to get lobby configuration info.
+     *
+     * @param lobbyId the UUID of the lobby.
+     * @return information on the configuration of the requested lobby.
+     */
+    @GetMapping("/{lobbyId}/config")
+    ResponseEntity<GameConfigurationDTO> lobbyConfigurationInfo(
+            @PathVariable @NonNull UUID lobbyId) {
+        // Check if the lobby exists.
+        Optional<Game> lobby = gameRepository.findById(lobbyId);
+        if (!lobby.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // Check if the lobby has been created.
+        if (lobby.get().getStatus() != GameStatus.CREATED) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        // Return ok status with configuration payload
+        return ResponseEntity.ok(lobby.get().getDTO().getConfiguration());
+    }
+
+    /**
      * Endpoint to allow a user to join a game.
      *
      * @param lobbyId    UUID of the lobby to join.
@@ -196,4 +220,40 @@ public class LobbyController {
         // Otherwise, return 200
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Endpoint to allow the host to change configuration.
+     *
+     * @param lobbyId UUID of the lobby to join.
+     * @param userId UUID of the user/host.
+     * @param gameConfigurationData The new configuration data.
+     * @return An ok status if successful.
+     */
+    @PostMapping("/{lobbyId}/config")
+    ResponseEntity updateConfiguration(
+            @PathVariable @NonNull UUID lobbyId,
+            @PathVariable @NonNull UUID userId,
+            @PathVariable @NonNull GameConfiguration gameConfigurationData) {
+        // Check if the lobby exists.
+        Optional<Game> lobby = gameRepository.findById(lobbyId);
+        if (!lobby.isPresent()) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        // Check if the lobby is created.
+        if (lobby.get().getStatus() != GameStatus.CREATED) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        // Check if the user exists
+        Optional<User> user = userRepository.findById(userId);
+        if (!user.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // Check if the user is host.
+        if (lobby.get().getHost().getUser().getId() != user.get().getId()) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        lobby.get().setConfiguration(gameConfigurationData);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
