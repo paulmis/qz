@@ -139,24 +139,23 @@ public class LobbyController {
     }
 
     /**
-     * Endpoint to get lobby configuration info.
+     * Endpoint to get lobby configuration.
      *
      * @param lobbyId the UUID of the lobby.
      * @return information on the configuration of the requested lobby.
      */
     @GetMapping("/{lobbyId}/config")
-    ResponseEntity<GameConfigurationDTO> lobbyConfigurationInfo(
+    ResponseEntity<GameConfigurationDTO> lobbyConfiguration(
             @PathVariable @NonNull UUID lobbyId) {
-        // Check if the lobby exists.
+        //Check if the lobby exists.
         Optional<Game> lobby = gameRepository.findById(lobbyId);
         if (!lobby.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-        // Check if the lobby has been created.
-        if (lobby.get().getStatus() != GameStatus.CREATED) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        //Check if the lobby has been created.
+        if(lobby.get().getStatus() != GameStatus.CREATED) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
-        // Return ok status with configuration payload
         return ResponseEntity.ok(lobby.get().getDTO().getConfiguration());
     }
 
@@ -226,14 +225,12 @@ public class LobbyController {
      *
      * @param lobbyId UUID of the lobby to join.
      * @param userId UUID of the user/host.
-     * @param gameConfigurationData The new configuration data.
-     * @return An ok status if successful.
+     * @return
      */
     @PostMapping("/{lobbyId}/config")
     ResponseEntity updateConfiguration(
             @PathVariable @NonNull UUID lobbyId,
-            @PathVariable @NonNull UUID userId,
-            @PathVariable @NonNull GameConfiguration gameConfigurationData) {
+            @PathVariable @NonNull UUID userId) {
         // Check if the lobby exists.
         Optional<Game> lobby = gameRepository.findById(lobbyId);
         if (!lobby.isPresent()) {
@@ -248,11 +245,13 @@ public class LobbyController {
         if (!user.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        // Check if the user is host.
-        if (lobby.get().getHost().getUser().getId() != user.get().getId()) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        // Check if the user is in the lobby.
+        if (!lobby.get().getPlayers().contains(user)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
-        lobby.get().setConfiguration(gameConfigurationData);
+        // Check if the user is host.
+        //ToDo: Method to check if the user is the host of the lobby.
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
