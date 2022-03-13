@@ -14,7 +14,13 @@ import javax.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
@@ -167,7 +173,7 @@ public class LobbyController {
      *      404 if the lobby doesn't exist, 403 if the player isn't the lobby head, 200 otherwise
      */
     @PutMapping("/{lobbyId}/start")
-    ResponseEntity start(@PathVariable UUID lobbyId) {
+    ResponseEntity<HttpStatus> start(@PathVariable UUID lobbyId) {
         // If the user or the game don't exist, return 404
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
         Optional<Game> lobby = gameRepository.findById(lobbyId);
