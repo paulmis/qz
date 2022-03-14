@@ -30,4 +30,9 @@ public class ActivityDTO implements DTO {
      * URL of the picture of the activity.
      */
     protected String icon;
+
+    /**
+     * Source of the information in the activity.
+     */
+    protected String source;
 }

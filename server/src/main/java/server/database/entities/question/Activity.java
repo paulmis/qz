@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.URL;
 import org.modelmapper.ModelMapper;
 import server.database.entities.utils.BaseEntity;
 
@@ -40,6 +41,12 @@ public class Activity extends BaseEntity<ActivityDTO> {
      * The filepath to the icon of the activity.
      */
     private String icon;
+
+    /**
+     * Source of the information in the activity.
+     */
+    @URL
+    private String source;
 
     @Override
     public ActivityDTO getDTO() {
