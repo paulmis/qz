@@ -38,23 +38,44 @@ Additionally, these tools will aid you in development and are heavily recommende
 
 
 ### Running the app
-The quizzz app consists of three components: the database, server, and client. Each of these must be run one after another:
-- database
-    1. `cmd` into the repository directory
-    2. Spin up the docker container with `docker-compose up -d`
-    3. In `Docker Desktop` you should see the `oopp` container with a `postgres` subcontainer running at `:5432`
-    4. Verify the connection with `IntelliJ`'s database module, `psql`, or `DBeaver`
-        * the connection details are provided in the `docker-compose.yml` file located in the root project directory
-- server:
-    1. Run the `Main` java file in the `/server/src/main/java`
-        * This may take a few minutes during the initial build/run
-    2. The server has launched successfully if the log ends with `Started Main in ... seconds (JVM running for ...)`
-        * if you are getting a `PSQLException` when running the server or the tests, then the database connection is failing
-- client:
-    1. Edit run/debug configuration the `Main` file in `/client/src/main/java`
-        * Add `--module-path="<LIB PATH IN JAVAFX FOLDER WHICH WAS DOWNLOADED>"--add-modules=javafx.controls,javafx.fxml` to `VM options/arguments`
-    2. Execute `gradle run` (`./gradlew run` on MacOS) or run `Main` in `/client` to launch the client 
-        * the client will spawn in the background
+
+The Quizzz app consists of three components: the database, server, and client. Each of these must be run one after another:
+
+#### Database
+
+##### Windows
+
+1. `cmd` into the repository directory
+2. Spin up the docker container with `docker-compose up -d`
+3. In `Docker Desktop` you should see the `oopp` container with a `postgres` subcontainer running at `:5432`
+4. Verify the connection with `IntelliJ`'s database module, `psql`, or `DBeaver`
+    * the connection details are provided in the `docker-compose.yml` file located in the root project directory
+
+##### Linux
+
+1. Spin up the docker container with `docker-compose up -d`
+2. Verify that the connection is running with `docker ps`
+   * The output should look similar to this:
+   ```
+    CONTAINER ID   IMAGE      COMMAND                  CREATED         STATUS         PORTS                                       NAMES
+    7e917b97e54a   postgres   "docker-entrypoint.s…"   4 seconds ago   Up 3 seconds   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp   repository-template-db-1
+    ```
+3. Verify the connection with `IntelliJ`'s database module, `psql`, or `DBeaver`
+   * the connection details are provided in the `docker-compose.yml` file located in the root project directory
+
+#### Server:
+
+1. Run the `Main` java file in the `/server/src/main/java
+   * This may take a few minutes during the initial build/run
+2. The server has launched successfully if the log ends with `Started Main in ... seconds (JVM running for ...)`
+    * if you are getting a `PSQLException` when running the server or the tests, then the database connection is failing
+
+#### Client:
+
+1. Edit run/debug configuration the `Main` file in `/client/src/main/java`
+    * Add `--module-path="<LIB PATH IN JAVAFX FOLDER WHICH WAS DOWNLOADED>"--add-modules=javafx.controls,javafx.fxml` to `VM options/arguments`
+2. Execute `gradle run` (`./gradlew run` on MacOS) or run `Main` in `/client` to launch the client 
+   * the client will spawn in the background
 
 ## How to contribute to it
 `<TBA>`
