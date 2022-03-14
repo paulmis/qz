@@ -158,7 +158,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
             this.host = player;
         }
 
-        syncAnswers();
         return true;
     }
 
@@ -186,7 +185,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
             }
         }
 
-        syncAnswers();
         return true;
     }
 
@@ -197,7 +195,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public void addQuestions(List<Question> questions) {
         this.questions.addAll(questions);
-        syncAnswers();
     }
 
     /**
@@ -235,6 +232,12 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
 
         // Get answers to current question
         TreeSet<Answer> currentAnswers = answers.get(question.get());
+        if (currentAnswers == null) {
+            // Init tree if question is answered for the first time
+            currentAnswers = new TreeSet<>();
+        }
+
+        // Retrieve previous answer from the same user
         Optional<Answer> oldAnswer = currentAnswers
                 .stream().filter(ans -> player.equals(ans.getPlayer())).findFirst();
         // Remove previous answer
@@ -246,7 +249,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
             return false;
         }
 
-        // Update answers
+        // Update answers to question
         answers.put(question.get(), currentAnswers);
         return true;
     }
@@ -265,34 +268,13 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         Question question = questionOpt.get();
 
         // Fill list and sort it by player id
-        List<Answer> currentAnswers = answers.get(question).stream().sorted().collect(Collectors.toList());
-        return currentAnswers;
-    }
-
-    /**
-     * Makes sure that every question has an answer tree and that answers of players that left are removed.
-     */
-    private void syncAnswers() {
-        // Init
-        Map<Question, TreeSet<Answer>> newAnswers = new HashMap<>();
-
-        // Make sure that all questions have an entry
-        for (Question q : questions) {
-            if (!answers.containsKey(q)) {
-                newAnswers.put(q, new TreeSet<>());
-            } else {
-                TreeSet<Answer> newQuestionAnswers = new TreeSet<>();
-                TreeSet<Answer> oldAnswers = answers.get(q);
-                // Make sure that only active players have an answer
-                for (Answer ans : oldAnswers) {
-                    if (players.contains(ans.getPlayer())) {
-                        newQuestionAnswers.add(ans);
-                    }
-                }
-                newAnswers.put(q, newQuestionAnswers);
-            }
+        TreeSet<Answer> currentAnswers = answers.get(question);
+        if (currentAnswers == null) {
+            // No answer given
+            return new ArrayList<>();
         }
-        answers = newAnswers;
+        List<Answer> currentAnswersList = currentAnswers.stream().sorted().collect(Collectors.toList());
+        return currentAnswersList;
     }
 
     /**
