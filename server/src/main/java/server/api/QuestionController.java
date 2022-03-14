@@ -31,8 +31,9 @@ public class QuestionController {
      *
      * @return Whether the question was successfully created.
      */
-    @PutMapping("/mc/create")
+    @PutMapping("/mc")
     public ResponseEntity<HttpStatus> mcCreate() {
+        // TODO: this should accept a list of activities
         List<Activity> activities = activityService.getActivities(4);
 
         Question question = new MCQuestion(activities,
