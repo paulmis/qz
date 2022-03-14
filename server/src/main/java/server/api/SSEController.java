@@ -14,7 +14,6 @@ import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.repositories.UserRepository;
-import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 
 /**
@@ -24,6 +23,7 @@ import server.database.repositories.game.GameRepository;
 @RequestMapping("/api/sse")
 @Slf4j
 public class SSEController {
+
     @Autowired
     private UserRepository userRepository;
 

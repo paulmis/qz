@@ -4,7 +4,12 @@ import commons.entities.UserDTO;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,37 +48,39 @@ public class User extends BaseEntity<UserDTO> {
      * User's nickname.
      */
     @Column(nullable = false, unique = true)
-    @NonNull private String username;
+    @NonNull protected String username;
 
     /**
      * email - string used for authentication purposes representing the email of the user.
      */
     @Column(nullable = false, unique = true)
-    @NonNull private String email;
+    @NonNull protected String email;
 
     /**
      * password - string representing user's salted password.
      */
     @Column(nullable = false)
-    @NonNull private String password;
+    @NonNull protected String password;
 
     /**
      * score - integer representing a player's total score.
      */
     @Column
-    private int score = 0;
+    protected int score = 0;
 
     /**
      * id - random unique uuid assigned to a certain player.
      */
     @Column
-    private int gamesPlayed = 0;
+    protected int gamesPlayed = 0;
 
     /**
      * Relation to player entities for each individual game.
      */
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<GamePlayer> gamePlayers = Collections.synchronizedSet(new HashSet<>());
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    protected Set<GamePlayer> gamePlayers = Collections.synchronizedSet(new HashSet<>());
 
     @Override
     public UserDTO getDTO() {

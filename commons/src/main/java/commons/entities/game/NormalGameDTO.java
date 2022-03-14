@@ -1,8 +1,10 @@
 package commons.entities.game;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * DTO for NormalGame entity.

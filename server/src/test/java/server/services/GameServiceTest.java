@@ -24,7 +24,6 @@ import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
 import server.database.repositories.question.QuestionRepository;
-import server.services.GameService;
 
 /**
  * Tests for GameService class.
