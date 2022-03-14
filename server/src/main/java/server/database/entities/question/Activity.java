@@ -61,9 +61,6 @@ public class Activity extends BaseEntity<ActivityDTO> {
     /**
      * The filepath to the icon of the activity.
      */
-    @Column(nullable = false)
-    @NotBlank
-    @NonNull
     private String icon;
 
     @Override

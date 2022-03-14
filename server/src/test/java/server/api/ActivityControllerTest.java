@@ -66,7 +66,7 @@ class ActivityControllerTest {
         List<Activity> activities = new ArrayList<>();
         List<ActivityDTO> activitiesDTO = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            Activity activity = new Activity("activity" + i, "icon" + i);
+            Activity activity = new Activity("activity" + i);
             activities.add(activity);
             activitiesDTO.add(activity.getDTO());
         }
