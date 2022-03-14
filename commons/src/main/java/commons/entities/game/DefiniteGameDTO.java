@@ -1,9 +1,11 @@
 package commons.entities.game;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import commons.entities.game.GameDTO;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * DTO for DefiniteGame entity.

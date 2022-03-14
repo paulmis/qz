@@ -1,10 +1,16 @@
 package server.database.entities.question;
 
 import commons.entities.ActivityDTO;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.URL;
 import org.modelmapper.ModelMapper;
 import server.database.entities.utils.BaseEntity;
@@ -15,6 +21,8 @@ import server.database.entities.utils.BaseEntity;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
 @Entity
 public class Activity extends BaseEntity<ActivityDTO> {
 
@@ -30,11 +38,16 @@ public class Activity extends BaseEntity<ActivityDTO> {
     /**
      * Description of the activity.
      */
+    @Column(nullable = false)
+    @NotBlank
+    @NonNull
     private String description;
 
     /**
      * The energy cost in Wh of the activity.
      */
+    @Column(nullable = false)
+    @PositiveOrZero
     private int cost;
 
     /**
