@@ -52,23 +52,28 @@ public class AnswerController {
             @PathVariable UUID gameId) {
 
         // Retrieve game and user
-        Optional<Game> game = gameRepository.findById(gameId);
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<Game> gameOpt = gameRepository.findById(gameId);
+        Optional<User> userOpt = userRepository.findByEmail(AuthContext.get());
 
         // Check if game exists.
-        if (game.isEmpty() || user.isEmpty()) {
+        if (gameOpt.isEmpty() || userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+        Game game = gameOpt.get();
+        User user = userOpt.get();
 
         // Find GamePlayer
-        Optional<GamePlayer> player = game.get().getPlayers().stream()
-                .filter(pl -> ((GamePlayer) pl).getUser().getId().equals(user.get().getId())).findFirst();
+        Optional<GamePlayer> player = game.getPlayers().stream()
+                .filter(pl -> ((GamePlayer) pl).getUser().getId().equals(user.getId())).findFirst();
         if (player.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         // Update the answer
-        if (game.get().addAnswer(new Answer(answerData), player.get())) {
+        if (game.addAnswer(new Answer(answerData), player.get())) {
+            // Save updated game
+            gameRepository.save(game);
+
             // Answer has been received successfully.
             return ResponseEntity.ok().build();
         }
