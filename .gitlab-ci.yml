@@ -24,7 +24,7 @@ build:
   artifacts:
     paths:
       - ./server/build/libs/
-      - ./client/build/libs/
+      - ./client/build/distributions/
       - ./commons/build/libs/
     expire_in: 10 mins
 
@@ -36,9 +36,9 @@ rearrange_artifacts:
     GIT_STRATEGY: none
   script:
     - mkdir ./artifacts
-    - mv ./server/build/libs/* ./artifacts/
-    - mv ./client/build/libs/* ./artifacts/
-    - mv ./commons/build/libs/* ./artifacts/
+    - mv ./server/build/libs/*.jar ./artifacts/
+    - mv ./client/build/distributions/*.zip ./artifacts/
+    - mv ./commons/build/libs/*.jar ./artifacts/
   artifacts:
     paths:
       - ./artifacts/
