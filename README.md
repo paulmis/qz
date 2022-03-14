@@ -65,7 +65,7 @@ The Quizzz app consists of three components: the database, server, and client. E
 
 #### Server:
 
-1. Run the `Main` java file in the `/server/src/main/java
+1. Run the `Main` java file in the `/server/src/main/java` directory
    * This may take a few minutes during the initial build/run
 2. The server has launched successfully if the log ends with `Started Main in ... seconds (JVM running for ...)`
     * if you are getting a `PSQLException` when running the server or the tests, then the database connection is failing
@@ -74,7 +74,7 @@ The Quizzz app consists of three components: the database, server, and client. E
 
 1. Edit run/debug configuration the `Main` file in `/client/src/main/java`
     * Add `--module-path="<LIB PATH IN JAVAFX FOLDER WHICH WAS DOWNLOADED>"--add-modules=javafx.controls,javafx.fxml` to `VM options/arguments`
-2. Execute `gradle run` (`./gradlew run` on MacOS) or run `Main` in `/client` to launch the client 
+2. Execute `gradle run` (`./gradlew run` on MacOS and Linux) or run `Main` in `/client` to launch the client 
    * the client will spawn in the background
 
 ## How to contribute to it
