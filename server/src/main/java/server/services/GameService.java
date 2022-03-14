@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.entities.game.DefiniteGame;
@@ -53,8 +54,17 @@ public class GameService {
      * Starts a new game, by verifying the starting conditions and creating a questions set.
      *
      * @param game the game to start
+     * @throws UnsupportedOperationException if a game other than a definite game is started
+     * @throws IllegalStateException if the game is already started or there aren't enough questions
      */
-    public void startGame(Game game) {
+    @Transactional
+    public void startGame(Game game)
+            throws UnsupportedOperationException, IllegalStateException {
+        // Make sure that the lobby is full and not started
+        if (game.getStatus() != GameStatus.CREATED || !game.isFull()) {
+            throw new IllegalStateException();
+        }
+
         // Initialize the questions
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;
@@ -63,7 +73,7 @@ public class GameService {
             throw new UnsupportedOperationException("Starting games other than definite games is not yet supported.");
         }
 
-        // Set the game status to started
+
         game.setStatus(GameStatus.ONGOING);
     }
 }

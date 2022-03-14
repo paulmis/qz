@@ -1,5 +1,5 @@
 plugins {
-    id 'org.kordamp.gradle.jacoco' version '0.43.0'
+    id 'org.kordamp.gradle.jacoco' version '0.47.0'
 }
 
 allprojects {
@@ -12,7 +12,10 @@ subprojects {
 	apply plugin: 'java'
 	apply plugin: 'checkstyle'
 	apply plugin: 'jacoco'
-	
+
+	jacoco {
+		toolVersion = "0.8.7"
+	}
 	
 	group = 'oopp'
 	version = '0.0.1-SNAPSHOT'
@@ -27,6 +30,8 @@ subprojects {
 	}
 
 	tasks.named('test') {
+		println "SPRING_PROPS_POSTGRES_HOST:"
+		println System.getenv('SPRING_PROPS_POSTGRES_HOST')
 		useJUnitPlatform()
 		finalizedBy jacocoTestReport 
 	}

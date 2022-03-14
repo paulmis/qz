@@ -2,6 +2,7 @@ package commons.entities.game;
 
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.utils.DTO;
+import java.time.LocalDateTime;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +30,7 @@ public class GameDTO implements DTO {
     /**
      * The creation date of the game.
      */
-    protected Date createDate;
+    protected LocalDateTime createDate;
 
     /**
      * The type of the game.
@@ -57,6 +58,11 @@ public class GameDTO implements DTO {
     protected Set<GamePlayerDTO> players;
 
     /**
+     * The head of the lobby - person in charge with special privileges.
+     */
+    protected UUID host;
+
+    /**
      * Copy constructor.
      *
      * @param gameDTO the game DTO to copy
@@ -70,5 +76,6 @@ public class GameDTO implements DTO {
         this.status = gameDTO.getStatus();
         this.currentQuestion = gameDTO.getCurrentQuestion();
         this.players = gameDTO.getPlayers();
+        this.host = gameDTO.getHost();
     }
 }

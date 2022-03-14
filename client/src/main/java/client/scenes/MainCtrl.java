@@ -24,15 +24,18 @@ import client.scenes.lobby.LobbyScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import commons.entities.game.configuration.GameConfigurationDTO;
-import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
-import javafx.event.EventHandler;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.stage.Modality;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.transform.Scale;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import lombok.Generated;
 
@@ -45,22 +48,22 @@ public class MainCtrl {
     private Stage primaryStage;
 
     private ServerConnectScreenCtrl serverConnectScreenCtrl;
-    private Scene serverConnectScreen;
+    private Parent serverConnectScreen;
     
     private LogInScreenCtrl logInScreenCtrl;
-    private Scene logInScreen;
+    private Parent logInScreen;
 
     private RegisterScreenCtrl registerScreenCtrl;
-    private Scene registerScreen;
+    private Parent registerScreen;
 
     private NicknameScreenCtrl nicknameScreenCtrl;
-    private Scene nicknameScreen;
+    private Parent nicknameScreen;
 
     private LobbyScreenCtrl lobbyScreenCtrl;
-    private Scene lobbyScene;
+    private Parent lobbyScene;
 
     private GameScreenCtrl gameScreenCtrl;
-    private Scene gameScreen;
+    private Parent gameScreen;
 
     private Popup lobbySettingsPopUp;
 
@@ -78,42 +81,110 @@ public class MainCtrl {
                            Pair<GameScreenCtrl, Parent> gameScreen) {
         this.primaryStage = primaryStage;
 
-        this.serverConnectScreen = new Scene(serverConnectScreen.getValue());
+        this.serverConnectScreen = serverConnectScreen.getValue();
         this.serverConnectScreenCtrl = serverConnectScreen.getKey();
 
-        this.logInScreen = new Scene(logInScreen.getValue());
+        this.logInScreen = logInScreen.getValue();
         this.logInScreenCtrl = logInScreen.getKey();
 
-        this.registerScreen = new Scene(registerScreen.getValue());
+        this.registerScreen = registerScreen.getValue();
         this.registerScreenCtrl = registerScreen.getKey();
 
-        this.nicknameScreen = new Scene(nicknameScreen.getValue());
+        this.nicknameScreen = nicknameScreen.getValue();
         this.nicknameScreenCtrl = nicknameScreen.getKey();
-        
-        this.lobbyScreenCtrl = lobbyScreen.getKey();
-        this.lobbyScene = new Scene(lobbyScreen.getValue());
 
-        this.gameScreen = new Scene(gameScreen.getValue());
+        this.lobbyScene = lobbyScreen.getValue();
+        this.lobbyScreenCtrl = lobbyScreen.getKey();
+
+        this.gameScreen = gameScreen.getValue();
         this.gameScreenCtrl = gameScreen.getKey();
 
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
         lobbySettingsPopUp = new Popup();
         showServerConnectScreen();
-        primaryStage.show();
     }
 
+    enum StageScalingStrategy {
+        /**
+         * Does absolutely nothing.
+         * Should be used only when a screen is really good at resizing.
+         */
+        Identity,
+        /**
+         * Stretches the UI to fit the window.
+         * Very situational. Looks ugly.
+         */
+        Stretch,
+        /**
+         * Scales the UI by the ratio and adds some
+         * white borders where it couldn't fit.
+         * One of the better options. The design will always scale good.
+         */
+        Letterbox,
+        /**
+         * This is the same as Identity but it also scales the UI
+         * as much as it can.
+         * Should be used when a screen resizes good enough but text and other
+         * stuff should be also big.
+         */
+        ScaledIdentity,
+        /**
+         * This forces a ratio on the user window.
+         * Pretty cool but buggy (Try resizing down the window, there doesn't seem to actually be a solution to this)
+         */
+        ForcedScaled,
+        /**
+         * Fixes the window size.
+         */
+        Fixed,
+    }
+
+    private void showScreenLetterBox(Parent parent, StageScalingStrategy strategy) {
+        if (primaryStage.getScene() == null) {
+            primaryStage.setScene(new Scene(new Group(new StackPane(parent))));
+        }
+
+        primaryStage.setTitle("Quizzzzz");
+        var scene = primaryStage.getScene();
+        var topGroup = ((Group) scene.getRoot());
+
+        switch (strategy) {
+            case Identity:
+            case Fixed:
+            case ScaledIdentity:
+                var anchor = new AnchorPane(parent);
+                topGroup.getChildren().set(0, new Group(anchor));
+
+                AnchorPane.setBottomAnchor(parent, 0d);
+                AnchorPane.setTopAnchor(parent, 0d);
+                AnchorPane.setLeftAnchor(parent, 0d);
+                AnchorPane.setRightAnchor(parent, 0d);
+
+                primaryStage.show();
+                scaling(scene, anchor, 1024, 576, strategy);
+                break;
+            case Stretch:
+            case ForcedScaled:
+            case Letterbox:
+                var stac = new StackPane(parent);
+                topGroup.getChildren().set(0, new Group(stac));
+
+                primaryStage.show();
+                scaling(scene, stac, 1024, 576, strategy);
+                break;
+            default:
+                break;
+        }
+
+    }
 
     /**
-     * This function displays the register screen.
+     * This function displays the server connect screen.
      * It also sets it min width and height
      */
     public void showServerConnectScreen() {
-        primaryStage.setTitle("Server Connect Screen");
-        primaryStage.setScene(serverConnectScreen);
-        primaryStage.sizeToScene();
-        primaryStage.setMinHeight(500);
-        primaryStage.setMinWidth(500);
+        this.showScreenLetterBox(serverConnectScreen, StageScalingStrategy.Letterbox);
     }
 
     /**
@@ -121,11 +192,7 @@ public class MainCtrl {
      * It also sets it min width and height.
      */
     public void showLogInScreen() {
-        primaryStage.setTitle("Log In Screen");
-        primaryStage.setScene(logInScreen);
-        primaryStage.sizeToScene();
-        primaryStage.setMinHeight(500);
-        primaryStage.setMinWidth(500);
+        this.showScreenLetterBox(logInScreen, StageScalingStrategy.Letterbox);
     }
 
     /**
@@ -133,11 +200,7 @@ public class MainCtrl {
      * It also sets it min width and height
      */
     public void showRegisterScreen() {
-        primaryStage.setTitle("Register Screen");
-        primaryStage.setScene(registerScreen);
-        primaryStage.sizeToScene();
-        primaryStage.setMinHeight(500);
-        primaryStage.setMinWidth(500);
+        this.showScreenLetterBox(registerScreen, StageScalingStrategy.Letterbox);
     }
 
     /**
@@ -145,23 +208,14 @@ public class MainCtrl {
      * It also sets it min width and height
      */
     public void showNicknameScreen() {
-        nicknameScreenCtrl.reset();
-        primaryStage.setTitle("Nickname Screen");
-        primaryStage.setScene(nicknameScreen);
-        primaryStage.sizeToScene();
-        primaryStage.setMinHeight(500);
-        primaryStage.setMinWidth(500);
+        this.showScreenLetterBox(nicknameScreen, StageScalingStrategy.Letterbox);
     }
 
     /**
      * Shows the lobby screen.
      */
     public void showLobbyScreen() {
-        primaryStage.setTitle(lobbyScreenCtrl.getName());
-        primaryStage.setScene(lobbyScene);
-        primaryStage.sizeToScene();
-        primaryStage.setMinHeight(500);
-        primaryStage.setMinWidth(500);
+        this.showScreenLetterBox(lobbyScene, StageScalingStrategy.Letterbox);
     }
 
     /**
@@ -169,11 +223,7 @@ public class MainCtrl {
      * It also sets it min width and height.
      */
     public void showGameScreen() {
-        primaryStage.setTitle("Game Screen");
-        primaryStage.setScene(gameScreen);
-        primaryStage.sizeToScene();
-        primaryStage.setMinHeight(500);
-        primaryStage.setMinWidth(500);
+        this.showScreenLetterBox(gameScreen, StageScalingStrategy.Letterbox);
     }
 
     /**
@@ -184,6 +234,7 @@ public class MainCtrl {
     public Stage getPrimaryStage() {
         return primaryStage;
     }
+
     /**
      * This function opens a popup with
      * the game config settings.
@@ -191,7 +242,6 @@ public class MainCtrl {
      * @param config the config of the game.
      * @param saveHandler the action that is to be performed on config save.
      */
-
     public void openLobbySettings(GameConfigurationDTO config, ConfigurationScreenCtrl.SaveHandler saveHandler) {
         lobbySettingsPopUp = new Popup();
         lobbySettingsPopUp.setOnShown(e -> {
@@ -221,5 +271,152 @@ public class MainCtrl {
      */
     public void closeLobbySettings() {
         lobbySettingsPopUp.hide();
+    }
+
+
+    /**
+     * The size listener for the scene.
+     * We keep a reference to it to be
+     * able to remove it when needed.
+     */
+    SceneSizeChangeListener sizeListener =
+            null;
+
+    /**
+     * This function sets the scaling of a scene using the provided strategy.
+     *
+     * @param scene The scene which is inside the stage.
+     * @param contentPane The pane that contains everything relevant in the screen.
+     * @param initWidth The initial width the scene had.
+     * @param initHeight The initial height the scene had.
+     * @param strategy The resize strategy provided.
+     */
+    private void scaling(final Scene scene,
+                         final Pane contentPane, float initWidth, float initHeight, StageScalingStrategy strategy) {
+
+        // We remove the listeners so we don't have conflicts.
+        if (sizeListener != null) {
+            scene.widthProperty().removeListener(sizeListener);
+            scene.heightProperty().removeListener(sizeListener);
+        }
+
+        double ratio = initWidth / initHeight;
+
+        // Creates the new listener
+        sizeListener = new SceneSizeChangeListener(scene, ratio, initHeight, initWidth, contentPane, strategy);
+
+        // Adds the listener to width and height
+        scene.widthProperty().addListener(sizeListener);
+        scene.heightProperty().addListener(sizeListener);
+
+        // Unbinds the stage minWidth and minHeight
+        // This is done to reverse effects of ForcedScaled strategy
+        primaryStage.minWidthProperty().unbind();
+        primaryStage.minHeightProperty().unbind();
+
+        // Sets the minwidth and minheight to initial size this is done to reset
+        // the effects of ForcedScaled
+        primaryStage.setMinWidth(initWidth);
+        primaryStage.setMinHeight(initHeight);
+
+        // This is done to reset the effects of Fixed strategy.
+        primaryStage.setResizable(true);
+
+        switch (strategy) {
+            case ForcedScaled:
+                // We add the listeners in order to force a certain ratio for the screen.
+                primaryStage.minWidthProperty().bind(scene.heightProperty().multiply(ratio));
+                primaryStage.minHeightProperty().bind(scene.widthProperty().divide(ratio));
+                break;
+            case Fixed:
+                primaryStage.setResizable(false);
+                break;
+            default:
+                break;
+
+        }
+    }
+
+    /**
+     * This class is our change listener for
+     * automatic scene scaling.
+     */
+    private static class SceneSizeChangeListener implements ChangeListener<Number> {
+
+        private final Scene scene;
+        private final double ratio;
+        private final double initHeight;
+        private final double initWidth;
+        private final Pane contentPane;
+        private final StageScalingStrategy strategy;
+
+        /**
+         * Constructor for the listener.
+         *
+         * @param scene The scene which properties we listen on.
+         * @param ratio The initial ratio.
+         * @param initHeight The initial width.
+         * @param initWidth The initial height.
+         * @param contentPane The pane which contains the important content of the scene.
+         * @param strategy The resizing strategy we will use.
+         */
+        public SceneSizeChangeListener(Scene scene, double ratio, double initHeight, double initWidth,
+                                       Pane contentPane, StageScalingStrategy strategy) {
+            this.scene = scene;
+            this.ratio = ratio;
+            this.initHeight = initHeight;
+            this.initWidth = initWidth;
+            this.contentPane = contentPane;
+            this.strategy = strategy;
+            changed(null, scene.getWidth(), scene.getWidth());
+        }
+
+        /**
+         * This is the change handler.
+         *
+         * @param observableValue The bindable property.
+         * @param oldValue The old value of the property.
+         * @param newValue The new value of the property.
+         */
+        @Override
+        public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
+
+            // We get the new size of the scene.
+            final double newWidth = scene.getWidth();
+            final double newHeight = scene.getHeight();
+
+            switch (strategy) {
+                case Fixed:
+                case Identity:
+                    // This just resizes the content pane to the scene size.
+                    contentPane.setMinWidth(newWidth);
+                    contentPane.setMinHeight(newHeight);
+                    break;
+                case Stretch:
+                    Scale scaling = new Scale(newWidth / initWidth, newHeight / initHeight);
+                    scaling.setPivotX(0);
+                    scaling.setPivotY(0);
+                    scene.getRoot().getTransforms().setAll(scaling);
+                    contentPane.setPrefWidth(newWidth / (newWidth / initWidth));
+                    contentPane.setPrefHeight(newHeight / (newHeight / initHeight));
+                    break;
+                case Letterbox:
+                case ForcedScaled:
+                case ScaledIdentity:
+                    double scaleFactor =
+                            newWidth / newHeight > ratio
+                                    ? newHeight / initHeight
+                                    : newWidth / initWidth;
+                    Scale letterScale = new Scale(scaleFactor, scaleFactor);
+                    letterScale.setPivotX(0);
+                    letterScale.setPivotY(0);
+                    scene.getRoot().getTransforms().setAll(letterScale);
+                    contentPane.setPrefWidth(newWidth / scaleFactor);
+                    contentPane.setPrefHeight(newHeight / scaleFactor);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }

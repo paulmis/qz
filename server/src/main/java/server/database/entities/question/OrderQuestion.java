@@ -1,6 +1,5 @@
 package server.database.entities.question;
 
-import commons.entities.AnswerDTO;
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +7,11 @@ import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
+import server.database.entities.Answer;
 
 /**
  * OrderQuestion data structure - describes a match question.
@@ -21,7 +20,7 @@ import org.modelmapper.ModelMapper;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class OrderQuestion extends Question {
 
     /**
@@ -72,30 +71,30 @@ public class OrderQuestion extends Question {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     @Override
-    public List<Double> checkAnswer(List<AnswerDTO> userAnswers) throws IllegalArgumentException {
+    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
         if (userAnswers == null) {
             throw new IllegalArgumentException("NULL input");
         }
         List<Double> points = new ArrayList<>();
 
-        for (AnswerDTO ans : userAnswers) {
-            if (ans.getUserChoice().size() != getActivities().size()) {
+        for (Answer ans : userAnswers) {
+            if (ans.getResponse().size() != getActivities().size()) {
                 throw new IllegalArgumentException(
                         "The number of activities in the answer must be the same as the question.");
             }
             // Check if the order of answers' costs is correct
-            int currentVal = ans.getUserChoice().get(0).getCost();
+            int currentVal = ans.getResponse().get(0).getCost();
             double currentPoints = 0;
             double pointStep = 1.0 / (getActivities().size() - 1);
             if (increasing) {
                 for (int idx = 1; idx < getActivities().size(); idx++) {
-                    if (ans.getUserChoice().get(idx).getCost() >= ans.getUserChoice().get(idx - 1).getCost()) {
+                    if (ans.getResponse().get(idx).getCost() >= ans.getResponse().get(idx - 1).getCost()) {
                         currentPoints += pointStep;
                     }
                 }
             } else {
                 for (int idx = 1; idx < getActivities().size(); idx++) {
-                    if (ans.getUserChoice().get(idx).getCost() <= ans.getUserChoice().get(idx - 1).getCost()) {
+                    if (ans.getResponse().get(idx).getCost() <= ans.getResponse().get(idx - 1).getCost()) {
                         currentPoints += pointStep;
                     }
                 }
@@ -109,6 +108,13 @@ public class OrderQuestion extends Question {
         return points;
     }
 
+    @Override
+    public Answer getRightAnswer() {
+        Answer rightAnswer = new Answer();
+        rightAnswer.setResponse(getActivities());
+        return rightAnswer;
+    }
+    
     @Override
     public QuestionDTO getDTO() {
         return new ModelMapper().map(this, QuestionDTO.class);
