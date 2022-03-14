@@ -214,6 +214,7 @@ public class LobbyController {
         if (lobby.isEmpty() || !lobbyService.removePlayer(lobby.get(), user.get())) {
             return ResponseEntity.notFound().build();
         }
+        gameRepository.save(lobby.get());
 
         return ResponseEntity.ok().build();
     }

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import server.database.entities.User;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
@@ -55,7 +56,6 @@ public class LobbyServiceTest {
         james.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
         jamesPlayer = new GamePlayer(james);
         jamesPlayer.setJoinDate(LocalDateTime.parse("2022-03-02T00:00:00"));
-
 
         // Create the game
         lobby = new NormalGame();

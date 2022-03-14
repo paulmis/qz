@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -106,7 +107,8 @@ public class NormalGameTest {
 
     @Test
     void size() {
-        assertEquals(2, game.size());
+        joePlayer.setAbandoned(true);
+        assertEquals(1, game.size());
     }
 
     @Test
@@ -122,27 +124,41 @@ public class NormalGameTest {
     }
 
     @Test
-    void removeOk() throws LastPlayerRemovedException {
+    void removeLobbyOk() throws LastPlayerRemovedException {
         assertTrue(game.remove(susanne.getId()));
         assertFalse(game.getPlayers().containsKey(susanne.getId()));
     }
 
     @Test
-    void removeNotFound() throws LastPlayerRemovedException {
+    void removeLobbyNotFound() throws LastPlayerRemovedException {
         assertFalse(game.remove(UUID.fromString("73246234-2364-2364-2364-236423642364")));
     }
 
     @Test
-    void removeHead() throws LastPlayerRemovedException {
+    void removeLobbyHead() throws LastPlayerRemovedException {
         assertTrue(game.remove(joe.getId()));
         assertEquals(game.getHost(), susannePlayer);
     }
 
     @Test
-    void removeLastPlayer()  {
+    void removeLobbyLastPlayer()  {
         assertThrows(LastPlayerRemovedException.class, () -> {
             game.remove(joe.getId());
             game.remove(susanne.getId());
         });
+    }
+
+    @Test
+    void removeGameOngoingOk() throws LastPlayerRemovedException {
+        game.setStatus(GameStatus.ONGOING);
+        assertTrue(game.remove(susanne.getId()));
+        assertTrue(game.getPlayers().containsKey(susanne.getId()));
+        assertTrue(game.getPlayers().get(susanne.getId()).isAbandoned());
+    }
+
+    @Test
+    void removeGameFinished() throws LastPlayerRemovedException {
+        game.setStatus(GameStatus.FINISHED);
+        assertFalse(game.remove(joe.getId()));
     }
 }

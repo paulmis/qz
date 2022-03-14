@@ -106,6 +106,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Automatically sets the create date to when the entity is first persisted.
      */
+    @Generated
     @PrePersist
     void onCreate() {
         createDate = LocalDateTime.now();
@@ -159,6 +160,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      *
      * @param userId the user id of the player to remove
      * @return whether the player was removed/marked as abandoned
+     * @throws LastPlayerRemovedException if the last player left/abandoned the game
      */
     public boolean remove(UUID userId) throws LastPlayerRemovedException {
         switch (this.status) {
@@ -185,12 +187,18 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
 
             case ONGOING:
                 // If the player had already abandoned the game, return false
-                if (!this.players.get(userId).isAbandoned()) {
+                if (!this.players.containsKey(userId) || this.players.get(userId).isAbandoned()) {
                     return false;
                 }
 
                 // Mark the player as abandoned
                 this.players.get(userId).setAbandoned(true);
+
+                // Check if all players abandoned the game
+                if (size() == 0) {
+                    throw new LastPlayerRemovedException();
+                }
+
                 return true;
 
             default:
@@ -221,12 +229,12 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
-     * Get the number of players in the game.
+     * Get the number of players in the game. Does not count abandoned players.
      *
-     * @return the number of players
+     * @return the number of players still in the game
      */
     public int size() {
-        return players.size();
+        return (int) players.values().stream().filter(players -> !players.isAbandoned()).count();
     }
 
     /**
