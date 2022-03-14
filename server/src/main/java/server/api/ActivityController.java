@@ -28,7 +28,7 @@ public class ActivityController {
      * @param activities List of activities to add.
      */
     @PostMapping("/batch")
-    ResponseEntity<HttpStatus> addActivity(@RequestBody List<ActivityDTO> activities) {
+    ResponseEntity<HttpStatus> batchAddActivity(@RequestBody List<ActivityDTO> activities) {
         // Convert DTOs to entities
         List<Activity> activityList = activities.stream().map(Activity::new).collect(Collectors.toList());
         // Save the entities
