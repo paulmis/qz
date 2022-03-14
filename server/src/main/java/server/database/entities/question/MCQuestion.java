@@ -8,6 +8,7 @@ import javax.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import server.database.entities.Answer;
 
@@ -72,6 +73,18 @@ public class MCQuestion extends Question {
         super(q);
         this.answer = answer;
         this.guessConsumption = guessConsumption;
+    }
+
+    /**
+     * Constructor with only required fields.
+     *
+     * @param activities the list of activities that compose the question.
+     * @param text       the description of the question.
+     * @param answer    the Activity that corresponds to the correct answer.
+     */
+    public MCQuestion(List<Activity> activities, String text, Activity answer) {
+        super(activities, text);
+        this.answer = answer;
     }
 
     /**
