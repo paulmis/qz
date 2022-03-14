@@ -236,6 +236,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
                 return true;
             }
         }
+        return false;
     }
 
     /**
