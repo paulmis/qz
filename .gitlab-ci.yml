@@ -42,8 +42,6 @@ rearrange_artifacts:
   artifacts:
     paths:
       - ./artifacts/
-    exclude:
-      - "./artifacts/*-plain.jar"
     expire_in: 3 days
 
 checkstyle-main:
