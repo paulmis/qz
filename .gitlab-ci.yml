@@ -21,8 +21,17 @@ build:
   stage: build
   script:
     - ./gradlew --build-cache assemble
+  artifacts:
+    paths:
+      - ./server/build/libs/
+      - ./client/build/libs/
+      - ./commons/build/libs/
+    exclude:
+      - "*-plain.jar"
+    expire_in: 1 hour
 
 rearrange_artifacts:
+  stage: build
   needs: [build]
   variables:
     GIT_STRATEGY: none
@@ -40,6 +49,7 @@ rearrange_artifacts:
 
 checkstyle-main:
   stage: analysis
+  needs: [build]
   script: ./gradlew checkstyleMain
   cache:
     key: "$CI_COMMIT_REF_NAME-main"
@@ -51,6 +61,7 @@ checkstyle-main:
 
 checkstyle-test:
   stage: analysis
+  needs: [build]
   script: ./gradlew checkstyleTest
   cache:
     key: "$CI_COMMIT_REF_NAME-test"
@@ -62,6 +73,7 @@ checkstyle-test:
 
 test:
   stage: test
+  needs: [build]
   script:
     - echo "GitLab CI/CD | Print all environment variables"
     - env
