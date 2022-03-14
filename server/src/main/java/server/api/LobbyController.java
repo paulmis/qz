@@ -27,6 +27,7 @@ import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
+import server.services.LobbyService;
 
 /*
 made following https://spring.io/guides/tutorials/rest/
@@ -45,6 +46,9 @@ public class LobbyController {
 
     @Autowired
     private GameService gameService;
+
+    @Autowired
+    private LobbyService lobbyService;
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
@@ -204,21 +208,11 @@ public class LobbyController {
             return ResponseEntity.notFound().build();
         }
 
-        // Check that the user is in a lobby
-        Optional<Game> lobbyOptional =
+        // Check that the user is in a lobby and remove them
+        Optional<Game> lobby =
                 gameRepository.findByPlayers_User_IdEqualsAndStatus(user.get().getId(), GameStatus.CREATED);
-        if (lobbyOptional.isEmpty()) {
+        if (lobby.isEmpty() || !lobbyService.removePlayer(lobby.get(), user.get())) {
             return ResponseEntity.notFound().build();
-        }
-
-        // Remove the player from the lobby
-        // If this was the last player, delete the lobby
-        Game lobby = lobbyOptional.get();
-        try {
-            lobby.remove(user.get().getId());
-            gameRepository.save(lobby);
-        } catch (LastPlayerRemovedException ex) {
-            gameRepository.delete(lobby);
         }
 
         return ResponseEntity.ok().build();

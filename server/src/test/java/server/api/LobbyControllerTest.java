@@ -1,5 +1,6 @@
 package server.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalToObject;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -19,6 +20,7 @@ import java.util.UUID;
 import javax.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,7 +41,9 @@ import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
+import server.database.repositories.question.QuestionRepository;
 import server.services.GameService;
+import server.services.LobbyService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -52,9 +56,6 @@ class LobbyControllerTest {
     private GameRepository gameRepository;
 
     @MockBean
-    private GameService gameService;
-
-    @MockBean
     private GamePlayerRepository gamePlayerRepository;
 
     @MockBean
@@ -62,6 +63,15 @@ class LobbyControllerTest {
 
     @MockBean
     private UserRepository userRepository;
+
+    @MockBean
+    private QuestionRepository questionRepository;
+
+    @MockBean
+    private LobbyService lobbyService;
+
+    @MockBean
+    private GameService gameService;
 
     private UUID getUUID(int id) {
         return UUID.fromString("00000000-0000-0000-0000-00000000000" + (id % 10));
@@ -103,7 +113,7 @@ class LobbyControllerTest {
         mockLobby = new NormalGame();
         mockLobby.setId(getUUID(3));
         mockLobby.setStatus(GameStatus.CREATED);
-        mockLobbyConfiguration = new NormalGameConfiguration();
+        mockLobbyConfiguration = new NormalGameConfiguration(10, 10, 2);
         mockLobby.setConfiguration(mockLobbyConfiguration);
 
         // Add players
@@ -122,6 +132,8 @@ class LobbyControllerTest {
                         john.getEmail(),
                         john.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(john.getId(), GameStatus.CREATED))
+                .thenReturn(Optional.of(mockLobby));
     }
 
     @Test
@@ -162,6 +174,9 @@ class LobbyControllerTest {
 
     @Test
     public void joinOkTest() throws Exception {
+        // Modify the capacity to allow the player to join
+        mockLobbyConfiguration.setCapacity(3);
+
         // Set the context user to a user that isn't in the game
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(
@@ -300,5 +315,29 @@ class LobbyControllerTest {
         this.mockMvc
                 .perform(put("/api/lobby/" + mockLobby.getId() + "/start"))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    void leaveOk() throws Exception {
+        // Mock the service
+        when(lobbyService.removePlayer(mockLobby, john)).thenReturn(true);
+
+        // Request
+        this.mockMvc
+                .perform(delete("/api/lobby/leave"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void leaveNotFound() throws Exception {
+        // Mock the service
+        when(lobbyService.removePlayer(mockLobby, john)).thenReturn(false);
+
+        // Set the context user
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        sally.getEmail(),
+                        sally.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
     }
 }
