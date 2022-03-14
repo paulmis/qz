@@ -21,6 +21,14 @@ build:
   stage: build
   script:
     - ./gradlew --build-cache assemble
+  artifacts:
+    paths:
+      - ./server/build/libs/
+      - ./client/build/libs/
+      - ./commons/build/libs/
+    exclude:
+      - "*-plain.jar"
+    expire_in: 3 days
 
 checkstyle-main:
   stage: analysis
