@@ -6,3 +6,39 @@
 #wrongCredentials{
     -fx-text-fill : red;
 }
+
+#passwordField{
+    -fx-background-color: #C4C4C4;
+}
+
+#emailField{
+    -fx-background-color: #C4C4C4;
+}
+
+#pane{
+    -fx-background-color: white
+}
+
+#nicknameField{
+    -fx-background-color: #C4C4C4;
+}
+
+#nicknameSetButton{
+    -fx-background-color: #6EB26C;
+}
+
+#signUpButton{
+    -fx-background-color: #6EB26C;
+}
+
+#haveAccountButton{
+    -fx-background-color: #DFD93F;
+}
+
+#urlField{
+    -fx-background-color: #C4C4C4;
+}
+
+#connectButton{
+    -fx-background-color: #6EB26C;
+}

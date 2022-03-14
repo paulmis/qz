@@ -19,14 +19,14 @@
    <children>
       <BorderPane prefHeight="576.0" prefWidth="1024.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <left>
-            <Pane fx:id="pane" prefHeight="576.0" prefWidth="262.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
+            <Pane fx:id="pane" prefHeight="576.0" prefWidth="262.0" BorderPane.alignment="CENTER">
                <children>
-                  <TextField fx:id="emailField" layoutX="53.0" layoutY="239.0" onKeyTyped="#resetMessage" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
+                  <TextField fx:id="emailField" layoutX="53.0" layoutY="239.0" onKeyTyped="#resetMessage" prefHeight="22.0" prefWidth="161.0">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </TextField>
-                  <TextField fx:id="passwordField" layoutX="53.0" layoutY="290.0" onKeyTyped="#resetMessage" prefHeight="22.0" prefWidth="161.0" style="-fx-background-color: C4C4C4;">
+                  <TextField fx:id="passwordField" layoutX="53.0" layoutY="290.0" onKeyTyped="#resetMessage" prefHeight="22.0" prefWidth="161.0">
                      <font>
                         <Font size="13.0" />
                      </font>
@@ -66,7 +66,7 @@
                         <Image url="@/client/images/logo.png" />
                      </image>
                   </ImageView>
-                  <Label fx:id="wrongCredentials" layoutX="47.0" layoutY="470.0" text="Wrong email or password !" textFill="RED">
+                  <Label fx:id="wrongCredentials" layoutX="47.0" layoutY="470.0" text="Wrong email or password !">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
