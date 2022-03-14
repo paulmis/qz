@@ -26,15 +26,17 @@ public class ActivityController {
      * Batch create/update activities.
      *
      * @param activities List of activities to add.
+     * @return DTOs of all added activities.
      */
     @PostMapping("/batch")
-    ResponseEntity<HttpStatus> batchAddActivity(@RequestBody List<ActivityDTO> activities) {
+    ResponseEntity<List<ActivityDTO>> batchAddActivity(@RequestBody List<ActivityDTO> activities) {
         // TODO: proper access control on this endpoint
         // Convert DTOs to entities
         List<Activity> activityList = activities.stream().map(Activity::new).collect(Collectors.toList());
         // Save the entities
-        activityRepository.saveAll(activityList);
+        List<ActivityDTO> activityDTOList = activityRepository.saveAll(activityList).stream()
+                .map(Activity::getDTO).collect(Collectors.toList());
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(activityDTOList, HttpStatus.OK);
     }
 }
