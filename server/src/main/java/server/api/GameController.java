@@ -16,7 +16,7 @@ import server.database.entities.question.Question;
 import server.database.repositories.game.GameRepository;
 
 /**
- * QuestionController, controller for all api endpoints of question.
+ * GameController, controller for all game-related API endpoints.
  */
 @RestController
 @RequestMapping("/api/game")
