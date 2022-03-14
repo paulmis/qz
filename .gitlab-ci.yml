@@ -26,9 +26,7 @@ build:
       - ./server/build/libs/
       - ./client/build/libs/
       - ./commons/build/libs/
-    exclude:
-      - "*-plain.jar"
-    expire_in: 1 hour
+    expire_in: 10 mins
 
 rearrange_artifacts:
   stage: build
@@ -44,7 +42,7 @@ rearrange_artifacts:
     paths:
       - ./artifacts/
     exclude:
-      - "*-plain.jar"
+      - "./artifacts/*-plain.jar"
     expire_in: 3 days
 
 checkstyle-main:
