@@ -43,6 +43,7 @@ rearrange_artifacts:
     paths:
       - ./artifacts/
     expire_in: 3 days
+    expose_as: "Built artifacts"
 
 checkstyle-main:
   stage: analysis
