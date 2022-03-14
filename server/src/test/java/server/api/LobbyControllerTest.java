@@ -226,21 +226,43 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void configPostLobbyConfigurationUpdatedTest() throws Exception {
+    public void configPostLobbyConfigurationUpdateTest() throws Exception {
         mockLobby.setStatus(GameStatus.CREATED);
         mockLobby.setHost(johnPlayer);
         // Create mock normal game configuration
         NormalGameConfiguration normalGameConfiguration = new NormalGameConfiguration();
-        normalGameConfiguration.setId(getUUID(3));
         normalGameConfiguration.setAnswerTime(5);
         normalGameConfiguration.setCapacity(10);
-        normalGameConfiguration.setAnswerTime(4);
+        normalGameConfiguration.setNumQuestions(15);
         // Request
         this.mockMvc
                 .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(normalGameConfiguration.getDTO())))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void configPostLobbyConfigurationUpdatedTest() throws Exception {
+        mockLobby.setStatus(GameStatus.CREATED);
+        mockLobby.setHost(johnPlayer);
+        // Create mock normal game configuration
+        NormalGameConfiguration normalGameConfiguration = new NormalGameConfiguration();
+        normalGameConfiguration.setAnswerTime(5);
+        normalGameConfiguration.setNumQuestions(15);
+        // Request
+        this.mockMvc
+                .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(normalGameConfiguration.getDTO())))
+                .andExpect(status().isOk());
+
+        this.mockMvc
+                .perform(get("/api/lobby/" + mockLobby.getId() + "/config"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(equalToObject(
+                        objectMapper.writeValueAsString(normalGameConfiguration.getDTO())
+                )));
     }
 
     @Test
