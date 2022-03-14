@@ -214,7 +214,7 @@ public class LobbyController {
         
         // Check if the lobby exists.
         Optional<Game> lobby = gameRepository.findById(lobbyId);
-        if (!lobby.isPresent()) {
+        if (lobby.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         // Check if the lobby has been created.
