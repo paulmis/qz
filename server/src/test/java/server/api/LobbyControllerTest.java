@@ -294,7 +294,7 @@ class LobbyControllerTest {
                         .content(objectMapper.writeValueAsString(normalGameConfiguration.getDTO())))
                 .andExpect(status().isBadRequest());
     }
-    //ToDo: Test if user is not host in lobbyConfiguration.
+
     @Test
     public void configPostUserNotHostTest() throws Exception {
         mockLobby.setStatus(GameStatus.CREATED);
