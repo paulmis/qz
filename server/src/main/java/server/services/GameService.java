@@ -73,7 +73,6 @@ public class GameService {
             throw new UnsupportedOperationException("Starting games other than definite games is not yet supported.");
         }
 
-
         game.setStatus(GameStatus.ONGOING);
     }
 }
