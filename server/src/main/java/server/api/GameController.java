@@ -51,22 +51,16 @@ public class GameController {
         }
 
         // If the user isn't in a game, return 404
-        Optional<Game> gameOptional = gameRepository.getPlayersGame(user.get().getId());
-        if (gameOptional.isEmpty()) {
+        Optional<Game> game = gameRepository.getPlayersGame(user.get().getId());
+        if (game.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         // Mark the player as abandoned
-        Game game = gameOptional.get();
-        try {
-            // If the removal fails, the player has already abandoned the lobby
-            if (!game.remove(user.get().getId())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
-        } catch (LastPlayerRemovedException ex) {
-            // If the player was the last player, conclude the game
-            game.setStatus(GameStatus.FINISHED);
+        if (!gameService.removePlayer(game.get(), user.get())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
+        gameRepository.save(game.get());
 
         // Return 200
         return ResponseEntity.ok().build();

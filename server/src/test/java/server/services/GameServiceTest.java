@@ -39,8 +39,10 @@ public class GameServiceTest {
     NormalGame game;
     User joe;
     User susanne;
+    User james;
     GamePlayer joePlayer;
     GamePlayer susannePlayer;
+    GamePlayer jamesPlayer;
     MCQuestion questionA;
     MCQuestion questionB;
     MCQuestion questionC;
@@ -59,6 +61,11 @@ public class GameServiceTest {
         susanne.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         susannePlayer = new GamePlayer(susanne);
         susannePlayer.setJoinDate(LocalDateTime.parse("2022-03-03T00:00:00"));
+
+        james = new User("James", "james@blames.com", "stinkydonkey");
+        james.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
+        jamesPlayer = new GamePlayer(james);
+        jamesPlayer.setJoinDate(LocalDateTime.parse("2022-03-02T00:00:00"));
 
         // Create questions
         questionA = new MCQuestion();
@@ -151,5 +158,28 @@ public class GameServiceTest {
 
         // Verify interactions
         verifyNoMoreInteractions(questionRepository);
+    }
+
+    @Test
+    void removePlayerLast() throws LastPlayerRemovedException {
+        // Remove susanne and then call the service to remove joe
+        game.setStatus(GameStatus.ONGOING);
+        game.remove(susanne.getId());
+        assertTrue(gameService.removePlayer(game, joe));
+
+        // Verify that the status changed
+        assertEquals(GameStatus.FINISHED, game.getStatus());
+        assertEquals(0, game.size());
+    }
+
+    @Test
+    void removePlayerNotFound() {
+        // Remove a player that is not in the game
+        game.setStatus(GameStatus.ONGOING);
+        assertFalse(gameService.removePlayer(game, james));
+
+        // Verify that the status hasn't changed
+        assertEquals(GameStatus.ONGOING, game.getStatus());
+        assertEquals(2, game.getPlayers().size());
     }
 }

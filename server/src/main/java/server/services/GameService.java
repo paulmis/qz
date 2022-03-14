@@ -7,9 +7,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
 import server.database.entities.game.Game;
+import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
 import server.database.repositories.question.QuestionRepository;
 
@@ -74,5 +78,27 @@ public class GameService {
         }
 
         game.setStatus(GameStatus.ONGOING);
+    }
+
+    /**
+     * Marks the player as abandoned. If the last player abandoed the lobby, marks the game as finished.
+     *
+     * @param game the game to remove the player from
+     * @param user the user to remove
+     * @return if the player has already abandoned the game, or the player isn't in the game, return false
+     */
+    @Transactional
+    public boolean removePlayer(Game game, User user) {
+        try {
+            // If the removal fails, the player has already abandoned the lobby
+            if (!game.remove(user.getId())) {
+                return false;
+            }
+        } catch (LastPlayerRemovedException ex) {
+            // If the player was the last player, conclude the game
+            game.setStatus(GameStatus.FINISHED);
+        }
+
+        return true;
     }
 }
