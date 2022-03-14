@@ -107,8 +107,11 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Answers given by each player for each question.
      */
-    @ManyToMany
-    protected Set<Answer> answers = new HashSet<>();
+    @ElementCollection
+    @CollectionTable(name = "answer_mapping",
+            joinColumns = {@JoinColumn(name = "game_id", referencedColumnName = "id")})
+    @MapKeyColumn(name = "answer_question")
+    protected Map<Question, TreeSet<Answer>> answers = new HashMap<>();
 
     /**
      * Automatically sets the creation date to when the entity is first persisted.
@@ -222,6 +225,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         if (!players.contains(player)) {
             return false;
         }
+        answer.setPlayer(player);
 
         // Get current question
         Optional<Question> question = getQuestion();
@@ -230,13 +234,21 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         }
 
         // Get answers to current question
-        for (Answer ans : answers) {
-            if (question.get().equals(ans.getQuestion()) && player.equals(ans.getPlayer())) {
-                ans.setResponse(answer.getResponse());
-                return true;
-            }
+        TreeSet<Answer> currentAnswers = answers.get(question.get());
+        Optional<Answer> oldAnswer = currentAnswers
+                .stream().filter(ans -> player.equals(ans.getPlayer())).findFirst();
+        // Remove previous answer
+        if (oldAnswer.isPresent()) {
+            currentAnswers.remove(oldAnswer.get());
         }
-        return false;
+        // Add new answer
+        if (!currentAnswers.add(answer)) {
+            return false;
+        }
+
+        // Update answers
+        answers.put(question.get(), currentAnswers);
+        return true;
     }
 
     /**
@@ -252,49 +264,35 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         }
         Question question = questionOpt.get();
 
-        // Fill list
-        List<Answer> currentAnswers = new ArrayList<>();
-        for (Answer ans : answers) {
-            if (!question.equals(ans.getQuestion())) {
-                continue;
-            }
-            if (players.contains(ans.getPlayer())) {
-                currentAnswers.add(ans);
-            }
-        }
-
-        // Sort list by player id
-        currentAnswers = currentAnswers.stream()
-                .sorted(Comparator.comparing(o -> o.getPlayer().getId()))
-                .collect(Collectors.toList());
+        // Fill list and sort it by player id
+        List<Answer> currentAnswers = answers.get(question).stream().sorted().collect(Collectors.toList());
         return currentAnswers;
     }
 
     /**
-     * Makes sure that every question has an answer from every player.
+     * Makes sure that every question has an answer tree and that answers of players that left are removed.
      */
     private void syncAnswers() {
         // Init
-        Set<Answer> newAnswers = new HashSet<>();
+        Map<Question, TreeSet<Answer>> newAnswers = new HashMap<>();
 
-        // Sync questions
+        // Make sure that all questions have an entry
         for (Question q : questions) {
-            for (GamePlayer p : players) {
-                Optional<Answer> oldAnswer = answers.stream()
-                        .filter(ans -> q.equals(ans.getQuestion()) && p.equals(ans.getPlayer())).findFirst();
-                if (oldAnswer.isPresent()) {
-                    newAnswers.add(oldAnswer.get());
-                } else {
-                    Answer emptyAnswer = new Answer();
-                    emptyAnswer.setQuestion(q);
-                    emptyAnswer.setPlayer(p);
-                    newAnswers.add(emptyAnswer);
+            if (!answers.containsKey(q)) {
+                newAnswers.put(q, new TreeSet<>());
+            } else {
+                TreeSet<Answer> newQuestionAnswers = new TreeSet<>();
+                TreeSet<Answer> oldAnswers = answers.get(q);
+                // Make sure that only active players have an answer
+                for (Answer ans : oldAnswers) {
+                    if (players.contains(ans.getPlayer())) {
+                        newQuestionAnswers.add(ans);
+                    }
                 }
+                newAnswers.put(q, newQuestionAnswers);
             }
         }
-
-        // Replace old set
-        this.answers = newAnswers;
+        answers = newAnswers;
     }
 
     /**

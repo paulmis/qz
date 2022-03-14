@@ -17,7 +17,6 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Activity;
-import server.database.entities.question.Question;
 import server.database.entities.utils.BaseEntity;
 
 /**
@@ -27,7 +26,7 @@ import server.database.entities.utils.BaseEntity;
 @Data
 @NoArgsConstructor
 @Entity
-public class Answer extends BaseEntity<AnswerDTO> {
+public class Answer extends BaseEntity<AnswerDTO> implements Comparable {
     /**
      * Construct a new answer from a DTO.
      *
@@ -51,13 +50,6 @@ public class Answer extends BaseEntity<AnswerDTO> {
     private GamePlayer player;
 
     /**
-     * The question the answer is answering.
-     */
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "question_id")
-    private Question question;
-
-    /**
      * Convert user choices to DTO.
      *
      * @return a list of ActivityDTOs
@@ -77,5 +69,14 @@ public class Answer extends BaseEntity<AnswerDTO> {
         );
 
         return modelMapper.map(this, AnswerDTO.class);
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (o == null || !(o instanceof Answer)) {
+            return 0;
+        }
+        Answer other = (Answer) o;
+        return getPlayer().getId().compareTo(other.getPlayer().getId());
     }
 }

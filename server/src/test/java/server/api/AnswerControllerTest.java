@@ -108,6 +108,7 @@ class AnswerControllerTest {
         // Set up a mock gamePlayer
         joePlayer = new GamePlayer();
         joePlayer.setUser(joe);
+        joePlayer.setId(getUUID("a"));
         mockLobby.add(joePlayer);
         when(gamePlayerRepository.existsByUserIdAndGameId(joe.getId(), mockLobby.getId())).thenReturn(true);
 

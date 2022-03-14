@@ -47,7 +47,7 @@ public class AnswerController {
      * @return ok status if successful, not found status if game doesn't exist
      */
     @PutMapping("/{gameId}/answer")
-    public ResponseEntity<HttpStatus> userAnswer(
+    public ResponseEntity userAnswer(
             @RequestBody AnswerDTO answerData,
             @PathVariable UUID gameId) {
 
@@ -68,10 +68,11 @@ public class AnswerController {
         }
 
         // Update the answer
-        game.get().addAnswer(new Answer(answerData), player.get());
-
-        // Answer has been received successfully.
-        return new ResponseEntity<>(HttpStatus.OK);
+        if (game.get().addAnswer(new Answer(answerData), player.get())) {
+            // Answer has been received successfully.
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
     /**
