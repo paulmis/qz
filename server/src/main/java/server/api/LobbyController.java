@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
-
-import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -212,6 +210,8 @@ public class LobbyController {
     @GetMapping("/{lobbyId}/config")
     ResponseEntity<GameConfigurationDTO> lobbyConfigurationInfo(
             @PathVariable @NonNull UUID lobbyId) {
+        //ToDo: Implemented for all types of game configuration.
+        
         // Check if the lobby exists.
         Optional<Game> lobby = gameRepository.findById(lobbyId);
         if (!lobby.isPresent()) {
