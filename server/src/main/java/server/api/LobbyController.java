@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
+
+import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +30,6 @@ import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
-import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
@@ -247,13 +248,13 @@ public class LobbyController {
      * Endpoint to allow the host to change configuration.
      *
      * @param lobbyId UUID of the lobby to join.
-     * @param gameConfigurationData The new configuration data.
+     * @param normalGameConfigurationData The new configuration data.
      * @return An ok status if successful.
      */
     @PostMapping("/{lobbyId}/config")
     ResponseEntity updateConfiguration(
             @PathVariable @NonNull UUID lobbyId,
-            @RequestBody GameConfigurationDTO gameConfigurationData) {
+            @RequestBody NormalGameConfigurationDTO normalGameConfigurationData) {
         Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
         // Check if the lobby exists and user exists.
@@ -269,7 +270,14 @@ public class LobbyController {
         if (lobby.getHost().getUser().getId() != user.get().getId()) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        // ToDo: lobby.setConfiguration(gameConfigurationData.get());
+        // Create new normal game configuration based on the clients' choices
+        NormalGameConfiguration newNormalGameConfiguration = new NormalGameConfiguration();
+        newNormalGameConfiguration.setId(normalGameConfigurationData.getId());
+        newNormalGameConfiguration.setCapacity(normalGameConfigurationData.getCapacity());
+        newNormalGameConfiguration.setAnswerTime(normalGameConfigurationData.getAnswerTime());
+        newNormalGameConfiguration.setNumQuestions(normalGameConfigurationData.getNumQuestions());
+        // Change lobby configuration
+        lobby.setConfiguration(newNormalGameConfiguration);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
