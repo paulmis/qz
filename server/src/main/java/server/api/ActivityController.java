@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,8 +28,9 @@ public class ActivityController {
      *
      * @param activities List of activities to add.
      */
-    @PutMapping("/batch")
+    @PostMapping("/batch")
     ResponseEntity<HttpStatus> batchAddActivity(@RequestBody List<ActivityDTO> activities) {
+        // TODO: proper access control on this endpoint
         // Convert DTOs to entities
         List<Activity> activityList = activities.stream().map(Activity::new).collect(Collectors.toList());
         // Save the entities
