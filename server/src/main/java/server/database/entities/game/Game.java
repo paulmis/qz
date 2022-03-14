@@ -215,24 +215,25 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      *
      * @param answer the answer to set
      * @param player the player giving the answer
+     * @return true if the answer was correctly added
      */
-    public void addAnswer(Answer answer, GamePlayer player) {
+    public boolean addAnswer(Answer answer, GamePlayer player) {
         // Check if player is actually playing in this game
         if (!players.contains(player)) {
-            return;
+            return false;
         }
 
         // Get current question
         Optional<Question> question = getQuestion();
         if (question.isEmpty()) {
-            return;
+            return false;
         }
 
         // Get answers to current question
         for (Answer ans : answers) {
             if (question.get().equals(ans.getQuestion()) && player.equals(ans.getPlayer())) {
                 ans.setResponse(answer.getResponse());
-                break;
+                return true;
             }
         }
     }

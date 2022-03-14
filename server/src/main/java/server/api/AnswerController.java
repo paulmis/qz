@@ -3,7 +3,6 @@ package server.api;
 import commons.entities.AnswerDTO;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +49,7 @@ public class AnswerController {
     @PutMapping("/{gameId}/answer")
     public ResponseEntity<HttpStatus> userAnswer(
             @RequestBody AnswerDTO answerData,
-            @PathVariable @NonNull UUID gameId) {
+            @PathVariable UUID gameId) {
 
         // Retrieve game and user
         Optional<Game> game = gameRepository.findById(gameId);
