@@ -21,11 +21,19 @@ build:
   stage: build
   script:
     - ./gradlew --build-cache assemble
+
+rearrange_artifacts:
+  needs: [build]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - mkdir ./artifacts
+    - mv ./server/build/libs/* ./artifacts/
+    - mv ./client/build/libs/* ./artifacts/
+    - mv ./commons/build/libs/* ./artifacts/
   artifacts:
     paths:
-      - ./server/build/libs/
-      - ./client/build/libs/
-      - ./commons/build/libs/
+      - ./artifacts/
     exclude:
       - "*-plain.jar"
     expire_in: 3 days
@@ -65,4 +73,5 @@ test:
   artifacts:
     paths:
       - ./coverage
+    expose_as: "Test coverage report"
   coverage: /TestCoverage:(\d+)%/
