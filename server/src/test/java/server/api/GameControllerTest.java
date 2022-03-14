@@ -156,16 +156,15 @@ public class GameControllerTest {
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
 
         // Mock the service
-        when(gameService.removePlayer(game, susanne)).thenReturn(true);
+        when(gameService.removePlayer(game, susanne)).thenReturn(false);
 
         // Perform the request
         this.mockMvc
                 .perform(post("/api/game/leave"))
-                .andExpect(status().isOk());
+                .andExpect(status().isConflict());
 
         // Verify interactions
         verify(gameRepository, times(1)).getPlayersGame(susanne.getId());
-        verify(gameRepository, times(1)).save(game);
         verify(gameService, times(1)).removePlayer(game, susanne);
         verifyNoMoreInteractions(gameRepository, gameService);
     }
