@@ -16,10 +16,18 @@
 
 package client.utils;
 
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+
+import commons.entities.UserDTO;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.InvocationCallback;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.glassfish.jersey.client.ClientConfig;
 
 
 /**
@@ -28,6 +36,8 @@ import java.util.List;
 public class ServerUtils {
 
     private static final String SERVER = "http://localhost:8080/";
+    private static Client client = ClientBuilder.newClient(new ClientConfig());
+    public static boolean loggedIn = false;
 
     /**
      * Gets a list of all the emoji urls from the backend.
@@ -100,9 +110,52 @@ public class ServerUtils {
         return "200";
     }
 
-    public String logIn(String email, String password) {
-        System.out.println("Verifying  User Credentials...\n");
-        return "200";
+    /**
+     * Handler for when the log in succeds.
+     */
+    public interface LogInHandlerSuccess {
+        void handle(String token);
+    }
+
+    /**
+     * Handler for when the log in fails.
+     */
+    public interface LogInHandlerFail {
+        void handle();
+    }
+
+    /**
+     * Function that checks user credentials.
+     *
+     * @param email string representing
+     *              the email of the user.
+     * @param password string representing
+     *                 the password of the user.
+     */
+    public void logIn(String email, String password,
+                      LogInHandlerSuccess logInHandlerSuccess, LogInHandlerFail logInHandlerFail) {
+        client = ClientBuilder.newClient(new ClientConfig());
+        UserDTO user = new UserDTO("", email, password);
+        var invocation = client
+                .target(SERVER).path("/api/auth/login")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPost(Entity.entity(user, APPLICATION_JSON));
+        invocation.submit(new InvocationCallback<String>() {
+
+            @Override
+            public void completed(String o) {
+                logInHandlerSuccess.handle(o);
+                client = client.register(new Authenticator(o));
+                loggedIn = true;
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                logInHandlerFail.handle();
+                System.out.println(throwable);
+            }
+        });
     }
 
     public String connect() {
