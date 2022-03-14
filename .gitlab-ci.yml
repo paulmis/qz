@@ -21,9 +21,33 @@ build:
   stage: build
   script:
     - ./gradlew --build-cache assemble
+  artifacts:
+    paths:
+      - ./server/build/libs/
+      - ./client/build/distributions/
+      - ./commons/build/libs/
+    expire_in: 10 mins
+
+rearrange_artifacts:
+  image: alpine:3.15
+  stage: build
+  needs: [build]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - mkdir ./artifacts
+    - mv ./server/build/libs/*.jar ./artifacts/
+    - mv ./client/build/distributions/*.zip ./artifacts/
+    - mv ./commons/build/libs/*.jar ./artifacts/
+  artifacts:
+    paths:
+      - ./artifacts/
+    expire_in: 3 days
+    expose_as: "Built artifacts"
 
 checkstyle-main:
   stage: analysis
+  needs: [build]
   script: ./gradlew checkstyleMain
   cache:
     key: "$CI_COMMIT_REF_NAME-main"
@@ -35,6 +59,7 @@ checkstyle-main:
 
 checkstyle-test:
   stage: analysis
+  needs: [build]
   script: ./gradlew checkstyleTest
   cache:
     key: "$CI_COMMIT_REF_NAME-test"
@@ -46,6 +71,7 @@ checkstyle-test:
 
 test:
   stage: test
+  needs: [build]
   script:
     - echo "GitLab CI/CD | Print all environment variables"
     - env
@@ -57,4 +83,5 @@ test:
   artifacts:
     paths:
       - ./coverage
+    expose_as: "Test coverage report"
   coverage: /TestCoverage:(\d+)%/
