@@ -152,7 +152,7 @@ public class LobbyController {
         
         // Check if the lobby exists.
         Optional<Game> lobby = gameRepository.findById(lobbyId);
-        if (!lobby.isPresent()) {
+        if (lobby.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         // Check if the lobby has been created.
@@ -236,28 +236,28 @@ public class LobbyController {
             @PathVariable @NonNull UUID lobbyId,
             @RequestBody NormalGameConfigurationDTO normalGameConfigurationData) {
         Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<User> userOptional = userRepository.findByEmail(AuthContext.get());
         // Check if the lobby exists and user exists.
-        if (!lobbyOptional.isPresent() || !user.isPresent()) {
+        if (lobbyOptional.isEmpty() || userOptional.isEmpty()) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         Game lobby = lobbyOptional.get();
+        User user = userOptional.get();
         // Check if the lobby is created.
         if (lobby.getStatus() != GameStatus.CREATED) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         // Check if the user is host.
-        if (lobby.getHost().getUser().getId() != user.get().getId()) {
+        if (lobby.getHost().getUser().getId() != user.getId()) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        // Create new normal game configuration based on the clients' choices
-        NormalGameConfiguration newNormalGameConfiguration = new NormalGameConfiguration();
-        newNormalGameConfiguration.setId(normalGameConfigurationData.getId());
-        newNormalGameConfiguration.setCapacity(normalGameConfigurationData.getCapacity());
-        newNormalGameConfiguration.setAnswerTime(normalGameConfigurationData.getAnswerTime());
-        newNormalGameConfiguration.setNumQuestions(normalGameConfigurationData.getNumQuestions());
+        // Create normal game configuration.
+        NormalGameConfiguration normalGameConfiguration = new NormalGameConfiguration(normalGameConfigurationData);
         // Change lobby configuration
-        lobby.setConfiguration(newNormalGameConfiguration);
+        lobby.setConfiguration(normalGameConfiguration);
+        // Update repositories
+        gameConfigurationRepository.save(normalGameConfiguration);
+        gameRepository.save(lobby);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
