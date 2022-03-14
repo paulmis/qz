@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
-
-import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
