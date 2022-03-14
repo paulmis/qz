@@ -18,19 +18,19 @@
    <children>
       <BorderPane prefHeight="576.0" prefWidth="1024.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <right>
-            <Pane fx:id="pane" prefHeight="576.0" prefWidth="278.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
+            <Pane fx:id="pane" prefHeight="576.0" prefWidth="278.0" BorderPane.alignment="CENTER">
                <children>
                   <Label layoutX="46.0" layoutY="348.0" prefHeight="21.0" prefWidth="166.0" text="Nickname">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="nicknameField" layoutX="47.0" layoutY="368.0" prefHeight="29.0" prefWidth="170.0" style="-fx-background-color: C4C4C4;">
+                  <TextField fx:id="nicknameField" layoutX="47.0" layoutY="368.0" prefHeight="29.0" prefWidth="170.0">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </TextField>
-                  <JFXButton fx:id="nicknameSetButton" alignment="CENTER" layoutX="44.0" layoutY="445.0" mnemonicParsing="false" onMouseClicked="#setNickname" prefHeight="22.0" prefWidth="170.0" style="-fx-background-color: #6EB26C;" text="Register" textAlignment="CENTER" textFill="WHITE">
+                  <JFXButton fx:id="nicknameSetButton" alignment="CENTER" layoutX="44.0" layoutY="445.0" mnemonicParsing="false" onMouseClicked="#setNickname" prefHeight="22.0" prefWidth="170.0" text="Register" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>

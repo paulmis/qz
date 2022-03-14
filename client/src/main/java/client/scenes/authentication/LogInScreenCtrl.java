@@ -10,6 +10,7 @@ import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
@@ -28,6 +29,7 @@ public class LogInScreenCtrl implements Initializable {
     @FXML private CheckBox rememberMe;
     @FXML private TextField emailField;
     @FXML private TextField passwordField;
+    @FXML private Label wrongCredentials;
     @FXML private Pane pane;
 
     /**
@@ -49,7 +51,7 @@ public class LogInScreenCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        this.wrongCredentials.setVisible(false);
     }
 
     /**
@@ -58,8 +60,13 @@ public class LogInScreenCtrl implements Initializable {
      */
     @FXML
     private void logInButtonClick() {
-        server.logIn(emailField.getText(), passwordField.getText());
-        mainCtrl.showLobbyScreen();
+        server.logIn(emailField.getText(), passwordField.getText(),
+                (s) -> {
+                    javafx.application.Platform.runLater(mainCtrl::showLobbyScreen);
+                },
+                () -> javafx.application.Platform.runLater(() -> {
+                    wrongCredentials.setVisible(true); })
+        );
     }
 
     /**
@@ -72,13 +79,21 @@ public class LogInScreenCtrl implements Initializable {
     }
 
     /**
+     * Function that resets the message
+     * when entering a new email / password.
+     */
+    @FXML
+    private void resetMessage() {
+        this.wrongCredentials.setVisible(false);
+    }
+
+    /**
      * Function that keeps track if user
      * wants to be remembered locally or not.
      */
     @FXML
     private void rememberMeTick() {
         rememberMe.getUserData();
-        System.out.print("User wants to be remembered...\n");
     }
 
     /**

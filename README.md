@@ -4,7 +4,7 @@ This project is a quizzz app. The quizzz app is a singleplayer and multiplayer g
 
 ## Group members
 
-| Profile Picture                                                                               | Name                       | Email                             |
+| Picture                                                                               | Name                       | Email                             |
 | --------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------- |
 | ![](https://avatars.githubusercontent.com/u/34619913?v=4&size=50)                             | David Dinucu-Jianu         | D.Dinucu-Jianu@student.tudelft.nl |
 | ![](https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50) | Rok Štular                 | R.Stular@student.tudelft.nl       |
@@ -20,34 +20,62 @@ This project is a quizzz app. The quizzz app is a singleplayer and multiplayer g
 <!-- - (please make sure the photos have the same size) -->
 
 ## How to run it
+### Set up the environment
+
+1. Download and install prerequisites:
+    * Download and install [IntelliJ](https://www.jetbrains.com/idea/)
+        * Note that to use some of the features discussed in the Wiki you'll need the Ultimate edition
+    * Download and install [JavaFX](https://gluonhq.com/products/javafx/)
+    * On Windows:
+        * Download and install [WSL2](https://docs.microsoft.com/en-us/windows/wsl/install)
+    * Download and install [Docker](https://docs.docker.com/get-docker/)
+2. Clone this repository with `git clone https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template.git`
+3. Build the project with `gradle build` to verify that the source is valid
+
+Additionally, these tools will aid you in development and are heavily recommended:
+- [Scene Builder](https://gluonhq.com/products/scene-builder/#download) - UI builder for `OpenJFX` frameworks
+- [Postman](https://www.postman.com/downloads/) - state of the art API testing tool
 
 
-## How to setup development environment
-Setting up environment:
-1. Resources required for development:
-    * Install an IDE of your choice ie. Intellij IDEA, Eclipse, etc.
-    * Download [JavaFX](https://gluonhq.com/products/javafx/)
-    * Download [Scene Builder](https://gluonhq.com/products/scene-builder/#download)
-    * Download [Postman (HTTP Requests Testing Tool)](https://www.postman.com/downloads/)
-2. Clone this repository
-3. Import the repository folder into your chosen IDE
-4. This will take a few minutes to initialize
-5. You can start development
+### Running the app
 
-The quizzz app consists of two components; a client and a server. Both of these must be run seperatly in order to work, with the serve running first and then the client. 
+The Quizzz app consists of three components: the database, server, and client. Each of these must be run one after another:
 
-Running the server:
-1. Run the `Main` java file in the `server` folder
-2. This may take a few minutes during the initial build/run
-3. In the command line it should say `started main` in the last lines
-4. The server is now running
+#### Database
 
-Running the client:
-1. Edit run/debug configuration the`Main` file in the `client` folder
-2. Click on VM options/arguments and add the following:
-`--module-path="<LIB PATH IN JAVAFX FOLDER WHICH WAS DOWNLOADED>"--add-modules=javafx.controls,javafx.fxml`
-3. Run the `Main` java file in the `client` folder
-4. The client is now running and is interactable
+##### Windows
+
+1. `cmd` into the repository directory
+2. Spin up the docker container with `docker-compose up -d`
+3. In `Docker Desktop` you should see the `oopp` container with a `postgres` subcontainer running at `:5432`
+4. Verify the connection with `IntelliJ`'s database module, `psql`, or `DBeaver`
+    * the connection details are provided in the `docker-compose.yml` file located in the root project directory
+
+##### Linux
+
+1. Spin up the docker container with `docker-compose up -d`
+2. Verify that the connection is running with `docker ps`
+   * The output should look similar to this:
+   ```
+    CONTAINER ID   IMAGE      COMMAND                  CREATED         STATUS         PORTS                                       NAMES
+    7e917b97e54a   postgres   "docker-entrypoint.s…"   4 seconds ago   Up 3 seconds   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp   repository-template-db-1
+    ```
+3. Verify the connection with `IntelliJ`'s database module, `psql`, or `DBeaver`
+   * the connection details are provided in the `docker-compose.yml` file located in the root project directory
+
+#### Server:
+
+1. Run the `Main` java file in the `/server/src/main/java` directory
+   * This may take a few minutes during the initial build/run
+2. The server has launched successfully if the log ends with `Started Main in ... seconds (JVM running for ...)`
+    * if you are getting a `PSQLException` when running the server or the tests, then the database connection is failing
+
+#### Client:
+
+1. Edit run/debug configuration the `Main` file in `/client/src/main/java`
+    * Add `--module-path="<LIB PATH IN JAVAFX FOLDER WHICH WAS DOWNLOADED>"--add-modules=javafx.controls,javafx.fxml` to `VM options/arguments`
+2. Execute `gradle run` (`./gradlew run` on MacOS and Linux) or run `Main` in `/client` to launch the client 
+   * the client will spawn in the background
 
 ## How to contribute to it
 `<TBA>`
