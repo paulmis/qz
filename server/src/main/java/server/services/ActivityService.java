@@ -22,6 +22,9 @@ public class ActivityService {
      * @return A list of activities.
      */
     public List<Activity> getActivities(int count) {
+        if (count < 0) {
+            throw new IllegalArgumentException("Count must be greater than or equal to 0.");
+        }
         List<Activity> activities = activityRepository.findAll();
         Collections.shuffle(activities);
         return activities.subList(0, count);
