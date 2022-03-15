@@ -3,22 +3,16 @@ package client.scenes.leaderboard;
 import client.scenes.MainCtrl;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
-import com.jfoenix.controls.JFXListView;
-import commons.entities.UserDTO;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 
+/**
+ * Global leaderboard controller.
+ */
 public class GlobalLeaderboardCtrl implements Initializable {
 
     private final ServerUtils server;
@@ -46,16 +40,21 @@ public class GlobalLeaderboardCtrl implements Initializable {
 
     }
 
+    /**
+     * Resets the leaderboard.
+     * This is done in order not to load the database everytime
+     * the app starts and only when the user navigates to this page.
+     */
     public void resetLeaderboard() {
-        if(leaderboardPane!=null) {
+        if (leaderboardPane != null) {
             this.anchorPane.getChildren().remove(leaderboardPane);
         }
         leaderboardPane = new LeaderboardPane(server.getGlobalLeaderboard());
         this.anchorPane.getChildren().add(leaderboardPane);
-        AnchorPane.setLeftAnchor(leaderboardPane,0d);
-        AnchorPane.setRightAnchor(leaderboardPane,0d);
-        AnchorPane.setBottomAnchor(leaderboardPane,0d);
-        AnchorPane.setTopAnchor(leaderboardPane,100d);
+        AnchorPane.setLeftAnchor(leaderboardPane, 0d);
+        AnchorPane.setRightAnchor(leaderboardPane, 0d);
+        AnchorPane.setBottomAnchor(leaderboardPane, 0d);
+        AnchorPane.setTopAnchor(leaderboardPane, 100d);
         leaderboardPane.setViewOrder(999);
     }
 

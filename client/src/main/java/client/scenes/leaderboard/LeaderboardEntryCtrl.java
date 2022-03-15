@@ -1,20 +1,23 @@
 package client.scenes.leaderboard;
 
 import commons.entities.UserDTO;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ResourceBundle;
-
+/**
+ * Leaderboard entry controller.
+ * Controls the user entry in the leaderboard list.
+ */
 public class LeaderboardEntryCtrl implements Initializable {
 
-    private UserDTO user;
-    private Integer rank;
+    private final UserDTO user;
+    private final Integer rank;
 
     @FXML private Label rankLabel;
     @FXML private Label nameLabel;
@@ -35,10 +38,7 @@ public class LeaderboardEntryCtrl implements Initializable {
         this.gamesLabel.setText(String.valueOf(user.getGamesPlayed()));
         this.scoreLabel.setText(String.valueOf(user.getScore()));
 
-        try {
-            this.imageView.setImage(new Image(String.valueOf(new URL("https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg")),true));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        var tempUrl = "https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg";
+        this.imageView.setImage(new Image(tempUrl, true));
     }
 }

@@ -60,10 +60,10 @@ public class Main extends Application {
         var gameScreen = FXML.load(GameScreenCtrl.class,
                 "client", "scenes", "GameScreen.fxml");
         var globalLeaderboardScreen = FXML.load(GlobalLeaderboardCtrl.class,
-                "client", "scenes","leaderboard", "GlobalLeaderboard.fxml");
+                "client", "scenes", "leaderboard", "GlobalLeaderboard.fxml");
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, serverConnectScreen, logInScreen, registerScreen, nicknameScreen,
-                lobbyScreen, gameScreen,globalLeaderboardScreen);
+                lobbyScreen, gameScreen, globalLeaderboardScreen);
     }
 }

@@ -1,21 +1,6 @@
 package client.scenes.leaderboard;
 
 import commons.entities.UserDTO;
-import javafx.geometry.Point3D;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Circle;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.*;
-import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
-import org.fxyz3d.importers.obj.ObjImporter;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -24,7 +9,26 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Point3D;
+import javafx.scene.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Box;
+import javafx.scene.shape.Circle;
+import org.fxyz3d.importers.obj.ObjImporter;
+import org.fxyz3d.shapes.primitives.Text3DMesh;
 
+
+/**
+ * Leaderboard controller class controls the inside leaderboard.
+ */
 public class LeaderboardCtrl implements Initializable {
 
     @FXML private Group group;
@@ -39,6 +43,9 @@ public class LeaderboardCtrl implements Initializable {
     @FXML private Label secondText;
     @FXML private Label thirdText;
     @FXML private VBox usersBox;
+    @FXML private Text3DMesh first3DText;
+    @FXML private Text3DMesh second3DText;
+    @FXML private Text3DMesh third3DText;
 
     private final List<UserDTO> leaderboard;
 
@@ -59,13 +66,23 @@ public class LeaderboardCtrl implements Initializable {
         firstText.setVisible(false);
         secondText.setVisible(false);
         thirdText.setVisible(false);
+        first3DText.setVisible(false);
+        second3DText.setVisible(false);
+        third3DText.setVisible(false);
+        usersBox.setVisible(false);
 
-        switch(leaderboard.size()) {
+        switch (leaderboard.size()) {
+            case 0:
+                first3DText.setVisible(true);
+                first3DText.setText3D("No players");
+                first3DText.setTranslateX(-100);
+                break;
             default:
             case 3:
                 thirdBox.setVisible(true);
                 thirdImage.setVisible(true);
                 thirdText.setVisible(true);
+                third3DText.setVisible(true);
                 thirdText.setText(leaderboard.get(2).getUsername());
                 thirdImage.setFill(tempImagePattern);
                 PhongMaterial bronzeMaterial = new PhongMaterial(Color.BROWN);
@@ -75,6 +92,7 @@ public class LeaderboardCtrl implements Initializable {
                 secondBox.setVisible(true);
                 secondImage.setVisible(true);
                 secondText.setVisible(true);
+                second3DText.setVisible(true);
                 secondText.setText(leaderboard.get(1).getUsername());
                 secondImage.setFill(tempImagePattern);
                 PhongMaterial silverMaterial = new PhongMaterial(Color.SILVER);
@@ -84,20 +102,24 @@ public class LeaderboardCtrl implements Initializable {
                 firstBox.setVisible(true);
                 firstImage.setVisible(true);
                 firstText.setVisible(true);
+                first3DText.setVisible(true);
                 firstText.setText(leaderboard.get(0).getUsername());
                 firstImage.setFill(tempImagePattern);
                 PhongMaterial goldMaterial = new PhongMaterial(Color.GOLD);
                 goldMaterial.setDiffuseMap(new Image("https://thumbs.dreamstime.com/b/gold-texture-golden-gradient-smooth-material-background-textured-bright-metal-light-shiny-metallic-blank-backdrop-decorative-131647513.jpg"));
                 firstBox.setMaterial(goldMaterial);
-                break;
+
+                createCup();
+                usersBox.setVisible(true);
+                usersBox.getChildren().addAll(
+                        IntStream.range(0, leaderboard.size())
+                                .mapToObj(value -> new LeaderboardEntryPane(leaderboard.get(value), value + 1))
+                                .collect(Collectors.toList())
+                );
         }
+    }
 
-        usersBox.getChildren().addAll(
-                IntStream.range(0,leaderboard.size())
-                .mapToObj(value -> new LeaderboardEntryPane(leaderboard.get(value),value+1))
-                .collect(Collectors.toList())
-        );
-
+    private void createCup() {
         try {
             ObjImporter importer = new ObjImporter();
             var model = importer.loadAsPoly(getClass().getResource("/client/models/WinnerCup.png")).getRoot();
@@ -109,7 +131,7 @@ public class LeaderboardCtrl implements Initializable {
             model.setScaleY(0.1);
             model.setScaleZ(0.1);
 
-            model.setRotationAxis(new Point3D(1,0,1));
+            model.setRotationAxis(new Point3D(1, 0, 1));
             model.setRotate(180);
             final int[] counter = {0};
             var timer = new Timer();
@@ -117,17 +139,16 @@ public class LeaderboardCtrl implements Initializable {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    javafx.application.Platform.runLater(()->{
-                        matrixRotateNode(model, Math.PI,0,Math.PI/180*(counter[0]++-180));
-                        counter[0]%=360;
+                    javafx.application.Platform.runLater(() -> {
+                        matrixRotateNode(model, Math.PI, 0, Math.PI / 180 * (counter[0]++ - 180));
+                        counter[0] %= 360;
                     });
                 }
-            },0,50);
+            }, 0, 50);
 
 
-        }catch(IOException ignored)
-        {
-
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -142,21 +163,21 @@ public class LeaderboardCtrl implements Initializable {
      * @param bet the y angle in radians we apply.
      * @param gam the z angle in radians we apply.
      */
-    private void matrixRotateNode(Node n, double alf, double bet, double gam){
-        double A11=Math.cos(alf)*Math.cos(gam);
-        double A12=Math.cos(bet)*Math.sin(alf)+Math.cos(alf)*Math.sin(bet)*Math.sin(gam);
-        double A13=Math.sin(alf)*Math.sin(bet)-Math.cos(alf)*Math.cos(bet)*Math.sin(gam);
-        double A21=-Math.cos(gam)*Math.sin(alf);
-        double A22=Math.cos(alf)*Math.cos(bet)-Math.sin(alf)*Math.sin(bet)*Math.sin(gam);
-        double A23=Math.cos(alf)*Math.sin(bet)+Math.cos(bet)*Math.sin(alf)*Math.sin(gam);
-        double A31=Math.sin(gam);
-        double A32=-Math.cos(gam)*Math.sin(bet);
-        double A33=Math.cos(bet)*Math.cos(gam);
+    private void matrixRotateNode(Node n, double alf, double bet, double gam) {
+        double a11 = Math.cos(alf) * Math.cos(gam);
+        double a12 = Math.cos(bet) * Math.sin(alf) + Math.cos(alf) * Math.sin(bet) * Math.sin(gam);
+        double a13 = Math.sin(alf) * Math.sin(bet) - Math.cos(alf) * Math.cos(bet) * Math.sin(gam);
+        double a21 = -Math.cos(gam) * Math.sin(alf);
+        double a22 = Math.cos(alf) * Math.cos(bet) - Math.sin(alf) * Math.sin(bet) * Math.sin(gam);
+        double a23 = Math.cos(alf) * Math.sin(bet) + Math.cos(bet) * Math.sin(alf) * Math.sin(gam);
+        double a31 = Math.sin(gam);
+        double a32 = -Math.cos(gam) * Math.sin(bet);
+        double a33 = Math.cos(bet) * Math.cos(gam);
 
-        double d = Math.acos((A11+A22+A33-1d)/2d);
-        if(d!=0d){
-            double den=2d*Math.sin(d);
-            Point3D p= new Point3D((A32-A23)/den,(A13-A31)/den,(A21-A12)/den);
+        double d = Math.acos((a11 + a22 + a33 - 1d) / 2d);
+        if (d != 0d)  {
+            double den = 2d * Math.sin(d);
+            Point3D p = new Point3D((a32 - a23) / den, (a13 - a31) / den, (a21 - a12) / den);
             n.setRotationAxis(p);
             n.setRotate(Math.toDegrees(d));
         }

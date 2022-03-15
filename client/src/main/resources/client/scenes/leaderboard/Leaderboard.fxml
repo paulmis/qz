@@ -37,17 +37,17 @@
                         <Point3D x="1.0" y="1.0" />
                      </rotationAxis>
                   </Box>
-                  <Text3DMesh fontSize="64" layoutX="425.0" layoutY="266.0" rotate="7.0" text3D="1st">
+                  <Text3DMesh fx:id="first3DText" fontSize="64" layoutX="425.0" layoutY="266.0" rotate="7.0" text3D="1st">
                      <rotationAxis>
                         <Point3D x="1.0" y="1.0" />
                      </rotationAxis>
                   </Text3DMesh>
-                  <Text3DMesh fontSize="48" layoutX="304.0" layoutY="340.0" rotate="7.0" text3D="2nd">
+                  <Text3DMesh fx:id="second3DText" fontSize="48" layoutX="304.0" layoutY="340.0" rotate="7.0" text3D="2nd">
                      <rotationAxis>
                         <Point3D x="1.0" y="1.0" />
                      </rotationAxis>
                   </Text3DMesh>
-                  <Text3DMesh fontSize="48" layoutX="563.0" layoutY="381.0" rotate="7.0" text3D="3rd">
+                  <Text3DMesh fx:id="third3DText" fontSize="48" layoutX="563.0" layoutY="381.0" rotate="7.0" text3D="3rd">
                      <rotationAxis>
                         <Point3D x="1.0" y="1.0" />
                      </rotationAxis>
