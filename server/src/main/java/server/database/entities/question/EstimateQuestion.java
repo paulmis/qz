@@ -70,26 +70,26 @@ public class EstimateQuestion extends Question {
 
         List<Double> points = new ArrayList<>();
         // estimation error of each user
-        List<Integer> errors = new ArrayList<>();
+        List<Long> errors = new ArrayList<>();
         // all the different errors, sorted and unique
-        Set<Integer> sortedErrors = new TreeSet<>();
+        Set<Long> sortedErrors = new TreeSet<>();
 
         // Get all estimation errors
-        int target = getActivities().get(0).getCost();
+        long target = getActivities().get(0).getCost();
         for (Answer ans : userAnswers) {
             if (ans.getResponse().size() != 1) {
                 throw new IllegalArgumentException("There should be a single activity per answer.");
             }
-            int userError = Math.abs(ans.getResponse().get(0).getCost() - target);
+            long userError = Math.abs(ans.getResponse().get(0).getCost() - target);
             errors.add(userError);
             sortedErrors.add(userError);
         }
 
         // For each user find their ranking
         double pointStep = 1.0 / (sortedErrors.size() - 1);
-        for (int myError : errors) {
+        for (long myError : errors) {
             double currentPoints = 1;
-            for (int err : sortedErrors) {
+            for (long err : sortedErrors) {
                 if (myError == err) {
                     break;
                 }
