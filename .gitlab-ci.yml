@@ -7,6 +7,7 @@ variables:
   POSTGRES_DB: oopp
   POSTGRES_USER: oopp_admin
   POSTGRES_PASSWORD: "1234"
+  POSTGRES_PORT: 5555
   POSTGRES_HOST_AUTH_METHOD: trust
 
 services:

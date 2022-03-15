@@ -81,7 +81,8 @@ public class GameService {
     }
 
     /**
-     * Marks the player as abandoned. If the last player abandoed the lobby, marks the game as finished.
+     * Marks the player as abandoned and disconnects their SSE emitter
+     * If the last player abandoned the lobby, marks the game as finished.
      *
      * @param game the game to remove the player from
      * @param user the user to remove
@@ -91,7 +92,7 @@ public class GameService {
     public boolean removePlayer(Game game, User user) {
         try {
             // If the removal fails, the player has already abandoned the lobby
-            if (!game.remove(user.getId())) {
+            if (!game.remove(user.getId()) || !game.getEmitters().disconnect(user.getId())) {
                 return false;
             }
         } catch (LastPlayerRemovedException ex) {
