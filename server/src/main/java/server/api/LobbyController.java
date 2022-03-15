@@ -92,14 +92,11 @@ public class LobbyController {
                     gameConfigurationRepository.save((NormalGameConfiguration) game.getConfiguration());
             game.setConfiguration(config);
 
-            // Save the game
-            game = gameRepository.save(game);
-
             // Create the player
             GamePlayer player = new GamePlayer(founder.get());
             game.add(player);
 
-            // Save the game with the player
+            // Save the game
             game = gameRepository.save(game);
         } catch (ConstraintViolationException | PersistenceException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -142,7 +139,7 @@ public class LobbyController {
     /**
      * Endpoint to allow a user to join a game.
      *
-     * @param lobbyId UUID of the lobby to join.
+     * @param lobbyId    UUID of the lobby to join.
      * @return true if the join was successful, false otherwise.
      */
     @PutMapping("/{lobbyId}/join")
@@ -160,7 +157,7 @@ public class LobbyController {
 
         // Check that the game hasn't started yet and add the player
         if (lobby.getStatus() != GameStatus.CREATED
-                || !lobby.add(player)) {
+            || !lobby.add(player)) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 

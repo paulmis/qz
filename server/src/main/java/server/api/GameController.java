@@ -3,6 +3,7 @@ package server.api;
 import commons.entities.QuestionDTO;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,23 +35,19 @@ public class GameController {
      * @return information/object of the current question
      */
     @GetMapping("/{gameId}/question/")
-    ResponseEntity<QuestionDTO> currentQuestion(@PathVariable UUID gameId) {
-
-        // Check if game exists
+    ResponseEntity<QuestionDTO> currentQuestion(
+            @PathVariable @NonNull UUID gameId) {
+        //Check if game exists.
         Optional<Game> game = gameRepository.findById(gameId);
         if (game.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        // Get current question
         Optional<Question> question = game.get().getQuestion();
-
-        // Check if question is not empty
+        //Check if question is not empty;
         if (question.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-
-        // Send 200 status and payload if question exists
+        //Send 200 status and payload if question exists.
         return ResponseEntity.ok(question.get().getDTO());
     }
 }

@@ -37,7 +37,6 @@ public class GameService {
         }
 
         // Create a list of all the available questions
-        /*
         List<Question> questions =
                 questionRepository
                     .findByIdNotIn(
@@ -45,19 +44,9 @@ public class GameService {
                                     .stream()
                                     .map(Question::getId)
                                     .collect(Collectors.toList()));
-         */
-        // ToDo: use a query instead of filter programmatically
-        List<Question> questions = questionRepository.findAll()
-                .stream()
-                .filter(q -> !usedQuestions.contains(q))
-                .collect(Collectors.toList());
 
         // Randomize the list and return the requested amount of questions
         Collections.shuffle(questions);
-
-        if (questions.size() <= count) {
-            throw new IllegalStateException("Not enough questions in the database.");
-        }
         return questions.subList(0, count);
     }
 
@@ -83,6 +72,7 @@ public class GameService {
         } else {
             throw new UnsupportedOperationException("Starting games other than definite games is not yet supported.");
         }
+
 
         game.setStatus(GameStatus.ONGOING);
     }
