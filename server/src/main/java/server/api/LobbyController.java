@@ -164,27 +164,6 @@ public class LobbyController {
     }
 
     /**
-     * Endpoint to get lobby configuration.
-     *
-     * @param lobbyId the UUID of the lobby.
-     * @return information on the configuration of the requested lobby.
-     */
-    @GetMapping("/{lobbyId}/config")
-    ResponseEntity<GameConfigurationDTO> lobbyConfiguration(
-            @PathVariable @NonNull UUID lobbyId) {
-        //Check if the lobby exists.
-        Optional<Game> lobby = gameRepository.findById(lobbyId);
-        if (!lobby.isPresent()) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        //Check if the lobby has been created.
-        if(lobby.get().getStatus() != GameStatus.CREATED) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        return ResponseEntity.ok(lobby.get().getDTO().getConfiguration());
-    }
-
-    /**
      * Endpoint to allow a user to join a game.
      *
      * @param lobbyId    UUID of the lobby to join.
