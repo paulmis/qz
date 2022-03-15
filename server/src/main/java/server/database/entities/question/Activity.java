@@ -48,7 +48,7 @@ public class Activity extends BaseEntity<ActivityDTO> {
      */
     @Column(nullable = false)
     @PositiveOrZero
-    private int cost;
+    private long cost;
 
     /**
      * The filepath to the icon of the activity.
