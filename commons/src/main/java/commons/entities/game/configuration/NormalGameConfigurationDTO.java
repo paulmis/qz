@@ -1,7 +1,6 @@
 package commons.entities.game.configuration;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import commons.entities.utils.DTO;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import jdk.jfr.Description;
