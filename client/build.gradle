@@ -25,6 +25,8 @@ dependencies {
 	implementation 'org.openjfx:javafx-controls:17.0.2'
 	implementation 'org.openjfx:javafx-fxml:17.0.2'
 
+	// this is for deserializing dates
+	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.3.0-rc1'
 	implementation group: 'com.jfoenix', name: 'jfoenix', version: '9.0.9'
 	implementation group: 'de.jensd', name: 'fontawesomefx-fontawesome', version: '4.7.0-9.1.2'
 }

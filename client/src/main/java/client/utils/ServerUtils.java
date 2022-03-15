@@ -16,18 +16,23 @@
 
 package client.utils;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
-
 import commons.entities.UserDTO;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.client.InvocationCallback;
+import commons.entities.game.GameStatus;
+import commons.entities.game.NormalGameDTO;
+import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import jakarta.ws.rs.client.*;
+import jakarta.ws.rs.core.MultivaluedMap;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.glassfish.jersey.client.ClientConfig;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.glassfish.jersey.client.ClientConfig;
+import java.util.UUID;
+
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.security.auth.login.Configuration.setConfiguration;
 
 
 /**
@@ -161,5 +166,75 @@ public class ServerUtils {
     public String connect() {
         System.out.println("New connection!\n");
         return "200";
+    }
+    public void sub() {
+        var client = ClientBuilder.newClient(new ClientConfig());
+        UserDTO user = new UserDTO(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10));
+        user.setId(UUID.randomUUID());
+        client
+                .target(SERVER).path("/api/auth/register")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(user, APPLICATION_JSON));
+        var r = client
+                .target(SERVER).path("/api/auth/login")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(user, APPLICATION_JSON));
+        System.out.println(r);
+        var token = r.readEntity(String.class);
+        System.out.println(token);
+        client = client.register(new Authenticator(token));
+
+
+        var game = new NormalGameDTO();
+        var config = new NormalGameConfigurationDTO();
+        config.setNumQuestions(20);
+        config.setAnswerTime(123);
+        config.setCapacity(1);
+        config.setId(UUID.randomUUID());
+        game.setId(UUID.randomUUID());
+        game.setGameId(RandomStringUtils.randomAlphabetic(10));
+        game.setStatus(GameStatus.FINISHED);
+        game.setConfiguration(config);
+
+        r  = client.target(SERVER).path("/api/lobby").request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(game, APPLICATION_JSON));
+
+        System.out.println(r.getStatus());
+        System.out.println(r);
+        var lobby = r.readEntity(NormalGameDTO.class);
+        System.out.println(lobby);
+
+        r = client.target(SERVER).path("/api/lobby/"+lobby.getId()+"/start").request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .put(Entity.entity(game, APPLICATION_JSON));
+        System.out.println(r);
+        r = client.target(SERVER).path("/api/sse/open").request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get();
+        System.out.println(r);
+
+
+    }
+    public class Authenticator implements ClientRequestFilter {
+
+        private final String token;
+
+        public Authenticator(String token) {
+            this.token = token;
+        }
+
+        /**
+         * Function that acts as a middleware in order to
+         * keep track of the token on every request we make.
+         *
+         * @param requestContext context holder for request.
+         */
+        public void filter(ClientRequestContext requestContext) {
+            MultivaluedMap<String, Object> headers = requestContext.getHeaders();
+            headers.add("Authorization", "Bearer " + token);
+        }
     }
 }
