@@ -15,6 +15,13 @@ import server.database.entities.game.Game;
 public interface GameRepository extends JpaRepository<Game, UUID> {
     List<Game> findAllByStatus(GameStatus status);
 
+    /**
+     * Finds player's active lobby. This function should not be used for ongoing games.
+     *
+     * @param id user's id
+     * @param status game status, should be set to CREATED
+     * @return empty if there is no active lobby for the player, otherwise the lobby
+     */
     Optional<Game> findByPlayers_User_IdEqualsAndStatus(@NonNull UUID id, @NonNull GameStatus status);
 
     /**
