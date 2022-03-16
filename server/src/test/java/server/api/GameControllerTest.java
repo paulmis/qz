@@ -1,30 +1,17 @@
 package server.api;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import commons.entities.game.GameStatus;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.UUID;
 import static org.hamcrest.Matchers.equalToObject;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static server.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import commons.entities.UserDTO;
 import commons.entities.game.GameStatus;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,15 +29,11 @@ import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
+import server.database.entities.question.MCQuestion;
+import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
-
-import server.database.entities.game.NormalGame;
-import server.database.entities.question.MCQuestion;
-import server.database.entities.question.Question;
-import server.database.repositories.game.GameRepository;
-
 
 /**
  * Tests for the GameController.
@@ -72,11 +55,7 @@ public class GameControllerTest {
     @MockBean
     private GameService gameService;
 
-    private UUID getUUID(int id) {
-        return UUID.fromString("00000000-0000-0000-0000-00000000000" + (id % 10));
-    }
-
-    private Game game;
+    private Game<?> game;
     private GameConfiguration gameConfiguration;
     private User john;
     private User susanne;
@@ -118,6 +97,7 @@ public class GameControllerTest {
         game.setStatus(GameStatus.ONGOING);
         gameConfiguration = new NormalGameConfiguration(10, 10, 2);
         game.setConfiguration(gameConfiguration);
+        when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
 
         // Add players
         johnPlayer = new GamePlayer(john);
@@ -126,7 +106,7 @@ public class GameControllerTest {
         game.add(johnPlayer);
         when(gameRepository.getPlayersGame(john.getId())).thenReturn(Optional.of(game));
         game.add(susannePlayer);
-        when(gameRepository.getPlayersGame(susanne.getId())).thenReturn(Optional.of(game));
+        when(gameRepository.getPlayersGame(susanne.getId())).thenReturn(Optional.of(game));;
 
         // Mock the authentication
         SecurityContextHolder.getContext().setAuthentication(
@@ -164,7 +144,8 @@ public class GameControllerTest {
                 .perform(get("/api/game/" + getUUID(1) + "/question/"))
                 .andExpect(status().isNotFound());
     }
-    
+
+    @Test
     public void leaveOk() throws Exception {
         // Mock the service
         when(gameService.removePlayer(game, john)).thenReturn(true);
