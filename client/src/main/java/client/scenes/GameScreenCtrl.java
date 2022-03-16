@@ -358,8 +358,21 @@ public class GameScreenCtrl implements Initializable {
         volume.setValue(volume.getValue() == 0 ? 100 : 0);
     }
 
-    @Name("questionStart")
+    /**
+     * Just an example method of an sse event handler.
+     *
+     * @param questionExample The deserialized object.
+     */
+    @Name("example")
     public void handleTest(QuestionDTO questionExample) {
+
+    }
+
+    /**
+     * Another example of a sse event handler.
+     */
+    @Name("questionStart")
+    public void getQuestion() {
 
     }
 }

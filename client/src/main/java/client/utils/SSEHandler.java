@@ -61,12 +61,22 @@ public class SSEHandler {
             }
 
             // Gets the type of the first parameter
-            var type = types[0];
 
             // This creates the SSEEvent handler for the event.
             return (SSEEventHandler) inboundSseEvent -> {
+
+                // Calls the method directly if there are no parameters.
+                if (types.length == 0) {
+                    javafx.application.Platform.runLater(() -> {
+                        try {
+                            method.invoke(handlerSource);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
                 // Reads the object with the extracted type.
-                var obj = inboundSseEvent.readData(type);
+                var obj = inboundSseEvent.readData(types[0]);
 
                 // This invokes the function with the object and the source inside a run later so
                 // javafx components can have their state changed.
