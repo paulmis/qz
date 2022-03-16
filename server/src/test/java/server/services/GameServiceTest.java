@@ -80,14 +80,14 @@ public class GameServiceTest {
 
         // Mock the repository
         lenient().when(questionRepository.count()).thenReturn(4L);
+        lenient().when(questionRepository.findAll())
+                .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
     }
 
     @Test
     void provideQuestionsOk() {
-        // Mock the repository
         // ToDo: fix QuestionRepository::findByIdNotIn
-        lenient().when(questionRepository.findAll())
-                .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
+        // Mock the repository
         //when(questionRepository.findByIdNotIn(usedQuestionIds))
         //        .thenReturn(Arrays.asList(questionD, questionC));
 
@@ -117,10 +117,8 @@ public class GameServiceTest {
 
     @Test
     void startNormal() {
-        // Mock the repository
         // ToDo: fix QuestionRepository::findByIdNotIn
-        lenient().when(questionRepository.findAll())
-                .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
+        // Mock the repository
         //when(questionRepository.findByIdNotIn(new ArrayList<>()))
         //        .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
 
