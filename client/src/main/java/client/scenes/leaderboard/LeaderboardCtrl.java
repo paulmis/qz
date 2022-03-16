@@ -49,16 +49,98 @@ public class LeaderboardCtrl implements Initializable {
     @FXML private Text3DMesh second3DText;
     @FXML private Text3DMesh third3DText;
 
-    private final List<UserDTO> leaderboard;
     private Timer rotationTimer;
-
-    public LeaderboardCtrl(List<UserDTO> leaderboard) {
-        this.leaderboard = leaderboard;
-    }
+    private Group cupModel;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+    }
 
+    private void createCup() {
+
+        try {
+            ObjImporter importer = new ObjImporter();
+            cupModel = importer.loadAsPoly(getClass().getResource("/client/models/WinnerCup.png")).getRoot();
+            cupModel.setTranslateX(500);
+            cupModel.setTranslateY(180);
+            cupModel.setTranslateZ(-200);
+            cupModel.setScaleX(0.1);
+            cupModel.setScaleY(0.1);
+            cupModel.setScaleZ(0.1);
+
+            cupModel.setRotationAxis(new Point3D(1, 0, 1));
+            cupModel.setRotate(180);
+            final int[] counter = {0};
+            rotationTimer = new Timer();
+
+            rotationTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    javafx.application.Platform.runLater(() -> {
+                        matrixRotateNode(cupModel, Math.PI, 0, Math.PI / 180 * (counter[0]++ - 180));
+                        counter[0] %= 360;
+                    });
+                }
+            }, 0, 50);
+
+            javafx.application.Platform.runLater(() -> group.getChildren().add(cupModel));
+
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * JavaFX 3d has no support for multiple 3d rotations
+     * at the same time without computing the unit vector
+     * yourself. Soo this function does that.
+     * From: https://stackoverflow.com/questions/30145414/rotate-a-3d-object-on-3-axis-in-javafx-properly
+     *
+     * @param n the node we rotate
+     * @param alf the x angle in radians we apply.
+     * @param bet the y angle in radians we apply.
+     * @param gam the z angle in radians we apply.
+     */
+    private void matrixRotateNode(Node n, double alf, double bet, double gam) {
+        double a11 = Math.cos(alf) * Math.cos(gam);
+        double a12 = Math.cos(bet) * Math.sin(alf) + Math.cos(alf) * Math.sin(bet) * Math.sin(gam);
+        double a13 = Math.sin(alf) * Math.sin(bet) - Math.cos(alf) * Math.cos(bet) * Math.sin(gam);
+        double a21 = -Math.cos(gam) * Math.sin(alf);
+        double a22 = Math.cos(alf) * Math.cos(bet) - Math.sin(alf) * Math.sin(bet) * Math.sin(gam);
+        double a23 = Math.cos(alf) * Math.sin(bet) + Math.cos(bet) * Math.sin(alf) * Math.sin(gam);
+        double a31 = Math.sin(gam);
+        double a32 = -Math.cos(gam) * Math.sin(bet);
+        double a33 = Math.cos(bet) * Math.cos(gam);
+
+        double d = Math.acos((a11 + a22 + a33 - 1d) / 2d);
+        if (d != 0d)  {
+            double den = 2d * Math.sin(d);
+            Point3D p = new Point3D((a32 - a23) / den, (a13 - a31) / den, (a21 - a12) / den);
+            n.setRotationAxis(p);
+            n.setRotate(Math.toDegrees(d));
+        }
+    }
+
+    /**
+     * This function stops the rotation timer.
+     */
+    public void stop() {
+        rotationTimer.cancel();
+    }
+
+
+    /**
+     * This function resets the leaderboard.
+     *
+     * @param leaderboard the leaderboard element.
+     */
+    public void reset(List<UserDTO> leaderboard) {
+        if (cupModel != null) {
+            group.getChildren().remove(cupModel);
+        }
+
+        usersBox.getChildren().clear();
 
         var boxes = List.of(firstBox, secondBox, thirdBox);
         boxes.forEach(box -> box.setVisible(false));
@@ -104,78 +186,5 @@ public class LeaderboardCtrl implements Initializable {
             texts.get(i).setText(leaderboard.get(i).getUsername());
             images.get(i).setFill(tempImagePattern);
         });
-    }
-
-    private void createCup() {
-
-        try {
-            ObjImporter importer = new ObjImporter();
-            var model = importer.loadAsPoly(getClass().getResource("/client/models/WinnerCup.png")).getRoot();
-            model.setTranslateX(500);
-            model.setTranslateY(180);
-            model.setTranslateZ(-200);
-            model.setScaleX(0.1);
-            model.setScaleY(0.1);
-            model.setScaleZ(0.1);
-
-            model.setRotationAxis(new Point3D(1, 0, 1));
-            model.setRotate(180);
-            final int[] counter = {0};
-            rotationTimer = new Timer();
-
-            rotationTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    javafx.application.Platform.runLater(() -> {
-                        matrixRotateNode(model, Math.PI, 0, Math.PI / 180 * (counter[0]++ - 180));
-                        counter[0] %= 360;
-                    });
-                }
-            }, 0, 50);
-
-            javafx.application.Platform.runLater(() -> group.getChildren().add(model));
-
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    /**
-     * JavaFX 3d has no support for multiple 3d rotations
-     * at the same time without computing the unit vector
-     * yourself. Soo this function does that.
-     * From: https://stackoverflow.com/questions/30145414/rotate-a-3d-object-on-3-axis-in-javafx-properly
-     *
-     * @param n the node we rotate
-     * @param alf the x angle in radians we apply.
-     * @param bet the y angle in radians we apply.
-     * @param gam the z angle in radians we apply.
-     */
-    private void matrixRotateNode(Node n, double alf, double bet, double gam) {
-        double a11 = Math.cos(alf) * Math.cos(gam);
-        double a12 = Math.cos(bet) * Math.sin(alf) + Math.cos(alf) * Math.sin(bet) * Math.sin(gam);
-        double a13 = Math.sin(alf) * Math.sin(bet) - Math.cos(alf) * Math.cos(bet) * Math.sin(gam);
-        double a21 = -Math.cos(gam) * Math.sin(alf);
-        double a22 = Math.cos(alf) * Math.cos(bet) - Math.sin(alf) * Math.sin(bet) * Math.sin(gam);
-        double a23 = Math.cos(alf) * Math.sin(bet) + Math.cos(bet) * Math.sin(alf) * Math.sin(gam);
-        double a31 = Math.sin(gam);
-        double a32 = -Math.cos(gam) * Math.sin(bet);
-        double a33 = Math.cos(bet) * Math.cos(gam);
-
-        double d = Math.acos((a11 + a22 + a33 - 1d) / 2d);
-        if (d != 0d)  {
-            double den = 2d * Math.sin(d);
-            Point3D p = new Point3D((a32 - a23) / den, (a13 - a31) / den, (a21 - a12) / den);
-            n.setRotationAxis(p);
-            n.setRotate(Math.toDegrees(d));
-        }
-    }
-
-    /**
-     * This function stops the rotation timer.
-     */
-    public void stop() {
-        rotationTimer.cancel();
     }
 }

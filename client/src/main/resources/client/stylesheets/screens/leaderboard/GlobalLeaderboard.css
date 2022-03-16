@@ -5,3 +5,7 @@
 #gridPane {
     -fx-background-color: backgroundColor;
 }
+
+#waitingLabel {
+    -fx-text-fill: backgroundColor;
+}

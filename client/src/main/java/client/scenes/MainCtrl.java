@@ -209,8 +209,8 @@ public class MainCtrl {
      * It also sets it min width and height
      */
     public void showGlobalLeaderboardScreen() {
-        globalLeaderboardCtrl.resetLeaderboard();
         this.showScreenLetterBox(globalLeaderboardScreen, StageScalingStrategy.Letterbox);
+        globalLeaderboardCtrl.reset();
     }
 
     /**

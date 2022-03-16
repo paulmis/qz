@@ -12,7 +12,7 @@ repositories {
 
 javafx {
     version = "17.0.2"
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    modules = [ 'javafx.controls', 'javafx.fxml']
 }
 
 dependencies {
@@ -32,4 +32,15 @@ dependencies {
 
 	implementation group: 'com.jfoenix', name: 'jfoenix', version: '9.0.9'
 	implementation group: 'de.jensd', name: 'fontawesomefx-fontawesome', version: '4.7.0-9.1.2'
+}
+
+run {
+	jvmArgs = [
+			"--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED",
+			"--add-exports=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED",
+			"--add-exports=javafx.base/com.sun.javafx.binding=ALL-UNNAMED",
+			"--add-exports=javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED",
+			"--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED",
+			"--add-exports=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED"
+	]
 }

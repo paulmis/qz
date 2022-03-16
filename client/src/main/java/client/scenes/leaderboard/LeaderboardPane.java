@@ -19,19 +19,16 @@ public class LeaderboardPane extends StackPane {
     /**
      * The constructor of the class. Initializes the view and adds it to the
      * stackpane and it creates a controller.
-     *
-     * @param leaderboard The list of users that represent the leaderboard.
      */
-    public LeaderboardPane(List<UserDTO> leaderboard) {
+    public LeaderboardPane() {
 
         // We create the loader for the fxml of the leaderboard
         FXMLLoader fxmlLoader =
                 new FXMLLoader(getClass().getResource("/client/scenes/leaderboard/Leaderboard.fxml"));
 
         // We set the controller of the fxml to our newly created controller
-        // we also pass in the leaderboard of users
         fxmlLoader.setControllerFactory(param ->
-                controller = new LeaderboardCtrl(leaderboard));
+                controller = new LeaderboardCtrl());
         // This loads the fxml
         try {
             view = (Node) fxmlLoader.load();
@@ -52,5 +49,14 @@ public class LeaderboardPane extends StackPane {
      */
     public void stop() {
         controller.stop();
+    }
+
+    /**
+     * Resets the leaderboard.
+     *
+     * @param leaderboard the new leaderboard.
+     */
+    public void reset(List<UserDTO> leaderboard) {
+        controller.reset(leaderboard);
     }
 }
