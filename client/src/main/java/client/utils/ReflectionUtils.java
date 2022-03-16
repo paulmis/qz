@@ -1,15 +1,18 @@
 package client.utils;
 
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
 import jdk.jfr.Description;
+import jdk.jfr.Name;
 import lombok.NonNull;
+
 
 /**
  * Helper methods for reflection.
@@ -37,6 +40,44 @@ public class ReflectionUtils {
         return fields.stream()
                 .filter(field -> field.isAnnotationPresent(annotation))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Helper method to extract all methods
+     * from an object that have the specified
+     * annotation class.
+     *
+     * @param obj The object the filtering will be done upon.
+     * @param annotation The annotation type we want the methods to have.
+     * @return A list of all the methods that have the specified annotation.
+     */
+    public static List<Method> getAnnotatedMethods(@NonNull Object obj,
+                                                 Class<? extends Annotation> annotation) {
+        var fields = new ArrayList<Method>();
+        Class currentClass = obj.getClass();
+        while (currentClass != Object.class) {
+            fields.addAll(Arrays.asList(currentClass.getDeclaredMethods()));
+            currentClass = currentClass.getSuperclass();
+        }
+
+        return fields.stream()
+                .filter(method -> method.isAnnotationPresent(annotation))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Helper method to get the name
+     * from a method by accessing the
+     * Name annotation.
+     *
+     * @param method the requested method.
+     * @return the string name of the method.
+     */
+    public static String getTextName(@NonNull Method method) {
+        if (!method.isAnnotationPresent(Name.class)) {
+            throw new IllegalArgumentException();
+        }
+        return method.getAnnotation(Name.class).value();
     }
 
     /**

@@ -1,8 +1,8 @@
 package commons.entities.game.configuration;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jdk.jfr.Description;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

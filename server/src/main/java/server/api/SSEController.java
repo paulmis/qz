@@ -16,6 +16,7 @@ import server.database.entities.game.Game;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
 
+
 /**
  * The SSE endpoint - opens new SSE connections.
  */
@@ -45,7 +46,7 @@ public class SSEController {
                     .orElseThrow(() -> new NoSuchElementException("User not found"));
 
             // The user must currently be in a game
-            Game game = gameRepository.findByPlayers_User_IdEqualsAndStatus(user.getId(), GameStatus.ONGOING)
+            Game game = gameRepository.findByPlayers_User_IdEqualsAndStatus(user.getId(), GameStatus.CREATED)
                     .orElseThrow(() -> new IllegalStateException("User not in a game"));
 
             // Register emitter callbacks.

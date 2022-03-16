@@ -209,6 +209,7 @@ public class MainCtrl {
      */
     public void showNicknameScreen() {
         this.showScreenLetterBox(nicknameScreen, StageScalingStrategy.Letterbox);
+        nicknameScreenCtrl.reset();
     }
 
     /**
@@ -224,6 +225,7 @@ public class MainCtrl {
      */
     public void showGameScreen() {
         this.showScreenLetterBox(gameScreen, StageScalingStrategy.Letterbox);
+        gameScreenCtrl.reset();
     }
 
     /**

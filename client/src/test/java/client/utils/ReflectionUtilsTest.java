@@ -4,11 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
+
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jdk.jfr.Description;
+import jdk.jfr.Name;
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +40,15 @@ public class ReflectionUtilsTest {
         @Description("balance in euros")
         public Float balance;
         public Integer brothers;
+
+        @Name("balance")
+        public void getBalance() {
+
+        }
+
+        public void otherFunction() {
+
+        }
     }
 
     Person personObj;
@@ -81,4 +93,22 @@ public class ReflectionUtilsTest {
         assertThrows(IllegalArgumentException.class, () -> ReflectionUtils.getMaxValue(balanceField));
         assertEquals(160, ReflectionUtils.getMaxValue(ageField));
     }
+
+    @Test
+    void getAnnotatedMethods() {
+        var annotatedMethodsName = ReflectionUtils.getAnnotatedMethods(personObj, Name.class)
+                .stream().map(Method::getName).collect(Collectors.toList());
+
+        assertEquals(List.of("getBalance"), annotatedMethodsName);
+    }
+
+    @Test
+    void getTextName() throws NoSuchMethodException {
+        var getBalanceMethod = personObj.getClass().getMethod("getBalance");
+        var otherMethod = personObj.getClass().getMethod("otherFunction");
+
+        assertThrows(IllegalArgumentException.class, () -> ReflectionUtils.getTextName(otherMethod));
+        assertEquals("balance", ReflectionUtils.getTextName(getBalanceMethod));
+    }
+
 }
