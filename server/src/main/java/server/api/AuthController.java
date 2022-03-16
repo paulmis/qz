@@ -1,6 +1,9 @@
 package server.api;
 
 import commons.entities.UserDTO;
+import java.util.HashMap;
+import java.util.Map;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,10 +12,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 import server.database.entities.User;
 import server.database.entities.auth.config.JWTHandler;
 import server.database.repositories.UserRepository;
@@ -43,17 +45,21 @@ public class AuthController {
      * @return 409 if the user with this data already exists, 201 and the auth token otherwise
      */
     @PostMapping("register")
-    public ResponseEntity<String> register(@RequestBody UserDTO userData) {
+    public ResponseEntity<String> register(@Valid @RequestBody UserDTO userData) {
         // If a user with this email or username already exists, return 409
         if (userRepository.existsByEmailOrUsername(userData.getEmail(), userData.getUsername())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return new ResponseEntity<>("User already exists", HttpStatus.CONFLICT);
         }
 
-        // Salt the password and persist
-        userData.setPassword(passwordEncoder.encode(userData.getPassword()));
-        User user = userRepository.save(new User(userData));
+        // Salt the password
+        try {
+            userData.setPassword(passwordEncoder.encode(userData.getPassword()));
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>("Password cannot be salted: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }
 
-        // Generate a JWT token and return it with 201
+        // Persist the user and return 201
+        User user = userRepository.save(new User(userData));
         return new ResponseEntity<>(handler.generateToken(user.getEmail()), HttpStatus.CREATED);
     }
 
@@ -84,5 +90,24 @@ public class AuthController {
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+    }
+
+    /**
+     * Handles user validation error messages.
+     *
+     * @param ex the validation exception instance
+     * @return the error messages
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }

@@ -1,5 +1,6 @@
 package server.database.entities;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import commons.entities.UserDTO;
 import java.util.Collections;
 import java.util.HashSet;
@@ -10,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,25 +37,25 @@ import server.database.entities.utils.BaseEntity;
 @Data
 @Entity
 @Table(name = "user_details")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User extends BaseEntity<UserDTO> {
-    /**
-     * Construct a new entity from a DTO.
-     *
-     * @param dto DTO to map to entity.
-     */
-    public User(UserDTO dto) {
-        new ModelMapper().map(dto, this);
-    }
-
     /**
      * User's nickname.
      */
+    protected String nickname;
+
+    /**
+     * User's name.
+     */
+    @Size(min = 3, max = 20)
     @Column(nullable = false, unique = true)
     @NonNull protected String username;
 
     /**
      * email - string used for authentication purposes representing the email of the user.
      */
+    @Email
+    @Size(max = 50)
     @Column(nullable = false, unique = true)
     @NonNull protected String email;
 
@@ -65,13 +68,11 @@ public class User extends BaseEntity<UserDTO> {
     /**
      * score - integer representing a player's total score.
      */
-    @Column
     protected int score = 0;
 
     /**
      * id - random unique uuid assigned to a certain player.
      */
-    @Column
     protected int gamesPlayed = 0;
 
     /**
@@ -81,6 +82,16 @@ public class User extends BaseEntity<UserDTO> {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     protected Set<GamePlayer> gamePlayers = Collections.synchronizedSet(new HashSet<>());
+
+    /**
+     * Construct a new entity from a DTO ignoring score and gamePlayer fields.
+     *
+     * @param dto DTO to map to entity.
+     */
+    public User(UserDTO dto) {
+        this(dto.getUsername(), dto.getEmail(), dto.getPassword());
+        this.nickname = dto.getNickname();
+    }
 
     @Override
     public UserDTO getDTO() {
