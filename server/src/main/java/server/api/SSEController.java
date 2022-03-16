@@ -46,7 +46,7 @@ public class SSEController {
                     .orElseThrow(() -> new NoSuchElementException("User not found"));
 
             // The user must currently be in a game
-            Game game = gameRepository.findByPlayers_User_IdEqualsAndStatus(user.getId(), GameStatus.CREATED)
+            Game game = gameRepository.findByPlayers_User_IdEqualsAndStatus(user.getId(), GameStatus.ONGOING)
                     .orElseThrow(() -> new IllegalStateException("User not in a game"));
 
             // Register emitter callbacks.

@@ -18,7 +18,6 @@ dependencies {
 	implementation group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '3.0.4'
 	implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '3.0.4'
 
-	//implementation group: 'org.glassfish.jersey.bundles', name: 'jaxrs-ri', version: '3.0.4'
 	implementation 'jakarta.ws.rs:jakarta.ws.rs-api:2.1.6'
 	implementation 'com.google.inject:guice:5.0.1'
 
@@ -30,6 +29,5 @@ dependencies {
 	implementation group: 'com.jfoenix', name: 'jfoenix', version: '9.0.9'
 	implementation group: 'de.jensd', name: 'fontawesomefx-fontawesome', version: '4.7.0-9.1.2'
 	implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-sse', version: '3.0.4'
-	//implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.0.1'
 
 }
