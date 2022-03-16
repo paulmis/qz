@@ -120,7 +120,7 @@ parser.add_argument(
     type=argparse.FileType("r"),
 )
 parser.add_argument(
-    "-a",
+    "-u",
     "--api-url",
     help="URL of the REST API. (default: %(default)s)",
     default="http://localhost:8080/",
@@ -141,6 +141,12 @@ parser.add_argument(
 auth_group = parser.add_argument_group(
     "Authentication details",
     "Configure the authentication details for the API endpoint",
+)
+auth_group.add_argument(
+    "-a",
+    "--auth-enabled",
+    help="Enable authentication. (default: %(default)s)",
+    action="store_true",
 )
 auth_group.add_argument(
     "-r",
@@ -193,34 +199,42 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
-# Obtain the JWT token to access the protected endpoint
-data = json.dumps(
-    {"email": args.email, "username": args.email, "password": args.password}
-)
-# Check if we need to login or register
-if args.register:
-    AUTH_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/auth/register")
-    logging.debug(f'Registering user "{args.email}"...')
-else:
-    AUTH_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/auth/login")
-    logging.debug(f'Logging in user "{args.email}"...')
+# Define all extra headers to be sent with the request
+HEADERS = {}
+if args.auth_enabled:
+    logging.info("Authentication enabled")
 
-# Perform the request to the correct endpoint
-result = post(AUTH_ENDPOINT, data)
-# If the request failed, exit with an error
-if not status_is_ok(result.status_code):
-    logging.error(
-        f"Failed to {'register' if args.register else 'login'} user \"{args.email}\"."
+    # Obtain the JWT token to access the protected endpoint
+    data = json.dumps(
+        {"email": args.email, "username": args.email, "password": args.password}
     )
-    logging.error(f"Status code: {result.status_code}")
-    logging.error(f'Response: "{result.data.decode()}"')
-    exit(1)
+    # Check if we need to login or register
+    if args.register:
+        AUTH_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/auth/register")
+        logging.debug(f'Registering user "{args.email}"...')
+    else:
+        AUTH_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/auth/login")
+        logging.debug(f'Logging in user "{args.email}"...')
 
-# If the request succeeded, load the JWT token
-logging.debug(
-    f"Successfully {'registered' if args.register else 'logged in'} user \"{args.email}\"."
-)
-TOKEN = result.data.decode()
+    # Perform the request to the correct endpoint
+    result = post(AUTH_ENDPOINT, data)
+    # If the request failed, exit with an error
+    if not status_is_ok(result.status_code):
+        logging.error(
+            f"Failed to {'register' if args.register else 'login'} user \"{args.email}\"."
+        )
+        logging.error(f"Status code: {result.status_code}")
+        logging.error(f'Response: "{result.data.decode()}"')
+        exit(1)
+
+    # If the request succeeded, load the JWT token
+    logging.debug(
+        f"Successfully {'registered' if args.register else 'logged in'} user \"{args.email}\"."
+    )
+    token = result.data.decode()
+    HEADERS["Authorization"] = f"Bearer {token}"
+else:
+    logging.info("Authentication disabled")
 
 # Get the API endpoint URL
 API_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/activity/batch")
@@ -241,7 +255,7 @@ for i in range(0, len(activities), args.chunk_size):
     # Get the activities to add
     chunk = activities[i : i + args.chunk_size]
     # POST the activities
-    resp = post(API_ENDPOINT, json.dumps(chunk), {"Authorization": f"Bearer {TOKEN}"})
+    resp = post(API_ENDPOINT, json.dumps(chunk), HEADERS)
     # If the request failed, exit with an error
     if not status_is_ok(resp.status_code):
         logging.error(f"Failed to add activities {i} to {i + args.chunk_size}")
