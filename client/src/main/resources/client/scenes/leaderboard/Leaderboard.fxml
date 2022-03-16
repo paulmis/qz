@@ -15,9 +15,9 @@
 <?import javafx.scene.text.Font?>
 <?import org.fxyz3d.shapes.primitives.Text3DMesh?>
 
-<ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="614.0" prefWidth="1000.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.leaderboard.LeaderboardCtrl">
+<ScrollPane fx:id="scrollPaneLeaderboard" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="614.0" prefWidth="1000.0" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.leaderboard.LeaderboardCtrl" stylesheets="@/client/stylesheets/GlobalTheme.css" >
    <content>
-      <VBox alignment="TOP_CENTER" fillWidth="false" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: transparent;">
+      <VBox fx:id="vboxScrollPaneLeaderboard" alignment="TOP_CENTER" fillWidth="false" prefHeight="200.0" prefWidth="100.0">
          <children>
             <Group fx:id="group">
                <children>
@@ -137,7 +137,7 @@
                   </Label>
                </children>
             </Group>
-            <VBox fx:id="usersBox" alignment="TOP_CENTER" prefHeight="109.0" prefWidth="959.0" spacing="15.0" style="-fx-background-color: white; -fx-border-radius: 20 20 0 0; -fx-background-radius: 20 20 0 0;">
+            <VBox fx:id="usersBox" alignment="TOP_CENTER" prefHeight="109.0" prefWidth="959.0" spacing="15.0">
                <VBox.margin>
                   <Insets top="15.0" />
                </VBox.margin>

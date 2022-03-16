@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.*?>
-<?import de.jensd.fx.glyphs.fontawesome.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576" prefWidth="1024" style="-fx-background-color: #FCFCFC;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.lobby.LobbyScreenCtrl">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576" prefWidth="1024" style="-fx-background-color: #FCFCFC;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.lobby.LobbyScreenCtrl">
    <children>
       <VBox>
          <children>
             <HBox alignment="BOTTOM_RIGHT" prefHeight="47.0" prefWidth="1009.0" spacing="15.0">
                <children>
+                  <JFXButton fx:id="leaderboardButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#leaderboardButtonClick" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #FF6969;" text="Leaderboard" textFill="WHITE" />
                   <JFXButton fx:id="userButton" alignment="CENTER" buttonType="RAISED" contentDisplay="GRAPHIC_ONLY">
                      <graphic>
                         <FontAwesomeIconView fill="#5e5e5e" glyphName="USER" size="20" text="" />

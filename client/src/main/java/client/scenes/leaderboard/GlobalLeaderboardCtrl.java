@@ -61,5 +61,6 @@ public class GlobalLeaderboardCtrl implements Initializable {
     @FXML
     private void goBackToLobbies() {
         mainCtrl.showLobbyScreen();
+        leaderboardPane.stop();
     }
 }

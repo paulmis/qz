@@ -46,4 +46,11 @@ public class LeaderboardPane extends StackPane {
         AnchorPane.setBottomAnchor(view, 0d);
         AnchorPane.setTopAnchor(view, 0d);
     }
+
+    /**
+     * Stops the rotation timer.
+     */
+    public void stop() {
+        controller.stop();
+    }
 }

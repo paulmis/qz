@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javafx.fxml.FXML;
@@ -31,8 +32,9 @@ import org.fxyz3d.shapes.primitives.Text3DMesh;
  */
 public class LeaderboardCtrl implements Initializable {
 
+    @FXML private VBox vboxScrollPaneLeaderboard;
     @FXML private Group group;
-    @FXML private ScrollPane scrollPane;
+    @FXML private ScrollPane scrollPaneLeaderboard;
     @FXML private Box firstBox;
     @FXML private Box secondBox;
     @FXML private Box thirdBox;
@@ -48,6 +50,7 @@ public class LeaderboardCtrl implements Initializable {
     @FXML private Text3DMesh third3DText;
 
     private final List<UserDTO> leaderboard;
+    private Timer rotationTimer;
 
     public LeaderboardCtrl(List<UserDTO> leaderboard) {
         this.leaderboard = leaderboard;
@@ -55,75 +58,59 @@ public class LeaderboardCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        var tempImagePattern = new ImagePattern(new Image("https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg"));
 
-        firstBox.setVisible(false);
-        secondBox.setVisible(false);
-        thirdBox.setVisible(false);
-        firstImage.setVisible(false);
-        secondImage.setVisible(false);
-        thirdImage.setVisible(false);
-        firstText.setVisible(false);
-        secondText.setVisible(false);
-        thirdText.setVisible(false);
-        first3DText.setVisible(false);
-        second3DText.setVisible(false);
-        third3DText.setVisible(false);
-        usersBox.setVisible(false);
 
-        switch (leaderboard.size()) {
-            case 0:
-                first3DText.setVisible(true);
-                first3DText.setText3D("No players");
-                first3DText.setTranslateX(-100);
-                break;
-            default:
-            case 3:
-                thirdBox.setVisible(true);
-                thirdImage.setVisible(true);
-                thirdText.setVisible(true);
-                third3DText.setVisible(true);
-                thirdText.setText(leaderboard.get(2).getUsername());
-                thirdImage.setFill(tempImagePattern);
-                PhongMaterial bronzeMaterial = new PhongMaterial(Color.BROWN);
-                bronzeMaterial.setDiffuseMap(new Image("https://artx.nyc3.cdn.digitaloceanspaces.com/textures/20/11/copper-5fc4cba901b8d-1200.jpg"));
-                thirdBox.setMaterial(bronzeMaterial);
-            case 2:
-                secondBox.setVisible(true);
-                secondImage.setVisible(true);
-                secondText.setVisible(true);
-                second3DText.setVisible(true);
-                secondText.setText(leaderboard.get(1).getUsername());
-                secondImage.setFill(tempImagePattern);
-                PhongMaterial silverMaterial = new PhongMaterial(Color.SILVER);
-                silverMaterial.setDiffuseMap(new Image("https://www.myfreetextures.com/wp-content/uploads/2014/10/silver-brushed-metal-texture-900x900.jpg"));
-                secondBox.setMaterial(silverMaterial);
-            case 1:
-                firstBox.setVisible(true);
-                firstImage.setVisible(true);
-                firstText.setVisible(true);
-                first3DText.setVisible(true);
-                firstText.setText(leaderboard.get(0).getUsername());
-                firstImage.setFill(tempImagePattern);
-                PhongMaterial goldMaterial = new PhongMaterial(Color.GOLD);
-                goldMaterial.setDiffuseMap(new Image("https://thumbs.dreamstime.com/b/gold-texture-golden-gradient-smooth-material-background-textured-bright-metal-light-shiny-metallic-blank-backdrop-decorative-131647513.jpg"));
-                firstBox.setMaterial(goldMaterial);
+        var boxes = List.of(firstBox, secondBox, thirdBox);
+        boxes.forEach(box -> box.setVisible(false));
 
-                createCup();
-                usersBox.setVisible(true);
-                usersBox.getChildren().addAll(
-                        IntStream.range(0, leaderboard.size())
-                                .mapToObj(value -> new LeaderboardEntryPane(leaderboard.get(value), value + 1))
-                                .collect(Collectors.toList())
-                );
+        var images = List.of(firstImage, secondImage, thirdImage);
+        images.forEach(image -> image.setVisible(false));
+
+        var texts = List.of(firstText, secondText, thirdText);
+        texts.forEach(text -> text.setVisible(false));
+
+        var texts3D = List.of(first3DText, second3DText, third3DText);
+        texts3D.forEach(text -> text.setVisible(false));
+
+        var materials = List.of(new PhongMaterial(Color.GOLD),
+                new PhongMaterial(Color.SILVER),
+                new PhongMaterial(Color.BROWN));
+
+        if (leaderboard.size() == 0) {
+            first3DText.setVisible(true);
+            first3DText.setText3D("No players");
+            first3DText.setTranslateX(-100);
+        } else {
+            CompletableFuture.runAsync(this::createCup);
+
+            usersBox.setVisible(true);
+            usersBox.getChildren().addAll(
+                    IntStream.range(0, leaderboard.size())
+                            .mapToObj(value -> new LeaderboardEntryPane(leaderboard.get(value), value + 1))
+                            .collect(Collectors.toList())
+            );
         }
+
+        var tempImagePattern =
+                new ImagePattern(
+                        new Image("https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg"));
+
+        IntStream.range(0, Math.min(3, leaderboard.size())).forEach(i -> {
+            boxes.get(i).setVisible(true);
+            images.get(i).setVisible(true);
+            texts.get(i).setVisible(true);
+            texts3D.get(i).setVisible(true);
+            boxes.get(i).setMaterial(materials.get(i));
+            texts.get(i).setText(leaderboard.get(i).getUsername());
+            images.get(i).setFill(tempImagePattern);
+        });
     }
 
     private void createCup() {
+
         try {
             ObjImporter importer = new ObjImporter();
             var model = importer.loadAsPoly(getClass().getResource("/client/models/WinnerCup.png")).getRoot();
-            group.getChildren().add(model);
             model.setTranslateX(500);
             model.setTranslateY(180);
             model.setTranslateZ(-200);
@@ -134,9 +121,9 @@ public class LeaderboardCtrl implements Initializable {
             model.setRotationAxis(new Point3D(1, 0, 1));
             model.setRotate(180);
             final int[] counter = {0};
-            var timer = new Timer();
+            rotationTimer = new Timer();
 
-            timer.schedule(new TimerTask() {
+            rotationTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     javafx.application.Platform.runLater(() -> {
@@ -145,6 +132,8 @@ public class LeaderboardCtrl implements Initializable {
                     });
                 }
             }, 0, 50);
+
+            javafx.application.Platform.runLater(() -> group.getChildren().add(model));
 
 
         } catch (IOException ex) {
@@ -181,5 +170,12 @@ public class LeaderboardCtrl implements Initializable {
             n.setRotationAxis(p);
             n.setRotate(Math.toDegrees(d));
         }
+    }
+
+    /**
+     * This function stops the rotation timer.
+     */
+    public void stop() {
+        rotationTimer.cancel();
     }
 }
