@@ -75,7 +75,7 @@ class LobbyControllerTest {
     @MockBean
     private LobbyService lobbyService;
 
-    private Game mockLobby;
+    private Game<?> mockLobby;
     private GameConfiguration mockLobbyConfiguration;
     private User john;
     private User susanne;
@@ -137,18 +137,18 @@ class LobbyControllerTest {
     @Test
     public void getAvailableLobbiesTest() throws Exception {
         // Mock a list of lobbies
-        Game mockLobby2 = new NormalGame();
-        mockLobby2.setId(getUUID(1));
-        mockLobby2.setStatus(GameStatus.CREATED);
-        mockLobby2.setConfiguration(new NormalGameConfiguration());
+        Game<?> otherLobby = new NormalGame();
+        otherLobby.setId(getUUID(1));
+        otherLobby.setStatus(GameStatus.CREATED);
+        otherLobby.setConfiguration(new NormalGameConfiguration());
         when(gameRepository.findAllByStatus(GameStatus.CREATED))
-                .thenReturn(new ArrayList<>(List.of(mockLobby, mockLobby2)));
+                .thenReturn(new ArrayList<>(List.of(mockLobby, otherLobby)));
 
         // Request
         this.mockMvc.perform(get("/api/lobby/available"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(equalToObject(
-                        objectMapper.writeValueAsString(List.of(mockLobby.getDTO(), mockLobby2.getDTO()))
+                        objectMapper.writeValueAsString(List.of(mockLobby.getDTO(), otherLobby.getDTO()))
                 )));
     }
 
@@ -337,5 +337,10 @@ class LobbyControllerTest {
                         sally.getEmail(),
                         sally.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+
+        // Request
+        this.mockMvc
+                .perform(delete("/api/lobby/leave"))
+                .andExpect(status().isNotFound());
     }
 }
