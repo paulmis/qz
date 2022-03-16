@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * The tests for the helper methods
- * found inside the RelfectionUtils class.
+ * found inside the ReflectionUtils class.
  */
 public class ReflectionUtilsTest {
 
