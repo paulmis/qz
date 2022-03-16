@@ -5,7 +5,7 @@ variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   # Custom CI postgres settings
   SPRING_PROPS_POSTGRES_HOST: postgres
-  SPRING_PROPS_POSTGRES_PORT: 5555
+  SPRING_PROPS_POSTGRES_PORT: 5432
   # General CI postgres settings
   POSTGRES_DB: oopp
   POSTGRES_USER: oopp_admin
