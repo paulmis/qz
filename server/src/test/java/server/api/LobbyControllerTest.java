@@ -67,6 +67,7 @@ class LobbyControllerTest {
 
     private Game mockLobby;
     private GameConfiguration mockLobbyConfiguration;
+    private NormalGameConfiguration normalGameConfiguration;
     private User john;
     private User susanne;
     private User sally;
@@ -103,6 +104,7 @@ class LobbyControllerTest {
         mockLobby.setStatus(GameStatus.CREATED);
         mockLobbyConfiguration = new NormalGameConfiguration();
         mockLobby.setConfiguration(mockLobbyConfiguration);
+        normalGameConfiguration = new NormalGameConfiguration(4, 8, 6);
 
         // Add players
         johnPlayer = new GamePlayer(john);
@@ -174,14 +176,6 @@ class LobbyControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    @Test
-    public void configGetLobbyNotCreatedTest() throws Exception {
-        //Check if the game has started or finished
-        mockLobby.setStatus(GameStatus.FINISHED);
-        this.mockMvc
-                .perform(get("/api/lobby/" + mockLobby.getId() + "/config"))
-                .andExpect(status().isBadRequest());
-    }
 
     @Test
     public void joinOkTest() throws Exception {
@@ -227,11 +221,7 @@ class LobbyControllerTest {
     public void configPostLobbyConfigurationUpdateTest() throws Exception {
         mockLobby.setStatus(GameStatus.CREATED);
         mockLobby.setHost(johnPlayer);
-        // Create mock normal game configuration
-        NormalGameConfiguration normalGameConfiguration = new NormalGameConfiguration();
-        normalGameConfiguration.setAnswerTime(5);
-        normalGameConfiguration.setCapacity(10);
-        normalGameConfiguration.setNumQuestions(15);
+
         // Request
         this.mockMvc
                 .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
@@ -244,17 +234,15 @@ class LobbyControllerTest {
     public void configPostLobbyConfigurationUpdatedTest() throws Exception {
         mockLobby.setStatus(GameStatus.CREATED);
         mockLobby.setHost(johnPlayer);
-        // Create mock normal game configuration
-        NormalGameConfiguration normalGameConfiguration = new NormalGameConfiguration();
-        normalGameConfiguration.setAnswerTime(5);
-        normalGameConfiguration.setNumQuestions(15);
-        // Request
+
+        // Send the new configuration
         this.mockMvc
                 .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(normalGameConfiguration.getDTO())))
                 .andExpect(status().isOk());
 
+        // Check if configuration has indeed updated
         this.mockMvc
                 .perform(get("/api/lobby/" + mockLobby.getId() + "/config"))
                 .andExpect(status().isOk())
@@ -267,12 +255,7 @@ class LobbyControllerTest {
     public void configPostLobbyNotFoundTest() throws Exception {
         mockLobby.setStatus(GameStatus.CREATED);
         mockLobby.setHost(johnPlayer);
-        // Create mock normal game configuration
-        NormalGameConfiguration normalGameConfiguration = new NormalGameConfiguration();
-        normalGameConfiguration.setId(getUUID(3));
-        normalGameConfiguration.setAnswerTime(5);
-        normalGameConfiguration.setCapacity(10);
-        normalGameConfiguration.setAnswerTime(4);
+
         // Request
         this.mockMvc
                 .perform(post("/api/lobby/" + getUUID(5) + "/config")
@@ -285,12 +268,7 @@ class LobbyControllerTest {
     public void configPostUserNotFoundTest() throws Exception {
         when(userRepository.findByEmail(john.getEmail())).thenReturn(Optional.empty());
         mockLobby.setStatus(GameStatus.CREATED);
-        // Create mock normal game configuration
-        NormalGameConfiguration normalGameConfiguration = new NormalGameConfiguration();
-        normalGameConfiguration.setId(getUUID(3));
-        normalGameConfiguration.setAnswerTime(5);
-        normalGameConfiguration.setCapacity(10);
-        normalGameConfiguration.setAnswerTime(4);
+
         // Request
         this.mockMvc
                 .perform(post("/api/lobby/" + getUUID(5) + "/config")
@@ -303,12 +281,7 @@ class LobbyControllerTest {
     public void configPostLobbyNotCreatedTest() throws Exception {
         mockLobby.setStatus(GameStatus.ONGOING);
         mockLobby.setHost(johnPlayer);
-        // Create mock normal game configuration
-        NormalGameConfiguration normalGameConfiguration = new NormalGameConfiguration();
-        normalGameConfiguration.setId(getUUID(3));
-        normalGameConfiguration.setAnswerTime(5);
-        normalGameConfiguration.setCapacity(10);
-        normalGameConfiguration.setAnswerTime(4);
+
         // Request
         this.mockMvc
                 .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
@@ -321,12 +294,7 @@ class LobbyControllerTest {
     public void configPostUserNotHostTest() throws Exception {
         mockLobby.setStatus(GameStatus.CREATED);
         mockLobby.setHost(susannePlayer);
-        // Create mock normal game configuration
-        NormalGameConfiguration normalGameConfiguration = new NormalGameConfiguration();
-        normalGameConfiguration.setId(getUUID(3));
-        normalGameConfiguration.setAnswerTime(5);
-        normalGameConfiguration.setCapacity(10);
-        normalGameConfiguration.setAnswerTime(4);
+
         // Request
         this.mockMvc
                 .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
