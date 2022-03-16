@@ -78,12 +78,37 @@ def activity_map_func(activity):
     Returns:
         dict: Activity in the ActivityDTO format
     """
-    return {
+
+    dto = {
         "description": activity["title"],
         "cost": activity["consumption_in_wh"],
-        "source": activity["source"],
+        # We don't care about URL fragments
+        "source": urllib.parse.urldefrag(activity["source"])[0],
         "icon": activity["image_path"],
     }
+
+    # Verify the cost value (and its validity)
+    if args.allow_negative == False and activity["consumption_in_wh"] < 0:
+        # If the const value is invalid, skip the activity
+        return None
+
+    # Verify the title length - if it's too long, truncate it
+    if len(dto["description"]) > args.description_len:
+        logging.warning(
+            f"Activity {activity['id']} has a description longer than {args.description_len} characters. Truncating."
+        )
+        logging.warning(f"Description: {dto['description']}")
+        dto["description"] = dto["description"][: args.description_len]
+
+    # Verify the source length - if it's too long, truncate it
+    if len(dto["source"]) > args.source_len:
+        logging.warning(
+            f"Activity {activity['id']} has a source longer than {args.source_len} characters. Truncating."
+        )
+        logging.warning(f"Source: {dto['source']}")
+        dto["source"] = dto["source"][: args.source_len]
+
+    return dto
 
 
 parser = argparse.ArgumentParser(
@@ -110,7 +135,7 @@ parser.add_argument(
 parser.add_argument(
     "-v",
     "--verbose",
-    help="More verbose output",
+    help="More verbose output. (default: %(default)s)",
     action="store_true",
 )
 auth_group = parser.add_argument_group(
@@ -120,7 +145,7 @@ auth_group = parser.add_argument_group(
 auth_group.add_argument(
     "-r",
     "--register",
-    help="Register the user instead of trying to log in.",
+    help="Register the user instead of trying to log in. (default: %(default)s)",
     action="store_true",
 )
 auth_group.add_argument(
@@ -136,6 +161,30 @@ auth_group.add_argument(
     help="Password to use for authentication. (default: %(default)s)",
     type=str,
     default="population",
+)
+dto_group = parser.add_argument_group(
+    "ActivityDTO details",
+    "Configure the ActivityDTO details to be used when adding activities",
+)
+dto_group.add_argument(
+    "-d",
+    "--description-len",
+    help="Maximum length of description. (default: %(default)s)",
+    type=int,
+    default=255,
+)
+dto_group.add_argument(
+    "-s",
+    "--source-len",
+    help="Maximum length of source. (default: %(default)s)",
+    type=int,
+    default=2048,
+)
+dto_group.add_argument(
+    "-n",
+    "--allow-negative",
+    help="Allow negative cost/consumption values. (default: %(default)s)",
+    action="store_true",
 )
 args = parser.parse_args()
 
@@ -178,10 +227,11 @@ API_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/activity/batch")
 logging.debug(f"Using API endpoint: {API_ENDPOINT}")
 
 # Load activities from the provided JSON
-activities = json.load(args.activities_file)
-logging.info(f"Loaded {len(activities)} activities.")
+activities_raw = json.load(args.activities_file)
+logging.info(f"Loaded {len(activities_raw)} activities.")
 # Map the activities into correct format
-activities = list(map(activity_map_func, activities))
+activities_map = map(activity_map_func, activities_raw)
+activities = [x for x in activities_map if x is not None]
 logging.debug(f"Successfully mapped activities into ActivityDTO format.")
 
 # Add activities in chunks
