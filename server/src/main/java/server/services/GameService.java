@@ -4,6 +4,7 @@ import commons.entities.game.GameStatus;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ public class GameService {
         }
 
         // Create a list of all the available questions
+        /*
         List<Question> questions =
                 questionRepository
                     .findByIdNotIn(
@@ -44,6 +46,12 @@ public class GameService {
                                     .stream()
                                     .map(Question::getId)
                                     .collect(Collectors.toList()));
+         */
+        // ToDo: fix QuestionRepository::findByIdNotIn
+        List<UUID> usedIds = usedQuestions.stream().map(Question::getId).collect(Collectors.toList());
+        List<Question> questions = questionRepository.findAll()
+                .stream().filter(q -> !usedIds.contains(q.getId()))
+                .collect(Collectors.toList());
 
         // Randomize the list and return the requested amount of questions
         Collections.shuffle(questions);
