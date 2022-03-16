@@ -80,13 +80,16 @@ public class GameServiceTest {
 
         // Mock the repository
         lenient().when(questionRepository.count()).thenReturn(4L);
+        lenient().when(questionRepository.findAll())
+                .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
     }
 
     @Test
     void provideQuestionsOk() {
+        // ToDo: fix QuestionRepository::findByIdNotIn
         // Mock the repository
-        when(questionRepository.findByIdNotIn(usedQuestionIds))
-                .thenReturn(Arrays.asList(questionD, questionC));
+        //when(questionRepository.findByIdNotIn(usedQuestionIds))
+        //        .thenReturn(Arrays.asList(questionD, questionC));
 
         // Provide the questions
         List<Question> questions = gameService.provideQuestions(2, Arrays.asList(questionB, questionA));
@@ -95,7 +98,9 @@ public class GameServiceTest {
 
         // Verify interactions
         verify(questionRepository).count();
-        verify(questionRepository).findByIdNotIn(usedQuestionIds);
+        // ToDo: fix QuestionRepository::findByIdNotIn
+        //verify(questionRepository).findByIdNotIn(usedQuestionIds);
+        verify(questionRepository).findAll();
         verifyNoMoreInteractions(questionRepository);
     }
 
@@ -112,9 +117,10 @@ public class GameServiceTest {
 
     @Test
     void startNormal() {
+        // ToDo: fix QuestionRepository::findByIdNotIn
         // Mock the repository
-        when(questionRepository.findByIdNotIn(new ArrayList<>()))
-                .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
+        //when(questionRepository.findByIdNotIn(new ArrayList<>()))
+        //        .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
 
         // Start the game
         gameService.startGame(game);
@@ -125,7 +131,9 @@ public class GameServiceTest {
 
         // Verify interactions
         verify(questionRepository).count();
-        verify(questionRepository).findByIdNotIn(new ArrayList<>());
+        // ToDo: fix QuestionRepository::findByIdNotIn
+        //verify(questionRepository).findByIdNotIn(new ArrayList<>());
+        verify(questionRepository).findAll();
         verifyNoMoreInteractions(questionRepository);
     }
 
