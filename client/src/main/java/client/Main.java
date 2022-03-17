@@ -24,6 +24,7 @@ import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
+import client.scenes.leaderboard.GlobalLeaderboardCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import com.google.inject.Injector;
 import javafx.application.Application;
@@ -58,9 +59,11 @@ public class Main extends Application {
                 "client", "scenes", "lobby", "LobbyScreen.fxml");
         var gameScreen = FXML.load(GameScreenCtrl.class,
                 "client", "scenes", "GameScreen.fxml");
+        var globalLeaderboardScreen = FXML.load(GlobalLeaderboardCtrl.class,
+                "client", "scenes", "leaderboard", "GlobalLeaderboard.fxml");
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, serverConnectScreen, logInScreen, registerScreen, nicknameScreen,
-                lobbyScreen, gameScreen);
+                lobbyScreen, gameScreen, globalLeaderboardScreen);
     }
 }

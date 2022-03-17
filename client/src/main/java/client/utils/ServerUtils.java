@@ -23,6 +23,8 @@ import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.InvocationCallback;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.Response;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -161,5 +163,21 @@ public class ServerUtils {
     public String connect() {
         System.out.println("New connection!\n");
         return "200";
+    }
+
+    /**
+     * Gets the global leaderboard from the database(mock function for now).
+     *
+     * @return the list of users that make up the global leaderboard.
+     */
+    public List<UserDTO> getGlobalLeaderboard() {
+        var r = client.target(SERVER).path("/api/leaderboard/score")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get();
+        if (r.getStatus() == Response.Status.OK.getStatusCode()) {
+            return r.readEntity(new GenericType<List<UserDTO>>() {});
+        }
+        return new ArrayList<>();
     }
 }
