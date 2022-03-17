@@ -190,7 +190,6 @@ class LobbyControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-
     @Test
     public void joinOk() throws Exception {
         // Modify the capacity to allow the player to join
