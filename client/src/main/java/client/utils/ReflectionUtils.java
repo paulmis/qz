@@ -1,5 +1,6 @@
 package client.utils;
 
+import commons.SSEMessage;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -10,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import jdk.jfr.Description;
-import jdk.jfr.Name;
 import lombok.NonNull;
 
 
@@ -67,18 +67,18 @@ public class ReflectionUtils {
     }
 
     /**
-     * Helper method to get the name
+     * Helper method to get the sse event name
      * from a method by accessing the
-     * Name annotation.
+     * SSEEventHandler annotation.
      *
      * @param method the requested method.
-     * @return the string name of the method.
+     * @return the sse event name enum.
      */
-    public static String getTextName(@NonNull Method method) {
-        if (!method.isAnnotationPresent(Name.class)) {
+    public static SSEMessage getSSEEventName(@NonNull Method method) {
+        if (!method.isAnnotationPresent(SSEEventHandler.class)) {
             throw new IllegalArgumentException();
         }
-        return method.getAnnotation(Name.class).value();
+        return method.getAnnotation(SSEEventHandler.class).value();
     }
 
     /**

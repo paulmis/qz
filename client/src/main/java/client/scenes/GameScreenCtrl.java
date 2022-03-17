@@ -3,13 +3,14 @@ package client.scenes;
 import client.scenes.questions.EstimateQuestionPane;
 import client.scenes.questions.MultipleChoiceQuestionCtrl;
 import client.scenes.questions.MultipleChoiceQuestionPane;
+import client.utils.SSEEventHandler;
 import client.utils.SSEHandler;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
-import commons.entities.QuestionDTO;
+import commons.SSEMessage;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.MalformedURLException;
@@ -359,20 +360,10 @@ public class GameScreenCtrl implements Initializable {
     }
 
     /**
-     * Just an example method of an sse event handler.
-     *
-     * @param questionExample The deserialized object.
+     * Example of a sse event handler.
      */
-    @Name("example")
-    public void handleTest(QuestionDTO questionExample) {
-
-    }
-
-    /**
-     * Another example of a sse event handler.
-     */
-    @Name("questionStart")
-    public void getQuestion() {
+    @SSEEventHandler(SSEMessage.PlayerLeft)
+    public void playerLeft(String playerId) {
 
     }
 }

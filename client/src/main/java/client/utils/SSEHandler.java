@@ -1,5 +1,6 @@
 package client.utils;
 
+import commons.SSEMessage;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -31,7 +32,7 @@ public class SSEHandler {
 
     Object handlerSource;
     SseEventSource sseEventSource;
-    Map<String, SSEEventHandler> eventHandlers;
+    Map<SSEMessage, SSEEventHandler> eventHandlers;
 
     /**
      * The constructor of the SSEHandler.
@@ -48,7 +49,7 @@ public class SSEHandler {
         var handlers = ReflectionUtils.getAnnotatedMethods(handlerSource, Name.class);
 
         // We get the names of all the event handlers
-        var names = handlers.stream().map(ReflectionUtils::getTextName).collect(Collectors.toList());
+        var names = handlers.stream().map(ReflectionUtils::getSSEEventName).collect(Collectors.toList());
 
         // We generate the runnables for each event.
         var runnables = handlers.stream().map(method -> {
@@ -95,7 +96,7 @@ public class SSEHandler {
         eventHandlers = IntStream.range(0, names.size()).boxed()
                 .collect(Collectors.toMap(names::get, runnables::get));
 
-        eventHandlers.put("init", new SSEEventHandler() {
+        eventHandlers.put(SSEMessage.Init, new SSEEventHandler() {
             @Override
             public void handle(InboundSseEvent inboundSseEvent) {
                 System.out.println("Initialized connection SSE.");
@@ -129,7 +130,7 @@ public class SSEHandler {
      * @param inboundSseEvent the sse event.
      */
     public void handleEvent(InboundSseEvent inboundSseEvent) {
-        eventHandlers.get(inboundSseEvent.getName()).handle(inboundSseEvent);
+        eventHandlers.get(SSEMessage.valueOf(inboundSseEvent.getName())).handle(inboundSseEvent);
     }
 
     public void handleException(Throwable throwable) {

@@ -1,5 +1,6 @@
 package server.api;
 
+import commons.SSEMessage;
 import commons.entities.QuestionDTO;
 import commons.entities.game.GameStatus;
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class SSEController {
                     .orElseThrow(() -> new NoSuchElementException("User not found"));
 
             // The user must currently be in a game
-            Game game = gameRepository.findByPlayers_User_IdEqualsAndStatus(user.getId(), GameStatus.ONGOING)
+            Game game = gameRepository.findByPlayers_User_IdEqualsAndStatus(user.getId(), GameStatus.CREATED)
                     .orElseThrow(() -> new IllegalStateException("User not in a game"));
 
             // Register emitter callbacks.
@@ -67,8 +68,7 @@ public class SSEController {
 
             // The client will wait for a first event in order to start.
             SseEmitter.SseEventBuilder event = SseEmitter.event()
-                    .id("0")
-                    .name("init");
+                    .name(SSEMessage.Init.toString());
             emitter.send(event);
 
             return ResponseEntity.ok(emitter);

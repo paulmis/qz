@@ -3,6 +3,7 @@ package client.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import commons.SSEMessage;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -10,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import jdk.jfr.Description;
-import jdk.jfr.Name;
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ public class ReflectionUtilsTest {
         public Float balance;
         public Integer brothers;
 
-        @Name("balance")
+        @SSEEventHandler(SSEMessage.Init)
         public void getBalance() {
 
         }
@@ -96,7 +96,7 @@ public class ReflectionUtilsTest {
 
     @Test
     void getAnnotatedMethods() {
-        var annotatedMethodsName = ReflectionUtils.getAnnotatedMethods(personObj, Name.class)
+        var annotatedMethodsName = ReflectionUtils.getAnnotatedMethods(personObj, SSEEventHandler.class)
                 .stream().map(Method::getName).collect(Collectors.toList());
 
         assertEquals(List.of("getBalance"), annotatedMethodsName);
@@ -107,8 +107,8 @@ public class ReflectionUtilsTest {
         var getBalanceMethod = personObj.getClass().getMethod("getBalance");
         var otherMethod = personObj.getClass().getMethod("otherFunction");
 
-        assertThrows(IllegalArgumentException.class, () -> ReflectionUtils.getTextName(otherMethod));
-        assertEquals("balance", ReflectionUtils.getTextName(getBalanceMethod));
+        assertThrows(IllegalArgumentException.class, () -> ReflectionUtils.getSSEEventName(otherMethod));
+        assertEquals(SSEMessage.Init, ReflectionUtils.getSSEEventName(getBalanceMethod));
     }
 
 }
