@@ -46,7 +46,8 @@ public class SSEHandler {
         this.handlerSource = handlerSource;
 
         // Gets all the methods that have the Name decoration. These are the event handlers.
-        var handlers = ReflectionUtils.getAnnotatedMethods(handlerSource, Name.class);
+        var handlers = ReflectionUtils.getAnnotatedMethods(handlerSource,
+                client.utils.SSEEventHandler.class);
 
         // We get the names of all the event handlers
         var names = handlers.stream().map(ReflectionUtils::getSSEEventName).collect(Collectors.toList());
