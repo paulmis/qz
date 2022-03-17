@@ -14,20 +14,21 @@ javafx {
 
 dependencies {
 	implementation project(":commons")
-	implementation group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '3.0.4'
-	implementation group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '3.0.4'
-	implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '3.0.4'
+	implementation group: 'org.apache.cxf', name: 'cxf-rt-rs-client', version: '3.5.1'
+	implementation group: 'org.apache.cxf', name: 'cxf-rt-rs-sse', version: '3.5.1'
+	implementation group: 'org.apache.cxf', name: 'cxf-rt-frontend-jaxrs', version: '3.5.1'
+	implementation group: 'org.apache.cxf', name: 'cxf-rt-rs-extension-providers', version: '3.5.1'
+	implementation 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.11.2'
 
-	implementation 'jakarta.ws.rs:jakarta.ws.rs-api:2.1.6'
 	implementation 'com.google.inject:guice:5.0.1'
 
 	implementation 'org.openjfx:javafx-controls:17.0.2'
 	implementation 'org.openjfx:javafx-fxml:17.0.2'
 
 	// this is for deserializing dates
-	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.3.0-rc1'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.5'
 	implementation group: 'com.jfoenix', name: 'jfoenix', version: '9.0.9'
 	implementation group: 'de.jensd', name: 'fontawesomefx-fontawesome', version: '4.7.0-9.1.2'
-	implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-sse', version: '3.0.4'
+
 
 }

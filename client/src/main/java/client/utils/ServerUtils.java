@@ -16,24 +16,27 @@
 
 package client.utils;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import commons.entities.UserDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.client.InvocationCallback;
-import jakarta.ws.rs.sse.SseEventSource;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.sse.SseEventSource;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.glassfish.jersey.client.ClientConfig;
+
 
 /**
  * Utilities for communicating with the server.
@@ -41,8 +44,18 @@ import org.glassfish.jersey.client.ClientConfig;
 public class ServerUtils {
 
     private static final String SERVER = "http://localhost:8080/";
-    private static Client client = ClientBuilder.newClient(new ClientConfig());
+    private static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
+            .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
     public static boolean loggedIn = false;
+
+    private Client newClient() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
+        JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
+        Client newClient = ClientBuilder.newClient().register(provider);
+        return newClient;
+    }
 
     /**
      * Gets a list of all the emoji urls from the backend.
@@ -139,7 +152,8 @@ public class ServerUtils {
      */
     public void logIn(String email, String password,
                       LogInHandlerSuccess logInHandlerSuccess, LogInHandlerFail logInHandlerFail) {
-        client = ClientBuilder.newClient(new ClientConfig());
+
+        client = this.newClient();
         UserDTO user = new UserDTO("", email, password);
         var invocation = client
                 .target(SERVER).path("/api/auth/login")
@@ -150,6 +164,7 @@ public class ServerUtils {
 
             @Override
             public void completed(String o) {
+                System.out.println(o);
                 logInHandlerSuccess.handle(o);
                 client = client.register(new Authenticator(o));
                 loggedIn = true;
@@ -175,7 +190,6 @@ public class ServerUtils {
      * @param sseHandler The handler of sse events, exceptions and completion.
      */
     public void subscribeToSSE(SSEHandler sseHandler) {
-
         var config = new NormalGameConfigurationDTO();
         config.setNumQuestions(20);
         config.setAnswerTime(123);
@@ -188,18 +202,18 @@ public class ServerUtils {
         game.setStatus(GameStatus.FINISHED);
         game.setConfiguration(config);
 
-        var r  = client.target(SERVER).path("/api/lobby").request(APPLICATION_JSON)
+        var r  = client.target(SERVER).path("/api/lobby")
+                .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .post(Entity.entity(game, APPLICATION_JSON));
 
         var lobby = r.readEntity(NormalGameDTO.class);
 
         client.target(SERVER).path("/api/lobby/" + lobby.getId() + "/start").request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
+               .accept(APPLICATION_JSON)
                 .put(Entity.entity(game, APPLICATION_JSON));
-
-        var target = ClientBuilder.newClient().target(SERVER).path("/api/sse/open");
-
+        var target = client.target(SERVER).path("api/sse/open");
+        System.out.println("here");
         SseEventSource eventSource = SseEventSource.target(target)
                 .build();
         eventSource.register(
@@ -208,6 +222,7 @@ public class ServerUtils {
                 sseHandler::handleCompletion);
         eventSource.open();
 
+        System.out.println(eventSource.isOpen());
         sseHandler.setSseEventSource(eventSource);
     }
 }

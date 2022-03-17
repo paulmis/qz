@@ -1,12 +1,13 @@
 package client.utils;
 
-import jakarta.ws.rs.sse.InboundSseEvent;
-import jakarta.ws.rs.sse.SseEventSource;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.ws.rs.sse.InboundSseEvent;
+import javax.ws.rs.sse.SseEventSource;
 import jdk.jfr.Name;
 import lombok.Generated;
+
 
 /**
  * This class handles everything SSE related.
@@ -93,6 +94,13 @@ public class SSEHandler {
         // This zips the names and runnables together into the map.
         eventHandlers = IntStream.range(0, names.size()).boxed()
                 .collect(Collectors.toMap(names::get, runnables::get));
+
+        eventHandlers.put("init", new SSEEventHandler() {
+            @Override
+            public void handle(InboundSseEvent inboundSseEvent) {
+                System.out.println("Initialized connection SSE.");
+            }
+        });
     }
 
     /**
