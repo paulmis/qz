@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
+
+import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +31,9 @@ import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
+import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
+import server.database.entities.game.configuration.SurvivalGameConfiguration;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
@@ -246,10 +250,16 @@ public class LobbyController {
         if (lobby.getHost().getUser().getId() != user.getId()) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        // Change and update lobby configuration
-        lobby.setConfiguration(new NormalGameConfiguration((NormalGameConfigurationDTO) gameConfigurationData));
-        // Update repositories
+        // Change and update lobby configuration based on configuration type.
+        if (gameConfigurationData instanceof NormalGameConfigurationDTO) {
+            lobby.setConfiguration(new NormalGameConfiguration((NormalGameConfigurationDTO) gameConfigurationData));
+        } else {
+            // Other configurations are not accepted as these are the only implemented game types as of now.
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+        // Update repository.
         gameRepository.save(lobby);
+        // Return an ok status.
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

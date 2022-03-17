@@ -39,6 +39,7 @@ import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
+import server.database.entities.game.configuration.SurvivalGameConfiguration;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
@@ -230,6 +231,20 @@ class LobbyControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(normalGameConfiguration.getDTO())))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void configPostLobbyConfigurationUpdateNotAcceptableTest() throws Exception {
+        mockLobby.setStatus(GameStatus.CREATED);
+        mockLobby.setHost(johnPlayer);
+        SurvivalGameConfiguration survivalGameConfiguration = new SurvivalGameConfiguration(1.25f);
+
+        // Request
+        this.mockMvc
+                .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(survivalGameConfiguration.getDTO())))
+                .andExpect(status().isNotAcceptable());
     }
 
     @Test
