@@ -90,7 +90,7 @@ public class LobbyController {
             GamePlayer player = new GamePlayer(founder.get());
             game.add(player);
 
-            // Save the game
+            // Save the game with the added host and player
             game = gameRepository.save(game);
         } catch (ConstraintViolationException | PersistenceException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
