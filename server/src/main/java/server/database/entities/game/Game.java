@@ -243,14 +243,22 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * Sets the answer of a player to the current question.
      *
      * @param answer the answer to set
-     * @param player the player giving the answer
+     * @param userId the id of the user giving the answer
      * @return true if the answer was correctly added
      */
-    public boolean addAnswer(Answer answer, GamePlayer player) {
+    public boolean addAnswer(Answer answer, UUID userId) {
         // Check if player is actually playing in this game
-        if (!players.contains(player)) {
+        if (!players.containsKey(userId)) {
             return false;
         }
+
+        // Fetch player
+        GamePlayer player = players.get(userId);
+        if (player == null) {
+            return false;
+        }
+
+        // Set answer's player
         answer.setPlayer(player);
 
         // Get current question

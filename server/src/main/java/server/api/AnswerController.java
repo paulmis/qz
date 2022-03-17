@@ -17,7 +17,6 @@ import server.database.entities.Answer;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
-import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
@@ -63,14 +62,12 @@ public class AnswerController {
         User user = userOpt.get();
 
         // Find GamePlayer
-        Optional<GamePlayer> player = game.getPlayers().stream()
-                .filter(pl -> ((GamePlayer) pl).getUser().getId().equals(user.getId())).findFirst();
-        if (player.isEmpty()) {
+        if (!game.getPlayers().containsKey(user.getId())) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         // Update the answer
-        if (game.addAnswer(new Answer(answerData), player.get())) {
+        if (game.addAnswer(new Answer(answerData), user.getId())) {
             // Save updated game
             gameRepository.save(game);
 
