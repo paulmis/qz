@@ -173,7 +173,7 @@ public class LobbyController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         //Check if the lobby has been created.
-        if(lobby.get().getStatus() != GameStatus.CREATED) {
+        if (lobby.get().getStatus() != GameStatus.CREATED) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.ok(lobby.get().getDTO().getConfiguration());
@@ -244,7 +244,7 @@ public class LobbyController {
      * Endpoint to allow the host to change configuration.
      *
      * @param lobbyId UUID of the lobby to join.
-     * @param normalGameConfigurationData The new configuration data.
+     * @param gameConfigurationData The new configuration data.
      * @return An ok status if successful.
      */
     @PostMapping("/{lobbyId}/config")
