@@ -166,17 +166,13 @@ public class LobbyController {
      */
     @GetMapping("/{lobbyId}/config")
     ResponseEntity<GameConfigurationDTO> lobbyConfiguration(
-            @PathVariable @NonNull UUID lobbyId) {
+            @PathVariable UUID lobbyId) {
         //Check if the lobby exists.
-        Optional<Game> lobby = gameRepository.findById(lobbyId);
-        if (!lobby.isPresent()) {
+        Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
+        if (lobbyOptional.isEmpty()) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-        //Check if the lobby has been created.
-        if (lobby.get().getStatus() != GameStatus.CREATED) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        return ResponseEntity.ok(lobby.get().getDTO().getConfiguration());
+        return ResponseEntity.ok(lobbyOptional.get().getConfiguration().getDTO());
     }
 
     /**
@@ -249,7 +245,7 @@ public class LobbyController {
      */
     @PostMapping("/{lobbyId}/config")
     ResponseEntity updateConfiguration(
-            @PathVariable @NonNull UUID lobbyId,
+            @PathVariable UUID lobbyId,
             @RequestBody GameConfigurationDTO gameConfigurationData) {
         Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
         Optional<User> userOptional = userRepository.findByEmail(AuthContext.get());
