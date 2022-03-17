@@ -130,7 +130,12 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public Game(GameDTO dto) {
         ModelMapper mapper = new ModelMapper();
-        this.id = dto.getId();
+        if (dto.getId() == null) {
+            // This id will change once the game entity is saved, but it must be non-null
+            this.id = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        } else {
+            this.id = dto.getId();
+        }
         this.gameId = dto.getGameId();
         this.createDate = dto.getCreateDate();
         if (dto.getConfiguration() instanceof NormalGameConfigurationDTO) {
