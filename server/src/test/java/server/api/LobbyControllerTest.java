@@ -168,7 +168,7 @@ class LobbyControllerTest {
         this.mockMvc
                 .perform(get("/api/lobby/" + mockLobby.getId() + "/config"))
                 .andExpect(content().string(equalToObject(
-                        objectMapper.writeValueAsString(mockLobby.getDTO().getConfiguration())
+                        objectMapper.writeValueAsString(mockLobby.getConfiguration().getDTO())
                 )));
     }
 
