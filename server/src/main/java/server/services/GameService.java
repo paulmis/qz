@@ -1,16 +1,21 @@
 package server.services;
 
 import commons.entities.game.GameStatus;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
 import server.database.entities.game.Game;
+import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
 import server.database.repositories.question.QuestionRepository;
 
@@ -18,6 +23,7 @@ import server.database.repositories.question.QuestionRepository;
  * Get the questions for a specific game.
  */
 @Service
+@Slf4j
 public class GameService {
     @Autowired
     private QuestionRepository questionRepository;
@@ -81,7 +87,46 @@ public class GameService {
             throw new UnsupportedOperationException("Starting games other than definite games is not yet supported.");
         }
 
-
         game.setStatus(GameStatus.ONGOING);
+    }
+
+    /**
+     * Marks the player as abandoned and disconnects their SSE emitter
+     * If the last player abandoned the lobby, marks the game as finished.
+     *
+     * @param game the game to remove the player from
+     * @param user the user to remove
+     * @return if the player has already abandoned the game, or the player isn't in the game, return false
+     */
+    @Transactional
+    public boolean removePlayer(Game game, User user) {
+        try {
+            // If the removal fails, the player has already abandoned the lobby
+            if (!game.remove(user.getId()) || !game.getEmitters().disconnect(user.getId())) {
+                return false;
+            }
+        } catch (LastPlayerRemovedException ex) {
+            // If the player was the last player, conclude the game
+            game.setStatus(GameStatus.FINISHED);
+
+            // Disconnect the player
+            if (!game.getEmitters().disconnect(user.getId())) {
+                return false;
+            }
+        }
+
+        // Update clients
+        try {
+            game
+                .getEmitters()
+                .sendAll(
+                    SseEmitter.event()
+                        .name("playerLeft")
+                        .data(user.getId()));
+        } catch (IOException ex) {
+            // Log failure to update clients
+            log.error("Unable to send removePlayer message to all players", ex);
+        }
+        return true;
     }
 }
