@@ -75,6 +75,12 @@ public class LobbyController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
+        // Check DTO's id
+        if (gameDTO.getId() == null) {
+            // This id will be changed once the game entity is saved, but it must be non-null
+            gameDTO.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        }
+
         // Create the game
         NormalGame game;
         try {
@@ -85,9 +91,6 @@ public class LobbyController {
             NormalGameConfiguration config =
                     gameConfigurationRepository.save((NormalGameConfiguration) game.getConfiguration());
             game.setConfiguration(config);
-
-            // Save the game in its initial state
-            game = gameRepository.save(game);
 
             // Create the player
             GamePlayer player = new GamePlayer(founder.get());
