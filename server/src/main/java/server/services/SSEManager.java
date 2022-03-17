@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
@@ -116,6 +117,23 @@ public class SSEManager {
         for (SseEmitter emitter : emitters.values()) {
             emitter.send(message);
         }
+    }
+
+    /**
+     * Disconnects the user's SSE emitter.
+     *
+     * @param userId user's id
+     * @return whether the emitter was successfully disconnected or not
+     */
+    public boolean disconnect(UUID userId) {
+        // If the user has no registered SSE emitter, we can't disconnect it.
+        if (!isRegistered(userId)) {
+            return false;
+        }
+
+        // Completes the emitter lifecycle and unregisters it.
+        emitters.get(userId).complete();
+        return unregister(userId);
     }
 
     /**

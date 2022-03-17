@@ -32,19 +32,21 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     /**
      * The player's nickname within the game.
      */
-    @Column
     protected String nickname;
+
+    /**
+     * Indicates whether the player abandoned the game before it ended.
+     */
+    protected boolean abandoned = false;
 
     /**
      * Player's score.
      */
-    @Column
     protected Integer score = 0;
 
     /**
      * The streak of correct answers in a row.
      */
-    @Column
     protected Integer streak = 0;
 
     /**
@@ -75,6 +77,7 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
      * @return player's nickname
      */
     public String getNickname() {
+        // the user != null is necessary
         return nickname == null && user != null ? user.getUsername() : nickname;
     }
 
