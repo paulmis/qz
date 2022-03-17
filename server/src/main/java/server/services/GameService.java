@@ -1,14 +1,14 @@
 package server.services;
 
 import commons.entities.game.GameStatus;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
@@ -21,6 +21,7 @@ import server.database.repositories.question.QuestionRepository;
  * Get the questions for a specific game.
  */
 @Service
+@Slf4j
 public class GameService {
     @Autowired
     private QuestionRepository questionRepository;
@@ -98,8 +99,20 @@ public class GameService {
         } catch (LastPlayerRemovedException ex) {
             // If the player was the last player, conclude the game
             game.setStatus(GameStatus.FINISHED);
+
+            // Disconnect the player
+            if (!game.getEmitters().disconnect(user.getId())) {
+                return false;
+            }
         }
 
+        // Update clients
+        try {
+            game.getEmitters().sendAll(user.getId() + " left");
+        } catch (IOException ex) {
+            // Log failure to update clients
+            log.error("Unable to send removePlayer message to all players", ex);
+        }
         return true;
     }
 }

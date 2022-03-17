@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import commons.entities.game.GameStatus;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +31,9 @@ import server.database.repositories.question.QuestionRepository;
  */
 @ExtendWith(MockitoExtension.class)
 public class GameServiceTest {
+    @Mock
+    SSEManager sseManager;
+
     @Mock
     private QuestionRepository questionRepository;
 
@@ -80,6 +84,7 @@ public class GameServiceTest {
 
         // Create the game
         game = new NormalGame();
+        game.setEmitters(sseManager);
         game.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         game.setConfiguration(new NormalGameConfiguration(3, 13, 2));
         game.add(joePlayer);
@@ -161,7 +166,28 @@ public class GameServiceTest {
     }
 
     @Test
-    void removePlayerLast() throws LastPlayerRemovedException {
+    void removePlayerOk() throws IOException {
+        // Mock the SSE manager
+        when(sseManager.disconnect(joe.getId())).thenReturn(true);
+
+        // Set status and then call the service to remove joe
+        game.setStatus(GameStatus.ONGOING);
+        assertTrue(gameService.removePlayer(game, joe));
+
+        // Verify that the status hasn't changed
+        assertEquals(GameStatus.ONGOING, game.getStatus());
+
+        // Verify interactions
+        verify(sseManager, times(1)).disconnect(joe.getId());
+        verify(sseManager, times(1)).sendAll(any());
+        verifyNoMoreInteractions(game.getEmitters());
+    }
+
+    @Test
+    void removePlayerLast() throws LastPlayerRemovedException, IOException {
+        // Mock the SSE manager
+        when(sseManager.disconnect(joe.getId())).thenReturn(true);
+
         // Remove susanne and then call the service to remove joe
         game.setStatus(GameStatus.ONGOING);
         game.remove(susanne.getId());
@@ -170,6 +196,11 @@ public class GameServiceTest {
         // Verify that the status changed
         assertEquals(GameStatus.FINISHED, game.getStatus());
         assertEquals(0, game.size());
+
+        // Verify interactions
+        verify(sseManager, times(1)).disconnect(joe.getId());
+        verify(sseManager, times(1)).sendAll(any());
+        verifyNoMoreInteractions(game.getEmitters());
     }
 
     @Test
@@ -181,5 +212,8 @@ public class GameServiceTest {
         // Verify that the status hasn't changed
         assertEquals(GameStatus.ONGOING, game.getStatus());
         assertEquals(2, game.getPlayers().size());
+
+        // Verify interactions
+        verifyNoMoreInteractions(game.getEmitters());
     }
 }
