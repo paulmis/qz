@@ -165,28 +165,6 @@ public class LobbyController {
      * @return information on the configuration of the requested lobby.
      */
     @GetMapping("/{lobbyId}/config")
-    ResponseEntity<GameConfigurationDTO> lobbyConfigurationInfo(
-            @PathVariable @NonNull UUID lobbyId) {
-        // Check if the lobby exists.
-        Optional<Game> lobby = gameRepository.findById(lobbyId);
-        if (!lobby.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        // Check if the lobby has been created.
-        if (lobby.get().getStatus() != GameStatus.CREATED) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        // Return ok status with configuration payload
-        return ResponseEntity.ok(lobby.get().getDTO().getConfiguration());
-    }
-
-    /**
-     * Endpoint to get lobby configuration.
-     *
-     * @param lobbyId the UUID of the lobby.
-     * @return information on the configuration of the requested lobby.
-     */
-    @GetMapping("/{lobbyId}/config")
     ResponseEntity<GameConfigurationDTO> lobbyConfiguration(
             @PathVariable @NonNull UUID lobbyId) {
         //Check if the lobby exists.
@@ -272,7 +250,7 @@ public class LobbyController {
     @PostMapping("/{lobbyId}/config")
     ResponseEntity updateConfiguration(
             @PathVariable @NonNull UUID lobbyId,
-            @RequestBody NormalGameConfigurationDTO normalGameConfigurationData) {
+            @RequestBody GameConfigurationDTO gameConfigurationData) {
         Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
         Optional<User> userOptional = userRepository.findByEmail(AuthContext.get());
         // Check if the lobby exists and user exists.
@@ -289,11 +267,8 @@ public class LobbyController {
         if (lobby.getHost().getUser().getId() != user.getId()) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        // Create normal game configuration.
-        NormalGameConfiguration normalGameConfiguration = new NormalGameConfiguration(normalGameConfigurationData);
-        // Change lobby configuration
-        lobby.setConfiguration(normalGameConfiguration);
-        //lobby.setConfiguration(new GameConfiguration(gameConfigurationDTO))
+        // Change and update lobby configuration
+        lobby.setConfiguration(new NormalGameConfiguration((NormalGameConfigurationDTO) gameConfigurationData));
         // Update repositories
         gameRepository.save(lobby);
         return new ResponseEntity<>(HttpStatus.OK);
