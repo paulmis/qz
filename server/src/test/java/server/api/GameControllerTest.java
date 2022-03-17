@@ -147,9 +147,6 @@ public class GameControllerTest {
 
     @Test
     public void leaveOk() throws Exception {
-        // Mock the service
-        when(gameService.removePlayer(game, john)).thenReturn(true);
-
         // Perform the request
         this.mockMvc
                 .perform(post("/api/game/leave"))
@@ -191,7 +188,7 @@ public class GameControllerTest {
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
 
         // Mock the service
-        when(gameService.removePlayer(game, susanne)).thenReturn(false);
+        doThrow(IllegalStateException.class).when(gameService).removePlayer(game, susanne);
 
         // Perform the request
         this.mockMvc

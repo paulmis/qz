@@ -57,7 +57,9 @@ public class GameController {
         }
 
         // Mark the player as abandoned
-        if (!gameService.removePlayer(game.get(), user.get())) {
+        try {
+            gameService.removePlayer(game.get(), user.get());
+        } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         gameRepository.save(game.get());
