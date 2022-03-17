@@ -2,6 +2,7 @@ package server.database.entities;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static server.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,15 +36,15 @@ public class NormalGameTest {
     void init() {
         // Create users
         joe = new User("joe", "joe@doe.com", "stinkywinky");
-        joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        joe.setId(getUUID(0));
         joePlayer = new GamePlayer(joe);
-        joePlayer.setId(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"));
+        joePlayer.setId(getUUID(1));
         joePlayer.setJoinDate(LocalDateTime.parse("2020-03-04T00:00:00"));
 
         susanne = new User("Susanne", "susanne@louisiane.com", "stinkymonkey");
-        susanne.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        susanne.setId(getUUID(2));
         susannePlayer = new GamePlayer(susanne);
-        susannePlayer.setId(UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"));
+        susannePlayer.setId(getUUID(3));
         susannePlayer.setJoinDate(LocalDateTime.parse("2022-03-03T00:00:00"));
 
         // Create questions
@@ -55,7 +56,7 @@ public class NormalGameTest {
 
         // Create the game
         game = new NormalGame();
-        game.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        game.setId(getUUID(4));
         game.setConfiguration(config);
         game.addQuestions(Arrays.asList(questionA, questionB));
         game.add(joePlayer);
