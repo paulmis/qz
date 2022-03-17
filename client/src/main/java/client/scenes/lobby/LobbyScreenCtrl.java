@@ -60,4 +60,8 @@ public class LobbyScreenCtrl {
             mainCtrl.closeLobbySettings();
         });
     }
+
+    public void leaderboardButtonClick() {
+        mainCtrl.showGlobalLeaderboardScreen();
+    }
 }

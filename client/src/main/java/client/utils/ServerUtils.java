@@ -232,4 +232,19 @@ public class ServerUtils {
         // Sets the source of the events in the handler.
         sseHandler.setSseEventSource(eventSource);
     }
+    /*
+     * Gets the global leaderboard from the database(mock function for now).
+     *
+     * @return the list of users that make up the global leaderboard.
+     */
+    public List<UserDTO> getGlobalLeaderboard() {
+        var r = client.target(SERVER).path("/api/leaderboard/score")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get();
+        if (r.getStatus() == Response.Status.OK.getStatusCode()) {
+            return r.readEntity(new GenericType<List<UserDTO>>() {});
+        }
+        return new ArrayList<>();
+    }
 }

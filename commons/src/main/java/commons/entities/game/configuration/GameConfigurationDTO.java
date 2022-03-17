@@ -42,5 +42,7 @@ public abstract class GameConfigurationDTO implements DTO {
      * Capacity of the lobby.
      */
     @DecimalMin(value = "1")
-    protected int capacity;
+    @DecimalMax(value = "8")
+    @Description("Capacity of lobby")
+    protected Integer capacity;
 }

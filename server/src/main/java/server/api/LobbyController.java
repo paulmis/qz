@@ -9,34 +9,26 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.PersistenceException;
-import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
+import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
+import server.services.LobbyService;
 
-/*
-made following https://spring.io/guides/tutorials/rest/
- */
 
 /**
  * LobbyController, expose endpoints for lobbies.
@@ -51,6 +43,9 @@ public class LobbyController {
 
     @Autowired
     private GameService gameService;
+
+    @Autowired
+    private LobbyService lobbyService;
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
@@ -68,7 +63,6 @@ public class LobbyController {
      * @return 400 if the game constraints were violated, 404 if the user doesn't exist, 409 if the founder is
      *      already in a lobby or a game, 201 and the game otherwise
      */
-    @Transactional
     @PostMapping
     ResponseEntity<NormalGameDTO> create(@RequestBody NormalGameDTO gameDTO) {
         // If the user doesn't exist, return 404
@@ -98,7 +92,7 @@ public class LobbyController {
             GamePlayer player = new GamePlayer(founder.get());
             game.add(player);
 
-            // Save the game
+            // Save the game with the added host and player
             game = gameRepository.save(game);
         } catch (ConstraintViolationException | PersistenceException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -196,6 +190,30 @@ public class LobbyController {
         }
 
         // Otherwise, return 200
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Endpoint to allow a player to leave the lobby.
+     *
+     * @return 404 if the player isn't in a lobby, 200 otherwise
+     */
+    @DeleteMapping("/leave")
+    ResponseEntity leave() {
+        // If the user or the game don't exist, return 404
+        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        if (user.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Check that the user is in a lobby and remove them
+        Optional<Game> lobby =
+                gameRepository.findByPlayers_User_IdEqualsAndStatus(user.get().getId(), GameStatus.CREATED);
+        if (lobby.isEmpty() || !lobbyService.removePlayer(lobby.get(), user.get())) {
+            return ResponseEntity.notFound().build();
+        }
+        gameRepository.save(lobby.get());
+
         return ResponseEntity.ok().build();
     }
 }
