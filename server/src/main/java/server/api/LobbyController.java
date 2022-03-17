@@ -169,7 +169,7 @@ public class LobbyController {
      *      404 if the lobby doesn't exist, 403 if the player isn't the lobby head, 200 otherwise
      */
     @PutMapping("/{lobbyId}/start")
-    ResponseEntity<HttpStatus> start(@PathVariable UUID lobbyId) {
+    ResponseEntity start(@PathVariable UUID lobbyId) {
         // If the user or the game don't exist, return 404
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
         Optional<Game> lobby = gameRepository.findById(lobbyId);

@@ -22,9 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import commons.entities.UserDTO;
-import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
-import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import java.net.URL;
 import java.util.ArrayList;
@@ -35,6 +33,8 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.sse.SseEventSource;
 
 /**
@@ -232,7 +232,8 @@ public class ServerUtils {
         // Sets the source of the events in the handler.
         sseHandler.setSseEventSource(eventSource);
     }
-    /*
+
+    /**
      * Gets the global leaderboard from the database(mock function for now).
      *
      * @return the list of users that make up the global leaderboard.
