@@ -1,8 +1,6 @@
 package server.api;
 
 import commons.entities.UserDTO;
-import java.util.HashMap;
-import java.util.Map;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,7 +10,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import server.database.entities.User;
@@ -42,7 +39,8 @@ public class AuthController {
      * Allows the user to register.
      *
      * @param userData the user data
-     * @return 409 if the user with this data already exists, 201 and the auth token otherwise
+     * @return 409 if the user with this data already exists, 400 if the DTO is malformed or doesn't meet constraints,
+     *      201 and the auth token otherwise
      */
     @PostMapping("register")
     public ResponseEntity<String> register(@Valid @RequestBody UserDTO userData) {
@@ -90,24 +88,5 @@ public class AuthController {
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-    }
-
-    /**
-     * Handles user validation error messages.
-     *
-     * @param ex the validation exception instance
-     * @return the error messages
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return errors;
     }
 }
