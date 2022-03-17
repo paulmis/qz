@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
 import server.database.entities.game.Game;
@@ -108,7 +109,12 @@ public class GameService {
 
         // Update clients
         try {
-            game.getEmitters().sendAll(user.getId() + " left");
+            game
+                .getEmitters()
+                .sendAll(
+                    SseEmitter.event()
+                        .name("playerLeft")
+                        .data(user.getId()));
         } catch (IOException ex) {
             // Log failure to update clients
             log.error("Unable to send removePlayer message to all players", ex);
