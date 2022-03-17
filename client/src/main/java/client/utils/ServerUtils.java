@@ -35,8 +35,6 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.sse.SseEventSource;
-import org.apache.commons.lang3.RandomStringUtils;
-
 
 /**
  * Utilities for communicating with the server.
@@ -48,13 +46,18 @@ public class ServerUtils {
             .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
     public static boolean loggedIn = false;
 
+    /**
+     * This function creates a new client with the mandatory
+     * JacksonJsonProvider and the JavaTimeModule.
+     *
+     * @return the new client.
+     */
     private Client newClient() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
         JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
-        Client newClient = ClientBuilder.newClient().register(provider);
-        return newClient;
+        return ClientBuilder.newClient().register(provider);
     }
 
     /**
@@ -190,15 +193,15 @@ public class ServerUtils {
      * @param sseHandler The handler of sse events, exceptions and completion.
      */
     public void subscribeToSSE(SSEHandler sseHandler) {
-        var config = new NormalGameConfigurationDTO();
-        config.setNumQuestions(20);
+
+        // The following lines create a new game and start it.
+        // These should be removed when we have proper lobby joining and creating implemented.
+        var config = new NormalGameConfigurationDTO(20);
         config.setAnswerTime(123);
         config.setCapacity(1);
-        config.setId(UUID.randomUUID());
 
         var game = new NormalGameDTO();
         game.setId(UUID.randomUUID());
-        game.setGameId(RandomStringUtils.randomAlphabetic(10));
         game.setStatus(GameStatus.FINISHED);
         game.setConfiguration(config);
 
@@ -209,20 +212,27 @@ public class ServerUtils {
 
         var lobby = r.readEntity(NormalGameDTO.class);
 
-        client.target(SERVER).path("/api/lobby/" + lobby.getId() + "/start").request(APPLICATION_JSON)
-               .accept(APPLICATION_JSON)
+        client.target(SERVER).path("/api/lobby/" + lobby.getId() + "/start")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
                 .put(Entity.entity(game, APPLICATION_JSON));
+
+        // This creates the WebTarget that the sse event source will use.
         var target = client.target(SERVER).path("api/sse/open");
-        System.out.println("here");
-        SseEventSource eventSource = SseEventSource.target(target)
-                .build();
+
+        // Builds the event source with the target.
+        SseEventSource eventSource = SseEventSource.target(target).build();
+
+        // Registers the handling of events, exceptions and completion.
         eventSource.register(
                 sseHandler::handleEvent,
                 sseHandler::handleException,
                 sseHandler::handleCompletion);
+
+        // Opens the sse listener.
         eventSource.open();
 
-        System.out.println(eventSource.isOpen());
+        // Sets the source of the events in the handler.
         sseHandler.setSseEventSource(eventSource);
     }
 }
