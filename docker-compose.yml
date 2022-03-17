@@ -1,11 +1,11 @@
-version: '3'
+version: '3.8'
 
 services:
   db:
     image: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: oopp
+      - POSTGRES_USER=oopp_admin
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=oopp
     ports:
-      - "5432:5432"
+      - "${SPRING_PROPS_POSTGRES_PORT:-5555}:5432"

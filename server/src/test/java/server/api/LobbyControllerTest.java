@@ -1,14 +1,13 @@
 package server.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalToObject;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static server.TestHelpers.getUUID;
@@ -20,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import javax.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,9 @@ import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
+import server.database.repositories.question.QuestionRepository;
 import server.services.GameService;
+import server.services.LobbyService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -68,7 +70,13 @@ class LobbyControllerTest {
     @MockBean
     private UserRepository userRepository;
 
-    private Game mockLobby;
+    @MockBean
+    private QuestionRepository questionRepository;
+
+    @MockBean
+    private LobbyService lobbyService;
+
+    private Game<?> mockLobby;
     private GameConfiguration mockLobbyConfiguration;
     private NormalGameConfiguration normalGameConfiguration;
     private User john;
@@ -105,7 +113,7 @@ class LobbyControllerTest {
         mockLobby = new NormalGame();
         mockLobby.setId(getUUID(3));
         mockLobby.setStatus(GameStatus.CREATED);
-        mockLobbyConfiguration = new NormalGameConfiguration();
+        mockLobbyConfiguration = new NormalGameConfiguration(10, 10, 2);
         mockLobby.setConfiguration(mockLobbyConfiguration);
         normalGameConfiguration = new NormalGameConfiguration(4, 8, 6);
 
@@ -125,23 +133,25 @@ class LobbyControllerTest {
                         john.getEmail(),
                         john.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(john.getId(), GameStatus.CREATED))
+                .thenReturn(Optional.of(mockLobby));
     }
 
     @Test
     public void getAvailableLobbiesTest() throws Exception {
         // Mock a list of lobbies
-        Game mockLobby2 = new NormalGame();
-        mockLobby2.setId(getUUID(1));
-        mockLobby2.setStatus(GameStatus.CREATED);
-        mockLobby2.setConfiguration(new NormalGameConfiguration());
+        Game<?> otherLobby = new NormalGame();
+        otherLobby.setId(getUUID(1));
+        otherLobby.setStatus(GameStatus.CREATED);
+        otherLobby.setConfiguration(new NormalGameConfiguration());
         when(gameRepository.findAllByStatus(GameStatus.CREATED))
-                .thenReturn(new ArrayList<>(List.of(mockLobby, mockLobby2)));
+                .thenReturn(new ArrayList<>(List.of(mockLobby, otherLobby)));
 
         // Request
         this.mockMvc.perform(get("/api/lobby/available"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(equalToObject(
-                        objectMapper.writeValueAsString(List.of(mockLobby.getDTO(), mockLobby2.getDTO()))
+                        objectMapper.writeValueAsString(List.of(mockLobby.getDTO(), otherLobby.getDTO()))
                 )));
     }
 
@@ -182,6 +192,9 @@ class LobbyControllerTest {
 
     @Test
     public void joinOkTest() throws Exception {
+        // Modify the capacity to allow the player to join
+        mockLobbyConfiguration.setCapacity(3);
+
         // Set the context user to a user that isn't in the game
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(

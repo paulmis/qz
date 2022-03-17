@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Point3D?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.shape.Box?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+<?import org.fxyz3d.shapes.primitives.Text3DMesh?>
+
+<ScrollPane fx:id="scrollPaneLeaderboard" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="614.0" prefWidth="1000.0" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.leaderboard.LeaderboardCtrl" stylesheets="@/client/stylesheets/GlobalTheme.css" >
+   <content>
+      <VBox fx:id="vboxScrollPaneLeaderboard" alignment="TOP_CENTER" fillWidth="false" prefHeight="200.0" prefWidth="100.0">
+         <children>
+            <Group fx:id="group">
+               <children>
+                  <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="450.0" stroke="#ffffff00" strokeType="INSIDE" width="964.0" />
+                  <Box fx:id="thirdBox" depth="100" height="112.0" layoutX="601.0" layoutY="386.0" rotate="7.0" width="100">
+                     <rotationAxis>
+                        <Point3D x="1.0" y="1.0" />
+                     </rotationAxis>
+                  </Box>
+                  <Box fx:id="secondBox" depth="100" height="160.0" layoutX="350.0" layoutY="365.0" rotate="7.0" width="100">
+                     <rotationAxis>
+                        <Point3D x="1.0" y="1.0" />
+                     </rotationAxis>
+                  </Box>
+                  <Box fx:id="firstBox" depth="100" height="241.0" layoutX="475.0" layoutY="324.0" rotate="7.0" width="100">
+                     <rotationAxis>
+                        <Point3D x="1.0" y="1.0" />
+                     </rotationAxis>
+                  </Box>
+                  <Text3DMesh fx:id="first3DText" fontSize="64" layoutX="425.0" layoutY="266.0" rotate="7.0" text3D="1st">
+                     <rotationAxis>
+                        <Point3D x="1.0" y="1.0" />
+                     </rotationAxis>
+                  </Text3DMesh>
+                  <Text3DMesh fx:id="second3DText" fontSize="48" layoutX="304.0" layoutY="340.0" rotate="7.0" text3D="2nd">
+                     <rotationAxis>
+                        <Point3D x="1.0" y="1.0" />
+                     </rotationAxis>
+                  </Text3DMesh>
+                  <Text3DMesh fx:id="third3DText" fontSize="48" layoutX="563.0" layoutY="381.0" rotate="7.0" text3D="3rd">
+                     <rotationAxis>
+                        <Point3D x="1.0" y="1.0" />
+                     </rotationAxis>
+                  </Text3DMesh>
+                  <Circle fx:id="firstImage" fill="WHITE" layoutX="475.0" layoutY="107.0" radius="54.0" rotate="7.0" stroke="BLACK" strokeType="INSIDE">
+                     <rotationAxis>
+                        <Point3D x="1.0" y="1.0" />
+                     </rotationAxis>
+                  </Circle>
+                  <Label fx:id="firstText" alignment="CENTER" layoutX="423.0" layoutY="169.0" prefHeight="27.0" prefWidth="104.0" text="asdasda">
+                     <textFill>
+                        <LinearGradient endX="1.0" endY="1.0">
+                           <stops>
+                              <Stop>
+                                 <color>
+                                    <Color red="0.8508771657943726" green="0.6867419481277466" blue="0.4569525718688965" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="0.007633587786259542">
+                                 <color>
+                                    <Color red="1.0" green="0.8503500819206238" blue="0.47999998927116394" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="1.0">
+                                 <color>
+                                    <Color red="0.75" green="0.5453752875328064" blue="0.014999999664723873" />
+                                 </color>
+                              </Stop>
+                           </stops>
+                        </LinearGradient>
+                     </textFill>
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                  <Circle fx:id="secondImage" fill="#feffff" layoutX="350.0" layoutY="194.0" radius="54.0" rotate="7.0" stroke="BLACK" strokeType="INSIDE">
+                     <rotationAxis>
+                        <Point3D x="1.0" y="1.0" />
+                     </rotationAxis>
+                  </Circle>
+                  <Label fx:id="secondText" alignment="CENTER" layoutX="298.0" layoutY="256.0" prefHeight="27.0" prefWidth="104.0" text="asdasda">
+                     <textFill>
+                        <LinearGradient endX="1.0" endY="1.0">
+                           <stops>
+                              <Stop>
+                                 <color>
+                                    <Color red="0.6140350699424744" green="0.6140350699424744" blue="0.6140350699424744" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="1.0">
+                                 <color>
+                                    <Color red="0.5175438523292542" green="0.5159465074539185" blue="0.5095570683479309" />
+                                 </color>
+                              </Stop>
+                           </stops>
+                        </LinearGradient>
+                     </textFill>
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                  <Circle fx:id="thirdImage" fill="WHITE" layoutX="601.0" layoutY="248.0" radius="54.0" rotate="7.0" stroke="BLACK" strokeType="INSIDE">
+                     <rotationAxis>
+                        <Point3D x="1.0" y="1.0" />
+                     </rotationAxis>
+                  </Circle>
+                  <Label fx:id="thirdText" alignment="CENTER" layoutX="549.0" layoutY="301.0" prefHeight="27.0" prefWidth="104.0" text="asdasda">
+                     <textFill>
+                        <LinearGradient endX="1.0" endY="1.0">
+                           <stops>
+                              <Stop>
+                                 <color>
+                                    <Color red="0.9561403393745422" green="0.7688469886779785" blue="0.5547974705696106" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="1.0">
+                                 <color>
+                                    <Color red="1.0" green="0.5632684826850891" blue="0.029999999329447746" />
+                                 </color>
+                              </Stop>
+                           </stops>
+                        </LinearGradient>
+                     </textFill>
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Group>
+            <VBox fx:id="usersBox" alignment="TOP_CENTER" prefHeight="109.0" prefWidth="959.0" spacing="15.0">
+               <VBox.margin>
+                  <Insets top="15.0" />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="60.0" left="5.0" right="5.0" top="15.0" />
+               </padding></VBox>
+         </children>
+      </VBox>
+   </content>
+   <padding>
+      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+   </padding>
+</ScrollPane>
