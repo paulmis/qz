@@ -1,0 +1,26 @@
+#usersBox {
+    -fx-background-color: backgroundColor;
+    -fx-border-radius: 20 20 0 0;
+    -fx-background-radius: 20 20 0 0;
+}
+
+#vboxScrollPaneLeaderboard {
+    -fx-background-color: transparent;
+}
+
+#scrollPaneLeaderboard {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+#firstText {
+    -fx-text-fill: backgroundColor;
+}
+
+#secondText {
+    -fx-text-fill: backgroundColor;
+}
+
+#thirdText {
+    -fx-text-fill: backgroundColor;
+}

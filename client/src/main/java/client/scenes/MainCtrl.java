@@ -20,12 +20,15 @@ import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
+import client.scenes.leaderboard.GlobalLeaderboardCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import commons.entities.game.configuration.GameConfigurationDTO;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -36,6 +39,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import lombok.Generated;
 
@@ -65,6 +69,9 @@ public class MainCtrl {
     private GameScreenCtrl gameScreenCtrl;
     private Parent gameScreen;
 
+    private GlobalLeaderboardCtrl globalLeaderboardCtrl;
+    private Parent globalLeaderboardScreen;
+
     private Popup lobbySettingsPopUp;
 
     /**
@@ -78,7 +85,8 @@ public class MainCtrl {
                            Pair<RegisterScreenCtrl, Parent> registerScreen,
                            Pair<NicknameScreenCtrl, Parent> nicknameScreen,
                            Pair<LobbyScreenCtrl, Parent> lobbyScreen,
-                           Pair<GameScreenCtrl, Parent> gameScreen) {
+                           Pair<GameScreenCtrl, Parent> gameScreen,
+                           Pair<GlobalLeaderboardCtrl, Parent> globalLeaderboardScreen) {
         this.primaryStage = primaryStage;
 
         this.serverConnectScreen = serverConnectScreen.getValue();
@@ -99,10 +107,19 @@ public class MainCtrl {
         this.gameScreen = gameScreen.getValue();
         this.gameScreenCtrl = gameScreen.getKey();
 
+        this.globalLeaderboardScreen = globalLeaderboardScreen.getValue();
+        this.globalLeaderboardCtrl = globalLeaderboardScreen.getKey();
+
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
         lobbySettingsPopUp = new Popup();
         showServerConnectScreen();
+
+        // This makes sure to close every thread when the app is closed.
+        primaryStage.setOnCloseRequest(e -> {
+            Platform.exit();
+            System.exit(0);
+        });
     }
 
     enum StageScalingStrategy {
@@ -185,6 +202,15 @@ public class MainCtrl {
      */
     public void showServerConnectScreen() {
         this.showScreenLetterBox(serverConnectScreen, StageScalingStrategy.Letterbox);
+    }
+
+    /**
+     * This function displays the global leaderboard screen.
+     * It also sets it min width and height
+     */
+    public void showGlobalLeaderboardScreen() {
+        this.showScreenLetterBox(globalLeaderboardScreen, StageScalingStrategy.Letterbox);
+        globalLeaderboardCtrl.reset();
     }
 
     /**

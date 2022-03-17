@@ -7,6 +7,7 @@ import static server.TestHelpers.getUUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -36,13 +37,13 @@ public class NormalGameTest {
         joe = new User("joe", "joe@doe.com", "stinkywinky");
         joe.setId(getUUID(0));
         joePlayer = new GamePlayer(joe);
-        joePlayer.setId(getUUID("a"));
+        joePlayer.setId(getUUID(1));
         joePlayer.setJoinDate(LocalDateTime.parse("2020-03-04T00:00:00"));
 
         susanne = new User("Susanne", "susanne@louisiane.com", "stinkymonkey");
-        susanne.setId(getUUID(1));
+        susanne.setId(getUUID(2));
         susannePlayer = new GamePlayer(susanne);
-        susannePlayer.setId(getUUID("b"));
+        susannePlayer.setId(getUUID(3));
         susannePlayer.setJoinDate(LocalDateTime.parse("2022-03-03T00:00:00"));
 
         // Create questions
@@ -54,7 +55,7 @@ public class NormalGameTest {
 
         // Create the game
         game = new NormalGame();
-        game.setId(getUUID(0));
+        game.setId(getUUID(4));
         game.setConfiguration(config);
         game.addQuestions(Arrays.asList(questionA, questionB));
         game.add(joePlayer);
@@ -106,7 +107,8 @@ public class NormalGameTest {
 
     @Test
     void size() {
-        assertEquals(2, game.size());
+        joePlayer.setAbandoned(true);
+        assertEquals(1, game.size());
     }
 
     @Test
@@ -122,9 +124,9 @@ public class NormalGameTest {
     }
 
     @Test
-    void removeOk() throws LastPlayerRemovedException {
+    void removeLobbyOk() throws LastPlayerRemovedException {
         assertTrue(game.remove(susanne.getId()));
-        assertFalse(game.getPlayers().contains(susannePlayer));
+        assertFalse(game.getPlayers().containsKey(susanne.getId()));
     }
 
     @Test
@@ -133,7 +135,7 @@ public class NormalGameTest {
     }
 
     @Test
-    void removeHead() throws LastPlayerRemovedException {
+    void removeLobbyHead() throws LastPlayerRemovedException {
         assertTrue(game.remove(joe.getId()));
         assertEquals(game.getHost(), susannePlayer);
     }
@@ -144,5 +146,19 @@ public class NormalGameTest {
             game.remove(joe.getId());
             game.remove(susanne.getId());
         });
+    }
+
+    @Test
+    void removeGameOngoingOk() throws LastPlayerRemovedException {
+        game.setStatus(GameStatus.ONGOING);
+        assertTrue(game.remove(susanne.getId()));
+        assertTrue(game.getPlayers().containsKey(susanne.getId()));
+        assertTrue(game.getPlayers().get(susanne.getId()).isAbandoned());
+    }
+
+    @Test
+    void removeGameFinished() throws LastPlayerRemovedException {
+        game.setStatus(GameStatus.FINISHED);
+        assertFalse(game.remove(joe.getId()));
     }
 }
