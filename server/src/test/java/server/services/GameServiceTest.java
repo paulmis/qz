@@ -3,8 +3,10 @@ package server.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static server.TestHelpers.getUUID;
 
 import commons.entities.game.GameStatus;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +33,9 @@ import server.database.repositories.question.QuestionRepository;
 @ExtendWith(MockitoExtension.class)
 public class GameServiceTest {
     @Mock
+    SSEManager sseManager;
+
+    @Mock
     private QuestionRepository questionRepository;
 
     @InjectMocks
@@ -39,8 +44,10 @@ public class GameServiceTest {
     NormalGame game;
     User joe;
     User susanne;
+    User james;
     GamePlayer joePlayer;
     GamePlayer susannePlayer;
+    GamePlayer jamesPlayer;
     MCQuestion questionA;
     MCQuestion questionB;
     MCQuestion questionC;
@@ -51,42 +58,51 @@ public class GameServiceTest {
     void init() {
         // Create users
         joe = new User("joe", "joe@doe.com", "stinkywinky");
-        joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        joe.setId(getUUID(0));
         joePlayer = new GamePlayer(joe);
         joePlayer.setJoinDate(LocalDateTime.parse("2020-03-04T00:00:00"));
 
         susanne = new User("Susanne", "susanne@louisiane.com", "stinkymonkey");
-        susanne.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        susanne.setId(getUUID(1));
         susannePlayer = new GamePlayer(susanne);
         susannePlayer.setJoinDate(LocalDateTime.parse("2022-03-03T00:00:00"));
 
+        james = new User("James", "james@blames.com", "stinkydonkey");
+        james.setId(getUUID(2));
+        jamesPlayer = new GamePlayer(james);
+        jamesPlayer.setJoinDate(LocalDateTime.parse("2022-03-02T00:00:00"));
+
         // Create questions
         questionA = new MCQuestion();
-        questionA.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        questionA.setId(getUUID(5));
         questionB = new MCQuestion();
-        questionB.setId(UUID.fromString("11111111-2222-2222-2222-222222222222"));
+        questionB.setId(getUUID(6));
         questionC = new MCQuestion();
-        questionC.setId(UUID.fromString("11111111-3333-3333-3333-333333333333"));
+        questionC.setId(getUUID(7));
         questionD = new MCQuestion();
-        questionD.setId(UUID.fromString("11111111-4444-4444-4444-444444444444"));
+        questionD.setId(getUUID(8));
         usedQuestionIds = Arrays.asList(questionB.getId(), questionA.getId());
 
         // Create the game
         game = new NormalGame();
-        game.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        game.setEmitters(sseManager);
+        game.setId(getUUID(3));
         game.setConfiguration(new NormalGameConfiguration(3, 13, 2));
         game.add(joePlayer);
         game.add(susannePlayer);
 
         // Mock the repository
         lenient().when(questionRepository.count()).thenReturn(4L);
+        lenient().when(questionRepository.findAll())
+                .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
     }
 
     @Test
     void provideQuestionsOk() {
+        // ToDo: fix QuestionRepository::findByIdNotIn
         // Mock the repository
-        when(questionRepository.findByIdNotIn(usedQuestionIds))
-                .thenReturn(Arrays.asList(questionD, questionC));
+        //when(questionRepository.findByIdNotIn(usedQuestionIds))
+        //        .thenReturn(Arrays.asList(questionD, questionC));
 
         // Provide the questions
         List<Question> questions = gameService.provideQuestions(2, Arrays.asList(questionB, questionA));
@@ -95,7 +111,9 @@ public class GameServiceTest {
 
         // Verify interactions
         verify(questionRepository).count();
-        verify(questionRepository).findByIdNotIn(usedQuestionIds);
+        // ToDo: fix QuestionRepository::findByIdNotIn
+        //verify(questionRepository).findByIdNotIn(usedQuestionIds);
+        verify(questionRepository).findAll();
         verifyNoMoreInteractions(questionRepository);
     }
 
@@ -112,9 +130,10 @@ public class GameServiceTest {
 
     @Test
     void startNormal() {
+        // ToDo: fix QuestionRepository::findByIdNotIn
         // Mock the repository
-        when(questionRepository.findByIdNotIn(new ArrayList<>()))
-                .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
+        //when(questionRepository.findByIdNotIn(new ArrayList<>()))
+        //        .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
 
         // Start the game
         gameService.startGame(game);
@@ -125,7 +144,9 @@ public class GameServiceTest {
 
         // Verify interactions
         verify(questionRepository).count();
-        verify(questionRepository).findByIdNotIn(new ArrayList<>());
+        // ToDo: fix QuestionRepository::findByIdNotIn
+        //verify(questionRepository).findByIdNotIn(new ArrayList<>());
+        verify(questionRepository).findAll();
         verifyNoMoreInteractions(questionRepository);
     }
 
@@ -151,5 +172,57 @@ public class GameServiceTest {
 
         // Verify interactions
         verifyNoMoreInteractions(questionRepository);
+    }
+
+    @Test
+    void removePlayerOk() throws IOException {
+        // Mock the SSE manager
+        when(sseManager.disconnect(joe.getId())).thenReturn(true);
+
+        // Set status and then call the service to remove joe
+        game.setStatus(GameStatus.ONGOING);
+        assertTrue(gameService.removePlayer(game, joe));
+
+        // Verify that the status hasn't changed
+        assertEquals(GameStatus.ONGOING, game.getStatus());
+
+        // Verify interactions
+        verify(sseManager, times(1)).disconnect(joe.getId());
+        verify(sseManager, times(1)).sendAll(any());
+        verifyNoMoreInteractions(game.getEmitters());
+    }
+
+    @Test
+    void removePlayerLast() throws LastPlayerRemovedException, IOException {
+        // Mock the SSE manager
+        when(sseManager.disconnect(joe.getId())).thenReturn(true);
+
+        // Remove susanne and then call the service to remove joe
+        game.setStatus(GameStatus.ONGOING);
+        game.remove(susanne.getId());
+        assertTrue(gameService.removePlayer(game, joe));
+
+        // Verify that the status changed
+        assertEquals(GameStatus.FINISHED, game.getStatus());
+        assertEquals(0, game.size());
+
+        // Verify interactions
+        verify(sseManager, times(1)).disconnect(joe.getId());
+        verify(sseManager, times(1)).sendAll(any());
+        verifyNoMoreInteractions(game.getEmitters());
+    }
+
+    @Test
+    void removePlayerNotFound() {
+        // Remove a player that is not in the game
+        game.setStatus(GameStatus.ONGOING);
+        assertFalse(gameService.removePlayer(game, james));
+
+        // Verify that the status hasn't changed
+        assertEquals(GameStatus.ONGOING, game.getStatus());
+        assertEquals(2, game.getPlayers().size());
+
+        // Verify interactions
+        verifyNoMoreInteractions(game.getEmitters());
     }
 }

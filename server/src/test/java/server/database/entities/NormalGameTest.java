@@ -2,10 +2,12 @@ package server.database.entities;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static server.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -34,15 +36,15 @@ public class NormalGameTest {
     void init() {
         // Create users
         joe = new User("joe", "joe@doe.com", "stinkywinky");
-        joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        joe.setId(getUUID(0));
         joePlayer = new GamePlayer(joe);
-        joePlayer.setId(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"));
+        joePlayer.setId(getUUID(1));
         joePlayer.setJoinDate(LocalDateTime.parse("2020-03-04T00:00:00"));
 
         susanne = new User("Susanne", "susanne@louisiane.com", "stinkymonkey");
-        susanne.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        susanne.setId(getUUID(2));
         susannePlayer = new GamePlayer(susanne);
-        susannePlayer.setId(UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"));
+        susannePlayer.setId(getUUID(3));
         susannePlayer.setJoinDate(LocalDateTime.parse("2022-03-03T00:00:00"));
 
         // Create questions
@@ -54,7 +56,7 @@ public class NormalGameTest {
 
         // Create the game
         game = new NormalGame();
-        game.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        game.setId(getUUID(4));
         game.setConfiguration(config);
         game.addQuestions(Arrays.asList(questionA, questionB));
         game.add(joePlayer);
@@ -106,7 +108,8 @@ public class NormalGameTest {
 
     @Test
     void size() {
-        assertEquals(2, game.size());
+        joePlayer.setAbandoned(true);
+        assertEquals(1, game.size());
     }
 
     @Test
@@ -122,27 +125,41 @@ public class NormalGameTest {
     }
 
     @Test
-    void removeOk() throws LastPlayerRemovedException {
+    void removeLobbyOk() throws LastPlayerRemovedException {
         assertTrue(game.remove(susanne.getId()));
-        assertFalse(game.getPlayers().contains(susannePlayer));
+        assertFalse(game.getPlayers().containsKey(susanne.getId()));
     }
 
     @Test
-    void removeNotFound() throws LastPlayerRemovedException {
+    void removeLobbyNotFound() throws LastPlayerRemovedException {
         assertFalse(game.remove(UUID.fromString("73246234-2364-2364-2364-236423642364")));
     }
 
     @Test
-    void removeHead() throws LastPlayerRemovedException {
+    void removeLobbyHead() throws LastPlayerRemovedException {
         assertTrue(game.remove(joe.getId()));
         assertEquals(game.getHost(), susannePlayer);
     }
 
     @Test
-    void removeLastPlayer()  {
+    void removeLobbyLastPlayer()  {
         assertThrows(LastPlayerRemovedException.class, () -> {
             game.remove(joe.getId());
             game.remove(susanne.getId());
         });
+    }
+
+    @Test
+    void removeGameOngoingOk() throws LastPlayerRemovedException {
+        game.setStatus(GameStatus.ONGOING);
+        assertTrue(game.remove(susanne.getId()));
+        assertTrue(game.getPlayers().containsKey(susanne.getId()));
+        assertTrue(game.getPlayers().get(susanne.getId()).isAbandoned());
+    }
+
+    @Test
+    void removeGameFinished() throws LastPlayerRemovedException {
+        game.setStatus(GameStatus.FINISHED);
+        assertFalse(game.remove(joe.getId()));
     }
 }

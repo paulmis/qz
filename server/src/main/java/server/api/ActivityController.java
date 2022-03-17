@@ -3,6 +3,7 @@ package server.api;
 import commons.entities.ActivityDTO;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import server.database.repositories.question.ActivityRepository;
  */
 @RestController
 @RequestMapping("/api/activity")
+@Slf4j
 public class ActivityController {
     @Autowired
     private ActivityRepository activityRepository;
@@ -34,9 +36,15 @@ public class ActivityController {
         // Convert DTOs to entities
         List<Activity> activityList = activities.stream().map(Activity::new).collect(Collectors.toList());
         // Save the entities
-        List<ActivityDTO> activityDTOList = activityRepository.saveAll(activityList).stream()
-                .map(Activity::getDTO).collect(Collectors.toList());
-
-        return new ResponseEntity<>(activityDTOList, HttpStatus.OK);
+        try {
+            List<ActivityDTO> activityDTOList = activityRepository.saveAll(activityList).stream()
+                    .map(Activity::getDTO).collect(Collectors.toList());
+            log.debug("Added {} activities", activityDTOList.size());
+            return new ResponseEntity<>(activityDTOList, HttpStatus.OK);
+        } catch (Exception e) {
+            // This can occur due to malformed data (for example, URL longer than 255 characters)
+            log.warn("Failed to save activities: {}", e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }
