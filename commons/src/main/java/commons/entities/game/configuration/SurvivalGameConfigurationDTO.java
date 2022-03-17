@@ -23,4 +23,9 @@ public class SurvivalGameConfigurationDTO extends GameConfigurationDTO {
     @DecimalMax(value = "10.0")
     @Description("Speed modifier")
     protected Float speedModifier;
+
+    public SurvivalGameConfigurationDTO(GameConfigurationDTO gameDTO, Float speedModifier) {
+        super(gameDTO);
+        this.speedModifier = speedModifier;
+    }
 }

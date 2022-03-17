@@ -2,6 +2,7 @@ package commons.entities.game.configuration;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import commons.entities.game.GameDTO;
 import commons.entities.utils.DTO;
 import java.util.UUID;
 import javax.persistence.MappedSuperclass;

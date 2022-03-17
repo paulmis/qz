@@ -24,6 +24,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import commons.entities.UserDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
+import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import java.net.URL;
 import java.util.ArrayList;
@@ -196,13 +197,9 @@ public class ServerUtils {
 
         // The following lines create a new game and start it.
         // These should be removed when we have proper lobby joining and creating implemented.
-        var config = new NormalGameConfigurationDTO(20);
-        config.setAnswerTime(123);
-        config.setCapacity(1);
-
+        var config = new NormalGameConfigurationDTO(null, 60, 1, 20);
         var game = new NormalGameDTO();
         game.setId(UUID.randomUUID());
-        game.setStatus(GameStatus.FINISHED);
         game.setConfiguration(config);
 
         var r  = client.target(SERVER).path("/api/lobby")
