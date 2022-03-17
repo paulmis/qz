@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 
 /**
- * Data transfer object for the survival-mode game configuration.
+ * Data transfer object for the survival-mode game configuration.`
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
