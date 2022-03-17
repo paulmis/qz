@@ -3,6 +3,8 @@ package server.api;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
+import commons.entities.game.configuration.GameConfigurationDTO;
+import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -131,6 +133,25 @@ public class LobbyController {
     }
 
     /**
+     * Endpoint to get lobby configuration info.
+     *
+     * @param lobbyId the UUID of the lobby.
+     * @return information on the configuration of the requested lobby.
+     */
+    @GetMapping("/{lobbyId}/config")
+    ResponseEntity<GameConfigurationDTO> lobbyConfigurationInfo(
+            @PathVariable UUID lobbyId) {
+        
+        // Check if the lobby exists.
+        Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
+        if (lobbyOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // Return ok status with configuration payload
+        return ResponseEntity.ok(lobbyOptional.get().getConfiguration().getDTO());
+    }
+
+    /**
      * Endpoint to allow a user to join a game.
      *
      * @param lobbyId    UUID of the lobby to join.
@@ -192,26 +213,43 @@ public class LobbyController {
     }
 
     /**
-     * Endpoint to allow a player to leave the lobby.
+     * Endpoint to allow the host to change configuration.
      *
-     * @return 404 if the player isn't in a lobby, 200 otherwise
+     * @param lobbyId UUID of the lobby to join.
+     * @param gameConfigurationData The new configuration data.
+     * @return An ok status if successful.
      */
-    @DeleteMapping("/leave")
-    ResponseEntity leave() {
-        // If the user or the game don't exist, return 404
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
-        if (user.isEmpty()) {
-            return ResponseEntity.notFound().build();
+    @PostMapping("/{lobbyId}/config")
+    ResponseEntity updateConfiguration(
+            @PathVariable UUID lobbyId,
+            @RequestBody GameConfigurationDTO gameConfigurationData) {
+        Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
+        Optional<User> userOptional = userRepository.findByEmail(AuthContext.get());
+        // Check if the lobby exists and user exists.
+        if (lobbyOptional.isEmpty() || userOptional.isEmpty()) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-
-        // Check that the user is in a lobby and remove them
-        Optional<Game> lobby =
-                gameRepository.findByPlayers_User_IdEqualsAndStatus(user.get().getId(), GameStatus.CREATED);
-        if (lobby.isEmpty() || !lobbyService.removePlayer(lobby.get(), user.get())) {
-            return ResponseEntity.notFound().build();
+        Game lobby = lobbyOptional.get();
+        User user = userOptional.get();
+        // Check if the lobby is created.
+        if (lobby.getStatus() != GameStatus.CREATED) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        gameRepository.save(lobby.get());
-
-        return ResponseEntity.ok().build();
+        // Check if the user is host.
+        if (lobby.getHost().getUser().getId() != user.getId()) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        // Change and update lobby configuration based on configuration type.
+        if (gameConfigurationData instanceof NormalGameConfigurationDTO) {
+            lobby.setConfiguration(new NormalGameConfiguration((NormalGameConfigurationDTO) gameConfigurationData));
+        } else {
+            // Other configurations are not accepted as these are the only implemented game types as of now.
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+        // Update repository.
+        gameRepository.save(lobby);
+        // Return an ok status.
+        return new ResponseEntity<>(HttpStatus.OK);
     }
+
 }
