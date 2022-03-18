@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -81,6 +82,7 @@ public class LobbyController {
         NormalGame game;
         try {
             game = new NormalGame(gameDTO);
+            game.setGameId(RandomStringUtils.random(6, true, true));
             game.setStatus(GameStatus.CREATED);
 
             // Save the configuration
@@ -188,7 +190,7 @@ public class LobbyController {
      *      404 if the lobby doesn't exist, 403 if the player isn't the lobby head, 200 otherwise
      */
     @PutMapping("/{lobbyId}/start")
-    ResponseEntity<HttpStatus> start(@PathVariable UUID lobbyId) {
+    ResponseEntity start(@PathVariable UUID lobbyId) {
         // If the user or the game don't exist, return 404
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
         Optional<Game> lobby = gameRepository.findById(lobbyId);
