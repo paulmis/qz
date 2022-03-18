@@ -21,9 +21,9 @@ import static com.google.inject.Guice.createInjector;
 import client.scenes.GameScreenCtrl;
 import client.scenes.MainCtrl;
 import client.scenes.authentication.LogInScreenCtrl;
-import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
+import client.scenes.authentication.UsernameScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
 import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
@@ -54,7 +54,7 @@ public class Main extends Application {
                 "client", "scenes", "authentication", "LogInScreen.fxml");
         var registerScreen = FXML.load(RegisterScreenCtrl.class,
                 "client", "scenes", "authentication", "RegisterScreen.fxml");
-        var nicknameScreen = FXML.load(NicknameScreenCtrl.class,
+        var nicknameScreen = FXML.load(UsernameScreenCtrl.class,
                 "client", "scenes", "authentication", "NicknameScreen.fxml");
         var lobbyScreen = FXML.load(LobbyScreenCtrl.class,
                 "client", "scenes", "lobby", "LobbyScreen.fxml");

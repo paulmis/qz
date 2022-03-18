@@ -58,7 +58,8 @@ public class RegisterScreenCtrl implements Initializable {
      */
     @FXML
     private void signUpButtonClick() {
-        server.register("asd", emailField.getText(), passwordField.getText(),
+        server.register(mainCtrl.getUsernameScreenCtrl().getUsernameField().getText(),
+                emailField.getText(), passwordField.getText(),
                 (s) -> {
                     javafx.application.Platform.runLater(mainCtrl::showLobbyScreen);
                 },
@@ -77,7 +78,7 @@ public class RegisterScreenCtrl implements Initializable {
     }
 
     /**
-     * Function that resets the message
+     * Function that resets the message.
      */
     @FXML
     private void resetMessage() {

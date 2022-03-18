@@ -17,9 +17,9 @@
 package client.scenes;
 
 import client.scenes.authentication.LogInScreenCtrl;
-import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
+import client.scenes.authentication.UsernameScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
 import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
@@ -35,8 +35,6 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.css.PseudoClass;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -47,7 +45,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import javafx.util.Pair;
 import lombok.Generated;
 
@@ -68,8 +65,8 @@ public class MainCtrl {
     private RegisterScreenCtrl registerScreenCtrl;
     private Parent registerScreen;
 
-    private NicknameScreenCtrl nicknameScreenCtrl;
-    private Parent nicknameScreen;
+    private UsernameScreenCtrl usernameScreenCtrl;
+    private Parent usernameScreen;
 
     private LobbyScreenCtrl lobbyScreenCtrl;
     private Parent lobbyScene;
@@ -96,7 +93,7 @@ public class MainCtrl {
                            Pair<ServerConnectScreenCtrl, Parent> serverConnectScreen,
                            Pair<LogInScreenCtrl, Parent> logInScreen,
                            Pair<RegisterScreenCtrl, Parent> registerScreen,
-                           Pair<NicknameScreenCtrl, Parent> nicknameScreen,
+                           Pair<UsernameScreenCtrl, Parent> nicknameScreen,
                            Pair<LobbyScreenCtrl, Parent> lobbyScreen,
                            Pair<GameScreenCtrl, Parent> gameScreen,
                            Pair<GlobalLeaderboardCtrl, Parent> globalLeaderboardScreen,
@@ -112,8 +109,8 @@ public class MainCtrl {
         this.registerScreen = registerScreen.getValue();
         this.registerScreenCtrl = registerScreen.getKey();
 
-        this.nicknameScreen = nicknameScreen.getValue();
-        this.nicknameScreenCtrl = nicknameScreen.getKey();
+        this.usernameScreen = nicknameScreen.getValue();
+        this.usernameScreenCtrl = nicknameScreen.getKey();
 
         this.lobbyScene = lobbyScreen.getValue();
         this.lobbyScreenCtrl = lobbyScreen.getKey();
@@ -255,9 +252,8 @@ public class MainCtrl {
     /**
      * This function displays the nickname selection screen.
      */
-    public void showNicknameScreen() {
-        this.showScreenLetterBox(nicknameScreen, StageScalingStrategy.Letterbox);
-        nicknameScreenCtrl.reset();
+    public void showUsernameScreen() {
+        this.showScreenLetterBox(usernameScreen, StageScalingStrategy.Letterbox);
     }
 
     /**
@@ -282,6 +278,10 @@ public class MainCtrl {
      */
     public Stage getPrimaryStage() {
         return primaryStage;
+    }
+
+    public UsernameScreenCtrl getUsernameScreenCtrl() {
+        return usernameScreenCtrl;
     }
 
     /**
