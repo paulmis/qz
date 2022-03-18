@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="authenticationAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="1024.0" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.authentication.NicknameScreenCtrl">
+<AnchorPane fx:id="authenticationAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="1024.0" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.authentication.UsernameScreenCtrl">
    <opaqueInsets>
       <Insets />
    </opaqueInsets>
@@ -20,17 +20,17 @@
          <right>
             <Pane fx:id="pane" prefHeight="576.0" prefWidth="278.0" BorderPane.alignment="CENTER">
                <children>
-                  <Label layoutX="46.0" layoutY="348.0" prefHeight="21.0" prefWidth="166.0" text="Nickname">
+                  <Label layoutX="46.0" layoutY="348.0" prefHeight="21.0" prefWidth="166.0" text="Username">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="nicknameField" layoutX="47.0" layoutY="368.0" prefHeight="29.0" prefWidth="170.0">
+                  <TextField fx:id="usernameField" layoutX="47.0" layoutY="368.0" prefHeight="29.0" prefWidth="170.0">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </TextField>
-                  <JFXButton fx:id="nicknameSetButton" alignment="CENTER" layoutX="44.0" layoutY="445.0" mnemonicParsing="false" onMouseClicked="#setNickname" prefHeight="22.0" prefWidth="170.0" text="Register" textAlignment="CENTER" textFill="WHITE">
+                  <JFXButton fx:id="usernameSetButton" alignment="CENTER" layoutX="44.0" layoutY="445.0" mnemonicParsing="false" onMouseClicked="#setUsername" prefHeight="22.0" prefWidth="170.0" text="Register" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>

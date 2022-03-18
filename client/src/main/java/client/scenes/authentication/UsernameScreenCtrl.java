@@ -22,16 +22,15 @@ import lombok.Generated;
 
 
 /**
- * Nickname Selecting Screen controller class.
+ * username Selecting Screen controller class.
  */
-@Generated
-public class NicknameScreenCtrl implements Initializable {
+public class UsernameScreenCtrl implements Initializable {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
-    @FXML private JFXButton nicknameSetButton;
-    @FXML private TextField nicknameField;
+    @FXML private JFXButton usernameSetButton;
+    @FXML private TextField usernameField;
     @FXML private ImageView profilePicture;
     @FXML private ImageView logo;
     @FXML private Label uploadImage;
@@ -39,11 +38,11 @@ public class NicknameScreenCtrl implements Initializable {
     @FXML private Pane pane;
 
     /**
-     * Constructor for the nickname screen control.
+     * Constructor for the username screen control.
      *
      */
     @Inject
-    public NicknameScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public UsernameScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
     }
@@ -62,15 +61,15 @@ public class NicknameScreenCtrl implements Initializable {
 
     /**
      * Function that takes user to lobby list page
-     * after they set a nickname.
+     * after they set a username.
      */
     @FXML
-    private void setNickname() {
-        if (nicknameField.getText().length() > 0) {
-            System.out.print("Welcome " + nicknameField.getText() + " !");
-            mainCtrl.showLobbyListScreen();
+    private void setUsername() {
+        if (usernameField.getText().length() > 0) {
+            System.out.print("Welcome " + usernameField.getText() + " !");
+            mainCtrl.showRegisterScreen();
         } else {
-            System.out.print("No nickname set !");
+            System.out.print("No username set !");
         }
     }
 
@@ -86,7 +85,7 @@ public class NicknameScreenCtrl implements Initializable {
         selectFile.getExtensionFilters().add(imageFilter);
         File pictureFile = selectFile.showOpenDialog(mainCtrl.getPrimaryStage());
         if (pictureFile != null) {
-            nicknameSetButton.setDisable(false);
+            usernameSetButton.setDisable(false);
             uploadImage.setVisible(false);
             profilePicture.setImage(new Image(pictureFile.getAbsolutePath()));
         }
@@ -101,14 +100,18 @@ public class NicknameScreenCtrl implements Initializable {
         return img;
     }
 
+    public TextField getUsernameField() {
+        return usernameField;
+    }
+
     /**
      * Function that resets picture and username
      * in case of logouts.
      */
     public void reset() {
-        nicknameSetButton.setDisable(true);
+        usernameSetButton.setDisable(true);
         profilePicture.setImage(generateImage(200, 200, 200, 1.0));
         uploadImage.setVisible(true);
-        nicknameField.clear();
+        usernameField.clear();
     }
 }

@@ -23,11 +23,11 @@
     -fx-background-color: white
 }
 
-#nicknameField{
+#usernameField{
     -fx-background-color: #C4C4C4;
 }
 
-#nicknameSetButton{
+#usernameSetButton{
     -fx-background-color: #6EB26C;
 }
 
