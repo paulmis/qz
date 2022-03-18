@@ -31,7 +31,7 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="emailField" layoutX="47.0" layoutY="242.0" prefHeight="22.0" prefWidth="161.0">
+                  <TextField fx:id="emailField" layoutX="47.0" layoutY="242.0" onKeyTyped="#resetMessage" prefHeight="22.0" prefWidth="161.0">
                      <font>
                         <Font size="13.0" />
                      </font>
@@ -66,6 +66,11 @@
                         <Image url="@/client/images/logo.png" />
                      </image>
                   </ImageView>
+                  <Label fx:id="userExists" layoutX="73.0" layoutY="397.0" text="Email already exists !" textFill="RED">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
                </children>
             </Pane>
          </right>

@@ -131,9 +131,54 @@ public class ServerUtils {
         }
     }
 
-    public String register(String email, String password) {
-        System.out.println("Registering new User...\n");
-        return "200";
+    /**
+     * Handler for when the register succeds.
+     */
+    public interface RegisterHandlerSuccess {
+        void handle(String token);
+    }
+
+    /**
+     * Handler for when the register fails.
+     */
+    public interface RegisterHandlerFail {
+        void handle();
+    }
+
+    /**
+     * Function that registers a new user.
+     *
+     * @param username string representing
+     *              the email of the user.
+     * @param email string representing
+     *              the email of the user.
+     * @param password string representing
+     *                 the password of the user.
+     */
+    public void register(String username, String email, String password,
+                           RegisterHandlerSuccess registerHandlerSuccess, RegisterHandlerFail registerHandlerFail) {
+        client = ClientBuilder.newClient(new ClientConfig());
+        UserDTO user = new UserDTO("", email, password);
+        var invocation = client
+                .target(SERVER).path("/api/auth/register")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPost(Entity.entity(user, APPLICATION_JSON));
+        invocation.submit(new InvocationCallback<String>() {
+
+            @Override
+            public void completed(String o) {
+                registerHandlerSuccess.handle(o);
+                client = client.register(new Authenticator(o));
+                loggedIn = true;
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                registerHandlerFail.handle();
+                System.out.println(throwable);
+            }
+        });
     }
 
     /**

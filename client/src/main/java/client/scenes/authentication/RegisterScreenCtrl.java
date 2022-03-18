@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import lombok.Generated;
 
@@ -27,6 +28,7 @@ public class RegisterScreenCtrl implements Initializable {
     @FXML private CheckBox rememberMe;
     @FXML private TextField emailField;
     @FXML private TextField passwordField;
+    @FXML private Label userExists;
 
     /**
      * Constructor for the register screen control.
@@ -47,6 +49,7 @@ public class RegisterScreenCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.userExists.setVisible(false);
     }
 
     /**
@@ -55,13 +58,13 @@ public class RegisterScreenCtrl implements Initializable {
      */
     @FXML
     private void signUpButtonClick() {
-        if (emailField.getText().length() > 0 && passwordField.getText().length() > 0) {
-            server.register(emailField.getText(), passwordField.getText());
-            System.out.print("Registering new account credentials...");
-            mainCtrl.showNicknameScreen();
-        } else {
-            System.out.print("Can't have empty username or password ! Try again");
-        }
+        server.register("asd", emailField.getText(), passwordField.getText(),
+                (s) -> {
+                    javafx.application.Platform.runLater(mainCtrl::showLobbyScreen);
+                },
+                () -> javafx.application.Platform.runLater(() -> {
+                    userExists.setVisible(true); })
+        );
     }
 
     /**
@@ -71,6 +74,14 @@ public class RegisterScreenCtrl implements Initializable {
     @FXML
     private void haveAccountButtonClick() {
         mainCtrl.showLogInScreen();
+    }
+
+    /**
+     * Function that resets the message
+     */
+    @FXML
+    private void resetMessage() {
+        this.userExists.setVisible(false);
     }
 
     /**
