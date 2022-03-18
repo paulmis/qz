@@ -254,4 +254,27 @@ public class LobbyController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /**
+     * Endpoint to allow a player to leave the lobby.
+     *
+     * @return 404 if the player isn't in a lobby, 200 otherwise
+     */
+    @DeleteMapping("/leave")
+    ResponseEntity leave() {
+        // If the user or the game don't exist, return 404
+        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        if (user.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Check that the user is in a lobby and remove them
+        Optional<Game> lobby =
+                gameRepository.findByPlayers_User_IdEqualsAndStatus(user.get().getId(), GameStatus.CREATED);
+        if (lobby.isEmpty() || !lobbyService.removePlayer(lobby.get(), user.get())) {
+            return ResponseEntity.notFound().build();
+        }
+        gameRepository.save(lobby.get());
+
+        return ResponseEntity.ok().build();
+    }
 }
