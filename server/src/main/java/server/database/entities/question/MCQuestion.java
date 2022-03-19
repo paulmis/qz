@@ -4,11 +4,14 @@ import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import server.database.entities.Answer;
 

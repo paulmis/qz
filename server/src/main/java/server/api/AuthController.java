@@ -19,7 +19,7 @@ import server.database.repositories.UserRepository;
  * Controller that handles authentication requests.
  */
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired

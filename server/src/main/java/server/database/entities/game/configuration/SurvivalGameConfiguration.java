@@ -2,7 +2,10 @@ package server.database.entities.game.configuration;
 
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

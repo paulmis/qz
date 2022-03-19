@@ -1,17 +1,19 @@
 package server.api;
 
 import commons.entities.QuestionDTO;
-import commons.entities.game.GameStatus;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
-import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;

@@ -1,5 +1,6 @@
 package server.api;
 
+import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.util.NoSuchElementException;
@@ -64,9 +65,7 @@ public class SSEController {
             game.emitters.register(user.getId(), emitter);
 
             // The client will wait for a first event in order to start.
-            SseEmitter.SseEventBuilder event = SseEmitter.event()
-                    .name(SSEMessageType.INIT.name());
-            emitter.send(event);
+            emitter.send(new SSEMessage(SSEMessageType.INIT));
 
             return ResponseEntity.ok(emitter);
         } catch (NoSuchElementException e) {
