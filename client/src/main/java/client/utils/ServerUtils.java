@@ -157,7 +157,7 @@ public class ServerUtils {
      */
     public void register(String username, String email, String password,
                            RegisterHandlerSuccess registerHandlerSuccess, RegisterHandlerFail registerHandlerFail) {
-        client = ClientBuilder.newClient(new ClientConfig());
+        client = this.newClient();
         UserDTO user = new UserDTO(username, email, password);
         var invocation = client
                 .target(SERVER).path("/api/auth/register")
