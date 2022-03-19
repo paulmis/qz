@@ -3,9 +3,11 @@ package server.services;
 import commons.entities.messages.SSEMessage;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import server.utils.CommunicationHelpers;
 
@@ -83,7 +85,7 @@ public class SSEManager {
      * @return Whether the message was successfully sent or not.
      * @throws IOException If the message could not be sent.
      */
-    public boolean send(UUID userId, Object message) throws IOException {
+    public boolean send(UUID userId, Set<ResponseBodyEmitter.DataWithMediaType> message) throws IOException {
         if (!emitters.containsKey(userId)) {
             log.debug("Cannot send message: user {} has no registered emitter", userId);
             return false;
@@ -112,7 +114,7 @@ public class SSEManager {
      * @return Whether the message was sent to all specified users or not.
      * @throws IOException If the message could not be sent.
      */
-    public boolean send(Iterable<UUID> users, Object message) throws IOException {
+    public boolean send(Iterable<UUID> users, Set<ResponseBodyEmitter.DataWithMediaType> message) throws IOException {
         boolean success = true;
         for (UUID userId : users) {
             success &= send(userId, message);
@@ -138,7 +140,7 @@ public class SSEManager {
      * @param message Message to send.
      * @throws IOException If the message could not be sent.
      */
-    public void sendAll(Object message) throws IOException {
+    public void sendAll(Set<ResponseBodyEmitter.DataWithMediaType> message) throws IOException {
         for (SseEmitter emitter : emitters.values()) {
             emitter.send(message);
         }

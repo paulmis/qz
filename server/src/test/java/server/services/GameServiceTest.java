@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import static server.TestHelpers.getUUID;
 
 import commons.entities.game.GameStatus;
+import commons.entities.messages.SSEMessage;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -195,7 +196,7 @@ public class GameServiceTest {
 
         // Verify interactions
         verify(sseManager, times(1)).disconnect(joe.getId());
-        verify(sseManager, times(1)).sendAll(any());
+        verify(sseManager, times(1)).sendAll(any(SSEMessage.class));
         verifyNoMoreInteractions(game.getEmitters());
     }
 
@@ -215,7 +216,7 @@ public class GameServiceTest {
 
         // Verify interactions
         verify(sseManager, times(1)).disconnect(joe.getId());
-        verify(sseManager, times(1)).sendAll(any());
+        verify(sseManager, times(1)).sendAll(any(SSEMessage.class));
         verifyNoMoreInteractions(game.getEmitters());
     }
 
