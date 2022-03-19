@@ -2,6 +2,8 @@ package server.database.entities;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static server.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -9,19 +11,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.MCQuestion;
+import server.services.SSEManager;
 
 /**
  * Tests for NormalGame class.
  */
+@ExtendWith(MockitoExtension.class)
 public class NormalGameTest {
     NormalGame game;
     NormalGameConfiguration config;
@@ -31,6 +43,9 @@ public class NormalGameTest {
     GamePlayer susannePlayer;
     MCQuestion questionA;
     MCQuestion questionB;
+
+    @Captor
+    private ArgumentCaptor<SSEMessage> sseMessageCaptor;
 
     @BeforeEach
     void init() {
@@ -82,6 +97,24 @@ public class NormalGameTest {
                 .usingRecursiveComparison()
                 .ignoringFields("players", "questions", "host", "random")
                 .isEqualTo(repl);
+    }
+
+    @Test
+    void setAcceptingAnswersTrue() throws IOException {
+        SSEManager manager = Mockito.spy(new SSEManager());
+        game.setEmitters(manager);
+        game.setAcceptingAnswers(true);
+        verify(manager).sendAll(sseMessageCaptor.capture());
+        assertEquals(SSEMessageType.START_QUESTION, sseMessageCaptor.getValue().getType());
+    }
+
+    @Test
+    void setAcceptingAnswersFalse() throws IOException {
+        SSEManager manager = Mockito.spy(new SSEManager());
+        game.setEmitters(manager);
+        game.setAcceptingAnswers(false);
+        verify(manager).sendAll(sseMessageCaptor.capture());
+        assertEquals(SSEMessageType.STOP_QUESTION, sseMessageCaptor.getValue().getType());
     }
 
     @Test

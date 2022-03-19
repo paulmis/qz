@@ -11,6 +11,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.AnswerDTO;
 import commons.entities.UserDTO;
 import commons.entities.game.GameStatus;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -82,7 +83,7 @@ class AnswerControllerTest {
     }
 
     @BeforeEach
-    private void init() {
+    private void init() throws IOException {
         // Setup mock question
         mockQuestion = new MCQuestion();
         mockQuestion.setActivities(List.of(

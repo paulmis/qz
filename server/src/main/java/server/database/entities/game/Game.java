@@ -6,6 +6,9 @@ import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -236,6 +239,20 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     @Transient
     protected boolean acceptingAnswers = false;
+
+    /**
+     * Toggle whether the players are allowed to submit an answer or not, and notify players about the change.
+     *
+     * @param acceptingAnswers whether the players are allowed to submit an answer or not.
+     */
+    public void setAcceptingAnswers(boolean acceptingAnswers) throws IOException {
+        this.acceptingAnswers = acceptingAnswers;
+        if (this.isAcceptingAnswers()) {
+            this.emitters.sendAll(new SSEMessage(SSEMessageType.START_QUESTION));
+        } else {
+            this.emitters.sendAll(new SSEMessage(SSEMessageType.STOP_QUESTION));
+        }
+    }
 
     /**
      * Adds questions to the game.
