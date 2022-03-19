@@ -54,7 +54,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * The game configuration.
      */
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
     protected GameConfiguration configuration;
 
     /**

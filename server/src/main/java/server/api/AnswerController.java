@@ -16,13 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import server.database.entities.answer.Answer;
 import server.database.entities.User;
+import server.database.entities.answer.Answer;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.entities.question.Activity;
 import server.database.entities.question.Question;
-import server.database.repositories.AnswerRepository;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
@@ -46,9 +45,6 @@ public class AnswerController {
 
     @Autowired
     private ActivityRepository activityRepository;
-
-    @Autowired
-    private AnswerRepository answerRepository;
 
     /**
      * Sends the users answers to the server.
@@ -101,7 +97,6 @@ public class AnswerController {
                 .collect(Collectors.toList()));
         if (game.addAnswer(userAnswer, user.getId())) {
             // Save updated game
-            answerRepository.save(userAnswer);
             gameRepository.save(game);
 
             // Answer has been received successfully.

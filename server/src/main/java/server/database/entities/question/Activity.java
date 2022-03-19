@@ -1,6 +1,7 @@
 package server.database.entities.question;
 
 import commons.entities.ActivityDTO;
+import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
@@ -14,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.URL;
 import org.modelmapper.ModelMapper;
 import server.database.entities.utils.BaseEntity;
-import java.util.UUID;
 
 /**
  * Activity data structure - describes a single activity and its energetic cost.

@@ -36,6 +36,7 @@ import server.database.entities.User;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
+import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.question.Activity;
 import server.database.entities.question.MCQuestion;
@@ -62,6 +63,7 @@ class AnswerControllerTest {
 
     private static Activity getActivity(int id) {
         Activity a = new Activity();
+        a.setId(getUUID(id));
         a.setDescription("Activity" + (id + 1));
         a.setCost(2 + id * 4);
         return a;
@@ -96,7 +98,9 @@ class AnswerControllerTest {
         mockLobby.setStatus(GameStatus.ONGOING);
         mockLobby.setQuestions(List.of(mockQuestion));
         mockLobby.setCurrentQuestion(0);
-        mockLobby.setConfiguration(new NormalGameConfiguration());
+        GameConfiguration conf = new NormalGameConfiguration();
+        conf.setCapacity(1);
+        mockLobby.setConfiguration(conf);
         when(gameRepository.existsById(mockLobby.getId())).thenReturn(true);
         when(gameRepository.findById(mockLobby.getId())).thenReturn(Optional.of(mockLobby));
 
@@ -119,6 +123,7 @@ class AnswerControllerTest {
                         joe.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
         when(userRepository.findByEmail(joe.getEmail())).thenReturn(Optional.of(joe));
+
     }
 
     private URI answerEndpoint(UUID gameId, Optional<Integer> questionIdx) {
@@ -150,6 +155,7 @@ class AnswerControllerTest {
     public void userAnswerOkTest() throws Exception {
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
+        userAnswer.setResponse(List.of(mockQuestion.getActivities().get(0).getDTO()));
         this.mockMvc
                 .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))
                         .contentType(MediaType.APPLICATION_JSON)

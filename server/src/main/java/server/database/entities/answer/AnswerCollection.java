@@ -21,6 +21,9 @@ import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.utils.BaseEntity;
 
+/**
+ * Relation entity to collect all answers for a given question.
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
