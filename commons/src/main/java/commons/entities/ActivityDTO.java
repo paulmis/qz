@@ -24,7 +24,7 @@ public class ActivityDTO implements DTO {
     /**
      * Energy consumption of the activity.
      */
-    protected int cost;
+    protected long cost;
 
     /**
      * URL of the picture of the activity.
