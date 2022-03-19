@@ -62,7 +62,7 @@ public class LogInScreenCtrl implements Initializable {
     private void logInButtonClick() {
         server.logIn(emailField.getText(), passwordField.getText(),
                 (s) -> {
-                    javafx.application.Platform.runLater(mainCtrl::showLobbyScreen);
+                    javafx.application.Platform.runLater(mainCtrl::showLobbyListScreen);
                 },
                 () -> javafx.application.Platform.runLater(() -> {
                     wrongCredentials.setVisible(true); })

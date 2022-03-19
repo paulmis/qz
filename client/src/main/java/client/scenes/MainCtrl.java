@@ -21,6 +21,7 @@ import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
+import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
@@ -72,6 +73,9 @@ public class MainCtrl {
     private GlobalLeaderboardCtrl globalLeaderboardCtrl;
     private Parent globalLeaderboardScreen;
 
+    private LobbyListCtrl lobbyListCtrl;
+    private Parent lobbyListScreen;
+
     private Popup lobbySettingsPopUp;
 
     /**
@@ -86,7 +90,8 @@ public class MainCtrl {
                            Pair<NicknameScreenCtrl, Parent> nicknameScreen,
                            Pair<LobbyScreenCtrl, Parent> lobbyScreen,
                            Pair<GameScreenCtrl, Parent> gameScreen,
-                           Pair<GlobalLeaderboardCtrl, Parent> globalLeaderboardScreen) {
+                           Pair<GlobalLeaderboardCtrl, Parent> globalLeaderboardScreen,
+                           Pair<LobbyListCtrl, Parent> lobbyListScreen) {
         this.primaryStage = primaryStage;
 
         this.serverConnectScreen = serverConnectScreen.getValue();
@@ -109,6 +114,9 @@ public class MainCtrl {
 
         this.globalLeaderboardScreen = globalLeaderboardScreen.getValue();
         this.globalLeaderboardCtrl = globalLeaderboardScreen.getKey();
+
+        this.lobbyListScreen = lobbyListScreen.getValue();
+        this.lobbyListCtrl = lobbyListScreen.getKey();
 
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
@@ -198,7 +206,6 @@ public class MainCtrl {
 
     /**
      * This function displays the server connect screen.
-     * It also sets it min width and height
      */
     public void showServerConnectScreen() {
         this.showScreenLetterBox(serverConnectScreen, StageScalingStrategy.Letterbox);
@@ -206,7 +213,6 @@ public class MainCtrl {
 
     /**
      * This function displays the global leaderboard screen.
-     * It also sets it min width and height
      */
     public void showGlobalLeaderboardScreen() {
         this.showScreenLetterBox(globalLeaderboardScreen, StageScalingStrategy.Letterbox);
@@ -214,8 +220,15 @@ public class MainCtrl {
     }
 
     /**
+     * This function displays the lobby list screen.
+     */
+    public void showLobbyListScreen() {
+        this.showScreenLetterBox(lobbyListScreen, StageScalingStrategy.Letterbox);
+        lobbyListCtrl.reset();
+    }
+
+    /**
      * This function displays the log in screen.
-     * It also sets it min width and height.
      */
     public void showLogInScreen() {
         this.showScreenLetterBox(logInScreen, StageScalingStrategy.Letterbox);
@@ -223,7 +236,6 @@ public class MainCtrl {
 
     /**
      * This function displays the register screen.
-     * It also sets it min width and height
      */
     public void showRegisterScreen() {
         this.showScreenLetterBox(registerScreen, StageScalingStrategy.Letterbox);
@@ -231,7 +243,6 @@ public class MainCtrl {
 
     /**
      * This function displays the nickname selection screen.
-     * It also sets it min width and height
      */
     public void showNicknameScreen() {
         this.showScreenLetterBox(nicknameScreen, StageScalingStrategy.Letterbox);
@@ -247,7 +258,6 @@ public class MainCtrl {
 
     /**
      * This function displays the game screen.
-     * It also sets it min width and height.
      */
     public void showGameScreen() {
         this.showScreenLetterBox(gameScreen, StageScalingStrategy.Letterbox);

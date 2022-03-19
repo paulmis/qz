@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import commons.entities.UserDTO;
+import commons.entities.game.GameDTO;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import java.net.URL;
@@ -133,7 +134,7 @@ public class ServerUtils {
     }
 
     /**
-     * Handler for when the log in succeds.
+     * Handler for when the log in succeeds.
      */
     public interface LogInHandlerSuccess {
         void handle(String token);
@@ -178,6 +179,90 @@ public class ServerUtils {
             public void failed(Throwable throwable) {
                 logInHandlerFail.handle();
                 System.out.println(throwable);
+            }
+        });
+    }
+
+
+    /**
+     * Handler for when the create lobby succeeds.
+     */
+    public interface CreateLobbyHandlerSuccess {
+        void handle(NormalGameDTO game);
+    }
+
+    /**
+     * Handler for when the create lobby fails.
+     */
+    public interface CreateLobbyHandlerFail {
+        void handle();
+    }
+
+    public void createLobby(CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
+                            CreateLobbyHandlerFail createLobbyHandlerFail) {
+        client = this.newClient();
+        var config = new NormalGameConfigurationDTO(null, 60, 1, 20);
+        var game = new NormalGameDTO();
+        game.setId(UUID.randomUUID());
+        game.setConfiguration(config);
+
+        var invocation = client
+                .target(SERVER).path("/api/lobby")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPost(Entity.entity(game, APPLICATION_JSON));
+
+        invocation.submit(new InvocationCallback<NormalGameDTO>() {
+
+            @Override
+            public void completed(NormalGameDTO o) {
+                createLobbyHandlerSuccess.handle(o);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                createLobbyHandlerFail.handle();
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Handler for when getting all lobbies succeeds.
+     */
+    public interface GetLobbiesHandlerSuccess {
+        void handle(List<GameDTO> games);
+    }
+
+    /**
+     * Handler for when getting all lobbies fails.
+     */
+    public interface GetLobbiesHandlerFail {
+        void handle();
+    }
+
+    public void getLobbies(GetLobbiesHandlerSuccess getLobbiesHandlerSuccess,
+                            GetLobbiesHandlerFail getLobbiesHandlerFail) {
+        client = this.newClient();
+
+        var invocation = client
+                .target(SERVER).path("/api/lobby/available")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildGet();
+
+        invocation.submit(new InvocationCallback<List<GameDTO>>() {
+
+            @Override
+            public void completed(List<GameDTO> o) {
+                System.out.println(o);
+                getLobbiesHandlerSuccess.handle(o);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                getLobbiesHandlerFail.handle();
+                throwable.printStackTrace();
             }
         });
     }
