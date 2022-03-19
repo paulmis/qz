@@ -54,4 +54,8 @@ public class ConfigurationScreenPane extends StackPane {
     public ConfigurationScreenPane(GameConfigurationDTO gameConfig, ConfigurationScreenCtrl.SaveHandler saveHandler) {
         setUpScreen(new ConfigurationScreenCtrl(gameConfig, saveHandler));
     }
+
+    public void makeTransparent() {
+        this.controller.makeTransparent();
+    }
 }

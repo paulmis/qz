@@ -4,17 +4,20 @@ import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.net.URL;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+/**
+ * The lobby list item controller.
+ * Controls a lobby list item.
+ */
 public class LobbyListItemCtrl implements Initializable {
     @FXML private AnchorPane lobbyInfoPane;
     @FXML private JFXButton showLobbyInfoButton;
@@ -54,19 +57,29 @@ public class LobbyListItemCtrl implements Initializable {
         );
 
         this.topLevelAnchorPane.maxHeightProperty().bind(
-                Bindings.when(lobbyInfoPane.visibleProperty()).then(63).otherwise(0)
+                Bindings.when(lobbyInfoPane.visibleProperty()).then(163).otherwise(63)
         );
+
+        this.topLevelAnchorPane.minHeightProperty().bind(this.topLevelAnchorPane.maxHeightProperty());
+        this.topLevelAnchorPane.prefHeightProperty().bind(topLevelAnchorPane.maxHeightProperty());
 
         this.expandIcon.glyphNameProperty().bind(
                 Bindings.when(lobbyInfoPane.visibleProperty()).then("ANGLE_UP").otherwise("ANGLE_DOWN")
         );
 
         var extraInfoScreen = new ConfigurationScreenPane(game.getConfiguration());
+        extraInfoScreen.makeTransparent();
         this.lobbyInfoPane.getChildren().add(extraInfoScreen);
-        AnchorPane.setBottomAnchor(extraInfoScreen,0d);
-        AnchorPane.setTopAnchor(extraInfoScreen,0d);
-        AnchorPane.setLeftAnchor(extraInfoScreen,0d);
-        AnchorPane.setRightAnchor(extraInfoScreen,0d);
+        AnchorPane.setBottomAnchor(extraInfoScreen, 0d);
+        AnchorPane.setTopAnchor(extraInfoScreen, 0d);
+        AnchorPane.setLeftAnchor(extraInfoScreen, 0d);
+        AnchorPane.setRightAnchor(extraInfoScreen, 0d);
+
+        var lobbyFull = game.getPlayers().size() == game.getConfiguration().getCapacity();
+
+        this.joinLobbyButton.setText((lobbyFull ? "FULL " : "JOIN ")
+                        + game.getPlayers().size() + "/" + game.getConfiguration().getCapacity());
+        this.joinLobbyButton.setDisable(lobbyFull);
     }
 
     @FXML

@@ -15,9 +15,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576" prefWidth="1024" style="-fx-background-color: lightGreen;" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.lobby.LobbyListCtrl">
+<AnchorPane fx:id="lobbyListAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576" prefWidth="1024" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.lobby.LobbyListCtrl">
    <children>
-      <AnchorPane prefHeight="50.0" prefWidth="1024.0" style="-fx-background-color: white;">
+      <AnchorPane fx:id="lobbyListTopBar" prefHeight="50.0" prefWidth="1024.0">
          <children>
             <Label layoutX="409.0" layoutY="7.0" text="Search for a lobby">
                <font>
@@ -41,7 +41,7 @@
             </JFXButton>
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="212.0" layoutY="69.0" prefHeight="507.0" prefWidth="600.0" style="-fx-background-color: white; -fx-background-radius: 10 10 0 0;">
+      <AnchorPane fx:id="lobbyListItemsAnchorPane" layoutX="212.0" layoutY="69.0" prefHeight="507.0" prefWidth="605.0">
          <children>
             <TextField fx:id="searchField" layoutX="14.0" layoutY="21.0" prefHeight="45.0" prefWidth="499.0" promptText="Search by game name, type or username">
                <font>
@@ -58,14 +58,14 @@
                   <FontAwesomeIconView glyphName="PLUS" size="40" />
                </graphic>
             </JFXButton>
-            <ScrollPane hbarPolicy="NEVER" layoutX="14.0" layoutY="77.0" pannable="true" prefHeight="423.0" prefWidth="569.0" vbarPolicy="NEVER">
+            <ScrollPane hbarPolicy="NEVER" layoutX="5.0" layoutY="77.0" pannable="true" prefHeight="423.0" prefWidth="595.0" vbarPolicy="NEVER">
                <content>
-                  <VBox fx:id="lobbyListVbox" prefHeight="425.0" prefWidth="569.0" />
+                  <VBox fx:id="lobbyListVbox" alignment="TOP_CENTER" prefHeight="425.0" prefWidth="599.0" />
                </content>
             </ScrollPane>
          </children>
       </AnchorPane>
-      <GridPane fx:id="userPanelGrid" layoutX="786.0" layoutY="60.0" maxWidth="223.0" prefHeight="100.0" prefWidth="223.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-view-order: -1; -fx-effect: dropshadow(three-pass-box, gray, 2, 10.0, 0, 0);" visible="false">
+      <GridPane fx:id="userPanelGrid" layoutX="786.0" layoutY="60.0" maxWidth="223.0" prefHeight="100.0" prefWidth="223.0">
          <columnConstraints>
             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
          </columnConstraints>
@@ -87,7 +87,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
                <children>
-                  <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="playerImageView" fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../../../../../../../../../../Downloads/index.jpg" />
                      </image>
@@ -95,7 +95,7 @@
                   <TextField fx:id="usernameField" editable="false" prefHeight="25.0" prefWidth="99.0" text="Andy Zaidman" GridPane.columnIndex="1" />
                   <JFXButton fx:id="editButton" alignment="CENTER" buttonType="RAISED" contentDisplay="GRAPHIC_ONLY" onAction="#editButtonClick" prefHeight="40.0" prefWidth="40.0" text="Leaderboard" textFill="WHITE" GridPane.columnIndex="2">
                      <graphic>
-                        <FontAwesomeIconView glyphName="EDIT" size="24" />
+                        <FontAwesomeIconView fx:id="editIcon" glyphName="EDIT" size="24" />
                      </graphic>
                   </JFXButton>
                </children>
@@ -111,7 +111,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
                <children>
-                  <JFXButton fx:id="signOutButton" onAction="#signOutButtonClick" prefHeight="32.0" prefWidth="203.0" text="Sign out" textFill="RED">
+                  <JFXButton fx:id="signOutButton" onAction="#signOutButtonClick" prefHeight="32.0" prefWidth="203.0" text="Sign out">
                      <graphic>
                         <FontAwesomeIconView glyphName="SIGN_OUT" size="24" />
                      </graphic>
