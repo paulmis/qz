@@ -47,6 +47,7 @@ public class ServerUtils {
     private static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
             .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
     public static boolean loggedIn = false;
+    public static UUID lobbyId = null;
 
     /**
      * This function creates a new client with the mandatory
@@ -56,6 +57,7 @@ public class ServerUtils {
      */
     private Client newClient() {
         loggedIn = false;
+        lobbyId = null;
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
@@ -207,7 +209,7 @@ public class ServerUtils {
      */
     public void createLobby(CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
                             CreateLobbyHandlerFail createLobbyHandlerFail) {
-        var config = new NormalGameConfigurationDTO(null, 60, 8, 20);
+        var config = new NormalGameConfigurationDTO(null, 60, 1, 20);
         var game = new NormalGameDTO();
         game.setId(UUID.randomUUID());
         game.setConfiguration(config);
@@ -223,6 +225,7 @@ public class ServerUtils {
             @Override
             public void completed(NormalGameDTO o) {
                 System.out.println(o);
+                ServerUtils.lobbyId = o.getId();
                 createLobbyHandlerSuccess.handle(o);
             }
 
@@ -312,6 +315,7 @@ public class ServerUtils {
             @Override
             public void completed(GameDTO o) {
                 System.out.println(o);
+                ServerUtils.lobbyId = o.getId();
                 joinLobbyHandlerSuccess.handle(o);
             }
 
@@ -379,25 +383,10 @@ public class ServerUtils {
      * @param sseHandler The handler of sse events, exceptions and completion.
      */
     public void subscribeToSSE(SSEHandler sseHandler) {
-
-        // The following lines create a new game and start it.
-        // These should be removed when we have proper lobby joining and creating implemented.
-        var config = new NormalGameConfigurationDTO(null, 60, 1, 20);
-        var game = new NormalGameDTO();
-        game.setId(UUID.randomUUID());
-        game.setConfiguration(config);
-
-        var r  = client.target(SERVER).path("/api/lobby")
+        client.target(SERVER).path("/api/lobby/" + lobbyId + "/start")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .post(Entity.entity(game, APPLICATION_JSON));
-
-        var lobby = r.readEntity(NormalGameDTO.class);
-
-        client.target(SERVER).path("/api/lobby/" + lobby.getId() + "/start")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .put(Entity.entity(game, APPLICATION_JSON));
+                .put(Entity.entity("", APPLICATION_JSON));
 
         // This creates the WebTarget that the sse event source will use.
         var target = client.target(SERVER).path("api/sse/open");
