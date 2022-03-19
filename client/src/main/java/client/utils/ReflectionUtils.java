@@ -1,6 +1,6 @@
 package client.utils;
 
-import commons.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -74,7 +74,7 @@ public class ReflectionUtils {
      * @param method the requested method.
      * @return the sse event name enum.
      */
-    public static SSEMessage getSSEEventName(@NonNull Method method) {
+    public static SSEMessageType getSSEEventName(@NonNull Method method) {
         if (!method.isAnnotationPresent(SSEEventHandler.class)) {
             throw new IllegalArgumentException();
         }

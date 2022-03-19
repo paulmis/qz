@@ -3,7 +3,7 @@ package client.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import commons.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -41,7 +41,7 @@ public class ReflectionUtilsTest {
         public Float balance;
         public Integer brothers;
 
-        @SSEEventHandler(SSEMessage.Init)
+        @SSEEventHandler(SSEMessageType.INIT)
         public void getBalance() {
 
         }
@@ -108,7 +108,7 @@ public class ReflectionUtilsTest {
         var otherMethod = personObj.getClass().getMethod("otherFunction");
 
         assertThrows(IllegalArgumentException.class, () -> ReflectionUtils.getSSEEventName(otherMethod));
-        assertEquals(SSEMessage.Init, ReflectionUtils.getSSEEventName(getBalanceMethod));
+        assertEquals(SSEMessageType.INIT, ReflectionUtils.getSSEEventName(getBalanceMethod));
     }
 
 }

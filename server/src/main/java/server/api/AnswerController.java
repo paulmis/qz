@@ -50,8 +50,14 @@ public class AnswerController {
             @RequestBody AnswerDTO answerData,
             @PathVariable @NonNull UUID gameId) {
         //Check if game exists.
-        if (!gameRepository.existsById(gameId)) {
+        Optional<Game> game = gameRepository.findById(gameId);
+        if (game.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // Check if the game is accepting answers.
+        if (!game.get().isAcceptingAnswers()) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
 
         //Send 200 status if answer is sent successfully.

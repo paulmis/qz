@@ -1,12 +1,13 @@
 package server.services;
 
+import commons.entities.messages.SSEMessage;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import server.utils.CommunicationHelpers;
 
 /**
  * Manager class to handle SSE emitters.
@@ -92,6 +93,18 @@ public class SSEManager {
     }
 
     /**
+     * Send a message to a single user.
+     *
+     * @param userId User ID to send the message to.
+     * @param message Message to send.
+     * @return Whether the message was successfully sent or not.
+     * @throws IOException If the message could not be sent.
+     */
+    public boolean send(UUID userId, SSEMessage message) throws IOException {
+        return send(userId, CommunicationHelpers.createSseEvent(message));
+    }
+
+    /**
      * Send a message to multiple users.
      *
      * @param users User IDs to send the message to.
@@ -108,6 +121,18 @@ public class SSEManager {
     }
 
     /**
+     * Send a message to multiple users.
+     *
+     * @param users User IDs to send the message to.
+     * @param message Message to send.
+     * @return Whether the message was sent to all specified users or not.
+     * @throws IOException If the message could not be sent.
+     */
+    public boolean send(Iterable<UUID> users, SSEMessage message) throws IOException {
+        return send(users, CommunicationHelpers.createSseEvent(message));
+    }
+
+    /**
      * Send a message to all users.
      *
      * @param message Message to send.
@@ -117,6 +142,16 @@ public class SSEManager {
         for (SseEmitter emitter : emitters.values()) {
             emitter.send(message);
         }
+    }
+
+    /**
+     * Send a message to all users.
+     *
+     * @param message Message to send.
+     * @throws IOException If the message could not be sent.
+     */
+    public void sendAll(SSEMessage message) throws IOException {
+        sendAll(CommunicationHelpers.createSseEvent(message));
     }
 
     /**

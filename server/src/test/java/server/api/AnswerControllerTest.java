@@ -98,6 +98,7 @@ class AnswerControllerTest {
         mockLobby.setStatus(GameStatus.ONGOING);
         mockLobby.setQuestions(List.of(mockQuestion));
         mockLobby.setCurrentQuestion(0);
+        mockLobby.setAcceptingAnswers(true);
         when(gameRepository.existsById(mockLobby.getId())).thenReturn(true);
         when(gameRepository.findById(mockLobby.getId())).thenReturn(Optional.of(mockLobby));
 
@@ -156,6 +157,20 @@ class AnswerControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userAnswer)))
                 .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void putAnswerNotAcceptingTest() throws Exception {
+        mockLobby.setAcceptingAnswers(false);
+
+        // Request
+        AnswerDTO userAnswer = new AnswerDTO();
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userAnswer)))
+                .andExpect(status().isNotAcceptable());
     }
 
     @Test

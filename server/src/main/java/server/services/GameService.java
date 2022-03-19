@@ -1,7 +1,8 @@
 package server.services;
 
-import commons.SSEMessage;
 import commons.entities.game.GameStatus;
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +13,6 @@ import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
 import server.database.entities.game.Game;
@@ -120,10 +120,7 @@ public class GameService {
         try {
             game
                 .getEmitters()
-                .sendAll(
-                    SseEmitter.event()
-                        .name(SSEMessage.PlayerLeft.toString())
-                        .data(user.getId()));
+                .sendAll(new SSEMessage(SSEMessageType.PLAYER_LEFT, user.getId()));
         } catch (IOException ex) {
             // Log failure to update clients
             log.error("Unable to send removePlayer message to all players", ex);
