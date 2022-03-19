@@ -1,8 +1,11 @@
 package server.api;
 
+import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +20,12 @@ import server.database.entities.Answer;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
+import server.database.entities.question.Activity;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
+import server.database.repositories.question.ActivityRepository;
 
 /**
  * AnswerController, controller for all api endpoints of question answers.
@@ -37,6 +42,9 @@ public class AnswerController {
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
+
+    @Autowired
+    private ActivityRepository activityRepository;
 
     /**
      * Sends the users answers to the server.
@@ -67,7 +75,24 @@ public class AnswerController {
         }
 
         // Update the answer
-        if (game.addAnswer(new Answer(answerData), user.getId())) {
+        Answer userAnswer = new Answer();
+        userAnswer.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        userAnswer.setResponse(answerData.getResponse().stream()
+                .map(new Function<ActivityDTO, Optional<Activity>>() {
+                    @Override
+                    public Optional<Activity> apply(ActivityDTO dto) {
+                        Optional<Activity> activity = activityRepository.findById(dto.getId());
+                        if (activity.isPresent()) {
+                            return activity;
+                        } else {
+                            return activityRepository
+                                    .findByDescriptionAndCost(dto.getDescription(), dto.getCost());
+                        }
+                    }
+                }).filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList()));
+        if (game.addAnswer(userAnswer, user.getId())) {
             // Save updated game
             gameRepository.save(game);
 
