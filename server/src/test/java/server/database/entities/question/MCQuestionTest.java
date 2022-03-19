@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import server.database.entities.Answer;
+import server.database.entities.answer.Answer;
 
 class MCQuestionTest {
 

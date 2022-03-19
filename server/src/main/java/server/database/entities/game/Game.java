@@ -12,7 +12,8 @@ import java.util.stream.Collectors;
 import javax.persistence.*;
 import lombok.*;
 import org.modelmapper.ModelMapper;
-import server.database.entities.Answer;
+import server.database.entities.answer.Answer;
+import server.database.entities.answer.AnswerCollection;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
@@ -107,11 +108,9 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Answers given by each player for each question.
      */
-    @ElementCollection
-    @CollectionTable(name = "answer_mapping",
-            joinColumns = {@JoinColumn(name = "game_id", referencedColumnName = "id")})
-    @MapKeyColumn(name = "answer_question")
-    protected Map<Question, TreeSet<Answer>> answers = new HashMap<>();
+    @JsonManagedReference
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
+    protected Map<Question, AnswerCollection> answers = new HashMap<>();
 
     /**
      * Automatically sets the creation date to when the entity is first persisted.
@@ -273,23 +272,14 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         }
 
         // Get answers to current question
-        TreeSet<Answer> currentAnswers = answers.get(question.get());
+        AnswerCollection currentAnswers = answers.get(question.get());
         if (currentAnswers == null) {
             // Init tree if question is answered for the first time
-            currentAnswers = new TreeSet<>();
+            currentAnswers = new AnswerCollection();
+            currentAnswers.setGame(this);
         }
 
-        // Retrieve previous answer from the same user
-        Optional<Answer> oldAnswer = currentAnswers
-                .stream().filter(ans -> player.equals(ans.getPlayer())).findFirst();
-        // Remove previous answer
-        if (oldAnswer.isPresent()) {
-            currentAnswers.remove(oldAnswer.get());
-        }
-        // Add new answer
-        if (!currentAnswers.add(answer)) {
-            return false;
-        }
+        currentAnswers.addAnswer(answer);
 
         // Update answers to question
         answers.put(question.get(), currentAnswers);
@@ -310,12 +300,11 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         Question question = questionOpt.get();
 
         // Fill list and sort it by player id
-        TreeSet<Answer> currentAnswers = answers.get(question);
-        if (currentAnswers == null) {
+        if (!answers.containsKey(question)) {
             // No answer given
             return new ArrayList<>();
         }
-        List<Answer> currentAnswersList = currentAnswers.stream().sorted().collect(Collectors.toList());
+        List<Answer> currentAnswersList = answers.get(question).getAnswerList();
         return currentAnswersList;
     }
 

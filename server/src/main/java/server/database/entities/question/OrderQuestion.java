@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
-import server.database.entities.Answer;
+import server.database.entities.answer.Answer;
 
 /**
  * OrderQuestion data structure - describes a match question.

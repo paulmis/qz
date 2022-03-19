@@ -1,5 +1,6 @@
-package server.database.entities;
+package server.database.entities.answer;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -23,11 +25,12 @@ import server.database.entities.utils.BaseEntity;
 /**
  * Answer entity - describes the answer given by a player to one of the questions of the quiz.
  */
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @Data
 @NoArgsConstructor
 @Entity
 public class Answer extends BaseEntity<AnswerDTO> implements Comparable {
+
     /**
      * Construct a new answer from a DTO.
      *
@@ -50,6 +53,14 @@ public class Answer extends BaseEntity<AnswerDTO> implements Comparable {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "player_id")
     private GamePlayer player;
+
+    /**
+     * The set of answers to the same question this one belongs to.
+     */
+    @JsonBackReference
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "answer_collection_id", nullable = false)
+    private AnswerCollection answerCollection;
 
     /**
      * Convert user choices to DTO.
@@ -75,7 +86,7 @@ public class Answer extends BaseEntity<AnswerDTO> implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-        if (o == null || !(o instanceof Answer)) {
+        if (o == null || !(o instanceof Answer) || getPlayer() == null) {
             return 0;
         }
         Answer other = (Answer) o;

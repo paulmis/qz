@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 import lombok.*;
-import server.database.entities.Answer;
+import server.database.entities.answer.Answer;
 import server.database.entities.game.Game;
 import server.database.entities.utils.BaseEntity;
 
