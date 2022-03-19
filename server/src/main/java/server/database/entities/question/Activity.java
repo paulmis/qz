@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.URL;
 import org.modelmapper.ModelMapper;
 import server.database.entities.utils.BaseEntity;
+import java.util.UUID;
 
 /**
  * Activity data structure - describes a single activity and its energetic cost.
@@ -33,6 +34,10 @@ public class Activity extends BaseEntity<ActivityDTO> {
      */
     public Activity(ActivityDTO dto) {
         new ModelMapper().map(dto, this);
+        if (getId() == null) {
+            // Avoid instances without an id set
+            this.id = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        }
     }
 
     /**
