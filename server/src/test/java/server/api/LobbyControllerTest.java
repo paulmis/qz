@@ -14,6 +14,7 @@ import static server.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -138,7 +139,7 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void getAvailableLobbiesTest() throws Exception {
+    public void getAvailable() throws Exception {
         // Mock a list of lobbies
         Game<?> otherLobby = new NormalGame();
         otherLobby.setId(getUUID(1));
@@ -156,7 +157,7 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void lobbyInfoTest() throws Exception {
+    public void getOk() throws Exception {
         // Request
         this.mockMvc.perform(get("/api/lobby/" + mockLobby.getId()))
                 .andExpect(status().isOk())
@@ -166,7 +167,7 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void lobbyNotFoundInfoTest() throws Exception {
+    public void getNotFound() throws Exception {
         // Request
         this.mockMvc
                 .perform(get("/api/lobby/" + getUUID(1)))
@@ -189,9 +190,8 @@ class LobbyControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-
     @Test
-    public void joinOkTest() throws Exception {
+    public void joinOk() throws Exception {
         // Modify the capacity to allow the player to join
         mockLobbyConfiguration.setCapacity(3);
 
@@ -209,21 +209,21 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void lobbyNotFoundJoinTest() throws Exception {
+    public void lobbyNotFoundJoin() throws Exception {
         this.mockMvc
                 .perform(put("/api/lobby/" + getUUID(1) + "/join"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void joinAlreadyPresentTest() throws Exception {
+    public void joinAlreadyPresent() throws Exception {
         this.mockMvc
                 .perform(put("/api/lobby/" + mockLobby.getId() + "/join"))
                 .andExpect(status().isConflict());
     }
 
     @Test
-    public void joinStartedGameTest() throws Exception {
+    public void joinStartedGame() throws Exception {
         // Mock a started game
         mockLobby.setStatus(GameStatus.ONGOING);
 
@@ -433,5 +433,34 @@ class LobbyControllerTest {
         this.mockMvc
                 .perform(put("/api/lobby/" + mockLobby.getId() + "/start"))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    void leaveOk() throws Exception {
+        // Mock the service
+        when(lobbyService.removePlayer(mockLobby, john)).thenReturn(true);
+
+        // Request
+        this.mockMvc
+                .perform(delete("/api/lobby/leave"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void leaveNotFound() throws Exception {
+        // Mock the service
+        when(lobbyService.removePlayer(mockLobby, john)).thenReturn(false);
+
+        // Set the context user
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        sally.getEmail(),
+                        sally.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+
+        // Request
+        this.mockMvc
+                .perform(delete("/api/lobby/leave"))
+                .andExpect(status().isNotFound());
     }
 }

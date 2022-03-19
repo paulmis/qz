@@ -69,10 +69,9 @@ public class AuthControllerTests {
 
         // Perform the request
         this.mvc
-                .perform(
-                        post("/api/auth/register")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(joeDTO)))
+                .perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(joeDTO)))
                 .andExpect(status().isCreated());
     }
 
@@ -83,11 +82,23 @@ public class AuthControllerTests {
 
         // Perform the request
         this.mvc
-                .perform(
-                        post("/api/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(joeDTO)))
+                .perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(joeDTO)))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    void registerBadRequestShortPassword() throws Exception {
+        // Remove the password
+        joeDTO.setPassword("dog");
+
+        // Perform the request
+        this.mvc
+                .perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(joeDTO)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -97,10 +108,9 @@ public class AuthControllerTests {
 
         // Perform the request
         this.mvc
-                .perform(
-                        post("/api/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(joeDTO)))
+                .perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(joeDTO)))
                 .andExpect(status().isOk());
     }
 
@@ -111,10 +121,9 @@ public class AuthControllerTests {
 
         // Perform the request
         this.mvc
-                .perform(
-                        post("/api/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(joeDTO)))
+                .perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(joeDTO)))
                 .andExpect(status().isUnauthorized());
     }
 }
