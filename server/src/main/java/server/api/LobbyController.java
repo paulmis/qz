@@ -3,6 +3,8 @@ package server.api;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
+import commons.entities.game.configuration.GameConfigurationDTO;
+import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +12,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,6 +82,7 @@ public class LobbyController {
         NormalGame game;
         try {
             game = new NormalGame(gameDTO);
+            game.setGameId(RandomStringUtils.random(6, true, true));
             game.setStatus(GameStatus.CREATED);
 
             // Save the configuration
@@ -131,6 +135,25 @@ public class LobbyController {
     }
 
     /**
+     * Endpoint to get lobby configuration info.
+     *
+     * @param lobbyId the UUID of the lobby.
+     * @return information on the configuration of the requested lobby.
+     */
+    @GetMapping("/{lobbyId}/config")
+    ResponseEntity<GameConfigurationDTO> lobbyConfigurationInfo(
+            @PathVariable UUID lobbyId) {
+        
+        // Check if the lobby exists.
+        Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
+        if (lobbyOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // Return ok status with configuration payload
+        return ResponseEntity.ok(lobbyOptional.get().getConfiguration().getDTO());
+    }
+
+    /**
      * Endpoint to allow a user to join a game.
      *
      * @param lobbyId    UUID of the lobby to join.
@@ -167,7 +190,7 @@ public class LobbyController {
      *      404 if the lobby doesn't exist, 403 if the player isn't the lobby head, 200 otherwise
      */
     @PutMapping("/{lobbyId}/start")
-    ResponseEntity<HttpStatus> start(@PathVariable UUID lobbyId) {
+    ResponseEntity start(@PathVariable UUID lobbyId) {
         // If the user or the game don't exist, return 404
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
         Optional<Game> lobby = gameRepository.findById(lobbyId);
@@ -189,6 +212,46 @@ public class LobbyController {
 
         // Otherwise, return 200
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Endpoint to allow the host to change configuration.
+     *
+     * @param lobbyId UUID of the lobby to join.
+     * @param gameConfigurationData The new configuration data.
+     * @return An ok status if successful.
+     */
+    @PostMapping("/{lobbyId}/config")
+    ResponseEntity updateConfiguration(
+            @PathVariable UUID lobbyId,
+            @RequestBody GameConfigurationDTO gameConfigurationData) {
+        Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
+        Optional<User> userOptional = userRepository.findByEmail(AuthContext.get());
+        // Check if the lobby exists and user exists.
+        if (lobbyOptional.isEmpty() || userOptional.isEmpty()) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        Game lobby = lobbyOptional.get();
+        User user = userOptional.get();
+        // Check if the lobby is created.
+        if (lobby.getStatus() != GameStatus.CREATED) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        // Check if the user is host.
+        if (lobby.getHost().getUser().getId() != user.getId()) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        // Change and update lobby configuration based on configuration type.
+        if (gameConfigurationData instanceof NormalGameConfigurationDTO) {
+            lobby.setConfiguration(new NormalGameConfiguration((NormalGameConfigurationDTO) gameConfigurationData));
+        } else {
+            // Other configurations are not accepted as these are the only implemented game types as of now.
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+        // Update repository.
+        gameRepository.save(lobby);
+        // Return an ok status.
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

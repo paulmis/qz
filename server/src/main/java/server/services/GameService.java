@@ -1,5 +1,6 @@
 package server.services;
 
+import commons.SSEMessage;
 import commons.entities.game.GameStatus;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -121,7 +122,7 @@ public class GameService {
                 .getEmitters()
                 .sendAll(
                     SseEmitter.event()
-                        .name("playerLeft")
+                        .name(SSEMessage.PlayerLeft.toString())
                         .data(user.getId()));
         } catch (IOException ex) {
             // Log failure to update clients

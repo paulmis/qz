@@ -50,6 +50,7 @@ class LeaderboardControllerTest {
 
     private User getUser(int id, int gamesPlayed, int score) {
         User user = new User("user" + id,
+                "user" + id,
                 "email" + id,
                 "password" + id,
                 score,
@@ -106,8 +107,10 @@ class LeaderboardControllerTest {
         String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(
                 users.stream().map(BaseEntity::getDTO).collect(Collectors.toList()));
 
-        this.mockMvc.perform(get("/api/leaderboard/score"))
-                .andExpect(status().isOk()).andExpect(content().json(expectedResponse));
+        this.mockMvc
+                .perform(get("/api/leaderboard/score"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedResponse));
     }
 
     /**
@@ -148,8 +151,10 @@ class LeaderboardControllerTest {
         String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(
                 users.stream().map(BaseEntity::getDTO).collect(Collectors.toList()));
 
-        this.mockMvc.perform(get("/api/leaderboard/score"))
-                .andExpect(status().isOk()).andExpect(content().json(expectedResponse));
+        this.mockMvc
+                .perform(get("/api/leaderboard/score"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedResponse));
     }
 
     /**
@@ -169,8 +174,10 @@ class LeaderboardControllerTest {
         String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(
                 users.stream().map(BaseEntity::getDTO).collect(Collectors.toList()));
 
-        this.mockMvc.perform(get("/api/leaderboard/games"))
-                .andExpect(status().isOk()).andExpect(content().json(expectedResponse));
+        this.mockMvc
+                .perform(get("/api/leaderboard/games"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedResponse));
     }
 
     /**
@@ -184,8 +191,10 @@ class LeaderboardControllerTest {
 
         String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(new ArrayList<>());
 
-        this.mockMvc.perform(get("/api/leaderboard/games"))
-                .andExpect(status().isOk()).andExpect(content().json(expectedResponse));
+        this.mockMvc
+                .perform(get("/api/leaderboard/games"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedResponse));
     }
 
     /**
@@ -199,7 +208,9 @@ class LeaderboardControllerTest {
 
         String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(new ArrayList<>());
 
-        this.mockMvc.perform(get("/api/leaderboard/score"))
-                .andExpect(status().isOk()).andExpect(content().json(expectedResponse));
+        this.mockMvc
+                .perform(get("/api/leaderboard/score"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedResponse));
     }
 }

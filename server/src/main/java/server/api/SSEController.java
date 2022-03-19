@@ -1,7 +1,10 @@
 package server.api;
 
+import commons.SSEMessage;
+import commons.entities.QuestionDTO;
 import commons.entities.game.GameStatus;
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,7 @@ import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
+
 
 /**
  * The SSE endpoint - opens new SSE connections.
@@ -62,6 +66,11 @@ public class SSEController {
             // Register emitter to the SSE manager.
             game.emitters.register(user.getId(), emitter);
 
+            // The client will wait for a first event in order to start.
+            SseEmitter.SseEventBuilder event = SseEmitter.event()
+                    .name(SSEMessage.Init.toString());
+            emitter.send(event);
+
             return ResponseEntity.ok(emitter);
         } catch (NoSuchElementException e) {
             // This should never happen
@@ -78,6 +87,9 @@ public class SSEController {
                 log.error("Failed to send error message to client: " + e1.getMessage());
             }
             emitter.complete();
+            return ResponseEntity.badRequest().body(emitter);
+        } catch (IOException e) {
+            log.debug("Failed to create SSE connection: " + e.getMessage());
             return ResponseEntity.badRequest().body(emitter);
         }
     }
