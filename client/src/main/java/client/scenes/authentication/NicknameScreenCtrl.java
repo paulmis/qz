@@ -68,7 +68,7 @@ public class NicknameScreenCtrl implements Initializable {
     private void setNickname() {
         if (nicknameField.getText().length() > 0) {
             System.out.print("Welcome " + nicknameField.getText() + " !");
-            mainCtrl.showLobbyScreen();
+            mainCtrl.showLobbyListScreen();
         } else {
             System.out.print("No nickname set !");
         }
