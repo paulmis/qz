@@ -100,7 +100,7 @@
                         <Image url="@/client/images/logo.png" />
                      </image>
                   </ImageView>
-                  <Label fx:id="userExists" layoutX="73.0" layoutY="397.0" text="Email already exists !" textFill="RED">
+                  <Label fx:id="userExists" layoutX="66.0" layoutY="397.0" text="Credentials not valid !" textFill="RED">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
