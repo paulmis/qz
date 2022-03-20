@@ -96,6 +96,18 @@ public class LobbyScreenCtrl {
     }
 
     /**
+     * Fired when the disband button is clicked.
+     */
+    public void disbandButtonClick() {
+        try {
+            this.server.leaveLobby();
+            this.mainCtrl.showLogInScreen();
+        } catch (IllegalStateException e) {
+            System.out.println(e);
+        }
+    }
+
+    /**
      * Fired when the lobby settings button is clicked.
      */
     public void lobbySettingsButtonClick() {
