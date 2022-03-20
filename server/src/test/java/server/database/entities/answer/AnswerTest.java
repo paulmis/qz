@@ -7,7 +7,6 @@ import commons.entities.AnswerDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.database.entities.question.Activity;
 
@@ -19,11 +18,6 @@ class AnswerTest {
         a.setDescription("Activity" + (id + 1));
         a.setCost(2 + id * 4);
         return a;
-    }
-
-    @BeforeEach
-    private void init() {
-
     }
 
     @Test

@@ -85,9 +85,9 @@ public class Answer extends BaseEntity<AnswerDTO> implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
+    public int compareTo(Object o) throws IllegalArgumentException {
         if (o == null || !(o instanceof Answer) || getPlayer() == null) {
-            return 0;
+            throw new IllegalArgumentException("Invalid comparison between Object " + o + " and Answer " + this);
         }
         Answer other = (Answer) o;
         return getPlayer().getId().compareTo(other.getPlayer().getId());
