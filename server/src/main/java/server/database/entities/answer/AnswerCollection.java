@@ -70,13 +70,17 @@ public class AnswerCollection extends BaseEntity {
         // Retrieve previous answer from the same user and remove it
         Optional<Answer> oldAnswer = collection
                 .stream().filter(ans -> player.equals(ans.getPlayer())).findFirst();
-        oldAnswer.ifPresent(value -> collection.remove(value));
 
-        // Add new answer
-        if (!collection.add(answer)) {
-            return false;
+        if (oldAnswer.isPresent()) {
+            // Update previous answer
+            oldAnswer.get().setResponse(answer.getResponse());
+        } else {
+            // Add new answer
+            if (!collection.add(answer)) {
+                return false;
+            }
+            answer.setAnswerCollection(this);
         }
-        answer.setAnswerCollection(this);
         return true;
     }
 
