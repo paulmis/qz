@@ -2,16 +2,19 @@ package client.scenes.leaderboard;
 
 import client.scenes.leaderboard.LeaderboardEntryCtrl;
 import commons.entities.UserDTO;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import lombok.Generated;
 
 /**
  * The leaderboard entry pane.
  * This is created only to make the
  * entry creatable inside code.
  */
+@Generated
 public class LeaderboardEntryPane extends StackPane {
 
     private Node view;
@@ -40,7 +43,8 @@ public class LeaderboardEntryPane extends StackPane {
         try {
             view = (Node) fxmlLoader.load();
         } catch (Exception e) {
-            System.out.println(e);
+            Platform.exit();
+            System.exit(0);
         }
 
         // Adds it to the view of this control(stack pane)
