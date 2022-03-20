@@ -270,11 +270,21 @@ public class LobbyController {
         // Check that the user is in a lobby and remove them
         Optional<Game> lobby =
                 gameRepository.findByPlayers_User_IdEqualsAndStatus(user.get().getId(), GameStatus.CREATED);
-        if (lobby.isEmpty() || !lobbyService.removePlayer(lobby.get(), user.get())) {
+        if (lobby.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        gameRepository.save(lobby.get());
 
+        Optional<GamePlayer> player = gamePlayerRepository.findGamePlayerByUserId(user.get().getId());
+        if (player.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            lobbyService.removePlayer(lobby.get(), user.get(), player.get());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        gameRepository.save(lobby.get());
         return ResponseEntity.ok().build();
     }
 }

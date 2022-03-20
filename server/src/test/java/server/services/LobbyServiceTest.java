@@ -12,12 +12,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import server.database.entities.User;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
+import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 
 /**
@@ -27,6 +27,9 @@ import server.database.repositories.game.GameRepository;
 public class LobbyServiceTest {
     @Mock
     private GameRepository gameRepository;
+
+    @Mock
+    private GamePlayerRepository gamePlayerRepository;
 
     @InjectMocks
     private LobbyService lobbyService;
@@ -68,18 +71,20 @@ public class LobbyServiceTest {
     @Test
     void removePlayerOk() {
         // Call the service function
-        assertTrue(lobbyService.removePlayer(lobby, joe));
+        assertTrue(lobbyService.removePlayer(lobby, joe, joePlayer));
 
         // Verify interactions
         verify(gameRepository, times(1)).save(lobby);
         verifyNoMoreInteractions(gameRepository);
+        verify(gamePlayerRepository, times(1)).deleteById(joePlayer.getId());
+        verifyNoMoreInteractions(gamePlayerRepository);
     }
 
     @Test
     void removePlayerLast() throws LastPlayerRemovedException {
         // Call the service function
         lobby.remove(joe.getId());
-        assertTrue(lobbyService.removePlayer(lobby, susanne));
+        assertTrue(lobbyService.removePlayer(lobby, susanne, susannePlayer));
 
         // Verify interactions
         verify(gameRepository, times(1)).delete(lobby);
@@ -89,7 +94,7 @@ public class LobbyServiceTest {
     @Test
     void removePlayerNotFound() {
         // Call the service function
-        assertFalse(lobbyService.removePlayer(lobby, james));
+        assertFalse(lobbyService.removePlayer(lobby, james, jamesPlayer));
 
         // Verify interactions
         verifyNoMoreInteractions(gameRepository);

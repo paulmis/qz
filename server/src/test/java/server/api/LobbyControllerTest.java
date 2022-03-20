@@ -438,7 +438,7 @@ class LobbyControllerTest {
     @Test
     void leaveOk() throws Exception {
         // Mock the service
-        when(lobbyService.removePlayer(mockLobby, john)).thenReturn(true);
+        when(lobbyService.removePlayer(mockLobby, john, johnPlayer)).thenReturn(true);
 
         // Request
         this.mockMvc
@@ -447,9 +447,20 @@ class LobbyControllerTest {
     }
 
     @Test
+    void leavePlayerNotFound() throws Exception {
+        // Mock the service
+        when(gamePlayerRepository.findGamePlayerByUserId(john.getId())).thenReturn(Optional.empty());
+
+        // Request
+        this.mockMvc
+                .perform(delete("/api/lobby/leave"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void leaveNotFound() throws Exception {
         // Mock the service
-        when(lobbyService.removePlayer(mockLobby, john)).thenReturn(false);
+        when(lobbyService.removePlayer(mockLobby, john, johnPlayer)).thenReturn(false);
 
         // Set the context user
         SecurityContextHolder.getContext().setAuthentication(
