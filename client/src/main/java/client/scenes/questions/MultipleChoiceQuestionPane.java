@@ -2,6 +2,8 @@ package client.scenes.questions;
 
 import java.net.URL;
 import java.util.List;
+
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
@@ -47,7 +49,8 @@ public class MultipleChoiceQuestionPane extends StackPane {
         try {
             view = (Node) fxmlLoader.load();
         } catch (Exception e) {
-            System.out.println(e);
+            Platform.exit();
+            System.exit(0);
         }
 
         // Adds it to the view of this control(stack pane)

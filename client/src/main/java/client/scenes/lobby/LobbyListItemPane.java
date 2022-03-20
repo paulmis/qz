@@ -1,11 +1,14 @@
 package client.scenes.lobby;
 
 import commons.entities.game.GameDTO;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
+
+import java.io.IOException;
 
 /**
  * The lobby list item pane.
@@ -35,7 +38,8 @@ public class LobbyListItemPane extends StackPane {
         try {
             view = (Node) fxmlLoader.load();
         } catch (Exception e) {
-            System.out.println(e);
+            Platform.exit();
+            System.exit(0);
         }
 
         // Adds it to the view of this control(stack pane)

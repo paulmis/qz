@@ -1,5 +1,6 @@
 package client.scenes.lobby.configuration;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleFloatProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -42,7 +43,8 @@ public class ConfigurationElementPane extends StackPane {
         try {
             view = (Node) fxmlLoader.load();
         } catch (Exception e) {
-            System.out.println(e);
+            Platform.exit();
+            System.exit(0);
         }
 
         // Adds it to the children of the view

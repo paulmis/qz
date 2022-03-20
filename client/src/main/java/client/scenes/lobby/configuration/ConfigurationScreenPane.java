@@ -2,6 +2,7 @@ package client.scenes.lobby.configuration;
 
 import client.scenes.questions.EstimateQuestionCtrl;
 import commons.entities.game.configuration.GameConfigurationDTO;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
@@ -30,7 +31,8 @@ public class ConfigurationScreenPane extends StackPane {
         try {
             view = (Node) fxmlLoader.load();
         } catch (Exception e) {
-            System.out.println(e);
+            Platform.exit();
+            System.exit(0);
         }
 
         getChildren().add(view);
