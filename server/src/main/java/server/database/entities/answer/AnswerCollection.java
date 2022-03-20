@@ -3,6 +3,8 @@ package server.database.entities.answer;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import commons.entities.utils.DTO;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -44,7 +46,18 @@ public class AnswerCollection extends BaseEntity {
      */
     @JsonManagedReference
     @OneToMany(mappedBy = "answerCollection", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Answer> collection = new TreeSet<>();
+    private Set<Answer> collection = new TreeSet<>(new Comparator<Answer>() {
+        @Override
+        public int compare(Answer o1, Answer o2) {
+            if (o1 == null || o2 == null) {
+                throw new NullPointerException();
+            }
+            if (o1.getPlayer() == null || o2.getPlayer() == null) {
+                throw new IllegalArgumentException("Only answers with a player can be compared");
+            }
+            return o1.getPlayer().getId().compareTo(o2.getPlayer().getId());
+        }
+    });
 
     /**
      * The game these answers refer to.
@@ -84,7 +97,13 @@ public class AnswerCollection extends BaseEntity {
         return true;
     }
 
+    /**
+     * Returns the list of answers in this collection, sorted by player id.
+     *
+     * @return answers given by each player, sorted by player id
+     */
     public List<Answer> getAnswerList() {
-        return collection.stream().sorted().collect(Collectors.toList());
+        // The sorting is guaranteed by the use of TreeSet
+        return new ArrayList<>(collection);
     }
 }

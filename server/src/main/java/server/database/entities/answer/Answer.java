@@ -29,7 +29,7 @@ import server.database.entities.utils.BaseEntity;
 @Data
 @NoArgsConstructor
 @Entity
-public class Answer extends BaseEntity<AnswerDTO> implements Comparable {
+public class Answer extends BaseEntity<AnswerDTO> {
 
     /**
      * Construct a new answer from a DTO.
@@ -82,14 +82,5 @@ public class Answer extends BaseEntity<AnswerDTO> implements Comparable {
         );
 
         return modelMapper.map(this, AnswerDTO.class);
-    }
-
-    @Override
-    public int compareTo(Object o) throws IllegalArgumentException {
-        if (o == null || !(o instanceof Answer) || getPlayer() == null) {
-            throw new IllegalArgumentException("Invalid comparison between Object " + o + " and Answer " + this);
-        }
-        Answer other = (Answer) o;
-        return getPlayer().getId().compareTo(other.getPlayer().getId());
     }
 }
