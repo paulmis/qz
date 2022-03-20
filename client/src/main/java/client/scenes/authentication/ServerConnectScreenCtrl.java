@@ -9,10 +9,12 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
+import lombok.Generated;
 
 /**
  * ServerConnectScreen controller class.
  */
+@Generated
 public class ServerConnectScreenCtrl implements Initializable {
 
     private final ServerUtils server;

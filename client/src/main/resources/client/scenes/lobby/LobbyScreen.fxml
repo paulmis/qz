@@ -17,7 +17,6 @@
          <children>
             <HBox alignment="BOTTOM_RIGHT" prefHeight="47.0" prefWidth="1009.0" spacing="15.0">
                <children>
-                  <JFXButton fx:id="leaderboardButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#leaderboardButtonClick" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #FF6969;" text="Leaderboard" textFill="WHITE" />
                   <JFXButton fx:id="userButton" alignment="CENTER" buttonType="RAISED" contentDisplay="GRAPHIC_ONLY">
                      <graphic>
                         <FontAwesomeIconView fill="#5e5e5e" glyphName="USER" size="20" text="" />
