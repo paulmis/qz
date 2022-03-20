@@ -20,6 +20,7 @@ public class LobbyService {
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
+
     /**
      * Removes the specified user from the lobby. If this was the last player in the lobby, the game is deleted.
      *
@@ -35,13 +36,11 @@ public class LobbyService {
             if (!lobby.remove(user.getId())) {
                 return false;
             }
-
             gamePlayerRepository.deleteById(player.getId());
             gameRepository.save(lobby);
         } catch (LastPlayerRemovedException ex) {
             gameRepository.delete(lobby);
         }
-
         return true;
     }
 }
