@@ -8,8 +8,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
 
-import java.io.IOException;
-
 /**
  * The lobby list item pane.
  * It is used as a wrapper for a lobby list item.

@@ -35,6 +35,7 @@ public class LobbyListCtrl implements Initializable {
     @FXML private JFXButton settingsButton;
     @FXML private JFXButton userButton;
     @FXML private JFXButton searchButton;
+    @FXML private JFXButton fetchButton;
     @FXML private GridPane userPanelGrid;
     @FXML private JFXButton createLobbyButton;
     @FXML private TextField searchField;
@@ -61,15 +62,9 @@ public class LobbyListCtrl implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-
         this.usernameField.textProperty().addListener((observable, oldValue, newValue) -> {
             //TODO: Replace this with a server call to change the username when it becomes available.
             System.out.println(newValue);
-        });
-
-        // This updates the lobby list every time the user types a char in the search bar.
-        this.searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            updateLobbyList(searchField.getText());
         });
 
 
@@ -166,5 +161,10 @@ public class LobbyListCtrl implements Initializable {
     private String createSearchableString(GameDTO game) {
         return game.getPlayers().stream().filter(gamePlayerDTO -> gamePlayerDTO.getId().equals(game.getHost()))
                 .findFirst().get().getNickname();
+    }
+
+    @FXML
+    private void fetchButtonClick() {
+        updateLobbyList(searchField.getText());
     }
 }

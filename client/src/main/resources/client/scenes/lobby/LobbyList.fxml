@@ -43,7 +43,7 @@
       </AnchorPane>
       <AnchorPane fx:id="lobbyListItemsAnchorPane" layoutX="212.0" layoutY="69.0" prefHeight="507.0" prefWidth="605.0">
          <children>
-            <TextField fx:id="searchField" layoutX="14.0" layoutY="21.0" prefHeight="45.0" prefWidth="499.0" promptText="Search by game name, type or username">
+            <TextField fx:id="searchField" layoutX="72.0" layoutY="21.0" prefHeight="45.0" prefWidth="376.0" promptText="Search by game name, type or username">
                <font>
                   <Font size="18.0" />
                </font>
@@ -63,9 +63,14 @@
                   <VBox fx:id="lobbyListVbox" alignment="TOP_CENTER" prefHeight="425.0" prefWidth="599.0" />
                </content>
             </ScrollPane>
+            <JFXButton fx:id="fetchButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="21.0" layoutY="23.0" onAction="#fetchButtonClick" prefHeight="40.0" prefWidth="40.0" text="Fetch" textFill="WHITE">
+               <graphic>
+                  <FontAwesomeIconView glyphName="REFRESH" size="36" />
+               </graphic>
+            </JFXButton>
          </children>
       </AnchorPane>
-      <GridPane fx:id="userPanelGrid" layoutX="786.0" layoutY="60.0" maxWidth="223.0" prefHeight="100.0" prefWidth="223.0">
+      <GridPane fx:id="userPanelGrid" layoutX="786.0" layoutY="60.0" maxWidth="223.0" prefHeight="100.0" prefWidth="223.0" visible="false">
          <columnConstraints>
             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
          </columnConstraints>
