@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -21,6 +20,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
+import server.database.entities.question.Question;
 import server.database.entities.utils.BaseEntity;
 
 /**
@@ -68,6 +68,13 @@ public class AnswerCollection extends BaseEntity {
     private Game game;
 
     /**
+     * The question answered by this collection.
+     */
+    @JsonManagedReference
+    @ManyToOne
+    private Question question;
+
+    /**
      * Add an answer to the collection, answer's player is maintained unique.
      *
      * @param answer answer to add
@@ -79,6 +86,9 @@ public class AnswerCollection extends BaseEntity {
         if (player == null) {
             return false;
         }
+
+        // Set answer's question
+        answer.setQuestion(question);
 
         // Retrieve previous answer from the same user and remove it
         Optional<Answer> oldAnswer = collection

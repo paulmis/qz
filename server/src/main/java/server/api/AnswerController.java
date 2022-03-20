@@ -74,6 +74,16 @@ public class AnswerController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
+        // Check if question is correct
+        Optional<Question> currentQuestion = game.getQuestion();
+        if (currentQuestion.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        if (!currentQuestion.get().getId().equals(answerData.getQuestionId())) {
+            // Trying to answer the wrong question
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
         // Update the answer
         Answer userAnswer = new Answer();
         userAnswer.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));

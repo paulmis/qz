@@ -277,6 +277,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
             // Init tree if question is answered for the first time
             currentAnswers = new AnswerCollection();
             currentAnswers.setGame(this);
+            currentAnswers.setQuestion(question.get());
         }
 
         currentAnswers.addAnswer(answer);

@@ -20,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Activity;
+import server.database.entities.question.Question;
 import server.database.entities.utils.BaseEntity;
 
 /**
@@ -53,6 +54,13 @@ public class Answer extends BaseEntity<AnswerDTO> {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "player_id")
     private GamePlayer player;
+
+    /**
+     * The question that this answer refers to.
+     */
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "question_id")
+    private Question question;
 
     /**
      * The set of answers to the same question this one belongs to.
