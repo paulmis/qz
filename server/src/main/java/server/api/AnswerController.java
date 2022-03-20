@@ -86,23 +86,26 @@ public class AnswerController {
 
         // Update the answer
         Answer userAnswer = new Answer();
-        userAnswer.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        // Make sure that the activities referenced in the answer are the same of the repository
+        // This is to ensure that no new activities are created when answering a question
         userAnswer.setResponse(answerData.getResponse().stream()
                 .map(new Function<ActivityDTO, Optional<Activity>>() {
                     @Override
                     public Optional<Activity> apply(ActivityDTO dto) {
                         Optional<Activity> activity = Optional.empty();
                         if (dto.getId() != null) {
+                            // Get activity by id
                             activity = activityRepository.findById(dto.getId());
                         }
                         if (activity.isPresent()) {
                             return activity;
                         } else {
+                            // Get activity by description and cost if the id wasn't enough
                             return activityRepository
                                     .findByDescriptionAndCost(dto.getDescription(), dto.getCost());
                         }
                     }
-                }).filter(Optional::isPresent)
+                }).filter(Optional::isPresent) // exclude activities not found
                 .map(Optional::get)
                 .collect(Collectors.toList()));
         if (game.addAnswer(userAnswer, user.getId())) {

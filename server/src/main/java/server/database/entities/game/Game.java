@@ -1,5 +1,7 @@
 package server.database.entities.game;
 
+import static server.utils.TestHelpers.getUUID;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import commons.entities.game.GameDTO;
@@ -130,7 +132,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         ModelMapper mapper = new ModelMapper();
         if (dto.getId() == null) {
             // This id will change once the game entity is saved, but it must be non-null
-            this.id = UUID.fromString("00000000-0000-0000-0000-000000000000");
+            this.id = getUUID(0);
         } else {
             this.id = dto.getId();
         }

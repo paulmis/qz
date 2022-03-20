@@ -3,12 +3,11 @@ package server.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static server.TestHelpers.getUUID;
+import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.game.GameStatus;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;

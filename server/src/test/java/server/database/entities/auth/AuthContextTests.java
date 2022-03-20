@@ -1,7 +1,7 @@
 package server.database.entities.auth;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static server.TestHelpers.getUUID;
+import static server.utils.TestHelpers.getUUID;
 
 import java.util.Collections;
 import org.junit.jupiter.api.Test;

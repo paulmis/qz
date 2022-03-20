@@ -1,4 +1,4 @@
-package server;
+package server.utils;
 
 import com.google.common.base.Strings;
 import java.util.UUID;

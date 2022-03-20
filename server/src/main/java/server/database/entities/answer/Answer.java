@@ -1,11 +1,12 @@
 package server.database.entities.answer;
 
+import static server.utils.TestHelpers.getUUID;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -37,7 +38,7 @@ public class Answer extends BaseEntity<AnswerDTO> {
      * @param dto DTO to map to entity.
      */
     public Answer(AnswerDTO dto) {
-        this.id = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        this.id = getUUID(0);
         this.response = dto.getResponse().stream().map(Activity::new).collect(Collectors.toList());
     }
 

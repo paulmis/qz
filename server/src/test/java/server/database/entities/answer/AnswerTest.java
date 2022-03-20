@@ -1,7 +1,7 @@
 package server.database.entities.answer;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static server.TestHelpers.getUUID;
+import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.AnswerDTO;
 import java.util.ArrayList;
