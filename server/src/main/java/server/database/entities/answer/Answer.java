@@ -20,7 +20,6 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Activity;
-import server.database.entities.question.Question;
 import server.database.entities.utils.BaseEntity;
 
 /**
@@ -56,18 +55,10 @@ public class Answer extends BaseEntity<AnswerDTO> {
     private GamePlayer player;
 
     /**
-     * The question that this answer refers to.
-     */
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "question_id")
-    private Question question;
-
-    /**
      * The set of answers to the same question this one belongs to.
      */
     @JsonBackReference
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "answer_collection_id", nullable = false)
     private AnswerCollection answerCollection;
 
     /**
@@ -87,6 +78,16 @@ public class Answer extends BaseEntity<AnswerDTO> {
         // Deep conversion of user choice
         propertyMapper.addMappings(
                 mapper -> mapper.map(Answer::getResponseDTO, AnswerDTO::setResponse)
+        );
+
+        // Retrieval of question
+        propertyMapper.addMappings(
+                mapper -> mapper.map(ans -> {
+                    if (answerCollection != null && answerCollection.getId() != null) {
+                        return answerCollection.getId().getQuestionId();
+                    }
+                    return null;
+                }, AnswerDTO::setQuestionId)
         );
 
         return modelMapper.map(this, AnswerDTO.class);

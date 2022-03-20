@@ -1,8 +1,7 @@
 package server.database.entities.answer;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import commons.entities.utils.DTO;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -11,35 +10,44 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import server.database.entities.game.Game;
+import lombok.NoArgsConstructor;
 import server.database.entities.game.GamePlayer;
-import server.database.entities.question.Question;
-import server.database.entities.utils.BaseEntity;
 
 /**
  * Relation entity to collect all answers for a given question.
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
+@NoArgsConstructor
 @Entity
-public class AnswerCollection extends BaseEntity {
+public class AnswerCollection {
 
-    public AnswerCollection() {
-        // Make sure the id is set at creation
-        this.id = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    /**
+     * Composite primary key
+     */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Embeddable
+    public static class Pk implements Serializable {
+        @Column(nullable = false, updatable = false)
+        private UUID gameId;
+
+        @Column(nullable = false, updatable = false)
+        private UUID questionId;
     }
 
-    @Override
-    public DTO getDTO() {
-        return null;
-    }
+    /**
+     * Composite id of the relation
+     */
+    @EmbeddedId
+    private Pk id;
 
     /**
      * Collection of answers represented by this class.
@@ -60,21 +68,6 @@ public class AnswerCollection extends BaseEntity {
     });
 
     /**
-     * The game these answers refer to.
-     */
-    @JsonBackReference
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-    @ToString.Exclude
-    private Game game;
-
-    /**
-     * The question answered by this collection.
-     */
-    @JsonManagedReference
-    @ManyToOne
-    private Question question;
-
-    /**
      * Add an answer to the collection, answer's player is maintained unique.
      *
      * @param answer answer to add
@@ -86,9 +79,6 @@ public class AnswerCollection extends BaseEntity {
         if (player == null) {
             return false;
         }
-
-        // Set answer's question
-        answer.setQuestion(question);
 
         // Retrieve previous answer from the same user and remove it
         Optional<Answer> oldAnswer = collection

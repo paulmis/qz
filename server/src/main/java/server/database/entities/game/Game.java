@@ -108,8 +108,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Answers given by each player for each question.
      */
-    @JsonManagedReference
-    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
     protected Map<Question, AnswerCollection> answers = new HashMap<>();
 
     /**
@@ -276,8 +275,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         if (currentAnswers == null) {
             // Init tree if question is answered for the first time
             currentAnswers = new AnswerCollection();
-            currentAnswers.setGame(this);
-            currentAnswers.setQuestion(question.get());
+            currentAnswers.setId(new AnswerCollection.Pk(getId(), question.get().getId()));
         }
 
         currentAnswers.addAnswer(answer);
