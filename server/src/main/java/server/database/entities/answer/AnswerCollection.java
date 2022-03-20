@@ -29,7 +29,7 @@ import server.database.entities.game.GamePlayer;
 public class AnswerCollection {
 
     /**
-     * Composite primary key
+     * Composite primary key.
      */
     @Data
     @AllArgsConstructor
@@ -44,7 +44,7 @@ public class AnswerCollection {
     }
 
     /**
-     * Composite id of the relation
+     * Composite id of the relation.
      */
     @EmbeddedId
     private Pk id;

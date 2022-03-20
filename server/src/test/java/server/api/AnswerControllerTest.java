@@ -91,6 +91,7 @@ class AnswerControllerTest {
                 getActivity(3),
                 getActivity(4)));
         ((MCQuestion) mockQuestion).setAnswer(mockQuestion.getActivities().get(1));
+        mockQuestion.setId(getUUID(2));
 
         // Set up a mock game
         mockLobby = new NormalGame();
@@ -156,6 +157,7 @@ class AnswerControllerTest {
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
         userAnswer.setResponse(List.of(mockQuestion.getActivities().get(0).getDTO()));
+        userAnswer.setQuestionId(mockQuestion.getId());
         this.mockMvc
                 .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
