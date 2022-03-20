@@ -335,6 +335,7 @@ public class GameScreenCtrl implements Initializable {
     @FXML
     private void quitButtonClick(ActionEvent actionEvent) {
         server.quitGame();
+        this.mainCtrl.showLogInScreen();
     }
 
 

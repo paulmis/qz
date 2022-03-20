@@ -108,6 +108,22 @@ public class ServerUtils {
     }
 
     /**
+     * Function that causes the user to leave the lobby.
+     */
+    public void leaveLobby() {
+        var request = client
+                .target(SERVER).path("/api/lobby/leave")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .delete();
+        if (request.getStatus() == Response.Status.OK.getStatusCode()) {
+            System.out.println("Left the lobby successfully");
+        } else if (request.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+            throw new IllegalStateException("User/Lobby not found");
+        }
+    }
+
+    /**
      * Function that causes the user to leave the game.
      */
     public void quitGame() {
