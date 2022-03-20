@@ -1,6 +1,5 @@
 package server.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalToObject;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
@@ -14,13 +13,11 @@ import static server.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import javax.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -438,7 +435,7 @@ class LobbyControllerTest {
     @Test
     void leaveOk() throws Exception {
         // Mock the service
-        when(lobbyService.removePlayer(mockLobby, john, johnPlayer)).thenReturn(true);
+        when(gamePlayerRepository.findGamePlayerByUserId(john.getId())).thenReturn(Optional.of(johnPlayer));
 
         // Request
         this.mockMvc

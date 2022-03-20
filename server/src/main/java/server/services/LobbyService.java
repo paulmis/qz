@@ -10,8 +10,6 @@ import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 
-import java.util.Optional;
-
 /**
  * Provides business logic for the lobbies.
  */

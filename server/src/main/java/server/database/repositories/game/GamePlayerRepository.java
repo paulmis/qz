@@ -1,10 +1,8 @@
 package server.database.repositories.game;
 
 import commons.entities.game.GameStatus;
-
 import java.util.Optional;
 import java.util.UUID;
-
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +17,7 @@ public interface GamePlayerRepository extends JpaRepository<GamePlayer, UUID> {
     boolean existsByUserIdAndGameId(UUID userId, UUID gameId);
 
     /**
+     * Find game player of a user from their user id.
      *
      * @param userId user's id
      * @return empty optional if the user is not a player, otherwise returns game player
