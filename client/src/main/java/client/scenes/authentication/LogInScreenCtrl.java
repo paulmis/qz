@@ -109,7 +109,7 @@ public class LogInScreenCtrl implements Initializable {
         panelTranslate.setDuration(Duration.millis(1000));
         panelTranslate.setCycleCount(1);
         panelTranslate.setAutoReverse(false);
-        panelTranslate.setOnFinished(e -> mainCtrl.showUsernameScreen());
+        panelTranslate.setOnFinished(e -> mainCtrl.showRegisterScreen());
         panelTranslate.play();
     }
 }

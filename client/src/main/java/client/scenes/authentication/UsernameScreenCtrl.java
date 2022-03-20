@@ -4,9 +4,6 @@ import client.scenes.MainCtrl;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
-import java.io.File;
-import java.net.URL;
-import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -19,6 +16,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import lombok.Generated;
+
+import java.io.File;
+import java.net.URL;
+import java.util.ResourceBundle;
+
 
 
 /**

@@ -23,6 +23,14 @@
     -fx-background-color: white
 }
 
+#pane1{
+    -fx-background-color: white
+}
+
+#pane2{
+    -fx-background-color: white
+}
+
 #usernameField{
     -fx-background-color: #C4C4C4;
 }
