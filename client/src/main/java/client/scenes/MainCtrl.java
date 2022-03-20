@@ -65,9 +65,6 @@ public class MainCtrl {
     private RegisterScreenCtrl registerScreenCtrl;
     private Parent registerScreen;
 
-    private UsernameScreenCtrl usernameScreenCtrl;
-    private Parent usernameScreen;
-
     private LobbyScreenCtrl lobbyScreenCtrl;
     private Parent lobbyScene;
 
@@ -93,7 +90,6 @@ public class MainCtrl {
                            Pair<ServerConnectScreenCtrl, Parent> serverConnectScreen,
                            Pair<LogInScreenCtrl, Parent> logInScreen,
                            Pair<RegisterScreenCtrl, Parent> registerScreen,
-                           Pair<UsernameScreenCtrl, Parent> nicknameScreen,
                            Pair<LobbyScreenCtrl, Parent> lobbyScreen,
                            Pair<GameScreenCtrl, Parent> gameScreen,
                            Pair<GlobalLeaderboardCtrl, Parent> globalLeaderboardScreen,
@@ -108,9 +104,6 @@ public class MainCtrl {
 
         this.registerScreen = registerScreen.getValue();
         this.registerScreenCtrl = registerScreen.getKey();
-
-        this.usernameScreen = nicknameScreen.getValue();
-        this.usernameScreenCtrl = nicknameScreen.getKey();
 
         this.lobbyScene = lobbyScreen.getValue();
         this.lobbyScreenCtrl = lobbyScreen.getKey();
@@ -246,14 +239,8 @@ public class MainCtrl {
      * This function displays the register screen.
      */
     public void showRegisterScreen() {
+        this.registerScreenCtrl.reset();
         this.showScreenLetterBox(registerScreen, StageScalingStrategy.Letterbox);
-    }
-
-    /**
-     * This function displays the nickname selection screen.
-     */
-    public void showUsernameScreen() {
-        this.showScreenLetterBox(usernameScreen, StageScalingStrategy.Letterbox);
     }
 
     /**
@@ -278,10 +265,6 @@ public class MainCtrl {
      */
     public Stage getPrimaryStage() {
         return primaryStage;
-    }
-
-    public UsernameScreenCtrl getUsernameScreenCtrl() {
-        return usernameScreenCtrl;
     }
 
     /**

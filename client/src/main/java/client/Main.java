@@ -54,8 +54,6 @@ public class Main extends Application {
                 "client", "scenes", "authentication", "LogInScreen.fxml");
         var registerScreen = FXML.load(RegisterScreenCtrl.class,
                 "client", "scenes", "authentication", "RegisterScreen.fxml");
-        var nicknameScreen = FXML.load(UsernameScreenCtrl.class,
-                "client", "scenes", "authentication", "NicknameScreen.fxml");
         var lobbyScreen = FXML.load(LobbyScreenCtrl.class,
                 "client", "scenes", "lobby", "LobbyScreen.fxml");
         var gameScreen = FXML.load(GameScreenCtrl.class,
@@ -66,7 +64,7 @@ public class Main extends Application {
                 "client", "scenes", "lobby", "LobbyList.fxml");
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, serverConnectScreen, logInScreen, registerScreen, nicknameScreen,
-                lobbyScreen, gameScreen, globalLeaderboardScreen, lobbyListScreen);
+        mainCtrl.initialize(primaryStage, serverConnectScreen, logInScreen, registerScreen,
+                lobbyScreen, gameScreen, globalLeaderboardScreen);
     }
 }
