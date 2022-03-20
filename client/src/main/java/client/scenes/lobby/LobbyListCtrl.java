@@ -1,6 +1,9 @@
 package client.scenes.lobby;
 
+import static javafx.application.Platform.runLater;
+
 import client.scenes.MainCtrl;
+import client.utils.AlgorithmicUtils;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
@@ -18,10 +21,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import lombok.Generated;
 
 /**
  * Lobby list controller. Controls the lobby list.
  */
+@Generated
 public class LobbyListCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
@@ -55,15 +60,20 @@ public class LobbyListCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+
         this.usernameField.textProperty().addListener((observable, oldValue, newValue) -> {
+            //TODO: Replace this with a server call to change the username when it becomes available.
             System.out.println(newValue);
         });
 
+        // This updates the lobby list every time the user types a char in the search bar.
         this.searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             updateLobbyList(searchField.getText());
         });
 
 
+        // This changes the icon of the edit username button depending on if the username field is editable.
         this.editIcon.glyphNameProperty().bind(
                 Bindings.when(usernameField.editableProperty()).then(
                         "PAPER_PLANE"
@@ -85,12 +95,13 @@ public class LobbyListCtrl implements Initializable {
     private void userButtonClick() {
         if (!userPanelGrid.isVisible()) {
             server.getMyInfo(userDTO -> {
-                javafx.application.Platform.runLater(() -> {
+                runLater(() -> {
                     this.usernameField.setText(userDTO.getUsername());
                     userPanelGrid.setVisible(true);
                     playerImageView.setImage(new Image("https://upload.wikimedia.org/wikipedia/commons/e/e3/Klaus_Iohannis_din_interviul_cu_Dan_Tapalag%C4%83_cropped.jpg"));
                 });
-            }, () -> System.out.println("Getting my data failed"));
+            }, () -> runLater(() ->
+                            mainCtrl.showErrorSnackBar("Something went wrong while fetching your user data.")));
         } else {
             userPanelGrid.setVisible(false);
         }
@@ -98,8 +109,8 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void createLobbyButtonClick() {
-        server.createLobby(game -> javafx.application.Platform.runLater(mainCtrl::showLobbyScreen),
-                () -> System.out.println("creating failed"));
+        server.createLobby(game -> runLater(mainCtrl::showLobbyScreen),
+                () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
     }
 
     @FXML
@@ -129,46 +140,31 @@ public class LobbyListCtrl implements Initializable {
 
     private void updateLobbyList(String filter) {
         server.getLobbies(
-                games -> javafx.application.Platform.runLater(() -> {
+                games -> runLater(() -> {
                     lobbyListVbox.getChildren().clear();
-                    lobbyListVbox.getChildren().addAll(
-                            games.stream().sorted(Comparator.comparing(gameDTO -> levDist(filter,
-                                    createSearchableString(gameDTO)))).map(gameDTO ->
-                                    new LobbyListItemPane(gameDTO, (id) -> server.joinLobby(id, gameDTO1 ->
-                                            javafx.application.Platform.runLater(mainCtrl::showLobbyScreen),
-                                            () -> {}))).collect(Collectors.toList())
-                    );
+
+                    Comparator<GameDTO> comparator = Comparator.comparing(gameDTO ->
+                            AlgorithmicUtils.levenshteinDistance(filter, createSearchableString(gameDTO)));
+
+                    var sortedLobbies = games.stream().sorted(comparator);
+
+                    var generatedLobbies =
+                            sortedLobbies.map(gameDTO ->
+                                    new LobbyListItemPane(gameDTO, (id) ->
+                                            server.joinLobby(id,
+                                                    gameDTO1 -> runLater(mainCtrl::showLobbyScreen),
+                                                    () -> runLater(() ->
+                                                            mainCtrl.showErrorSnackBar(
+                                                                    "Something went wrong while joining the lobby."
+                                                            ))))).collect(Collectors.toList());
+
+                    lobbyListVbox.getChildren().addAll(generatedLobbies);
                 }),
-                () -> {});
+                () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while fetching the lobbies.")));
     }
 
     private String createSearchableString(GameDTO game) {
         return game.getPlayers().stream().filter(gamePlayerDTO -> gamePlayerDTO.getId().equals(game.getHost()))
                 .findFirst().get().getNickname();
-    }
-
-    private int levDist(String a, String b) {
-        var dist = new int[a.length() + 1][b.length() + 1];
-
-        for (int i = 0; i < a.length(); i++) {
-            dist[i][0] = 0;
-        }
-
-        for (int i = 0; i < b.length(); i++) {
-            dist[0][i] = 0;
-        }
-
-        for (int j = 1; j <= b.length(); j++) {
-            for (int i = 1; i <= a.length(); i++) {
-                dist[i][j] =
-                        Math.min(
-                                Math.min(
-                                        dist[i - 1][j] + 1,
-                                        dist[i][j - 1] + 1),
-                                (dist[i - 1][j - 1] + ((a.charAt(i - 1) == b.charAt(j - 1)) ? 0 : 1)));
-            }
-        }
-
-        return dist[a.length()][b.length()];
     }
 }

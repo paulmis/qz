@@ -6,12 +6,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import lombok.Generated;
 
 /**
  * The leaderboard entry pane.
  * This is created only to make the
  * entry creatable inside code.
  */
+@Generated
 public class LeaderboardEntryPane extends StackPane {
 
     private Node view;

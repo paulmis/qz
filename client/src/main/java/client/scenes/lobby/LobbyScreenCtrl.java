@@ -10,12 +10,14 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import lombok.Generated;
 import lombok.Getter;
 
 /**
  * Lobby controller.
  */
 @Getter
+@Generated
 public class LobbyScreenCtrl {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;

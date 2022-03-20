@@ -4,12 +4,14 @@ import javafx.beans.property.SimpleFloatProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
+import lombok.Generated;
 
 /**
  * The class that encompasses the ConfigurationElement.
  * The purpose of this class is to allow the
  * initialization of the control inside code.
  */
+@Generated
 public class ConfigurationElementPane extends StackPane {
     private Node view;
     private ConfigurationElementCtrl controller;

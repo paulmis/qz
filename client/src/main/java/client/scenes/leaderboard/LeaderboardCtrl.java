@@ -23,6 +23,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Circle;
+import lombok.Generated;
 import org.fxyz3d.importers.obj.ObjImporter;
 import org.fxyz3d.shapes.primitives.Text3DMesh;
 
@@ -30,6 +31,7 @@ import org.fxyz3d.shapes.primitives.Text3DMesh;
 /**
  * Leaderboard controller class controls the inside leaderboard.
  */
+@Generated
 public class LeaderboardCtrl implements Initializable {
 
     @FXML private VBox vboxScrollPaneLeaderboard;

@@ -13,11 +13,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import lombok.Generated;
 
 /**
  * The lobby list item controller.
  * Controls a lobby list item.
  */
+@Generated
 public class LobbyListItemCtrl implements Initializable {
     @FXML private AnchorPane lobbyInfoPane;
     @FXML private JFXButton showLobbyInfoButton;
@@ -75,8 +77,11 @@ public class LobbyListItemCtrl implements Initializable {
         AnchorPane.setLeftAnchor(extraInfoScreen, 0d);
         AnchorPane.setRightAnchor(extraInfoScreen, 0d);
 
+        // a boolean that depicts if the lobby is full
         var lobbyFull = game.getPlayers().size() == game.getConfiguration().getCapacity();
 
+        // If the lobby is full the button is disabled and the text says FULL
+        // Otherwise the text is Join and the button is enabled.
         this.joinLobbyButton.setText((lobbyFull ? "FULL " : "JOIN ")
                         + game.getPlayers().size() + "/" + game.getConfiguration().getCapacity());
         this.joinLobbyButton.setDisable(lobbyFull);

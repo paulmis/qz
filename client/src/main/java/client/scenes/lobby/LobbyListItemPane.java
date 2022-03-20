@@ -5,11 +5,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import lombok.Generated;
 
 /**
  * The lobby list item pane.
  * It is used as a wrapper for a lobby list item.
  */
+@Generated
 public class LobbyListItemPane extends StackPane {
 
     private Node view;

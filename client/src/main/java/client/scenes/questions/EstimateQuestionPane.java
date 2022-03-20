@@ -3,6 +3,7 @@ package client.scenes.questions;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
+import lombok.Generated;
 
 /**
  * The class that encompasses the estimate
@@ -10,6 +11,7 @@ import javafx.scene.layout.StackPane;
  * The purpose of this class is to allow the
  * generation of the control inside code.
  */
+@Generated
 public class EstimateQuestionPane extends StackPane {
 
     private Node view;

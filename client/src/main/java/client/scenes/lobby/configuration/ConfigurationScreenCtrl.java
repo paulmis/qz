@@ -14,6 +14,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import jdk.jfr.Description;
+import lombok.Generated;
 import lombok.NonNull;
 
 
@@ -21,6 +22,7 @@ import lombok.NonNull;
  * The controller for the ConfigurationScreen.
  * It handles all the actions of the ConfigurationScreen.
  */
+@Generated
 public class ConfigurationScreenCtrl implements Initializable {
 
     /**

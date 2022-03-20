@@ -9,11 +9,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.util.StringConverter;
+import lombok.Generated;
 
 /**
  * The controller for a configuration element.
  * This control is to be used inside of a ConfigurationScreen.
  */
+@Generated
 public class ConfigurationElementCtrl implements Initializable {
 
     @FXML private Label elementLabel;

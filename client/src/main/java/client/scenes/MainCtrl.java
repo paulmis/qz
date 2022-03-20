@@ -25,10 +25,17 @@ import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
+import com.jfoenix.controls.JFXSnackbar;
+import com.jfoenix.controls.JFXSnackbarLayout;
 import commons.entities.game.configuration.GameConfigurationDTO;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Parent;
@@ -40,7 +47,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import javafx.util.Pair;
 import lombok.Generated;
 
@@ -77,6 +84,8 @@ public class MainCtrl {
     private Parent lobbyListScreen;
 
     private Popup lobbySettingsPopUp;
+
+    private Parent activeScreen;
 
     /**
      * Initialize the main controller.
@@ -165,10 +174,12 @@ public class MainCtrl {
         Fixed,
     }
 
+
     private void showScreenLetterBox(Parent parent, StageScalingStrategy strategy) {
         if (primaryStage.getScene() == null) {
             primaryStage.setScene(new Scene(new Group(new StackPane(parent))));
         }
+        activeScreen = parent;
 
         primaryStage.setTitle("Quizzzzz");
         var scene = primaryStage.getScene();
@@ -311,6 +322,41 @@ public class MainCtrl {
         lobbySettingsPopUp.hide();
     }
 
+    /**
+     * Displays an error snackBar to the user.
+     *
+     * @param message The text message that will be displayed in the snackBar.
+     */
+    public void showErrorSnackBar(String message) {
+        var snack = new JFXSnackbar();
+        snack.setStyle("-fx-text-fill: red");
+        snack.registerSnackbarContainer((Pane) activeScreen);
+        snack.fireEvent(new JFXSnackbar.SnackbarEvent(
+                new JFXSnackbarLayout(message),
+                Duration.seconds(1), new PseudoClass() {
+                    @Override
+                    public String getPseudoClassName() {
+                        return "error";
+                    }
+                }));
+        snack.toFront();
+        snack.setViewOrder(-1);
+    }
+
+    /**
+     * Displays an informational snackBar to the user.
+     *
+     * @param message The text message that will be displayed in the snackBar.
+     */
+    public void showInformationalSnackBar(String message) {
+        var snack = new JFXSnackbar();
+        snack.registerSnackbarContainer((Pane) activeScreen);
+        snack.enqueue(new JFXSnackbar.SnackbarEvent(
+                new JFXSnackbarLayout(message),
+                Duration.seconds(1), null));
+        snack.toFront();
+        snack.setViewOrder(-1);
+    }
 
     /**
      * The size listener for the scene.

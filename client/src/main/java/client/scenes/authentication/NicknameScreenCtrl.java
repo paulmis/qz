@@ -18,12 +18,13 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-
+import lombok.Generated;
 
 
 /**
  * Nickname Selecting Screen controller class.
  */
+@Generated
 public class NicknameScreenCtrl implements Initializable {
 
     private final ServerUtils server;
