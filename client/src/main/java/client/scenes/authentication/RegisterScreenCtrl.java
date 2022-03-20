@@ -86,7 +86,7 @@ public class RegisterScreenCtrl implements Initializable {
             pane2.setMouseTransparent(false);
             borderPane2.setMouseTransparent(false);
         } else {
-            System.out.print("No username set !");
+            //No username set
         }
     }
 
@@ -155,13 +155,14 @@ public class RegisterScreenCtrl implements Initializable {
      */
     @FXML
     private void signUpButtonClick() {
-        server.register(this.usernameField.getText(),
+        server.register(usernameField.getText(),
                 emailField.getText(), passwordField.getText(),
                 (s) -> {
                     javafx.application.Platform.runLater(mainCtrl::showLobbyScreen);
+                    //If completed the function redirects the user to the lobby screen
                 },
                 () -> javafx.application.Platform.runLater(() -> {
-                    userExists.setVisible(true); })
+                    userExists.setVisible(true); })//If the function fails it triggers the error message.
         );
     }
 
