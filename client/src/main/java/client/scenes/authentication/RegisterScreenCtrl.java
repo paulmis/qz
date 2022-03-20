@@ -76,7 +76,7 @@ public class RegisterScreenCtrl implements Initializable {
 
     @FXML
     private void setUsername() {
-        if (usernameField.getText().length() > 0 ) {
+        if (usernameField.getText().length() > 0) {
             pane1.setVisible(false);
             pane1.setDisable(true);
             pane1.setMouseTransparent(true);
@@ -100,14 +100,27 @@ public class RegisterScreenCtrl implements Initializable {
         FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.png");
         selectFile.setTitle("Select your Profile Picture");
         selectFile.getExtensionFilters().add(imageFilter);
+        // Filter that allows user to only select image files of types jpg png
         File pictureFile = selectFile.showOpenDialog(mainCtrl.getPrimaryStage());
-        if (pictureFile != null) {
+        // Opens up a dialogue that lets user select a file
+        if (pictureFile != null) {  // Every user needs to select a picture
             usernameSetButton.setDisable(false);
             uploadImage.setVisible(false);
             profilePicture.setImage(new Image(pictureFile.getAbsolutePath()));
         }
     }
 
+    /**
+     * Function that generates an image filled with a colour
+     * based on the 3 rgb values and opacity.
+     *
+     * @param red the amount of red
+     * @param green the amount of green
+     * @param blue the amount of blue
+     * @param opacity the opacity of the image
+     * @return a new Image file that is filled with the colour obtained out of the
+     *          3 rgb values.
+     */
     private Image generateImage(int red, int green, int blue, double opacity) {
         WritableImage img = new WritableImage(1, 1);
         PixelWriter pw = img.getPixelWriter();
@@ -135,6 +148,7 @@ public class RegisterScreenCtrl implements Initializable {
         uploadImage.setVisible(true);
         usernameField.clear();
     }
+
     /**
      * Function that sends new account credentials to server
      * after a button click.
