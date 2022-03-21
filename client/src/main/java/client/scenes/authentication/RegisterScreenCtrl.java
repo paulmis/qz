@@ -42,6 +42,7 @@ public class RegisterScreenCtrl implements Initializable {
     @FXML private ImageView logo;
     @FXML private Label uploadImage;
     @FXML private Label userExists;
+    @FXML private Label registerMessage;
     @FXML private FileChooser selectFile;
     @FXML private Pane pane1;
     @FXML private Pane pane2;
@@ -77,14 +78,15 @@ public class RegisterScreenCtrl implements Initializable {
     @FXML
     private void setUsername() {
         if (usernameField.getText().length() > 0) {
-            pane1.setVisible(false);
-            pane1.setDisable(true);
-            pane1.setMouseTransparent(true);
-            borderPane1.setMouseTransparent(true);
-            pane2.setVisible(true);
-            pane2.setDisable(false);
-            pane2.setMouseTransparent(false);
-            borderPane2.setMouseTransparent(false);
+            server.register(usernameField.getText(),
+                    emailField.getText(), passwordField.getText(),
+                    (s) -> {
+                        javafx.application.Platform.runLater(mainCtrl::showLobbyScreen);
+                        //If completed the function redirects the user to the lobby screen
+                    },
+                    () -> javafx.application.Platform.runLater(() -> {
+                        userExists.setVisible(true); })//If the function fails it triggers the error message.
+            );
         } else {
             //No username set
         }
@@ -135,17 +137,18 @@ public class RegisterScreenCtrl implements Initializable {
      * in case of logouts.
      */
     public void reset() { // We want pane1 to pop up first
-        pane1.setVisible(true);
-        pane1.setDisable(false);
-        pane1.setMouseTransparent(false);
-        borderPane1.setMouseTransparent(false);
-        pane2.setVisible(false);
-        pane2.setDisable(true);
-        pane2.setMouseTransparent(true);
-        borderPane2.setMouseTransparent(true);
+        pane2.setVisible(true);
+        pane2.setDisable(false);
+        pane2.setMouseTransparent(false);
+        borderPane2.setMouseTransparent(false);
+        pane1.setVisible(false);
+        pane1.setDisable(true);
+        pane1.setMouseTransparent(true);
+        borderPane1.setMouseTransparent(true);
         usernameSetButton.setDisable(true);
         profilePicture.setImage(generateImage(200, 200, 200, 1.0));
         uploadImage.setVisible(true);
+        registerMessage.setVisible(false);
         usernameField.clear();
     }
 
@@ -155,15 +158,14 @@ public class RegisterScreenCtrl implements Initializable {
      */
     @FXML
     private void signUpButtonClick() {
-        server.register(usernameField.getText(),
-                emailField.getText(), passwordField.getText(),
-                (s) -> {
-                    javafx.application.Platform.runLater(mainCtrl::showLobbyScreen);
-                    //If completed the function redirects the user to the lobby screen
-                },
-                () -> javafx.application.Platform.runLater(() -> {
-                    userExists.setVisible(true); })//If the function fails it triggers the error message.
-        );
+        pane2.setVisible(false);
+        pane2.setDisable(true);
+        pane2.setMouseTransparent(true);
+        borderPane2.setMouseTransparent(true);
+        pane1.setVisible(true);
+        pane1.setDisable(false);
+        pane1.setMouseTransparent(false);
+        borderPane1.setMouseTransparent(false);
     }
 
     /**

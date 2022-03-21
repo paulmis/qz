@@ -54,3 +54,7 @@
 #connectButton{
     -fx-background-color: #6EB26C;
 }
+
+#registerMessage{
+    -fx-text-fill: #1ed410;
+}
