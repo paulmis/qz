@@ -1,8 +1,8 @@
-package server.database.entities;
+package server.database.entities.game;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static server.TestHelpers.getUUID;
+import static server.utils.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,8 +13,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.database.entities.game.GamePlayer;
-import server.database.entities.game.NormalGame;
+import server.database.entities.User;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.MCQuestion;
@@ -80,7 +79,7 @@ public class NormalGameTest {
         NormalGame repl = new NormalGame(dto);
         assertThat(game)
                 .usingRecursiveComparison()
-                .ignoringFields("players", "questions", "host", "random")
+                .ignoringFields("players", "questions", "answers", "host", "random")
                 .isEqualTo(repl);
     }
 
@@ -131,8 +130,8 @@ public class NormalGameTest {
     }
 
     @Test
-    void removeLobbyNotFound() throws LastPlayerRemovedException {
-        assertFalse(game.remove(UUID.fromString("73246234-2364-2364-2364-236423642364")));
+    void removeNotFound() throws LastPlayerRemovedException {
+        assertFalse(game.remove(getUUID(64)));
     }
 
     @Test
@@ -142,7 +141,7 @@ public class NormalGameTest {
     }
 
     @Test
-    void removeLobbyLastPlayer()  {
+    void removeLastPlayer() {
         assertThrows(LastPlayerRemovedException.class, () -> {
             game.remove(joe.getId());
             game.remove(susanne.getId());

@@ -3,16 +3,15 @@ package server.services;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
+import static server.utils.TestHelpers.getUUID;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import server.database.entities.User;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
@@ -43,23 +42,23 @@ public class LobbyServiceTest {
     void init() {
         // Create users
         joe = new User("joe", "joe@doe.com", "stinkywinky");
-        joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        joe.setId(getUUID(0));
         joePlayer = new GamePlayer(joe);
         joePlayer.setJoinDate(LocalDateTime.parse("2020-03-04T00:00:00"));
 
         susanne = new User("Susanne", "susanne@louisiane.com", "stinkymonkey");
-        susanne.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        susanne.setId(getUUID(1));
         susannePlayer = new GamePlayer(susanne);
         susannePlayer.setJoinDate(LocalDateTime.parse("2022-03-03T00:00:00"));
 
         james = new User("James", "james@blames.com", "stinkydonkey");
-        james.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
+        james.setId(getUUID(2));
         jamesPlayer = new GamePlayer(james);
         jamesPlayer.setJoinDate(LocalDateTime.parse("2022-03-02T00:00:00"));
 
         // Create the game
         lobby = new NormalGame();
-        lobby.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        lobby.setId(getUUID(0));
         lobby.setConfiguration(new NormalGameConfiguration(3, 13, 2));
         lobby.add(joePlayer);
         lobby.add(susannePlayer);

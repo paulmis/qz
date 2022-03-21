@@ -3,7 +3,7 @@ package server.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static server.TestHelpers.getUUID;
+import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.game.GameStatus;
 import java.io.IOException;

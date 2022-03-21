@@ -1,9 +1,9 @@
 package server.database.entities.auth;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static server.utils.TestHelpers.getUUID;
 
 import java.util.Collections;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,7 +19,7 @@ public class AuthContextTests {
     void get() {
         // Create the user
         User joe = new User("joe", "joe@doe.com", "stinkywinky");
-        joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        joe.setId(getUUID(0));
 
         // Set the context
         SecurityContextHolder.getContext().setAuthentication(

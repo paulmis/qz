@@ -7,13 +7,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static server.utils.TestHelpers.getUUID;
 
-import com.google.common.base.Strings;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,8 +31,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import server.database.entities.User;
 import server.database.entities.game.Game;
-import server.database.entities.game.GamePlayer;
-import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
 
@@ -74,11 +71,6 @@ class SSEControllerTest {
         public GameDTO getDTO() {
             return null;
         }
-    }
-
-    private UUID getUUID(int id) {
-        return UUID.fromString(String.format("00000000-0000-0000-0000-%s",
-                Strings.padStart(String.valueOf(id), 11, '0')));
     }
 
     @Test

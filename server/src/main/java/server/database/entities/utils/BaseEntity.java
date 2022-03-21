@@ -20,7 +20,7 @@ import org.hibernate.annotations.GenericGenerator;
 @NoArgsConstructor
 public abstract class BaseEntity<D extends DTO> {
     /**
-     * id - random unique uuid assigned to a certain player.
+     * id - random unique uuid assigned to a certain entity.
      */
     @Id
     @GeneratedValue(generator = "UUID")
