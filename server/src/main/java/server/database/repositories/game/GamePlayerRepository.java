@@ -15,14 +15,4 @@ public interface GamePlayerRepository extends JpaRepository<GamePlayer, UUID> {
     boolean existsByUserIdAndGameStatusNot(UUID userId, GameStatus status);
 
     boolean existsByUserIdAndGameId(UUID userId, UUID gameId);
-
-    /**
-     * Find game player of a user from their user id.
-     *
-     * @param userId user's id
-     * @return empty optional if the user is not a player, otherwise returns game player
-     */
-    @Query("SELECT gp FROM GamePlayer gp "
-            + "WHERE gp.user.id = ?1")
-    Optional<GamePlayer> findGamePlayerByUserId(@NonNull UUID userId);
 }
