@@ -1,6 +1,5 @@
 package server.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalToObject;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
@@ -43,7 +42,6 @@ import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
-import server.database.repositories.question.QuestionRepository;
 import server.services.GameService;
 import server.services.LobbyService;
 
@@ -68,9 +66,6 @@ class LobbyControllerTest {
 
     @MockBean
     private UserRepository userRepository;
-
-    @MockBean
-    private QuestionRepository questionRepository;
 
     @MockBean
     private LobbyService lobbyService;
