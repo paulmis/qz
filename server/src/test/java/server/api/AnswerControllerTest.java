@@ -178,7 +178,7 @@ class AnswerControllerTest {
                 .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userAnswer)))
-                .andExpect(status().isNotAcceptable());
+                .andExpect(status().isConflict());
     }
 
     @Test
