@@ -342,6 +342,9 @@ public class MainCtrl {
         snack.setViewOrder(-1);
     }
 
+    public void showInformationalSnackBar() {
+    }
+
     /**
      * The size listener for the scene.
      * We keep a reference to it to be

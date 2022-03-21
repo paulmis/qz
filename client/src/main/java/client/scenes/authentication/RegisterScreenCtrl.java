@@ -20,6 +20,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import static javafx.application.Platform.runLater;
 import lombok.Generated;
 
 
@@ -85,8 +86,10 @@ public class RegisterScreenCtrl implements Initializable {
             server.register(usernameField.getText(),
                     emailText, passwordText,
                     (s) -> {
-                        mainCtrl.showInformationalSnackBar("Success");
-                        javafx.application.Platform.runLater(mainCtrl::showLobbyListScreen);
+                        runLater(() -> {
+                            mainCtrl.showLobbyListScreen();
+                            mainCtrl.showInformationalSnackBar("Success!");
+                        });
                         //If completed the function redirects the user to the lobby screen
                     },
                     () -> javafx.application.Platform.runLater(() -> {
