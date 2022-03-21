@@ -16,7 +16,6 @@
 
 package server;
 
-import java.util.Random;
 import lombok.Generated;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,15 +27,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @Generated
 @Configuration
 public class Config {
-
-    /** Retrieve a new PRNG object.
-     *
-     * @return Newly-generated PRNG object
-     */
-    @Bean
-    public Random getRandom() {
-        return new Random();
-    }
 
     /**
      * Initialize and set up a new threaded task scheduler.
