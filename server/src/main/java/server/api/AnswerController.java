@@ -57,7 +57,6 @@ public class AnswerController {
     public ResponseEntity userAnswer(
             @RequestBody AnswerDTO answerData,
             @PathVariable UUID gameId) {
-
         // Retrieve game and user
         Optional<Game> gameOpt = gameRepository.findById(gameId);
         Optional<User> userOpt = userRepository.findByEmail(AuthContext.get());
@@ -72,6 +71,11 @@ public class AnswerController {
         // Find GamePlayer
         if (!game.getPlayers().containsKey(user.getId())) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Check if the game is accepting answers.
+        if (!game.isAcceptingAnswers()) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
         // Check if question is correct

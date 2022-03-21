@@ -1,12 +1,11 @@
 package client.utils;
 
-import commons.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.ws.rs.sse.InboundSseEvent;
 import javax.ws.rs.sse.SseEventSource;
-import jdk.jfr.Name;
 import lombok.Generated;
 
 
@@ -32,7 +31,7 @@ public class SSEHandler {
 
     Object handlerSource;
     SseEventSource sseEventSource;
-    Map<SSEMessage, SSEEventHandler> eventHandlers;
+    Map<SSEMessageType, SSEEventHandler> eventHandlers;
 
     /**
      * The constructor of the SSEHandler.
@@ -97,7 +96,7 @@ public class SSEHandler {
         eventHandlers = IntStream.range(0, names.size()).boxed()
                 .collect(Collectors.toMap(names::get, runnables::get));
 
-        eventHandlers.put(SSEMessage.Init, new SSEEventHandler() {
+        eventHandlers.put(SSEMessageType.INIT, new SSEEventHandler() {
             @Override
             public void handle(InboundSseEvent inboundSseEvent) {
                 System.out.println("Initialized connection SSE.");
@@ -131,7 +130,7 @@ public class SSEHandler {
      * @param inboundSseEvent the sse event.
      */
     public void handleEvent(InboundSseEvent inboundSseEvent) {
-        eventHandlers.get(SSEMessage.valueOf(inboundSseEvent.getName())).handle(inboundSseEvent);
+        eventHandlers.get(SSEMessageType.valueOf(inboundSseEvent.getName())).handle(inboundSseEvent);
     }
 
     public void handleException(Throwable throwable) {

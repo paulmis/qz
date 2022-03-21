@@ -1,7 +1,6 @@
 package server.api;
 
 import commons.entities.QuestionDTO;
-import commons.entities.game.GameStatus;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
-import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;

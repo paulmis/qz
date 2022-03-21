@@ -1,6 +1,6 @@
 package client.utils;
 
-import commons.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -20,5 +20,5 @@ public @interface SSEEventHandler {
      *
      * @return the enum.
      */
-    SSEMessage value();
+    SSEMessageType value();
 }
