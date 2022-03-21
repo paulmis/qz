@@ -101,7 +101,7 @@ public class LobbyScreenCtrl {
     public void disbandButtonClick() {
         try {
             this.server.leaveLobby();
-            this.mainCtrl.showLogInScreen();
+            this.mainCtrl.showLobbyListScreen();
         } catch (IllegalStateException e) {
             System.out.println(e);
         }

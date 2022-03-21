@@ -117,11 +117,10 @@ public class ServerUtils {
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .delete();
-        if (request.getStatus() == Response.Status.OK.getStatusCode()) {
-            System.out.println("Left the lobby successfully");
-        } else if (request.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+        if (request.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
             throw new IllegalStateException("User/Lobby not found");
         }
+        System.out.println("Left the lobby successfully");
     }
 
     /**
@@ -133,13 +132,12 @@ public class ServerUtils {
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .post(Entity.json("{}"));
-        if (request.getStatus() == Response.Status.OK.getStatusCode()) {
-            System.out.println("Left the lobby successfully");
-        } else if (request.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+        if (request.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
             throw new IllegalStateException("User/Game not found");
         } else if (request.getStatus() == Response.Status.CONFLICT.getStatusCode()) {
             throw new IllegalStateException("Player could not be removed");
         }
+        System.out.println("Left the game successfully");
     }
 
     /** Gets a list of the leaderboard images from the server.
