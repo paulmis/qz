@@ -35,7 +35,7 @@ public class Activity extends BaseEntity<ActivityDTO> {
      */
     public Activity(ActivityDTO dto) {
         new ModelMapper().map(dto, this);
-        if (getId() == null) {
+        if (dto.getId() == null) {
             // Avoid instances without an id set
             this.id = getUUID(0);
         }
