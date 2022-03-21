@@ -1,5 +1,8 @@
 package client.scenes.authentication;
 
+
+import static javafx.application.Platform.runLater;
+
 import client.scenes.MainCtrl;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
@@ -20,8 +23,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import static javafx.application.Platform.runLater;
 import lombok.Generated;
+
 
 
 /**
@@ -82,7 +85,7 @@ public class RegisterScreenCtrl implements Initializable {
     @FXML
     private void setUsername() {
         if (usernameField.getText().length() > 0) {
-            System.out.print(usernameField.getText() +emailText + passwordText);
+            System.out.print(usernameField.getText() + emailText + passwordText);
             server.register(usernameField.getText(),
                     emailText, passwordText,
                     (s) -> {
@@ -93,8 +96,8 @@ public class RegisterScreenCtrl implements Initializable {
                         //If completed the function redirects the user to the lobby screen
                     },
                     () -> javafx.application.Platform.runLater(() -> {
-                        mainCtrl.showErrorSnackBar("Password must be between 8 and 32 characters!");})
-                    //If the function fails it triggers the error message.
+                        mainCtrl.showErrorSnackBar("Invalid Credentials!"); })
+            //If the function fails it triggers the error message.
             );
         } else {
             //No username set
