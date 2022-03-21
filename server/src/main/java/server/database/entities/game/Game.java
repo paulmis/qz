@@ -81,7 +81,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * List of players currently in the game mapped by their user IDs.
      */
     @JsonManagedReference
-    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     protected Map<UUID, GamePlayer> players = new HashMap<>();
 
     /**

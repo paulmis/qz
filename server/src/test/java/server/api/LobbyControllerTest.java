@@ -42,7 +42,6 @@ import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
-import server.database.repositories.question.QuestionRepository;
 import server.services.GameService;
 import server.services.LobbyService;
 
@@ -67,9 +66,6 @@ class LobbyControllerTest {
 
     @MockBean
     private UserRepository userRepository;
-
-    @MockBean
-    private QuestionRepository questionRepository;
 
     @MockBean
     private LobbyService lobbyService;
@@ -435,7 +431,7 @@ class LobbyControllerTest {
     @Test
     void leaveOk() throws Exception {
         // Mock the service
-        when(gamePlayerRepository.findGamePlayerByUserId(john.getId())).thenReturn(Optional.of(johnPlayer));
+        when(lobbyService.removePlayer(mockLobby, john)).thenReturn(true);
 
         // Request
         this.mockMvc
@@ -444,20 +440,9 @@ class LobbyControllerTest {
     }
 
     @Test
-    void leavePlayerNotFound() throws Exception {
-        // Mock the service
-        when(gamePlayerRepository.findGamePlayerByUserId(john.getId())).thenReturn(Optional.empty());
-
-        // Request
-        this.mockMvc
-                .perform(delete("/api/lobby/leave"))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     void leaveNotFound() throws Exception {
         // Mock the service
-        when(lobbyService.removePlayer(mockLobby, john, johnPlayer)).thenReturn(false);
+        when(lobbyService.removePlayer(mockLobby, john)).thenReturn(false);
 
         // Set the context user
         SecurityContextHolder.getContext().setAuthentication(

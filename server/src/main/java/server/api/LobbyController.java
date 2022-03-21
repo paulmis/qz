@@ -23,7 +23,6 @@ import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
-import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
@@ -274,13 +273,8 @@ public class LobbyController {
             return ResponseEntity.notFound().build();
         }
 
-        Optional<GamePlayer> player = gamePlayerRepository.findGamePlayerByUserId(user.get().getId());
-        if (player.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
         try {
-            lobbyService.removePlayer(lobby.get(), user.get(), player.get());
+            lobbyService.removePlayer(lobby.get(), user.get());
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
