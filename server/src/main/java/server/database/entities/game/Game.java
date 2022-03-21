@@ -1,17 +1,24 @@
 package server.database.entities.game;
 
+import static server.utils.TestHelpers.getUUID;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.persistence.*;
 import lombok.*;
 import org.modelmapper.ModelMapper;
+import server.database.entities.answer.Answer;
+import server.database.entities.answer.AnswerCollection;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
@@ -52,7 +59,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * The game configuration.
      */
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
     protected GameConfiguration configuration;
 
     /**
@@ -78,11 +85,11 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     private SaveableRandom random = new SaveableRandom(this.seed);
 
     /**
-     * List of players currently in the game.
+     * List of players currently in the game mapped by their user IDs.
      */
     @JsonManagedReference
-    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
-    protected Set<GamePlayer> players = new HashSet<>();
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    protected Map<UUID, GamePlayer> players = new HashMap<>();
 
     /**
      * The head of the lobby - person in charge with special privileges.
@@ -104,8 +111,15 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     protected List<Question> questions = new ArrayList<>();
 
     /**
-     * Automatically sets the create date to when the entity is first persisted.
+     * Answers given by each player for each question.
      */
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
+    protected Map<Question, AnswerCollection> answers = new HashMap<>();
+
+    /**
+     * Automatically sets the creation date to when the entity is first persisted.
+     */
+    @Generated
     @PrePersist
     void onCreate() {
         createDate = LocalDateTime.now();
@@ -119,7 +133,12 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public Game(GameDTO dto) {
         ModelMapper mapper = new ModelMapper();
-        this.id = dto.getId();
+        if (dto.getId() == null) {
+            // This id will change once the game entity is saved, but it must be non-null
+            this.id = getUUID(0);
+        } else {
+            this.id = dto.getId();
+        }
         this.gameId = dto.getGameId();
         this.createDate = dto.getCreateDate();
         if (dto.getConfiguration() instanceof NormalGameConfigurationDTO) {
@@ -138,43 +157,92 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public boolean add(GamePlayer player) {
         // Check if the player can be added
-        if (isFull() || !this.players.add(player)) {
+        if (isFull() || players.containsKey(player.getUser().getId())) {
             return false;
         }
+
+        // Add the player
+        this.players.put(player.getUser().getId(), player);
         player.setGame(this);
 
         // If the lobby is empty, add this player as the head of the lobby
         if (this.players.size() == 1) {
             this.host = player;
         }
+
         return true;
     }
 
     /**
-     * Remove a player from the game.
+     * Remove a player from the game. If the game is ongoing, the player will only be marked as abandoned.
+     * If the game has concluded nothing will happen and the function will return false.
      *
-     * @param playerId The id of the player to remove
-     * @return Whether the player was removed.
+     * @param userId the user id of the player to remove
+     * @return whether the player was removed/marked as abandoned
+     * @throws LastPlayerRemovedException if the last player left/abandoned the game
      */
-    public boolean remove(UUID playerId) throws LastPlayerRemovedException {
-        // Remove the player from the game
-        if (!this.players.removeIf(player -> player.getUser().getId().equals(playerId))) {
-            return false;
+    public boolean remove(UUID userId) throws LastPlayerRemovedException {
+        switch (this.status) {
+            case CREATED:
+                // Remove the player from the game
+                if (this.players.remove(userId) == null) {
+                    return false;
+                }
+
+                // If the head left, replace them
+                if (this.host.getUser().getId() == userId) {
+                    this.host = this.players
+                            .values().stream()
+                            .min(Comparator.comparing(GamePlayer::getJoinDate))
+                            .orElse(null);
+
+                    // If the last player left, throw an exception
+                    if (this.host == null) {
+                        throw new LastPlayerRemovedException();
+                    }
+                }
+
+                return true;
+
+            case ONGOING:
+                // If the player had already abandoned the game, return false
+                if (!this.players.containsKey(userId) || this.players.get(userId).isAbandoned()) {
+                    return false;
+                }
+
+                // Mark the player as abandoned
+                this.players.get(userId).setAbandoned(true);
+
+                // Check if all players abandoned the game
+                if (size() == 0) {
+                    throw new LastPlayerRemovedException();
+                }
+
+                return true;
+
+            default:
+                return false;
         }
+    }
 
-        // If the head left, replace them
-        if (this.host.getUser().getId() == playerId) {
-            this.host = this.players.stream()
-                    .min(Comparator.comparing(GamePlayer::getJoinDate))
-                    .orElse(null);
+    /**
+     * Whether the players are allowed to submit an answer or not.
+     */
+    @Transient
+    protected boolean acceptingAnswers = false;
 
-            // If the last player left, throw an exception
-            if (this.host == null) {
-                throw new LastPlayerRemovedException();
-            }
-        }
+    /**
+     * Toggle whether the players are allowed to submit an answer or not, and notify players about the change.
+     *
+     * @param acceptingAnswers whether the players are allowed to submit an answer or not.
+     */
+    public void setAcceptingAnswers(boolean acceptingAnswers) throws IOException {
+        this.acceptingAnswers = acceptingAnswers;
 
-        return true;
+        this.emitters.sendAll(new SSEMessage(
+                this.isAcceptingAnswers()
+                        ? SSEMessageType.START_QUESTION
+                        : SSEMessageType.STOP_QUESTION));
     }
 
     /**
@@ -200,12 +268,77 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
+     * Sets the answer of a player to the current question.
+     *
+     * @param answer the answer to set
+     * @param userId the id of the user giving the answer
+     * @return true if the answer was correctly added
+     */
+    public boolean addAnswer(Answer answer, UUID userId) {
+        // Check if player is actually playing in this game
+        if (!players.containsKey(userId)) {
+            return false;
+        }
+
+        // Fetch player
+        GamePlayer player = players.get(userId);
+        if (player == null) {
+            return false;
+        }
+
+        // Set answer's player
+        answer.setPlayer(player);
+
+        // Get current question
+        Optional<Question> question = getQuestion();
+        if (question.isEmpty()) {
+            return false;
+        }
+
+        // Get answers to current question
+        AnswerCollection currentAnswers = answers.get(question.get());
+        if (currentAnswers == null) {
+            // Init tree if question is answered for the first time
+            currentAnswers = new AnswerCollection();
+            currentAnswers.setId(new AnswerCollection.Pk(getId(), question.get().getId()));
+        }
+
+        currentAnswers.addAnswer(answer);
+
+        // Update answers to question
+        answers.put(question.get(), currentAnswers);
+        return true;
+    }
+
+    /**
+     * Returns the list of answers given by each player to the current question.
+     *
+     * @return answers given by each player to the current question, sorted by player id
+     */
+    public List<Answer> getCurrentAnswers() {
+        // Retrieve current question
+        Optional<Question> questionOpt = getQuestion();
+        if (questionOpt.isEmpty()) {
+            return new ArrayList<>();
+        }
+        Question question = questionOpt.get();
+
+        // Fill list and sort it by player id
+        if (!answers.containsKey(question)) {
+            // No answer given
+            return new ArrayList<>();
+        }
+        List<Answer> currentAnswersList = answers.get(question).getAnswerList();
+        return currentAnswersList;
+    }
+
+    /**
      * Get the number of players in the game.
      *
-     * @return the number of players
+     * @return the number of players still in the game
      */
     public int size() {
-        return players.size();
+        return (int) players.values().stream().filter(players -> !players.isAbandoned()).count();
     }
 
     /**
@@ -231,7 +364,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
                 this.configuration.getDTO(),
                 this.status,
                 this.currentQuestion,
-                this.players.stream().map(GamePlayer::getDTO).collect(Collectors.toSet()),
+                this.players.values().stream().map(GamePlayer::getDTO).collect(Collectors.toSet()),
                 this.host == null ? null : this.host.getId());
     }
 

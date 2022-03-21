@@ -7,13 +7,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static server.utils.TestHelpers.getUUID;
 
-import com.google.common.base.Strings;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,8 +31,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import server.database.entities.User;
 import server.database.entities.game.Game;
-import server.database.entities.game.GamePlayer;
-import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
 
@@ -76,11 +73,6 @@ class SSEControllerTest {
         }
     }
 
-    private UUID getUUID(int id) {
-        return UUID.fromString(String.format("00000000-0000-0000-0000-%s",
-                Strings.padStart(String.valueOf(id), 11, '0')));
-    }
-
     @Test
     void testOpenNotInGame() throws Exception {
         MvcResult mvcResult = this.mockMvc.perform(get("/api/sse/open"))
@@ -98,7 +90,7 @@ class SSEControllerTest {
         Game game = new MockGame();
         game.setStatus(GameStatus.ONGOING);         // Set the game to ongoing
 
-        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(user.getId(), GameStatus.ONGOING))
+        when(gameRepository.getPlayersGame(user.getId()))
                 .thenReturn(Optional.of(game));
 
         MvcResult mvcResult = this.mockMvc.perform(get("/api/sse/open"))

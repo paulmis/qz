@@ -37,7 +37,7 @@ Additionally, these tools will aid you in development and are heavily recommende
 - [Postman](https://www.postman.com/downloads/) - state of the art API testing tool
 
 
-### Running the app
+### Getting it started
 
 The Quizzz app consists of three components: the database, server, and client. Each of these must be run one after another:
 
@@ -76,6 +76,14 @@ The Quizzz app consists of three components: the database, server, and client. E
     * Add `--module-path="<LIB PATH IN JAVAFX FOLDER WHICH WAS DOWNLOADED>"--add-modules=javafx.controls,javafx.fxml` to `VM options/arguments`
 2. Execute `gradle run` (`./gradlew run` on MacOS and Linux) or run `Main` in `/client` to launch the client 
    * the client will spawn in the background
+
+### Populating the database
+
+In order to populate the database, a helper script is provided: `populate_db.py`. To run it, you will need the `activities.json` file (which is included in the repository).
+
+Then, run: `python populate_db.py activities.json -c 100 -r`. The script will create a new user, and use it to access the protected API endpoint. If you have already ran the script before and don't want to register the new user, run the script without the `-r` flag. Additionally, attempting to re-register an existing user will cause the script to fail with the `409` error code.
+
+For more configuration options run `python populate_db.py --help`.
 
 ## How to contribute to it
 `<TBA>`

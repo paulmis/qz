@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import jdk.jfr.Description;
+import lombok.Generated;
 import lombok.NonNull;
 
 
@@ -20,6 +22,7 @@ import lombok.NonNull;
  * The controller for the ConfigurationScreen.
  * It handles all the actions of the ConfigurationScreen.
  */
+@Generated
 public class ConfigurationScreenCtrl implements Initializable {
 
     /**
@@ -35,6 +38,7 @@ public class ConfigurationScreenCtrl implements Initializable {
 
     @FXML private FlowPane mainPane;
     @FXML private JFXButton saveButton;
+    @FXML private AnchorPane rootPane;
     private GameConfigurationDTO gameConfig;
     private boolean editable;
     private SaveHandler saveHandler;
@@ -123,5 +127,14 @@ public class ConfigurationScreenCtrl implements Initializable {
     @FXML
     private void saveConfig() {
         saveHandler.handle(this.gameConfig);
+    }
+
+    /**
+     * This function makes the background of the control transparent.
+     */
+    public void makeTransparent() {
+        this.rootPane.setStyle("-fx-background-color: transparent; "
+                + "-fx-background-radius: 0; "
+                + "-fx-effect: none;");
     }
 }

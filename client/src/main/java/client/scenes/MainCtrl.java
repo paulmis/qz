@@ -20,12 +20,23 @@ import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
+import client.scenes.leaderboard.GlobalLeaderboardCtrl;
+import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
+import com.jfoenix.controls.JFXSnackbar;
+import com.jfoenix.controls.JFXSnackbarLayout;
 import commons.entities.game.configuration.GameConfigurationDTO;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.css.PseudoClass;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -36,6 +47,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.util.Pair;
 import lombok.Generated;
 
@@ -65,7 +77,15 @@ public class MainCtrl {
     private GameScreenCtrl gameScreenCtrl;
     private Parent gameScreen;
 
+    private GlobalLeaderboardCtrl globalLeaderboardCtrl;
+    private Parent globalLeaderboardScreen;
+
+    private LobbyListCtrl lobbyListCtrl;
+    private Parent lobbyListScreen;
+
     private Popup lobbySettingsPopUp;
+
+    private Parent activeScreen;
 
     /**
      * Initialize the main controller.
@@ -78,7 +98,9 @@ public class MainCtrl {
                            Pair<RegisterScreenCtrl, Parent> registerScreen,
                            Pair<NicknameScreenCtrl, Parent> nicknameScreen,
                            Pair<LobbyScreenCtrl, Parent> lobbyScreen,
-                           Pair<GameScreenCtrl, Parent> gameScreen) {
+                           Pair<GameScreenCtrl, Parent> gameScreen,
+                           Pair<GlobalLeaderboardCtrl, Parent> globalLeaderboardScreen,
+                           Pair<LobbyListCtrl, Parent> lobbyListScreen) {
         this.primaryStage = primaryStage;
 
         this.serverConnectScreen = serverConnectScreen.getValue();
@@ -99,10 +121,22 @@ public class MainCtrl {
         this.gameScreen = gameScreen.getValue();
         this.gameScreenCtrl = gameScreen.getKey();
 
+        this.globalLeaderboardScreen = globalLeaderboardScreen.getValue();
+        this.globalLeaderboardCtrl = globalLeaderboardScreen.getKey();
+
+        this.lobbyListScreen = lobbyListScreen.getValue();
+        this.lobbyListCtrl = lobbyListScreen.getKey();
+
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
         lobbySettingsPopUp = new Popup();
         showServerConnectScreen();
+
+        // This makes sure to close every thread when the app is closed.
+        primaryStage.setOnCloseRequest(e -> {
+            Platform.exit();
+            System.exit(0);
+        });
     }
 
     enum StageScalingStrategy {
@@ -140,10 +174,12 @@ public class MainCtrl {
         Fixed,
     }
 
+
     private void showScreenLetterBox(Parent parent, StageScalingStrategy strategy) {
         if (primaryStage.getScene() == null) {
             primaryStage.setScene(new Scene(new Group(new StackPane(parent))));
         }
+        activeScreen = parent;
 
         primaryStage.setTitle("Quizzzzz");
         var scene = primaryStage.getScene();
@@ -181,15 +217,29 @@ public class MainCtrl {
 
     /**
      * This function displays the server connect screen.
-     * It also sets it min width and height
      */
     public void showServerConnectScreen() {
         this.showScreenLetterBox(serverConnectScreen, StageScalingStrategy.Letterbox);
     }
 
     /**
+     * This function displays the global leaderboard screen.
+     */
+    public void showGlobalLeaderboardScreen() {
+        this.showScreenLetterBox(globalLeaderboardScreen, StageScalingStrategy.Letterbox);
+        globalLeaderboardCtrl.reset();
+    }
+
+    /**
+     * This function displays the lobby list screen.
+     */
+    public void showLobbyListScreen() {
+        this.showScreenLetterBox(lobbyListScreen, StageScalingStrategy.Letterbox);
+        lobbyListCtrl.reset();
+    }
+
+    /**
      * This function displays the log in screen.
-     * It also sets it min width and height.
      */
     public void showLogInScreen() {
         this.showScreenLetterBox(logInScreen, StageScalingStrategy.Letterbox);
@@ -197,7 +247,6 @@ public class MainCtrl {
 
     /**
      * This function displays the register screen.
-     * It also sets it min width and height
      */
     public void showRegisterScreen() {
         this.showScreenLetterBox(registerScreen, StageScalingStrategy.Letterbox);
@@ -205,10 +254,10 @@ public class MainCtrl {
 
     /**
      * This function displays the nickname selection screen.
-     * It also sets it min width and height
      */
     public void showNicknameScreen() {
         this.showScreenLetterBox(nicknameScreen, StageScalingStrategy.Letterbox);
+        nicknameScreenCtrl.reset();
     }
 
     /**
@@ -220,10 +269,10 @@ public class MainCtrl {
 
     /**
      * This function displays the game screen.
-     * It also sets it min width and height.
      */
     public void showGameScreen() {
         this.showScreenLetterBox(gameScreen, StageScalingStrategy.Letterbox);
+        gameScreenCtrl.reset();
     }
 
     /**
@@ -273,6 +322,41 @@ public class MainCtrl {
         lobbySettingsPopUp.hide();
     }
 
+    /**
+     * Displays an error snackBar to the user.
+     *
+     * @param message The text message that will be displayed in the snackBar.
+     */
+    public void showErrorSnackBar(String message) {
+        var snack = new JFXSnackbar();
+        snack.setStyle("-fx-text-fill: red");
+        snack.registerSnackbarContainer((Pane) activeScreen);
+        snack.fireEvent(new JFXSnackbar.SnackbarEvent(
+                new JFXSnackbarLayout(message),
+                Duration.seconds(1), new PseudoClass() {
+                    @Override
+                    public String getPseudoClassName() {
+                        return "error";
+                    }
+                }));
+        snack.toFront();
+        snack.setViewOrder(-1);
+    }
+
+    /**
+     * Displays an informational snackBar to the user.
+     *
+     * @param message The text message that will be displayed in the snackBar.
+     */
+    public void showInformationalSnackBar(String message) {
+        var snack = new JFXSnackbar();
+        snack.registerSnackbarContainer((Pane) activeScreen);
+        snack.enqueue(new JFXSnackbar.SnackbarEvent(
+                new JFXSnackbarLayout(message),
+                Duration.seconds(1), null));
+        snack.toFront();
+        snack.setViewOrder(-1);
+    }
 
     /**
      * The size listener for the scene.

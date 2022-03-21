@@ -1,6 +1,7 @@
 package server.api;
 
-import commons.entities.game.GameStatus;
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
+
 
 /**
  * The SSE endpoint - opens new SSE connections.
@@ -45,7 +47,7 @@ public class SSEController {
                     .orElseThrow(() -> new NoSuchElementException("User not found"));
 
             // The user must currently be in a game
-            Game game = gameRepository.findByPlayers_User_IdEqualsAndStatus(user.getId(), GameStatus.ONGOING)
+            Game game = gameRepository.getPlayersGame(user.getId())
                     .orElseThrow(() -> new IllegalStateException("User not in a game"));
 
             // Register emitter callbacks.
@@ -61,6 +63,9 @@ public class SSEController {
 
             // Register emitter to the SSE manager.
             game.emitters.register(user.getId(), emitter);
+
+            // The client will wait for a first event in order to start.
+            emitter.send(new SSEMessage(SSEMessageType.INIT));
 
             return ResponseEntity.ok(emitter);
         } catch (NoSuchElementException e) {
@@ -78,6 +83,9 @@ public class SSEController {
                 log.error("Failed to send error message to client: " + e1.getMessage());
             }
             emitter.complete();
+            return ResponseEntity.badRequest().body(emitter);
+        } catch (IOException e) {
+            log.debug("Failed to create SSE connection: " + e.getMessage());
             return ResponseEntity.badRequest().body(emitter);
         }
     }

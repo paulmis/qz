@@ -1,25 +1,39 @@
-package server.database.entities;
+package server.database.entities.game;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static server.utils.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.database.entities.game.GamePlayer;
-import server.database.entities.game.NormalGame;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import server.database.entities.User;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.MCQuestion;
+import server.services.SSEManager;
 
 /**
  * Tests for NormalGame class.
  */
+@ExtendWith(MockitoExtension.class)
 public class NormalGameTest {
     NormalGame game;
     NormalGameConfiguration config;
@@ -30,19 +44,22 @@ public class NormalGameTest {
     MCQuestion questionA;
     MCQuestion questionB;
 
+    @Captor
+    private ArgumentCaptor<SSEMessage> sseMessageCaptor;
+
     @BeforeEach
     void init() {
         // Create users
         joe = new User("joe", "joe@doe.com", "stinkywinky");
-        joe.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        joe.setId(getUUID(0));
         joePlayer = new GamePlayer(joe);
-        joePlayer.setId(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"));
+        joePlayer.setId(getUUID(1));
         joePlayer.setJoinDate(LocalDateTime.parse("2020-03-04T00:00:00"));
 
         susanne = new User("Susanne", "susanne@louisiane.com", "stinkymonkey");
-        susanne.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        susanne.setId(getUUID(2));
         susannePlayer = new GamePlayer(susanne);
-        susannePlayer.setId(UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"));
+        susannePlayer.setId(getUUID(3));
         susannePlayer.setJoinDate(LocalDateTime.parse("2022-03-03T00:00:00"));
 
         // Create questions
@@ -54,7 +71,7 @@ public class NormalGameTest {
 
         // Create the game
         game = new NormalGame();
-        game.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        game.setId(getUUID(4));
         game.setConfiguration(config);
         game.addQuestions(Arrays.asList(questionA, questionB));
         game.add(joePlayer);
@@ -78,8 +95,26 @@ public class NormalGameTest {
         NormalGame repl = new NormalGame(dto);
         assertThat(game)
                 .usingRecursiveComparison()
-                .ignoringFields("players", "questions", "host", "random")
+                .ignoringFields("players", "questions", "answers", "host", "random")
                 .isEqualTo(repl);
+    }
+
+    @Test
+    void setAcceptingAnswersTrue() throws IOException {
+        SSEManager manager = Mockito.spy(new SSEManager());
+        game.setEmitters(manager);
+        game.setAcceptingAnswers(true);
+        verify(manager).sendAll(sseMessageCaptor.capture());
+        assertEquals(SSEMessageType.START_QUESTION, sseMessageCaptor.getValue().getType());
+    }
+
+    @Test
+    void setAcceptingAnswersFalse() throws IOException {
+        SSEManager manager = Mockito.spy(new SSEManager());
+        game.setEmitters(manager);
+        game.setAcceptingAnswers(false);
+        verify(manager).sendAll(sseMessageCaptor.capture());
+        assertEquals(SSEMessageType.STOP_QUESTION, sseMessageCaptor.getValue().getType());
     }
 
     @Test
@@ -106,7 +141,8 @@ public class NormalGameTest {
 
     @Test
     void size() {
-        assertEquals(2, game.size());
+        joePlayer.setAbandoned(true);
+        assertEquals(1, game.size());
     }
 
     @Test
@@ -122,27 +158,41 @@ public class NormalGameTest {
     }
 
     @Test
-    void removeOk() throws LastPlayerRemovedException {
+    void removeLobbyOk() throws LastPlayerRemovedException {
         assertTrue(game.remove(susanne.getId()));
-        assertFalse(game.getPlayers().contains(susannePlayer));
+        assertFalse(game.getPlayers().containsKey(susanne.getId()));
     }
 
     @Test
     void removeNotFound() throws LastPlayerRemovedException {
-        assertFalse(game.remove(UUID.fromString("73246234-2364-2364-2364-236423642364")));
+        assertFalse(game.remove(getUUID(64)));
     }
 
     @Test
-    void removeHead() throws LastPlayerRemovedException {
+    void removeLobbyHead() throws LastPlayerRemovedException {
         assertTrue(game.remove(joe.getId()));
         assertEquals(game.getHost(), susannePlayer);
     }
 
     @Test
-    void removeLastPlayer()  {
+    void removeLastPlayer() {
         assertThrows(LastPlayerRemovedException.class, () -> {
             game.remove(joe.getId());
             game.remove(susanne.getId());
         });
+    }
+
+    @Test
+    void removeGameOngoingOk() throws LastPlayerRemovedException {
+        game.setStatus(GameStatus.ONGOING);
+        assertTrue(game.remove(susanne.getId()));
+        assertTrue(game.getPlayers().containsKey(susanne.getId()));
+        assertTrue(game.getPlayers().get(susanne.getId()).isAbandoned());
+    }
+
+    @Test
+    void removeGameFinished() throws LastPlayerRemovedException {
+        game.setStatus(GameStatus.FINISHED);
+        assertFalse(game.remove(joe.getId()));
     }
 }

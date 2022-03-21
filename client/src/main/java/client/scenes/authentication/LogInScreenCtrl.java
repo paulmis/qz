@@ -14,11 +14,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
+import lombok.Generated;
 
 
 /**
  * Log in Screen controller class.
  */
+@Generated
 public class LogInScreenCtrl implements Initializable {
 
     private final ServerUtils server;
@@ -61,11 +63,11 @@ public class LogInScreenCtrl implements Initializable {
     @FXML
     private void logInButtonClick() {
         server.logIn(emailField.getText(), passwordField.getText(),
-                (s) -> {
-                    javafx.application.Platform.runLater(mainCtrl::showLobbyScreen);
-                },
+                (s) -> javafx.application.Platform.runLater(mainCtrl::showLobbyListScreen),
                 () -> javafx.application.Platform.runLater(() -> {
-                    wrongCredentials.setVisible(true); })
+                    wrongCredentials.setVisible(true);
+                    mainCtrl.showErrorSnackBar("Something went wrong will logging you in.");
+                })
         );
     }
 
