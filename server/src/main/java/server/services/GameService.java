@@ -1,5 +1,6 @@
 package server.services;
 
+import commons.SSEMessage;
 import commons.entities.game.GameStatus;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -115,8 +116,8 @@ public class GameService {
         try {
             game.getEmitters().sendAll(
                     SseEmitter.event()
-                            .name("playerLeft")
-                            .data(user.getId()));
+                        .name(SSEMessage.PlayerLeft.toString())
+                        .data(user.getId()));
         } catch (IOException ex) {
             // Log failure to update clients
             log.error("Unable to send removePlayer message to all players", ex);

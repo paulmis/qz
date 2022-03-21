@@ -1,0 +1,15 @@
+.jfx-snackbar-content {
+    -fx-background-color: primaryColor;
+    -fx-effect: dropshadow(three-pass-box, gray, 10, 0, 0, 0);
+    -fx-border-radius:30;
+    -fx-background-radius:30;
+}
+.jfx-snackbar-toast {
+    -fx-text-fill: backgroundColor;
+    -fx-border-radius:30;
+    -fx-background-radius:30;
+}
+
+.jfx-snackbar-content:error {
+     -fx-background-color: darkRed;
+ }

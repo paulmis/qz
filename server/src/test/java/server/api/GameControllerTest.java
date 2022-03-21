@@ -122,7 +122,7 @@ public class GameControllerTest {
         game.addQuestions(new ArrayList<>(List.of(question)));
         game.setCurrentQuestion(0);
         this.mockMvc
-                .perform(get("/api/game/" + game.getId() + "/question/"))
+                .perform(get("/api/game/" + game.getId() + "/question"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(equalToObject(
                         objectMapper.writeValueAsString(question.getDTO())
@@ -133,7 +133,7 @@ public class GameControllerTest {
     public void questionEmptyTest() throws Exception {
         // Request question object -> expect a conflict status
         this.mockMvc
-                .perform(get("/api/game/" + game.getId() + "/question/"))
+                .perform(get("/api/game/" + game.getId() + "/question"))
                 .andExpect(status().isConflict());
     }
 
@@ -141,7 +141,7 @@ public class GameControllerTest {
     public void gameNotFoundTest() throws Exception {
         // Request question object -> expect a not found status
         this.mockMvc
-                .perform(get("/api/game/" + getUUID(1) + "/question/"))
+                .perform(get("/api/game/" + getUUID(1) + "/question"))
                 .andExpect(status().isNotFound());
     }
 

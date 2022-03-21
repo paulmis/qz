@@ -74,7 +74,7 @@ public class GameController {
      * @param gameId the UUID of the current game
      * @return information/object of the current question
      */
-    @GetMapping("/{gameId}/question/")
+    @GetMapping("/{gameId}/question")
     ResponseEntity<QuestionDTO> currentQuestion(
             @PathVariable UUID gameId) {
         // Check if game exists.

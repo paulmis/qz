@@ -14,6 +14,7 @@ import static server.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +40,7 @@ import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
+import server.database.entities.game.configuration.SurvivalGameConfiguration;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
@@ -77,6 +79,7 @@ class LobbyControllerTest {
 
     private Game<?> mockLobby;
     private GameConfiguration mockLobbyConfiguration;
+    private NormalGameConfiguration normalGameConfiguration;
     private User john;
     private User susanne;
     private User sally;
@@ -113,6 +116,7 @@ class LobbyControllerTest {
         mockLobby.setStatus(GameStatus.CREATED);
         mockLobbyConfiguration = new NormalGameConfiguration(10, 10, 2);
         mockLobby.setConfiguration(mockLobbyConfiguration);
+        normalGameConfiguration = new NormalGameConfiguration(4, 8, 6);
 
         // Add players
         johnPlayer = new GamePlayer(john);
@@ -135,7 +139,7 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void getAvailableLobbiesTest() throws Exception {
+    public void getAvailable() throws Exception {
         // Mock a list of lobbies
         Game<?> otherLobby = new NormalGame();
         otherLobby.setId(getUUID(1));
@@ -153,7 +157,7 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void lobbyInfoTest() throws Exception {
+    public void getOk() throws Exception {
         // Request
         this.mockMvc.perform(get("/api/lobby/" + mockLobby.getId()))
                 .andExpect(status().isOk())
@@ -163,7 +167,7 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void lobbyNotFoundInfoTest() throws Exception {
+    public void getNotFound() throws Exception {
         // Request
         this.mockMvc
                 .perform(get("/api/lobby/" + getUUID(1)))
@@ -171,7 +175,23 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void joinOkTest() throws Exception {
+    public void configGetConfigTest() throws Exception {
+        this.mockMvc
+                .perform(get("/api/lobby/" + mockLobby.getId() + "/config"))
+                .andExpect(content().string(equalToObject(
+                        objectMapper.writeValueAsString(mockLobby.getConfiguration().getDTO())
+                )));
+    }
+
+    @Test
+    public void configGetLobbyNotFoundTest() throws Exception {
+        this.mockMvc
+                .perform(get("/api/lobby/" + getUUID(1) + "/config"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void joinOk() throws Exception {
         // Modify the capacity to allow the player to join
         mockLobbyConfiguration.setCapacity(3);
 
@@ -189,21 +209,21 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void lobbyNotFoundJoinTest() throws Exception {
+    public void lobbyNotFoundJoin() throws Exception {
         this.mockMvc
                 .perform(put("/api/lobby/" + getUUID(1) + "/join"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void joinAlreadyPresentTest() throws Exception {
+    public void joinAlreadyPresent() throws Exception {
         this.mockMvc
                 .perform(put("/api/lobby/" + mockLobby.getId() + "/join"))
                 .andExpect(status().isConflict());
     }
 
     @Test
-    public void joinStartedGameTest() throws Exception {
+    public void joinStartedGame() throws Exception {
         // Mock a started game
         mockLobby.setStatus(GameStatus.ONGOING);
 
@@ -211,6 +231,106 @@ class LobbyControllerTest {
         this.mockMvc
                 .perform(put("/api/lobby/" + mockLobby.getId() + "/join"))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    public void configPostLobbyConfigurationUpdateTest() throws Exception {
+        mockLobby.setStatus(GameStatus.CREATED);
+        mockLobby.setHost(johnPlayer);
+
+        // Request
+        this.mockMvc
+                .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(normalGameConfiguration.getDTO())))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void configPostLobbyConfigurationUpdateNotAcceptableTest() throws Exception {
+        mockLobby.setStatus(GameStatus.CREATED);
+        mockLobby.setHost(johnPlayer);
+        SurvivalGameConfiguration survivalGameConfiguration = new SurvivalGameConfiguration(1.25f);
+
+        // Request
+        this.mockMvc
+                .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(survivalGameConfiguration.getDTO())))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    public void configPostLobbyConfigurationUpdatedTest() throws Exception {
+        mockLobby.setStatus(GameStatus.CREATED);
+        mockLobby.setHost(johnPlayer);
+
+        // Send the new configuration
+        this.mockMvc
+                .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(normalGameConfiguration.getDTO())))
+                .andExpect(status().isOk());
+
+        // Check if configuration has indeed updated
+        this.mockMvc
+                .perform(get("/api/lobby/" + mockLobby.getId() + "/config"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(equalToObject(
+                        objectMapper.writeValueAsString(normalGameConfiguration.getDTO())
+                )));
+    }
+
+    @Test
+    public void configPostLobbyNotFoundTest() throws Exception {
+        mockLobby.setStatus(GameStatus.CREATED);
+        mockLobby.setHost(johnPlayer);
+
+        // Request
+        this.mockMvc
+                .perform(post("/api/lobby/" + getUUID(5) + "/config")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(normalGameConfiguration.getDTO())))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void configPostUserNotFoundTest() throws Exception {
+        when(userRepository.findByEmail(john.getEmail())).thenReturn(Optional.empty());
+        mockLobby.setStatus(GameStatus.CREATED);
+
+        // Request
+        this.mockMvc
+                .perform(post("/api/lobby/" + getUUID(5) + "/config")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(normalGameConfiguration.getDTO())))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void configPostLobbyNotCreatedTest() throws Exception {
+        mockLobby.setStatus(GameStatus.ONGOING);
+        mockLobby.setHost(johnPlayer);
+
+        // Request
+        this.mockMvc
+                .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(normalGameConfiguration.getDTO())))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void configPostUserNotHostTest() throws Exception {
+        mockLobby.setStatus(GameStatus.CREATED);
+        mockLobby.setHost(susannePlayer);
+
+        // Request
+        this.mockMvc
+                .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(normalGameConfiguration.getDTO())))
+                .andExpect(status().isForbidden());
     }
 
     @Test

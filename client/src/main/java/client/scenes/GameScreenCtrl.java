@@ -3,11 +3,14 @@ package client.scenes;
 import client.scenes.questions.EstimateQuestionPane;
 import client.scenes.questions.MultipleChoiceQuestionCtrl;
 import client.scenes.questions.MultipleChoiceQuestionPane;
+import client.utils.SSEEventHandler;
+import client.utils.SSEHandler;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
+import commons.SSEMessage;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.MalformedURLException;
@@ -32,14 +35,19 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
+import lombok.Generated;
+
 
 /**
  * Game Screen Controller.
  * Handles question changing and interactivity of the user.
  */
+@Generated
 public class GameScreenCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+
+    private SSEHandler sseHandler;
 
     @FXML private BorderPane mainBorderPane;
     @FXML private HBox avatarHBox;
@@ -99,6 +107,16 @@ public class GameScreenCtrl implements Initializable {
 
         // This loads the estimate question type.
         loadMockEstimate();
+    }
+
+    /**
+     * This function resets the game screen ctrl.
+     * It handles all the required set-up that needs to be done for a game to start.
+     */
+    public void reset() {
+        // this starts the sse connection
+        sseHandler = new SSEHandler(this);
+        server.subscribeToSSE(sseHandler);
     }
 
     /**
@@ -340,5 +358,13 @@ public class GameScreenCtrl implements Initializable {
     @FXML
     private void volumeButtonClick(ActionEvent actionEvent) {
         volume.setValue(volume.getValue() == 0 ? 100 : 0);
+    }
+
+    /**
+     * Example of a sse event handler.
+     */
+    @SSEEventHandler(SSEMessage.PlayerLeft)
+    public void playerLeft(String playerId) {
+
     }
 }

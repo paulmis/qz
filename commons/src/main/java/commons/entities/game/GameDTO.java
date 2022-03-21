@@ -1,5 +1,6 @@
 package commons.entities.game;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.utils.DTO;
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @ToString(callSuper = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GameDTO implements DTO {
     /**
      * The unique identifier of the game.
