@@ -8,10 +8,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
@@ -32,11 +32,11 @@ public class GameService {
     /**
      * Provides the specified amount of questions, excluding the specified questions.
      *
-     * @param count The amount of questions to return.
+     * @param count         The amount of questions to return.
      * @param usedQuestions The questions to exclude.
      * @return Randomly chosen questions.
      * @throws IllegalStateException If the amount of questions to return is greater than the amount of
-     *      questions in the database.
+     *                               questions in the database.
      */
     public List<Question> provideQuestions(int count, List<Question> usedQuestions) throws IllegalStateException {
         // Check that there are enough questions
@@ -70,7 +70,7 @@ public class GameService {
      *
      * @param game the game to start
      * @throws UnsupportedOperationException if a game other than a definite game is started
-     * @throws IllegalStateException if the game is already started or there aren't enough questions
+     * @throws IllegalStateException         if the game is already started or there aren't enough questions
      */
     @Transactional
     public void startGame(Game game)
@@ -97,30 +97,24 @@ public class GameService {
      *
      * @param game the game to remove the player from
      * @param user the user to remove
-     * @return if the player has already abandoned the game, or the player isn't in the game, return false
+     * @throws IllegalStateException if the player has already abandoned the game, or the player isn't in the game
      */
     @Transactional
-    public boolean removePlayer(Game game, User user) {
+    public void removePlayer(Game game, User user) throws IllegalStateException {
         try {
             // If the removal fails, the player has already abandoned the lobby
-            if (!game.remove(user.getId()) || !game.getEmitters().disconnect(user.getId())) {
-                return false;
+            if (!game.remove(user.getId())) {
+                throw new IllegalStateException("Impossible to remove the player");
             }
         } catch (LastPlayerRemovedException ex) {
             // If the player was the last player, conclude the game
             game.setStatus(GameStatus.FINISHED);
-
-            // Disconnect the player
-            if (!game.getEmitters().disconnect(user.getId())) {
-                return false;
-            }
         }
 
-        // Update clients
+        // Disconnect the player and update clients
+        game.getEmitters().disconnect(user.getId());
         try {
-            game
-                .getEmitters()
-                .sendAll(
+            game.getEmitters().sendAll(
                     SseEmitter.event()
                         .name(SSEMessage.PlayerLeft.toString())
                         .data(user.getId()));
@@ -128,6 +122,5 @@ public class GameService {
             // Log failure to update clients
             log.error("Unable to send removePlayer message to all players", ex);
         }
-        return true;
     }
 }
