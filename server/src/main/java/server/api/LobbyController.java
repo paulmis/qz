@@ -278,7 +278,6 @@ public class LobbyController {
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-        gameRepository.save(lobby.get());
         return ResponseEntity.ok().build();
     }
 }
