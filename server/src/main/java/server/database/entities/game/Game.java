@@ -247,11 +247,11 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public void setAcceptingAnswers(boolean acceptingAnswers) throws IOException {
         this.acceptingAnswers = acceptingAnswers;
-        if (this.isAcceptingAnswers()) {
-            this.emitters.sendAll(new SSEMessage(SSEMessageType.START_QUESTION));
-        } else {
-            this.emitters.sendAll(new SSEMessage(SSEMessageType.STOP_QUESTION));
-        }
+
+        this.emitters.sendAll(new SSEMessage(
+                this.isAcceptingAnswers() ?
+                    SSEMessageType.START_QUESTION :
+                    SSEMessageType.STOP_QUESTION));
     }
 
     /**

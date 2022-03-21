@@ -49,7 +49,7 @@ public class AnswerController {
     public ResponseEntity<HttpStatus> userAnswer(
             @RequestBody AnswerDTO answerData,
             @PathVariable @NonNull UUID gameId) {
-        //Check if game exists.
+        // Check if game exists.
         Optional<Game> game = gameRepository.findById(gameId);
         if (game.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -57,10 +57,10 @@ public class AnswerController {
 
         // Check if the game is accepting answers.
         if (!game.get().isAcceptingAnswers()) {
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
-        //Send 200 status if answer is sent successfully.
+        // Send 200 status if answer is sent successfully.
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import server.utils.CommunicationHelpers;
+import server.utils.SSE;
 
 /**
  * Manager class to handle SSE emitters.
@@ -103,7 +103,7 @@ public class SSEManager {
      * @throws IOException If the message could not be sent.
      */
     public boolean send(UUID userId, SSEMessage message) throws IOException {
-        return send(userId, CommunicationHelpers.createSseEvent(message));
+        return send(userId, SSE.createEvent(message));
     }
 
     /**
@@ -131,7 +131,7 @@ public class SSEManager {
      * @throws IOException If the message could not be sent.
      */
     public boolean send(Iterable<UUID> users, SSEMessage message) throws IOException {
-        return send(users, CommunicationHelpers.createSseEvent(message));
+        return send(users, SSE.createEvent(message));
     }
 
     /**
@@ -153,7 +153,7 @@ public class SSEManager {
      * @throws IOException If the message could not be sent.
      */
     public void sendAll(SSEMessage message) throws IOException {
-        sendAll(CommunicationHelpers.createSseEvent(message));
+        sendAll(SSE.createEvent(message));
     }
 
     /**
