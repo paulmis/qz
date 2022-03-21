@@ -6,25 +6,43 @@ plugins {
 application {
     mainClass = 'client.Main'
 }
+repositories {
+	mavenCentral()
+}
 
 javafx {
     version = "17.0.2"
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    modules = [ 'javafx.controls', 'javafx.fxml']
 }
 
 dependencies {
 	implementation project(":commons")
-	implementation group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '3.0.3'
-	implementation group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '3.0.3'
-	implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '3.0.3'
+	implementation group: 'org.apache.cxf', name: 'cxf-rt-rs-client', version: '3.5.1'
+	implementation group: 'org.apache.cxf', name: 'cxf-rt-rs-sse', version: '3.5.1'
+	implementation group: 'org.apache.cxf', name: 'cxf-rt-frontend-jaxrs', version: '3.5.1'
+	implementation group: 'org.apache.cxf', name: 'cxf-rt-rs-extension-providers', version: '3.5.1'
+	implementation 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.11.2'
 
-	implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.0.1'
-	
 	implementation 'com.google.inject:guice:5.0.1'
+	implementation 'org.fxyz3d:fxyz3d:0.5.4'
+	implementation 'org.fxyz3d:fxyz3d-importers:0.5.4'
 
 	implementation 'org.openjfx:javafx-controls:17.0.2'
 	implementation 'org.openjfx:javafx-fxml:17.0.2'
 
+	// this is for deserializing dates
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.5'
 	implementation group: 'com.jfoenix', name: 'jfoenix', version: '9.0.9'
 	implementation group: 'de.jensd', name: 'fontawesomefx-fontawesome', version: '4.7.0-9.1.2'
+}
+
+run {
+	jvmArgs = [
+			"--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED",
+			"--add-exports=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED",
+			"--add-exports=javafx.base/com.sun.javafx.binding=ALL-UNNAMED",
+			"--add-exports=javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED",
+			"--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED",
+			"--add-exports=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED"
+	]
 }

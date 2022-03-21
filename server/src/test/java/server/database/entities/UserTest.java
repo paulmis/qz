@@ -1,10 +1,8 @@
 package server.database.entities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import commons.entities.UserDTO;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class UserTest {

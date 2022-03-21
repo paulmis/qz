@@ -1,5 +1,7 @@
 package server.database.entities.question;
 
+import static server.utils.TestHelpers.getUUID;
+
 import commons.entities.ActivityDTO;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,6 +35,10 @@ public class Activity extends BaseEntity<ActivityDTO> {
      */
     public Activity(ActivityDTO dto) {
         new ModelMapper().map(dto, this);
+        if (dto.getId() == null) {
+            // Avoid instances without an id set
+            this.id = getUUID(0);
+        }
     }
 
     /**
@@ -48,7 +54,7 @@ public class Activity extends BaseEntity<ActivityDTO> {
      */
     @Column(nullable = false)
     @PositiveOrZero
-    private int cost;
+    private long cost;
 
     /**
      * The filepath to the icon of the activity.
@@ -57,7 +63,9 @@ public class Activity extends BaseEntity<ActivityDTO> {
 
     /**
      * Source of the information in the activity.
+     * Any sane URL will be at most 2048 characters long, hence this length limit.
      */
+    @Column(length = 2048)
     @URL
     private String source;
 

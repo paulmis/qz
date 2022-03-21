@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import server.database.entities.utils.BaseEntity;
+import server.database.entities.User;
 import server.database.repositories.UserRepository;
 
 /**
@@ -40,7 +40,7 @@ public class LeaderboardController {
                                                              @RequestParam Optional<Integer> size) {
         Pageable paging = PageRequest.of(page.orElse(0), Math.min(MAX_PAGE_SIZE, size.orElse(MAX_PAGE_SIZE)));
         List<UserDTO> userLeaderboard = userRepository.findAllByOrderByScoreDesc(paging).stream()
-                .map(BaseEntity::getDTO).collect(Collectors.toList());
+                .map(User::getDTO).collect(Collectors.toList());
         return ResponseEntity.ok(userLeaderboard);
     }
 
@@ -57,7 +57,7 @@ public class LeaderboardController {
                                                              @RequestParam Optional<Integer> size) {
         Pageable paging = PageRequest.of(page.orElse(0), Math.min(MAX_PAGE_SIZE, size.orElse(MAX_PAGE_SIZE)));
         List<UserDTO> userLeaderboard = userRepository.findAllByOrderByGamesPlayedDesc(paging).stream()
-                .map(BaseEntity::getDTO).collect(Collectors.toList());
+                .map(User::getDTO).collect(Collectors.toList());
         return ResponseEntity.ok(userLeaderboard);
     }
 }

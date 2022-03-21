@@ -3,7 +3,9 @@ package client.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import commons.entities.messages.SSEMessageType;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.constraints.DecimalMax;
@@ -13,9 +15,10 @@ import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+
 /**
  * The tests for the helper methods
- * found inside the RelfectionUtils class.
+ * found inside the ReflectionUtils class.
  */
 public class ReflectionUtilsTest {
 
@@ -37,6 +40,15 @@ public class ReflectionUtilsTest {
         @Description("balance in euros")
         public Float balance;
         public Integer brothers;
+
+        @SSEEventHandler(SSEMessageType.INIT)
+        public void getBalance() {
+
+        }
+
+        public void otherFunction() {
+
+        }
     }
 
     Person personObj;
@@ -81,4 +93,22 @@ public class ReflectionUtilsTest {
         assertThrows(IllegalArgumentException.class, () -> ReflectionUtils.getMaxValue(balanceField));
         assertEquals(160, ReflectionUtils.getMaxValue(ageField));
     }
+
+    @Test
+    void getAnnotatedMethods() {
+        var annotatedMethodsName = ReflectionUtils.getAnnotatedMethods(personObj, SSEEventHandler.class)
+                .stream().map(Method::getName).collect(Collectors.toList());
+
+        assertEquals(List.of("getBalance"), annotatedMethodsName);
+    }
+
+    @Test
+    void getTextName() throws NoSuchMethodException {
+        var getBalanceMethod = personObj.getClass().getMethod("getBalance");
+        var otherMethod = personObj.getClass().getMethod("otherFunction");
+
+        assertThrows(IllegalArgumentException.class, () -> ReflectionUtils.getSSEEventName(otherMethod));
+        assertEquals(SSEMessageType.INIT, ReflectionUtils.getSSEEventName(getBalanceMethod));
+    }
+
 }

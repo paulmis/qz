@@ -1,14 +1,12 @@
 package server.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+import static server.utils.TestHelpers.getUUID;
 
-import com.google.common.base.Strings;
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
@@ -27,17 +25,6 @@ class SSEManagerTest {
     void setUp() {
         // We want a new SSEManager for each test run.
         sseManager = new SSEManager();
-    }
-
-    /**
-     * Convert an integer to a UUID.
-     *
-     * @param id ID to convert to UUID.
-     * @return Generated UUID.
-     */
-    private UUID getUUID(int id) {
-        return UUID.fromString(String.format("00000000-0000-0000-0000-%s",
-                Strings.padStart(String.valueOf(id), 11, '0')));
     }
 
     /**
@@ -146,7 +133,7 @@ class SSEManagerTest {
         sseManager.register(getUUID(2), emitter2);
 
         // Send a message to the first emitter.
-        assertTrue(sseManager.send(getUUID(1), "test"));
+        assertTrue(sseManager.send(getUUID(1), new SSEMessage(SSEMessageType.INIT)));
 
         // Verify that the `send()` function was called only for the emitter with the given ID.
         verify(emitter1, times(1)).send(any());
@@ -172,7 +159,7 @@ class SSEManagerTest {
         // Get the list of targeted emitters.
         Set<UUID> uuids = Set.of(getUUID(1), getUUID(2));
         // Send the message to the targeted emitters, verify that it was successful.
-        assertTrue(sseManager.send(uuids, "test"));
+        assertTrue(sseManager.send(uuids, new SSEMessage(SSEMessageType.INIT)));
 
         // Verify that the `send()` function was called only for the targeted emitters.
         verify(emitter1, times(1)).send(any());
@@ -197,7 +184,7 @@ class SSEManagerTest {
         sseManager.register(getUUID(3), emitter3);
 
         // Send the message to all emitters.
-        sseManager.sendAll("test");
+        sseManager.sendAll(new SSEMessage(SSEMessageType.INIT));
 
         // Verify that the `send()` function was called for all emitters.
         verify(emitter1, times(1)).send(any());
@@ -213,7 +200,7 @@ class SSEManagerTest {
     @Test
     void testSendUnknown() throws IOException {
         // Function should return false.
-        assertFalse(sseManager.send(getUUID(1), "test"));
+        assertFalse(sseManager.send(getUUID(1), new SSEMessage(SSEMessageType.INIT)));
     }
 
     /**
@@ -236,7 +223,7 @@ class SSEManagerTest {
         Set<UUID> uuids = Set.of(getUUID(1), getUUID(2), getUUID(3));
 
         // Function call should return false, because we have a user without an emitter in the set.
-        assertFalse(sseManager.send(uuids, "test"));
+        assertFalse(sseManager.send(uuids, new SSEMessage(SSEMessageType.INIT)));
 
         // All users that were in the set and have emitters registered should be notified.
         verify(emitter1, times(1)).send(any());

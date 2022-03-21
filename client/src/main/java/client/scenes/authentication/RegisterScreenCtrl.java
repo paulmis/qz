@@ -10,11 +10,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import lombok.Generated;
 
 
 /**
  * Register Screen controller class.
  */
+@Generated
 public class RegisterScreenCtrl implements Initializable {
 
     private final ServerUtils server;

@@ -1,9 +1,11 @@
 package server.api;
 
+import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.NonNull;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.User;
+import server.database.entities.answer.Answer;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
+import server.database.entities.question.Activity;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
+import server.database.repositories.question.ActivityRepository;
 
 /**
  * AnswerController, controller for all api endpoints of question answers.
@@ -38,6 +43,9 @@ public class AnswerController {
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
 
+    @Autowired
+    private ActivityRepository activityRepository;
+
     /**
      * Sends the users answers to the server.
      *
@@ -46,16 +54,72 @@ public class AnswerController {
      * @return ok status if successful, not found status if game doesn't exist
      */
     @PutMapping("/{gameId}/answer")
-    public ResponseEntity<HttpStatus> userAnswer(
+    public ResponseEntity userAnswer(
             @RequestBody AnswerDTO answerData,
-            @PathVariable @NonNull UUID gameId) {
-        //Check if game exists.
-        if (!gameRepository.existsById(gameId)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            @PathVariable UUID gameId) {
+        // Retrieve game and user
+        Optional<Game> gameOpt = gameRepository.findById(gameId);
+        Optional<User> userOpt = userRepository.findByEmail(AuthContext.get());
+
+        // Check if game exists.
+        if (gameOpt.isEmpty() || userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        Game game = gameOpt.get();
+        User user = userOpt.get();
+
+        // Find GamePlayer
+        if (!game.getPlayers().containsKey(user.getId())) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        //Send 200 status if answer is sent successfully.
-        return new ResponseEntity<>(HttpStatus.OK);
+        // Check if the game is accepting answers.
+        if (!game.isAcceptingAnswers()) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        // Check if question is correct
+        Optional<Question> currentQuestion = game.getQuestion();
+        if (currentQuestion.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        if (!currentQuestion.get().getId().equals(answerData.getQuestionId())) {
+            // Trying to answer the wrong question
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        // Update the answer
+        Answer userAnswer = new Answer();
+        // Make sure that the activities referenced in the answer are the same of the repository
+        // This is to ensure that no new activities are created when answering a question
+        userAnswer.setResponse(answerData.getResponse().stream()
+                .map(new Function<ActivityDTO, Optional<Activity>>() {
+                    @Override
+                    public Optional<Activity> apply(ActivityDTO dto) {
+                        Optional<Activity> activity = Optional.empty();
+                        if (dto.getId() != null) {
+                            // Get activity by id
+                            activity = activityRepository.findById(dto.getId());
+                        }
+                        if (activity.isPresent()) {
+                            return activity;
+                        } else {
+                            // Get activity by description and cost if the id wasn't enough
+                            return activityRepository
+                                    .findByDescriptionAndCost(dto.getDescription(), dto.getCost());
+                        }
+                    }
+                }).filter(Optional::isPresent) // exclude activities not found
+                .map(Optional::get)
+                .collect(Collectors.toList()));
+        if (game.addAnswer(userAnswer, user.getId())) {
+            // Save updated game
+            gameRepository.save(game);
+
+            // Answer has been received successfully.
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
     /**

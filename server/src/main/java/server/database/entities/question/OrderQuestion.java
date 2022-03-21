@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
-import server.database.entities.Answer;
+import server.database.entities.answer.Answer;
 
 /**
  * OrderQuestion data structure - describes a match question.
@@ -83,7 +83,7 @@ public class OrderQuestion extends Question {
                         "The number of activities in the answer must be the same as the question.");
             }
             // Check if the order of answers' costs is correct
-            int currentVal = ans.getResponse().get(0).getCost();
+            long currentVal = ans.getResponse().get(0).getCost();
             double currentPoints = 0;
             double pointStep = 1.0 / (getActivities().size() - 1);
             if (increasing) {

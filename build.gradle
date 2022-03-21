@@ -30,8 +30,6 @@ subprojects {
 	}
 
 	tasks.named('test') {
-		println "SPRING_PROPS_POSTGRES_HOST:"
-		println System.getenv('SPRING_PROPS_POSTGRES_HOST')
 		useJUnitPlatform()
 		finalizedBy jacocoTestReport 
 	}

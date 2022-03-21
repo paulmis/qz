@@ -1,15 +1,18 @@
 package client.scenes.lobby.configuration;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleFloatProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
+import lombok.Generated;
 
 /**
  * The class that encompasses the ConfigurationElement.
  * The purpose of this class is to allow the
  * initialization of the control inside code.
  */
+@Generated
 public class ConfigurationElementPane extends StackPane {
     private Node view;
     private ConfigurationElementCtrl controller;
@@ -40,7 +43,8 @@ public class ConfigurationElementPane extends StackPane {
         try {
             view = (Node) fxmlLoader.load();
         } catch (Exception e) {
-            System.out.println(e);
+            Platform.exit();
+            System.exit(0);
         }
 
         // Adds it to the children of the view

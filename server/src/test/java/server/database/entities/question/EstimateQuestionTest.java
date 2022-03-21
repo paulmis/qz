@@ -2,15 +2,15 @@ package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import server.database.entities.Answer;
+import server.database.entities.answer.Answer;
 
 class EstimateQuestionTest {
 
@@ -126,12 +126,11 @@ class EstimateQuestionTest {
         String questionText = "aQuestion";
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        UUID anId = UUID.randomUUID();
         Question estimateNoArgs = new EstimateQuestion();
-        estimateNoArgs.setId(anId);
+        estimateNoArgs.setId(getUUID(0));
         estimateNoArgs.setActivities(List.copyOf(activities));
         estimateNoArgs.setText(questionText);
-        Question estimateAllArgs = new EstimateQuestion(anId, activities, questionText);
+        Question estimateAllArgs = new EstimateQuestion(getUUID(0), activities, questionText);
 
         // Constructor comparison
         assertEquals(estimateNoArgs.getId(), estimateAllArgs.getId());
@@ -145,8 +144,7 @@ class EstimateQuestionTest {
         String questionText = "aQuestion";
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        UUID anId = UUID.randomUUID();
-        Question estimateAllArgs = new EstimateQuestion(anId, activities, questionText);
+        Question estimateAllArgs = new EstimateQuestion(getUUID(0), activities, questionText);
         Question estimateCopy = new EstimateQuestion(estimateAllArgs);
 
         // Constructor comparison
