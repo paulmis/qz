@@ -1,5 +1,7 @@
 package server.database.entities.question;
 
+import static server.utils.TestHelpers.getUUID;
+
 import commons.entities.ActivityDTO;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,6 +35,10 @@ public class Activity extends BaseEntity<ActivityDTO> {
      */
     public Activity(ActivityDTO dto) {
         new ModelMapper().map(dto, this);
+        if (dto.getId() == null) {
+            // Avoid instances without an id set
+            this.id = getUUID(0);
+        }
     }
 
     /**

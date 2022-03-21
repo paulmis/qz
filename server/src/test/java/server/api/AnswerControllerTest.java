@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalToObject;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static server.utils.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -35,6 +36,8 @@ import server.database.entities.User;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
+import server.database.entities.game.configuration.GameConfiguration;
+import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.question.Activity;
 import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
@@ -58,12 +61,9 @@ class AnswerControllerTest {
     @MockBean
     private GamePlayerRepository gamePlayerRepository;
 
-    private UUID getUUID(int id) {
-        return UUID.fromString("00000000-0000-0000-0000-00000000000" + (id % 10));
-    }
-
     private static Activity getActivity(int id) {
         Activity a = new Activity();
+        a.setId(getUUID(id));
         a.setDescription("Activity" + (id + 1));
         a.setCost(2 + id * 4);
         return a;
@@ -91,6 +91,7 @@ class AnswerControllerTest {
                 getActivity(3),
                 getActivity(4)));
         ((MCQuestion) mockQuestion).setAnswer(mockQuestion.getActivities().get(1));
+        mockQuestion.setId(getUUID(2));
 
         // Set up a mock game
         mockLobby = new NormalGame();
@@ -98,6 +99,9 @@ class AnswerControllerTest {
         mockLobby.setStatus(GameStatus.ONGOING);
         mockLobby.setQuestions(List.of(mockQuestion));
         mockLobby.setCurrentQuestion(0);
+        GameConfiguration conf = new NormalGameConfiguration();
+        conf.setCapacity(1);
+        mockLobby.setConfiguration(conf);
         when(gameRepository.existsById(mockLobby.getId())).thenReturn(true);
         when(gameRepository.findById(mockLobby.getId())).thenReturn(Optional.of(mockLobby));
 
@@ -109,7 +113,8 @@ class AnswerControllerTest {
         // Set up a mock gamePlayer
         joePlayer = new GamePlayer();
         joePlayer.setUser(joe);
-        joePlayer.setGame(mockLobby);
+        joePlayer.setId(getUUID("a"));
+        mockLobby.add(joePlayer);
         when(gamePlayerRepository.existsByUserIdAndGameId(joe.getId(), mockLobby.getId())).thenReturn(true);
 
         // Set the context user
@@ -119,6 +124,7 @@ class AnswerControllerTest {
                         joe.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
         when(userRepository.findByEmail(joe.getEmail())).thenReturn(Optional.of(joe));
+
     }
 
     private URI answerEndpoint(UUID gameId, Optional<Integer> questionIdx) {
@@ -148,9 +154,10 @@ class AnswerControllerTest {
 
     @Test
     public void userAnswerOkTest() throws Exception {
-
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
+        userAnswer.setResponse(List.of(mockQuestion.getActivities().get(0).getDTO()));
+        userAnswer.setQuestionId(mockQuestion.getId());
         this.mockMvc
                 .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -164,6 +171,29 @@ class AnswerControllerTest {
         AnswerDTO userAnswer = new AnswerDTO();
         this.mockMvc
                 .perform(MockMvcRequestBuilders.put(answerEndpoint(getUUID(1)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userAnswer)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void userAnswerWrongUserTest() throws Exception {
+        // Set up wrong user
+        User susan = new User("susan", "susan@anas.com", "stinkypinky");
+        susan.setId(getUUID(1));
+
+        // Set the context user
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        susan.getEmail(),
+                        susan.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+        when(userRepository.findByEmail(susan.getEmail())).thenReturn(Optional.of(susan));
+
+        // Request
+        AnswerDTO userAnswer = new AnswerDTO();
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userAnswer)))
                 .andExpect(status().isNotFound());

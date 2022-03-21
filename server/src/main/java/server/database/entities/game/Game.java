@@ -1,5 +1,7 @@
 package server.database.entities.game;
 
+import static server.utils.TestHelpers.getUUID;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import commons.entities.game.GameDTO;
@@ -12,6 +14,8 @@ import java.util.stream.Collectors;
 import javax.persistence.*;
 import lombok.*;
 import org.modelmapper.ModelMapper;
+import server.database.entities.answer.Answer;
+import server.database.entities.answer.AnswerCollection;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
@@ -52,7 +56,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * The game configuration.
      */
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
     protected GameConfiguration configuration;
 
     /**
@@ -104,7 +108,13 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     protected List<Question> questions = new ArrayList<>();
 
     /**
-     * Automatically sets the create date to when the entity is first persisted.
+     * Answers given by each player for each question.
+     */
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
+    protected Map<Question, AnswerCollection> answers = new HashMap<>();
+
+    /**
+     * Automatically sets the creation date to when the entity is first persisted.
      */
     @Generated
     @PrePersist
@@ -122,7 +132,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         ModelMapper mapper = new ModelMapper();
         if (dto.getId() == null) {
             // This id will change once the game entity is saved, but it must be non-null
-            this.id = UUID.fromString("00000000-0000-0000-0000-000000000000");
+            this.id = getUUID(0);
         } else {
             this.id = dto.getId();
         }
@@ -156,6 +166,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         if (this.players.size() == 1) {
             this.host = player;
         }
+
         return true;
     }
 
@@ -234,7 +245,72 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
-     * Get the number of players in the game. Does not count abandoned players.
+     * Sets the answer of a player to the current question.
+     *
+     * @param answer the answer to set
+     * @param userId the id of the user giving the answer
+     * @return true if the answer was correctly added
+     */
+    public boolean addAnswer(Answer answer, UUID userId) {
+        // Check if player is actually playing in this game
+        if (!players.containsKey(userId)) {
+            return false;
+        }
+
+        // Fetch player
+        GamePlayer player = players.get(userId);
+        if (player == null) {
+            return false;
+        }
+
+        // Set answer's player
+        answer.setPlayer(player);
+
+        // Get current question
+        Optional<Question> question = getQuestion();
+        if (question.isEmpty()) {
+            return false;
+        }
+
+        // Get answers to current question
+        AnswerCollection currentAnswers = answers.get(question.get());
+        if (currentAnswers == null) {
+            // Init tree if question is answered for the first time
+            currentAnswers = new AnswerCollection();
+            currentAnswers.setId(new AnswerCollection.Pk(getId(), question.get().getId()));
+        }
+
+        currentAnswers.addAnswer(answer);
+
+        // Update answers to question
+        answers.put(question.get(), currentAnswers);
+        return true;
+    }
+
+    /**
+     * Returns the list of answers given by each player to the current question.
+     *
+     * @return answers given by each player to the current question, sorted by player id
+     */
+    public List<Answer> getCurrentAnswers() {
+        // Retrieve current question
+        Optional<Question> questionOpt = getQuestion();
+        if (questionOpt.isEmpty()) {
+            return new ArrayList<>();
+        }
+        Question question = questionOpt.get();
+
+        // Fill list and sort it by player id
+        if (!answers.containsKey(question)) {
+            // No answer given
+            return new ArrayList<>();
+        }
+        List<Answer> currentAnswersList = answers.get(question).getAnswerList();
+        return currentAnswersList;
+    }
+
+    /**
+     * Get the number of players in the game.
      *
      * @return the number of players still in the game
      */
