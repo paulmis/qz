@@ -20,6 +20,7 @@ import java.util.Random;
 import lombok.Generated;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
  * Configuration of the quote application.
@@ -35,5 +36,19 @@ public class Config {
     @Bean
     public Random getRandom() {
         return new Random();
+    }
+
+    /**
+     * Initialize and set up a new threaded task scheduler.
+     *
+     * @return The fully configured scheduler for the game.
+     */
+    @Bean
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
+        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.setThreadNamePrefix("scheduler-");
+        threadPoolTaskScheduler.setThreadGroupName("scheduler-group");
+        threadPoolTaskScheduler.setPoolSize(10);
+        return threadPoolTaskScheduler;
     }
 }
