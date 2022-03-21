@@ -1,10 +1,8 @@
 package server.api;
 
-import commons.SSEMessage;
-import commons.entities.QuestionDTO;
-import commons.entities.game.GameStatus;
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
-import java.time.LocalTime;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,9 +65,7 @@ public class SSEController {
             game.emitters.register(user.getId(), emitter);
 
             // The client will wait for a first event in order to start.
-            SseEmitter.SseEventBuilder event = SseEmitter.event()
-                    .name(SSEMessage.Init.toString());
-            emitter.send(event);
+            emitter.send(new SSEMessage(SSEMessageType.INIT));
 
             return ResponseEntity.ok(emitter);
         } catch (NoSuchElementException e) {

@@ -1,7 +1,10 @@
 package server.database.entities.game.configuration;
 
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
