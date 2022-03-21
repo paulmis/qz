@@ -336,7 +336,7 @@ public class GameScreenCtrl implements Initializable {
     private void quitButtonClick(ActionEvent actionEvent) {
         try {
             this.server.quitGame();
-            this.mainCtrl.showLogInScreen();
+            this.mainCtrl.showLobbyListScreen();
         } catch (IllegalStateException e) {
             System.out.println(e);
         }
