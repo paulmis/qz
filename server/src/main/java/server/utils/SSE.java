@@ -16,7 +16,7 @@ public class SSE {
      * @return The built SSE event.
      */
     public static Set<ResponseBodyEmitter.DataWithMediaType> createEvent(SSEMessage message) {
-        var builder = SseEmitter.event().name(message.getType().name());
+        SseEmitter.SseEventBuilder builder = SseEmitter.event().name(message.getType().name());
         if (message.getData() != null) {
             builder.data(message.getData());
         }
