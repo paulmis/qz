@@ -2,15 +2,15 @@ package server.database.entities.question;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import server.database.entities.Answer;
+import server.database.entities.answer.Answer;
 
 class OrderQuestionTest {
     static Question q;
@@ -183,8 +183,7 @@ class OrderQuestionTest {
     void allArgsConstructorTest() {
         // Test setup
         Question orderNoArgs = new OrderQuestion();
-        UUID anId = UUID.randomUUID();
-        orderNoArgs.setId(anId);
+        orderNoArgs.setId(getUUID(0));
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
         orderNoArgs.setActivities(List.copyOf(activities));
@@ -192,7 +191,7 @@ class OrderQuestionTest {
         orderNoArgs.setText(questionText);
         boolean order = true;
         ((OrderQuestion) orderNoArgs).setIncreasing(order);
-        Question orderAllArgs = new OrderQuestion(anId, activities, questionText, order);
+        Question orderAllArgs = new OrderQuestion(getUUID(0), activities, questionText, order);
 
         // Constructor comparison
         assertEquals(orderNoArgs.getId(), orderAllArgs.getId());
@@ -207,9 +206,8 @@ class OrderQuestionTest {
         String questionText = "aQuestion";
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        UUID anId = UUID.randomUUID();
         boolean order = true;
-        Question orderAllArgs = new OrderQuestion(anId, activities, questionText, order);
+        Question orderAllArgs = new OrderQuestion(getUUID(0), activities, questionText, order);
         Question orderCopy = new OrderQuestion(orderAllArgs, order);
 
         // Constructor comparison

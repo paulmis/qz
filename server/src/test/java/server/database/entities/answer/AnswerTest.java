@@ -1,6 +1,7 @@
-package server.database.entities;
+package server.database.entities.answer;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.AnswerDTO;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ class AnswerTest {
 
     private static Activity getActivity(int id) {
         Activity a = new Activity();
+        a.setId(getUUID(id));
         a.setDescription("Activity" + (id + 1));
         a.setCost(2 + id * 4);
         return a;

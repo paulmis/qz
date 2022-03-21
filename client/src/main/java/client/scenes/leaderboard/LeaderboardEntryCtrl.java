@@ -9,11 +9,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import lombok.Generated;
 
 /**
  * Leaderboard entry controller.
  * Controls the user entry in the leaderboard list.
  */
+@Generated
 public class LeaderboardEntryCtrl implements Initializable {
 
     private final UserDTO user;

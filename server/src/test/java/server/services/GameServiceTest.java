@@ -1,17 +1,9 @@
 package server.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static server.TestHelpers.getUUID;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
@@ -189,7 +181,9 @@ public class GameServiceTest {
 
         // Set status and then call the service to remove joe
         game.setStatus(GameStatus.ONGOING);
-        assertTrue(gameService.removePlayer(game, joe));
+        assertDoesNotThrow(() -> {
+            gameService.removePlayer(game, joe);
+        });
 
         // Verify that the status hasn't changed
         assertEquals(GameStatus.ONGOING, game.getStatus());
@@ -208,7 +202,9 @@ public class GameServiceTest {
         // Remove susanne and then call the service to remove joe
         game.setStatus(GameStatus.ONGOING);
         game.remove(susanne.getId());
-        assertTrue(gameService.removePlayer(game, joe));
+        assertDoesNotThrow(() -> {
+            gameService.removePlayer(game, joe);
+        });
 
         // Verify that the status changed
         assertEquals(GameStatus.FINISHED, game.getStatus());
@@ -224,7 +220,9 @@ public class GameServiceTest {
     void removePlayerNotFound() {
         // Remove a player that is not in the game
         game.setStatus(GameStatus.ONGOING);
-        assertFalse(gameService.removePlayer(game, james));
+        assertThrows(IllegalStateException.class, () -> {
+            gameService.removePlayer(game, james);
+        });
 
         // Verify that the status hasn't changed
         assertEquals(GameStatus.ONGOING, game.getStatus());

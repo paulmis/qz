@@ -1,0 +1,19 @@
+#userPanelGrid {
+    -fx-background-color: backgroundColor;
+    -fx-background-radius: 10;
+    -fx-view-order: -1;
+    -fx-effect: dropshadow(three-pass-box, gray, 2, 10.0, 0, 0);
+}
+#lobbyListAnchorPane {
+    -fx-background-image: url("/client/images/background.jpg");
+    -fx-background-size: cover;
+}
+
+#lobbyListTopBar {
+    -fx-background-color: backgroundColor;
+}
+
+#lobbyListItemsAnchorPane {
+    -fx-background-color: white;
+    -fx-background-radius: 10 10 0 0;
+}

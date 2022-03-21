@@ -13,10 +13,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import lombok.Generated;
 
 /**
  * Global leaderboard controller.
  */
+@Generated
 public class GlobalLeaderboardCtrl implements Initializable {
 
     private final ServerUtils server;
@@ -83,7 +85,7 @@ public class GlobalLeaderboardCtrl implements Initializable {
 
     @FXML
     private void goBackToLobbies() {
-        mainCtrl.showLobbyScreen();
+        mainCtrl.showLobbyListScreen();
         leaderboardPane.stop();
     }
 }

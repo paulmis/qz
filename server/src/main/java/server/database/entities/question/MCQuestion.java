@@ -13,7 +13,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
-import server.database.entities.Answer;
+import server.database.entities.answer.Answer;
 
 /**
  * MCQuestion data structure - describes a multiple choice question.

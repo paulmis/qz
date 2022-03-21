@@ -2,15 +2,18 @@ package client.scenes.leaderboard;
 
 import commons.entities.UserDTO;
 import java.util.List;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import lombok.Generated;
 
 /**
  * The leaderboard pane class wrapper.
  * This is done so the class can be initialized in code.
  */
+@Generated
 public class LeaderboardPane extends StackPane {
 
     private Node view;
@@ -33,7 +36,8 @@ public class LeaderboardPane extends StackPane {
         try {
             view = (Node) fxmlLoader.load();
         } catch (Exception e) {
-            System.out.println(e);
+            Platform.exit();
+            System.exit(0);
         }
 
         // Adds it to the view of this control(stack pane)

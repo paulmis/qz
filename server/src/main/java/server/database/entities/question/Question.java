@@ -1,24 +1,21 @@
 package server.database.entities.question;
 
 import commons.entities.QuestionDTO;
-import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import server.database.entities.Answer;
-import server.database.entities.game.Game;
+import server.database.entities.answer.Answer;
 import server.database.entities.utils.BaseEntity;
-
-/*
-I followed this guide to handle inheritance:
-https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
-*/
 
 /**
  * Question data structure - describes a question of the quiz.
@@ -26,7 +23,6 @@ https://tech.lalitbhatt.net/2014/07/mapping-inheritance-in-hibernate.html
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -51,12 +47,6 @@ public abstract class Question extends BaseEntity<QuestionDTO> {
     protected String text;
 
     /**
-     * Games where this question is asked.
-     */
-    @ManyToMany
-    protected List<Game> games = new ArrayList<>();
-
-    /**
      * Copy constructor for the Question class.
      *
      * @param q an instance of Question to copy.
@@ -65,7 +55,6 @@ public abstract class Question extends BaseEntity<QuestionDTO> {
         this.id = q.id;
         this.activities = q.activities;
         this.text = q.text;
-        this.games = q.games;
     }
 
     /**
