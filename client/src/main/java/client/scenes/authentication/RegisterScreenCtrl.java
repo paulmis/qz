@@ -31,6 +31,8 @@ public class RegisterScreenCtrl implements Initializable {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private String emailText;
+    private String passwordText;
 
     @FXML private JFXButton signUpButton;
     @FXML private JFXButton haveAccountButton;
@@ -79,15 +81,17 @@ public class RegisterScreenCtrl implements Initializable {
     @FXML
     private void setUsername() {
         if (usernameField.getText().length() > 0) {
+            System.out.print(usernameField.getText() +emailText + passwordText);
             server.register(usernameField.getText(),
-                    emailField.getText(), passwordField.getText(),
+                    emailText, passwordText,
                     (s) -> {
-                        mainCtrl.showInformationalSnackBar("success");
-                        javafx.application.Platform.runLater(mainCtrl::showLobbyScreen);
+                        mainCtrl.showInformationalSnackBar("Success");
+                        javafx.application.Platform.runLater(mainCtrl::showLobbyListScreen);
                         //If completed the function redirects the user to the lobby screen
                     },
                     () -> javafx.application.Platform.runLater(() -> {
-                        userExists.setVisible(true); })//If the function fails it triggers the error message.
+                        mainCtrl.showErrorSnackBar("Password must be between 8 and 32 characters!");})
+                    //If the function fails it triggers the error message.
             );
         } else {
             //No username set
@@ -160,6 +164,8 @@ public class RegisterScreenCtrl implements Initializable {
      */
     @FXML
     private void signUpButtonClick() {
+        passwordText = passwordField.getText();
+        emailText = emailField.getText();
         pane2.setVisible(false);
         pane2.setDisable(true);
         pane2.setMouseTransparent(true);
