@@ -8,5 +8,6 @@ public enum SSEMessageType {
     INIT,
     PLAYER_LEFT,
     START_QUESTION,
-    STOP_QUESTION
+    STOP_QUESTION,
+    LOBBY_DELETED,
 }
