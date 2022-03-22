@@ -20,6 +20,8 @@ import javafx.fxml.FXML;
 import lombok.Generated;
 import lombok.Getter;
 
+import java.util.concurrent.ExecutionException;
+
 /**
  * Lobby controller.
  */
@@ -154,7 +156,11 @@ public class LobbyScreenCtrl implements SSESource {
             this.server.leaveLobby();
             this.mainCtrl.showLobbyListScreen();
         } catch (IllegalStateException e) {
-            System.out.println(e);
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
