@@ -110,37 +110,61 @@ public class ServerUtils {
     }
 
     /**
+     * Handler for when the leave lobby succeeds.
+     */
+    public interface LeaveGameHandler {
+        void handle(Response response);
+    }
+
+    /**
      * Function that causes the user to leave the lobby.
      */
-    public void leaveLobby() throws ExecutionException, InterruptedException {
+    public void leaveLobby(LeaveGameHandler leaveGameHandler) {
         var request = client
                 .target(SERVER).path("/api/lobby/leave")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .async()
-                .delete();
-        if (request.get().getStatus() == 404) {
-            throw new IllegalStateException("User/Lobby not found");
-        }
-        System.out.println("Left the lobby successfully");
+                .buildDelete();
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                leaveGameHandler.handle(response);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+
+            }
+        });
+    }
+
+    /**
+     * Handler for when the quitting game succeeds.
+     */
+    public interface QuitGameHandler {
+        void handle(Response response);
     }
 
     /**
      * Function that causes the user to leave the game.
      */
-    public void quitGame() throws ExecutionException, InterruptedException {
+    public void quitGame(QuitGameHandler quitGameHandler) {
         var request = client
                 .target(SERVER).path("/api/game/leave")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .async()
-                .post(Entity.json("{}"));
-        if (request.get().getStatus() == 404) {
-            throw new IllegalStateException("User/Game not found");
-        } else if (request.get().getStatus() == 409) {
-            throw new IllegalStateException("Player could not be removed");
-        }
-        System.out.println("Left the game successfully");
+                .buildPost(Entity.json("{}"));
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                quitGameHandler.handle(response);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                System.out.println(throwable.toString());
+            }
+        });
     }
 
     /** Gets a list of the leaderboard images from the server.
