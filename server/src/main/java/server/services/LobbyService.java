@@ -2,16 +2,14 @@ package server.services;
 
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
+import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.database.entities.User;
 import server.database.entities.game.Game;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.repositories.game.GameRepository;
-import java.io.IOException;
 
 /**
  * Provides business logic for the lobbies.
@@ -52,9 +50,12 @@ public class LobbyService {
      */
     @Transactional(noRollbackFor = IOException.class)
     public boolean deleteLobby(Game lobby, User user) {
-        // Check that the user is the lobby host
-        if (!lobby.getHost().getUser().equals(user)) {
-            return false;
+        // Check if the host is set. If host is null, let anyone can delete the lobby
+        if (lobby.getHost() != null) {
+            // Check that the user is the lobby host
+            if (!lobby.getHost().getUser().equals(user)) {
+                return false;
+            }
         }
 
         // Delete the lobby

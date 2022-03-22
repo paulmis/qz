@@ -93,4 +93,37 @@ public class LobbyServiceTest {
         // Verify interactions
         verifyNoMoreInteractions(gameRepository);
     }
+
+    @Test
+    void deleteLobbyOk() {
+        // Call the service function
+        assertTrue(lobbyService.deleteLobby(lobby, joe));
+
+        // Verify interactions
+        verify(gameRepository, times(1)).delete(lobby);
+        verifyNoMoreInteractions(gameRepository);
+    }
+
+    @Test
+    void deleteLobbyMissingHost() {
+        // Remove lobby host
+        lobby.setHost(null);
+
+        // Call the service function
+        assertTrue(lobbyService.deleteLobby(lobby, susanne));
+
+        // Verify interactions
+        verify(gameRepository, times(1)).delete(lobby);
+        verifyNoMoreInteractions(gameRepository);
+    }
+
+    @Test
+    void deleteLobbyNotHost() {
+        // Call the service function
+        assertFalse(lobbyService.deleteLobby(lobby, susanne));
+
+        // Verify interactions
+        verify(gameRepository, times(0)).delete(lobby);
+        verifyNoMoreInteractions(gameRepository);
+    }
 }
