@@ -18,6 +18,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
+
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -337,7 +339,11 @@ public class GameScreenCtrl implements Initializable {
             this.server.quitGame();
             this.mainCtrl.showLobbyListScreen();
         } catch (IllegalStateException e) {
-            System.out.println(e);
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
