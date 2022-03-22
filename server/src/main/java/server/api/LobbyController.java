@@ -43,13 +43,13 @@ import server.services.LobbyService;
 public class LobbyController {
 
     @Autowired
-    private GameRepository gameRepository;
-
-    @Autowired
     private GameService gameService;
 
     @Autowired
     private LobbyService lobbyService;
+
+    @Autowired
+    private GameRepository gameRepository;
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
@@ -297,27 +297,17 @@ public class LobbyController {
             return ResponseEntity.notFound().build();
         }
 
-        // Check that the user is in a lobby and remove them
+        // Find the user's lobby
         Optional<Game> lobby =
                 gameRepository.findByPlayers_User_IdEqualsAndStatus(user.get().getId(), GameStatus.CREATED);
         if (lobby.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        // Check that the user is the lobby host
-        if (!lobby.get().getHost().getUser().getId().equals(user.get().getId())) {
+        if (!lobbyService.deleteLobby(lobby.get(), user.get())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // Delete the lobby
-        gameRepository.delete(lobby.get());
-
-        // Update players of the deletion
-        try {
-            lobby.get().getEmitters().sendAll(new SSEMessage(SSEMessageType.LOBBY_DELETED));
-        } catch (IOException e) {
-            // Nothing to do
-        }
         return ResponseEntity.ok().build();
     }
 }

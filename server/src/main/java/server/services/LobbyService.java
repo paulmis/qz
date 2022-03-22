@@ -1,12 +1,17 @@
 package server.services;
 
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.database.entities.User;
 import server.database.entities.game.Game;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.repositories.game.GameRepository;
+import java.io.IOException;
 
 /**
  * Provides business logic for the lobbies.
@@ -35,6 +40,35 @@ public class LobbyService {
         } catch (LastPlayerRemovedException ex) {
             gameRepository.delete(lobby);
         }
+        return true;
+    }
+
+    /**
+     * Deletes the lobby from the database. This action can be performed only by the lobby's host.
+     *
+     * @param lobby the lobby being deleted
+     * @param user the user performing the action
+     * @return true if the lobby was successfully deleted, false otherwise
+     */
+    @Transactional(noRollbackFor = IOException.class)
+    public boolean deleteLobby(Game lobby, User user) {
+        // Check that the user is the lobby host
+        if (!lobby.getHost().getUser().equals(user)) {
+            return false;
+        }
+
+        // Delete the lobby
+        gameRepository.delete(lobby);
+
+        // Update players of the deletion
+        try {
+            lobby.getEmitters().sendAll(new SSEMessage(SSEMessageType.LOBBY_DELETED));
+        } catch (IOException e) {
+            // Couldn't notify other players, nothing to do
+        }
+
+        // Close connection to the players
+        lobby.getEmitters().disconnectAll();
         return true;
     }
 }
