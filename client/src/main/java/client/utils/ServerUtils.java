@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -110,13 +111,14 @@ public class ServerUtils {
     /**
      * Function that causes the user to leave the lobby.
      */
-    public void leaveLobby() {
+    public void leaveLobby() throws ExecutionException, InterruptedException {
         var request = client
                 .target(SERVER).path("/api/lobby/leave")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
+                .async()
                 .delete();
-        if (request.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+        if (request.get().getStatus() == 404) {
             throw new IllegalStateException("User/Lobby not found");
         }
         System.out.println("Left the lobby successfully");
@@ -125,15 +127,16 @@ public class ServerUtils {
     /**
      * Function that causes the user to leave the game.
      */
-    public void quitGame() {
+    public void quitGame() throws ExecutionException, InterruptedException {
         var request = client
                 .target(SERVER).path("/api/game/leave")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
+                .async()
                 .post(Entity.json("{}"));
-        if (request.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+        if (request.get().getStatus() == 404) {
             throw new IllegalStateException("User/Game not found");
-        } else if (request.getStatus() == Response.Status.CONFLICT.getStatusCode()) {
+        } else if (request.get().getStatus() == 409) {
             throw new IllegalStateException("Player could not be removed");
         }
         System.out.println("Left the game successfully");
