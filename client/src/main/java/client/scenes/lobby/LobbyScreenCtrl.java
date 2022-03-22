@@ -6,14 +6,13 @@ import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
+import java.util.concurrent.ExecutionException;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.Generated;
 import lombok.Getter;
-
-import java.util.concurrent.ExecutionException;
 
 /**
  * Lobby controller.
