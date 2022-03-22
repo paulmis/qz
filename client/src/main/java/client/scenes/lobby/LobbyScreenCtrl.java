@@ -11,10 +11,9 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javax.ws.rs.core.Response;
 import lombok.Generated;
 import lombok.Getter;
-
-import javax.ws.rs.core.Response;
 
 /**
  * Lobby controller.
@@ -61,7 +60,7 @@ public class LobbyScreenCtrl {
             @Override
             public void handle(Response response) {
                 javafx.application.Platform.runLater(() -> {
-                    switch(response.getStatus()) {
+                    switch (response.getStatus()) {
                         case 200:
                             System.out.println("User successfully removed from lobby");
                             mainCtrl.showLobbyListScreen();
@@ -71,6 +70,8 @@ public class LobbyScreenCtrl {
                             break;
                         case 409:
                             System.out.println("Couldn't remove player");
+                            break;
+                        default:
                             break;
                     }
                 });

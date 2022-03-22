@@ -35,9 +35,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
-import lombok.Generated;
-
 import javax.ws.rs.core.Response;
+import lombok.Generated;
 
 
 /**
@@ -340,7 +339,7 @@ public class GameScreenCtrl implements Initializable {
             @Override
             public void handle(Response response) {
                 javafx.application.Platform.runLater(() -> {
-                    switch(response.getStatus()) {
+                    switch (response.getStatus()) {
                         case 200:
                             System.out.println("User successfully removed from game");
                             mainCtrl.showLobbyListScreen();
@@ -350,6 +349,8 @@ public class GameScreenCtrl implements Initializable {
                             break;
                         case 409:
                             System.out.println("Couldn't remove player");
+                            break;
+                        default:
                             break;
                     }
                 });
