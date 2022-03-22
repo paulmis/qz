@@ -14,6 +14,8 @@ import javafx.stage.Stage;
 import lombok.Generated;
 import lombok.Getter;
 
+import javax.ws.rs.core.Response;
+
 /**
  * Lobby controller.
  */
@@ -55,16 +57,25 @@ public class LobbyScreenCtrl {
      * Fired when the disband button is clicked.
      */
     public void disbandButtonClick() {
-        try {
-            this.server.leaveLobby();
-            this.mainCtrl.showLobbyListScreen();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        this.server.leaveLobby(new ServerUtils.LeaveGameHandler() {
+            @Override
+            public void handle(Response response) {
+                javafx.application.Platform.runLater(() -> {
+                    switch(response.getStatus()) {
+                        case 200:
+                            System.out.println("User successfully removed from lobby");
+                            mainCtrl.showLobbyListScreen();
+                            break;
+                        case 404:
+                            System.out.println("User/Game not found");
+                            break;
+                        case 409:
+                            System.out.println("Couldn't remove player");
+                            break;
+                    }
+                });
+            }
+        });
     }
 
     /**

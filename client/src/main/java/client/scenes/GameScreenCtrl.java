@@ -18,7 +18,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutionException;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -37,6 +36,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import lombok.Generated;
+
+import javax.ws.rs.core.Response;
 
 
 /**
@@ -335,16 +336,25 @@ public class GameScreenCtrl implements Initializable {
      */
     @FXML
     private void quitButtonClick(ActionEvent actionEvent) {
-        try {
-            this.server.quitGame();
-            this.mainCtrl.showLobbyListScreen();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        this.server.quitGame(new ServerUtils.QuitGameHandler() {
+            @Override
+            public void handle(Response response) {
+                javafx.application.Platform.runLater(() -> {
+                    switch(response.getStatus()) {
+                        case 200:
+                            System.out.println("User successfully removed from game");
+                            mainCtrl.showLobbyListScreen();
+                            break;
+                        case 404:
+                            System.out.println("User/Game not found");
+                            break;
+                        case 409:
+                            System.out.println("Couldn't remove player");
+                            break;
+                    }
+                });
+            }
+        });
     }
 
 
