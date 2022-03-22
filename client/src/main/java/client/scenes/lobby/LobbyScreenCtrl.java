@@ -24,8 +24,6 @@ import javafx.scene.layout.VBox;
 import lombok.Generated;
 import lombok.Getter;
 
-import java.util.concurrent.ExecutionException;
-
 /**
  * Lobby controller.
  */
