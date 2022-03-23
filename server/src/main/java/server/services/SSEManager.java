@@ -21,7 +21,6 @@ public class SSEManager {
      * The Map which maps user IDs to SSE emitters.
      * As this class can be called from different threads, we need to use a concurrent map.
      */
-    @ElementCollection
     private Map<UUID, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     /**
