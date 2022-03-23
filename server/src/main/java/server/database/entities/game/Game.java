@@ -4,6 +4,7 @@ import static server.utils.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.google.common.collect.Streams;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
@@ -330,6 +331,40 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         }
         List<Answer> currentAnswersList = answers.get(question).getAnswerList();
         return currentAnswersList;
+    }
+
+    /**
+     * Updates the scores of the users based on the given question
+     * and their answers.
+     *
+     * @param question the question that the answers are for.
+     * @param answers the answers to the question.
+     */
+    public void updateScores(@NonNull Question question, @NonNull List<Answer> answers) {
+        Map<GamePlayer, Double> scores = Streams.zip(
+                        answers.stream().map(Answer::getPlayer),
+                        question.checkAnswer(answers).stream(),
+                        AbstractMap.SimpleEntry::new)
+                        .collect(Collectors.toMap(e -> e.getKey(),
+                                e  -> e.getValue()
+                                        * (configuration.getPointsCorrect() + configuration.getPointsWrong())
+                                        - configuration.getPointsWrong()));
+
+        players.values().forEach(gamePlayer -> {
+            var score = scores.get(gamePlayer);
+            var isCorrect =  score >= 0.75d;
+            if (!isCorrect) {
+                gamePlayer.setStreak(0);
+            } else {
+                if (gamePlayer.getStreak() >= configuration.getStreakSize()) {
+                    score *= configuration.getStreakMultiplier();
+                }
+                gamePlayer.setStreak(gamePlayer.getStreak() + 1);
+            }
+
+            gamePlayer.setScore(gamePlayer.getScore() + (int) Math.round(score));
+        });
+
     }
 
     /**

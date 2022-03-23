@@ -87,7 +87,7 @@ public class GameServiceTest {
         game = new NormalGame();
         game.setEmitters(sseManager);
         game.setId(getUUID(3));
-        game.setConfiguration(new NormalGameConfiguration(3, 13, 2));
+        game.setConfiguration(new NormalGameConfiguration(3, 13, 2, 2, 2f, 100, 0));
         game.add(joePlayer);
         game.add(susannePlayer);
 
