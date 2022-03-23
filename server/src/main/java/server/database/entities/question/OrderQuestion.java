@@ -4,6 +4,7 @@ import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -76,6 +77,8 @@ public class OrderQuestion extends Question {
         if (userAnswers == null) {
             throw new IllegalArgumentException("NULL input");
         }
+
+        // Init
         List<Double> points = new ArrayList<>();
 
         for (Answer ans : userAnswers) {
@@ -83,27 +86,35 @@ public class OrderQuestion extends Question {
                 throw new IllegalArgumentException(
                         "The number of activities in the answer must be the same as the question.");
             }
+
             // Check if the order of answers' costs is correct
-            long currentVal = ans.getResponse().get(0);
+            // Give partial points for partially sorted lists
             double currentPoints = 0;
             double pointStep = 1.0 / (getActivities().size() - 1);
-            if (increasing) {
-                for (int idx = 1; idx < getActivities().size(); idx++) {
-                    if (ans.getResponse().get(idx) >= ans.getResponse().get(idx - 1)) {
-                        currentPoints += pointStep;
+            Function<List<Long>, Double> comparator = new Function<>() {
+                @Override
+                public Double apply(List<Long> values) {
+                    // Assign a partial point for adjacent answers in the correct order
+                    if (values.get(1) == values.get(0)) {
+                        return pointStep;
+                    } else if (values.get(1) > values.get(0)) {
+                        return increasing ? pointStep : 0;
+                    } else {
+                        return increasing ? 0 : pointStep;
                     }
                 }
-            } else {
-                for (int idx = 1; idx < getActivities().size(); idx++) {
-                    if (ans.getResponse().get(idx) <= ans.getResponse().get(idx - 1)) {
-                        currentPoints += pointStep;
-                    }
-                }
+            };
+            for (int idx = 1; idx < getActivities().size(); idx++) {
+                currentPoints += comparator.apply(ans.getResponse().subList(idx - 1, idx + 1));
             }
+
+            // Fix possible rounding errors
             if (currentPoints + pointStep > 1) {
                 // This is to avoid rounding errors like 3*(1/3) != 1
                 currentPoints = 1;
             }
+
+            // Add player's score
             points.add(currentPoints);
         }
         return points;
