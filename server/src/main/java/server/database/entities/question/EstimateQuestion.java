@@ -74,12 +74,9 @@ public class EstimateQuestion extends Question {
             if (ans.getResponse().size() != 1) {
                 throw new IllegalArgumentException("There should be a single activity per answer.");
             }
-            long userError = Math.abs(ans.getResponse().get(0) - target);
-            errors.add(userError);
-            sortedErrors.add(userError);
         }
 
-        return userAnswers.stream().map(answer -> MathHelpers.calculatePercentage(answer.getResponse().get(0).getCost(),
+        return userAnswers.stream().map(answer -> MathHelpers.calculatePercentage(answer.getResponse().get(0),
                 getActivities().get(0).getCost())).collect(Collectors.toList());
     }
 
