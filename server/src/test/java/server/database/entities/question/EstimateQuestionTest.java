@@ -32,10 +32,10 @@ class EstimateQuestionTest {
         q.setActivities(components);
     }
 
-    private Answer getAnswer(int estimate) {
+    private Answer getAnswer(long estimate) {
         Answer ans = new Answer();
-        List<Activity> answerActivities = new ArrayList<>();
-        answerActivities.add(getActivity(estimate));
+        List<Long> answerActivities = new ArrayList<>();
+        answerActivities.add(estimate);
         ans.setResponse(answerActivities);
         return ans;
     }
@@ -62,7 +62,7 @@ class EstimateQuestionTest {
         assertEquals(1, myQuestion.getRightAnswer().getResponse().size());
 
         // Correct activity has right cost
-        assertEquals(costTest, myQuestion.getRightAnswer().getResponse().get(0).getCost());
+        assertEquals(costTest, myQuestion.getRightAnswer().getResponse().get(0));
     }
 
     @Test
@@ -98,11 +98,11 @@ class EstimateQuestionTest {
                 getAnswer(107), // #1
                 getAnswer(0))); // #4
 
-        List<Activity> answerAct = List.of(
-                getActivity(0),
-                getActivity(1),
-                getActivity(2),
-                getActivity(3)
+        List<Long> answerAct = List.of(
+                getActivity(0).getCost(),
+                getActivity(1).getCost(),
+                getActivity(2).getCost(),
+                getActivity(3).getCost()
         );
         Answer a = new Answer();
         a.setResponse(answerAct);

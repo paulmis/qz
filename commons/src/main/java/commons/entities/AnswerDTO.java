@@ -17,7 +17,7 @@ public class AnswerDTO implements DTO {
     /**
      * The list of activities from the Question given as an answer.
      */
-    protected List<? extends ActivityDTO> response = new ArrayList<>();
+    protected List<Long> response = new ArrayList<>();
 
     /**
      * The id of the question being answered.
