@@ -4,6 +4,7 @@ import static server.utils.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import commons.entities.AnswerDTO;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -15,8 +16,11 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
@@ -52,18 +56,34 @@ public class Answer extends BaseEntity<AnswerDTO> {
     protected List<Long> response = new ArrayList<>();
 
     /**
+     * Timestamp of answer creation.
+     */
+    @Column(columnDefinition = "TIMESTAMP")
+    protected LocalDateTime answerDate;
+
+    /**
+     * Automatically sets the creation date to when the entity is first persisted.
+     */
+    @Generated
+    @PrePersist
+    @PreUpdate
+    protected void onCreate() {
+        answerDate = LocalDateTime.now();
+    }
+
+    /**
      * The player that gave the answer.
      */
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "player_id")
-    private GamePlayer player;
+    protected GamePlayer player;
 
     /**
      * The set of answers to the same question this one belongs to.
      */
     @JsonBackReference
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-    private AnswerCollection answerCollection;
+    protected AnswerCollection answerCollection;
 
     @Override
     public AnswerDTO getDTO() {
