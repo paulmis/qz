@@ -1,16 +1,19 @@
 package client.scenes;
 
+import client.communication.game.GameCommunication;
 import client.scenes.questions.EstimateQuestionPane;
 import client.scenes.questions.MultipleChoiceQuestionCtrl;
 import client.scenes.questions.MultipleChoiceQuestionPane;
+import client.utils.ClientState;
 import client.utils.SSEEventHandler;
 import client.utils.SSEHandler;
-import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
 import commons.entities.messages.SSEMessageType;
+import commons.entities.questions.MCQuestionDTO;
+import commons.entities.questions.QuestionDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.MalformedURLException;
@@ -36,6 +39,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import lombok.Generated;
+import org.apache.commons.lang3.NotImplementedException;
 
 
 /**
@@ -44,7 +48,7 @@ import lombok.Generated;
  */
 @Generated
 public class GameScreenCtrl implements Initializable {
-    private final ServerUtils server;
+    private final GameCommunication communication;
     private final MainCtrl mainCtrl;
 
     private SSEHandler sseHandler;
@@ -77,13 +81,13 @@ public class GameScreenCtrl implements Initializable {
     /**
      * Initialize a new controller using dependency injection.
      *
-     * @param server Reference to communication utilities object.
+     * @param communication Reference to communication utilities object.
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public GameScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public GameScreenCtrl(GameCommunication communication, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
-        this.server = server;
+        this.communication = communication;
     }
 
 
@@ -116,7 +120,7 @@ public class GameScreenCtrl implements Initializable {
     public void reset() {
         // this starts the sse connection
         sseHandler = new SSEHandler(this);
-        server.subscribeToSSE(sseHandler);
+        communication.subscribeToSSE(sseHandler);
     }
 
     /**
@@ -193,8 +197,7 @@ public class GameScreenCtrl implements Initializable {
         emojiHBox.getChildren().clear();
 
         // Gets the emojis from the server.
-        var emojiUrls = server.getEmojis();
-
+        var emojiUrls = communication.getEmojis();
 
         try {
 
@@ -235,7 +238,7 @@ public class GameScreenCtrl implements Initializable {
 
         // Gets the power ups from the server.
         // This is subject to change in the future.
-        var powerUpUrls = server.getPowerUps();
+        var powerUpUrls = communication.getPowerUps();
 
         try {
             powerUpUrls.forEach(powerUpUrl -> {
@@ -272,7 +275,7 @@ public class GameScreenCtrl implements Initializable {
         avatarHBox.getChildren().clear();
 
         // Gets the leaderboard image urls from the server.
-        var leaderBoardUrls = server.getLeaderBoardImages();
+        var leaderBoardUrls = communication.getLeaderBoardImages();
 
         try {
 
@@ -334,7 +337,7 @@ public class GameScreenCtrl implements Initializable {
      */
     @FXML
     private void quitButtonClick(ActionEvent actionEvent) {
-        server.quitGame();
+        communication.quitGame();
     }
 
 
@@ -366,5 +369,38 @@ public class GameScreenCtrl implements Initializable {
     @SSEEventHandler(SSEMessageType.PLAYER_LEFT)
     public void playerLeft(String playerId) {
 
+    }
+
+    /**
+     * Transits the client to the question stage.
+     */
+    @SSEEventHandler(SSEMessageType.START_QUESTION)
+    void toQuestionStage() {
+        // Set the current question
+        GameCommunication.getCurrentQuestion(ClientState.game.getId(),
+                // Success
+                (question) -> javafx.application.Platform.runLater(() -> setQuestion(question)),
+                // Failure
+                () -> javafx.application.Platform.runLater(() -> {
+                    mainCtrl.showErrorSnackBar("Unable to retrieve the current question");
+                }));
+
+        // TODO: timer
+    }
+
+    /**
+     * Shows the question on the screen.
+     *
+     * @param question the question to show.
+     */
+    void setQuestion(QuestionDTO question) {
+        // Show the question
+        if (question instanceof MCQuestionDTO) {
+            // TODO: implement
+        } else {
+            throw new NotImplementedException("showQuestion doesn't support " + question.getClass() + " questions yet");
+        }
+
+        ClientState.currentQuestion = question;
     }
 }

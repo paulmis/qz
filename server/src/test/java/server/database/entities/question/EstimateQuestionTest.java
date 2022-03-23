@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static server.utils.TestHelpers.getUUID;
 
-import commons.entities.QuestionDTO;
+import commons.entities.questions.QuestionDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -108,16 +108,12 @@ class EstimateQuestionTest {
         a.setResponse(answerAct);
         userGuesses.add(a);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            q.checkAnswer(userGuesses);
-        });
+        assertThrows(IllegalArgumentException.class, () -> q.checkAnswer(userGuesses));
     }
 
     @Test
     void checkAnswerNullInput() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            q.checkAnswer(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> q.checkAnswer(null));
     }
 
     @Test
