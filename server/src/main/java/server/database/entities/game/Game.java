@@ -356,9 +356,11 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         // score and sets their new score accordingly.
         players.values().forEach(gamePlayer -> {
             var score = scores.get(gamePlayer);
-            var isCorrect =  score >= 0.75d;
+            var isCorrect =  score >= configuration.getCorrectAnswerThreshold();
 
             updateStreak(gamePlayer, isCorrect);
+            updatePowerUpPoints(gamePlayer, isCorrect);
+
             var streakScore = computeStreakScore(gamePlayer, score);
             gamePlayer.setScore(gamePlayer.getScore() + (int) Math.round(streakScore));
         });
@@ -403,6 +405,18 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     protected void updateStreak(GamePlayer gamePlayer, boolean isCorrect) {
         gamePlayer.setStreak(isCorrect ? gamePlayer.getStreak() + 1 : 0);
+    }
+
+    /**
+     * Updates the power-up points of the player based on if his answer is correct.
+     *
+     * @param gamePlayer the game player that added the answer.
+     * @param isCorrect if the answer is correct.
+     */
+    protected void updatePowerUpPoints(GamePlayer gamePlayer, boolean isCorrect) {
+        if (isCorrect) {
+            gamePlayer.setPowerUpPoints(gamePlayer.getPowerUpPoints() + 1);
+        }
     }
 
     /**

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import commons.entities.game.GameDTO;
 import commons.entities.utils.DTO;
 import java.util.UUID;
+import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
@@ -65,4 +66,9 @@ public abstract class GameConfigurationDTO implements DTO {
     @DecimalMax(value = "1000")
     @Description("Points for wrong answer")
     protected Integer pointsWrong;
+
+    @DecimalMin(value = "0")
+    @DecimalMax(value = "100")
+    @Description("Correct answer threshold")
+    protected Integer correctAnswerThreshold;
 }
