@@ -42,6 +42,17 @@ public class SSEHandler {
      * @param handlerSource the handler source object. This is the source of the events handlers.
      */
     public SSEHandler(Object handlerSource) {
+        initialize(handlerSource);
+    }
+
+
+    /**
+     * This function initializes the sse handler object.
+     * It resets the map and changes the source object.
+     *
+     * @param handlerSource the source of the handlers.
+     */
+    public void initialize(Object handlerSource) {
         this.handlerSource = handlerSource;
 
         // Gets all the methods that have the Name decoration. These are the event handlers.
@@ -130,6 +141,7 @@ public class SSEHandler {
      * @param inboundSseEvent the sse event.
      */
     public void handleEvent(InboundSseEvent inboundSseEvent) {
+        System.out.println(inboundSseEvent.getName());
         eventHandlers.get(SSEMessageType.valueOf(inboundSseEvent.getName())).handle(inboundSseEvent);
     }
 
