@@ -29,17 +29,11 @@ import commons.entities.utils.ApiError;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.sse.SseEventSource;
 
 /**
  * Utilities for communicating with the server.
@@ -47,10 +41,19 @@ import javax.ws.rs.sse.SseEventSource;
 public class ServerUtils {
 
     private static final String SERVER = "http://localhost:8080/";
-    private static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
+    public static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
             .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
     public static boolean loggedIn = false;
     public static UUID lobbyId = null;
+
+    /**
+     * Provides a request target for the server that can be used to build and invoke a query.
+     *
+     * @return the request target.
+     */
+    public static WebTarget getRequestTarget() {
+        return client.target(SERVER);
+    }
 
     /**
      * This function creates a new client with the mandatory
@@ -68,47 +71,6 @@ public class ServerUtils {
         return ClientBuilder.newClient().register(provider);
     }
 
-    /**
-     * Gets a list of all the emoji urls from the backend.
-     *
-     * @return List of emoji urls
-     */
-    public List<URL> getEmojis() {
-        try {
-            return Arrays.asList(
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * Gets a list of all the powerUp urls from the backend.
-     *
-     * @return List of emoji urls
-     */
-    public List<URL> getPowerUps() {
-        try {
-            return Arrays.asList(
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
 
     /**
      * Handler for when the leave lobby succeeds.
