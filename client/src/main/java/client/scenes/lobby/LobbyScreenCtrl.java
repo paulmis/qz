@@ -1,17 +1,19 @@
 package client.scenes.lobby;
 
+import static javafx.application.Platform.runLater;
+
 import client.scenes.MainCtrl;
-import client.scenes.lobby.configuration.ConfigurationScreenPane;
+import client.utils.SSEEventHandler;
+import client.utils.SSEHandler;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
+import commons.entities.messages.SSEMessageType;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import lombok.Generated;
 import lombok.Getter;
+
 
 /**
  * Lobby controller.
@@ -21,6 +23,8 @@ import lombok.Getter;
 public class LobbyScreenCtrl {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+
+    private SSEHandler sseHandler;
 
     private String name = "Ligma's Lobby";
 
@@ -44,10 +48,40 @@ public class LobbyScreenCtrl {
     }
 
     /**
+     * This function resets the lobbu screen ctrl.
+     * It handles all the required set-up that needs to be done for a lobby to be displayed.
+     */
+    public void reset() {
+        // this starts the sse connection
+        sseHandler = new SSEHandler(this);
+        server.subscribeToSSE(sseHandler);
+    }
+
+    /**
      * Fired when the start button is clicked.
      */
     public void startButtonClick() {
-        this.mainCtrl.showGameScreen();
+        this.server.startLobby(response -> runLater(() -> {
+            switch (response.getStatus()) {
+                case 403:
+                    mainCtrl.showErrorSnackBar("Starting the game failed! You are not the host.");
+                    break;
+                case 409:
+                    mainCtrl.showErrorSnackBar("Something went wrong while starting the game.");
+                    break;
+                case 425:
+                    mainCtrl.showInformationalSnackBar("Try again after a second.");
+                    break;
+                case 200:
+                    mainCtrl.showInformationalSnackBar("Game started!");
+                    break;
+                default:
+                    mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");
+                    break;
+            }
+            System.out.println(response);
+
+        }));
     }
 
     /**
@@ -61,5 +95,10 @@ public class LobbyScreenCtrl {
             System.out.println(conf);
             mainCtrl.closeLobbySettings();
         });
+    }
+
+    @SSEEventHandler(SSEMessageType.GAME_START)
+    public void startGame() {
+        mainCtrl.showGameScreen(this.sseHandler);
     }
 }

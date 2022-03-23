@@ -383,11 +383,6 @@ public class ServerUtils {
      * @param sseHandler The handler of sse events, exceptions and completion.
      */
     public void subscribeToSSE(SSEHandler sseHandler) {
-        client.target(SERVER).path("/api/lobby/" + lobbyId + "/start")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .put(Entity.entity("", APPLICATION_JSON));
-
         // This creates the WebTarget that the sse event source will use.
         var target = client.target(SERVER).path("api/sse/open");
 
@@ -405,6 +400,39 @@ public class ServerUtils {
 
         // Sets the source of the events in the handler.
         sseHandler.setSseEventSource(eventSource);
+    }
+
+    /**
+     * Handler for starting a game.
+     */
+    public interface StartLobbyHandler {
+        void handle(Response response);
+    }
+
+    /**
+     * This function starts a lobby from the server.
+     *
+     * @param startLobbyHandler the handler of the response.
+     */
+    public void startLobby(StartLobbyHandler startLobbyHandler) {
+
+        var invocation = client.target(SERVER).path("/api/lobby/" + lobbyId + "/start")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPut(Entity.entity("", APPLICATION_JSON));
+
+        invocation.submit(new InvocationCallback<Response>() {
+
+            @Override
+            public void completed(Response o) {
+                startLobbyHandler.handle(o);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+
+            }
+        });
     }
 
     /**

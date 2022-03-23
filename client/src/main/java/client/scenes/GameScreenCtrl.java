@@ -113,10 +113,9 @@ public class GameScreenCtrl implements Initializable {
      * This function resets the game screen ctrl.
      * It handles all the required set-up that needs to be done for a game to start.
      */
-    public void reset() {
-        // this starts the sse connection
-        sseHandler = new SSEHandler(this);
-        server.subscribeToSSE(sseHandler);
+    public void reset(SSEHandler sseHandler) {
+        this.sseHandler = sseHandler;
+        sseHandler.initialize(this);
     }
 
     /**

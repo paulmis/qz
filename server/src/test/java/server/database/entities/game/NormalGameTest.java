@@ -22,12 +22,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import server.database.entities.User;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.MCQuestion;
+import server.database.repositories.question.QuestionRepository;
+import server.services.GameService;
 import server.services.SSEManager;
 
 /**
@@ -97,24 +100,6 @@ public class NormalGameTest {
                 .usingRecursiveComparison()
                 .ignoringFields("players", "questions", "answers", "host", "random")
                 .isEqualTo(repl);
-    }
-
-    @Test
-    void setAcceptingAnswersTrue() throws IOException {
-        SSEManager manager = Mockito.spy(new SSEManager());
-        game.setEmitters(manager);
-        game.setAcceptingAnswers(true);
-        verify(manager).sendAll(sseMessageCaptor.capture());
-        assertEquals(SSEMessageType.START_QUESTION, sseMessageCaptor.getValue().getType());
-    }
-
-    @Test
-    void setAcceptingAnswersFalse() throws IOException {
-        SSEManager manager = Mockito.spy(new SSEManager());
-        game.setEmitters(manager);
-        game.setAcceptingAnswers(false);
-        verify(manager).sendAll(sseMessageCaptor.capture());
-        assertEquals(SSEMessageType.STOP_QUESTION, sseMessageCaptor.getValue().getType());
     }
 
     @Test
