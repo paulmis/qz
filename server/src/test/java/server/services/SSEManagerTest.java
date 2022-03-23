@@ -112,7 +112,7 @@ class SSEManagerTest {
      */
     @Test
     void testIsRegistered() {
-        var emitter1 = new SseEmitter();
+        SseEmitter emitter1 = new SseEmitter();
         sseManager.register(getUUID(1), emitter1);
         assertTrue(sseManager.isRegistered(getUUID(1)));
         assertFalse(sseManager.isRegistered(getUUID(2)));
