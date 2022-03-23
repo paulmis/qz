@@ -107,9 +107,9 @@ class LobbyControllerTest {
         mockLobby = new NormalGame();
         mockLobby.setId(getUUID(3));
         mockLobby.setStatus(GameStatus.CREATED);
-        mockLobbyConfiguration = new NormalGameConfiguration(10, 10, 2);
+        mockLobbyConfiguration = new NormalGameConfiguration(10, 10, 2, 2, 2f, 100, 0);
         mockLobby.setConfiguration(mockLobbyConfiguration);
-        normalGameConfiguration = new NormalGameConfiguration(4, 8, 6);
+        normalGameConfiguration = new NormalGameConfiguration(4, 8, 6, 2, 2f, 100, 0);
 
         // Add players
         johnPlayer = new GamePlayer(john);

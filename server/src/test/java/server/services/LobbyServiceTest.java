@@ -59,7 +59,7 @@ public class LobbyServiceTest {
         // Create the game
         lobby = new NormalGame();
         lobby.setId(getUUID(0));
-        lobby.setConfiguration(new NormalGameConfiguration(3, 13, 2));
+        lobby.setConfiguration(new NormalGameConfiguration(3, 13, 2, 2, 2f, 100, 0));
         lobby.add(joePlayer);
         lobby.add(susannePlayer);
     }

@@ -95,7 +95,7 @@ public class GameControllerTest {
         game = new NormalGame();
         game.setId(getUUID(3));
         game.setStatus(GameStatus.ONGOING);
-        gameConfiguration = new NormalGameConfiguration(10, 10, 2);
+        gameConfiguration = new NormalGameConfiguration(10, 10, 2, 2, 2f, 100, 0);
         game.setConfiguration(gameConfiguration);
         when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
 

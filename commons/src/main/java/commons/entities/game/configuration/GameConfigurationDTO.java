@@ -45,4 +45,24 @@ public abstract class GameConfigurationDTO implements DTO {
     @DecimalMax(value = "8")
     @Description("Capacity of lobby")
     protected Integer capacity;
+
+    @DecimalMin(value = "2")
+    @DecimalMax(value = "100")
+    @Description("Minimum streak size")
+    protected Integer streakSize;
+
+    @DecimalMin(value = "1")
+    @DecimalMax(value = "10")
+    @Description("Streak multiplier")
+    protected Float streakMultiplier;
+
+    @DecimalMin(value = "0")
+    @DecimalMax(value = "1000")
+    @Description("Points for correct answer")
+    protected Integer pointsCorrect;
+
+    @DecimalMin(value = "-1000")
+    @DecimalMax(value = "0")
+    @Description("Points for wrong answer")
+    protected Integer pointsWrong;
 }

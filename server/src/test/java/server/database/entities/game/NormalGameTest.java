@@ -67,7 +67,7 @@ public class NormalGameTest {
         questionB = new MCQuestion();
 
         // Create config
-        config = new NormalGameConfiguration(17, 13, 2);
+        config = new NormalGameConfiguration(17, 13, 2, 2, 2f, 100, 0);
 
         // Create the game
         game = new NormalGame();

@@ -34,6 +34,18 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
     @Column(nullable = false)
     protected int capacity = 6;
 
+    @Column(nullable = false)
+    protected Integer streakSize = 3;
+
+    @Column(nullable = false)
+    protected Float streakMultiplier = 1.5f;
+
+    @Column(nullable = false)
+    protected Integer pointsCorrect = 100;
+
+    @Column(nullable = false)
+    protected Integer pointsWrong = 0;
+
     /**
      * Creates a new game configuration from a DTO.
      *
@@ -41,5 +53,10 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
      */
     public GameConfiguration(GameConfigurationDTO dto) {
         this.answerTime = dto.getAnswerTime();
+        this.capacity = dto.getCapacity();
+        this.streakSize = dto.getStreakSize();
+        this.streakMultiplier = dto.getStreakMultiplier();
+        this.pointsCorrect = dto.getPointsCorrect();
+        this.pointsWrong = dto.getPointsWrong();
     }
 }
