@@ -2,8 +2,7 @@ package client.scenes;
 
 import client.communication.game.GameCommunication;
 import client.scenes.questions.EstimateQuestionPane;
-import client.scenes.questions.MultipleChoiceQuestionCtrl;
-import client.scenes.questions.MultipleChoiceQuestionPane;
+import client.scenes.questions.MCQuestionPane;
 import client.utils.ClientState;
 import client.utils.SSEEventHandler;
 import client.utils.SSEHandler;
@@ -16,7 +15,6 @@ import commons.entities.questions.MCQuestionDTO;
 import commons.entities.questions.QuestionDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -122,26 +120,6 @@ public class GameScreenCtrl implements Initializable {
     public void reset(SSEHandler sseHandler) {
         this.sseHandler = sseHandler;
         sseHandler.initialize(this);
-    }
-
-    /**
-     * A mock function that loads the mcq control.
-     */
-    private void loadMockMCQ() {
-        try {
-            MultipleChoiceQuestionCtrl.AnswerHandler doSomething = () -> {};
-
-            mainBorderPane.setCenter(new MultipleChoiceQuestionPane("Short question",
-                    Arrays.asList("answer 12", "asdasd", "asdasdasd", "asdasda"),
-                    Arrays.asList(
-                            new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                            new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                            new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                            new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50")),
-                    Arrays.asList(doSomething, doSomething, doSomething, doSomething)));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -429,9 +407,8 @@ public class GameScreenCtrl implements Initializable {
                 // Success
                 (question) -> javafx.application.Platform.runLater(() -> setQuestion(question)),
                 // Failure
-                () -> javafx.application.Platform.runLater(() -> {
-                    mainCtrl.showErrorSnackBar("Unable to retrieve the current question");
-                }));
+                () -> javafx.application.Platform.runLater(
+                    () -> mainCtrl.showErrorSnackBar("Unable to retrieve the current question")));
 
         // TODO: timer
     }
@@ -444,11 +421,27 @@ public class GameScreenCtrl implements Initializable {
     void setQuestion(QuestionDTO question) {
         // Show the question
         if (question instanceof MCQuestionDTO) {
-            // TODO: implement
+            // Create the question pane
+            MCQuestionPane questionPane = new MCQuestionPane(
+                (MCQuestionDTO) question,           // Question
+                (answer) ->                         // Answer handler
+                    GameCommunication.putAnswer(
+                        ClientState.game.getId(),
+                        answer,
+                        // Success
+                        () -> {
+                        },
+                        // Failure
+                        () -> javafx.application.Platform.runLater(
+                            () -> mainCtrl.showErrorSnackBar("Unable to send the answer"))));
+
+            // Assign the question pane
+            mainBorderPane.setCenter(questionPane);
         } else {
-            throw new NotImplementedException("showQuestion doesn't support " + question.getClass() + " questions yet");
+            throw new NotImplementedException(question.getClass() + " not supported yet");
         }
 
+        // Set the current question
         ClientState.currentQuestion = question;
     }
 }
