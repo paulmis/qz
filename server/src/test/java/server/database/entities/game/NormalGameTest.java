@@ -47,6 +47,10 @@ public class NormalGameTest {
     GamePlayer susannePlayer;
     MCQuestion questionA;
     MCQuestion questionB;
+    Activity activityA;
+    Activity activityB;
+    Activity activityC;
+    Activity activityD;
 
     @Captor
     private ArgumentCaptor<SSEMessage> sseMessageCaptor;
@@ -69,6 +73,25 @@ public class NormalGameTest {
         // Create questions
         questionA = new MCQuestion();
         questionB = new MCQuestion();
+
+        activityA = new Activity();
+        activityA.setCost(100);
+
+        activityB = new Activity();
+        activityB.setCost(200);
+
+        activityC = new Activity();
+        activityC.setCost(300);
+
+        activityD = new Activity();
+        activityD.setCost(400);
+
+        var activities = List.of(activityA, activityB, activityC, activityD);
+        questionA.setActivities(activities);
+        questionA.setAnswer(activityA);
+
+        questionB.setActivities(activities);
+        questionB.setAnswer(activityB);
 
         // Create config
         config = new NormalGameConfiguration(17, 13, 2, 2, 2f, 100, -10);
@@ -286,22 +309,59 @@ public class NormalGameTest {
         assertEquals(0, joePlayer.getStreak());
     }
 
-    /*
     @Test
-    void updateScores() {
+    void updateScoresCorrect() {
         var answerA = new Answer();
         answerA.setPlayer(joePlayer);
-        answerA.setResponse(List.of(questionA.getAnswer()));
-        answerA.setAnswerCollection(new AnswerCollection());
+        answerA.setResponse(List.of(questionA.getAnswer().getCost()));
 
         var answerB = new Answer();
         answerB.setPlayer(susannePlayer);
-        answerB.setResponse(List.of(questionA.getAnswer()));
-        answerB.setAnswerCollection(new AnswerCollection());
+        answerB.setResponse(List.of(questionA.getAnswer().getCost()));
 
         game.updateScores(questionA, List.of(answerA, answerB));
         assertEquals(100, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
+
+        assertEquals(100, susannePlayer.getScore());
+        assertEquals(1, susannePlayer.getStreak());
     }
-     */
+
+    @Test
+    void updateScoresHalf() {
+        var answerA = new Answer();
+        answerA.setPlayer(joePlayer);
+        answerA.setResponse(List.of(questionA.getAnswer().getCost()));
+
+        var answerB = new Answer();
+        answerB.setPlayer(susannePlayer);
+        answerB.setResponse(List.of(300L));
+
+        game.updateScores(questionA, List.of(answerA, answerB));
+        assertEquals(100, joePlayer.getScore());
+        assertEquals(1, joePlayer.getStreak());
+
+        assertEquals(-10, susannePlayer.getScore());
+        assertEquals(0, susannePlayer.getStreak());
+    }
+
+    @Test
+    void updateScoresWrong() {
+        joePlayer.setStreak(12);
+
+        var answerA = new Answer();
+        answerA.setPlayer(joePlayer);
+        answerA.setResponse(List.of(300L));
+
+        var answerB = new Answer();
+        answerB.setPlayer(susannePlayer);
+        answerB.setResponse(List.of(300L));
+
+        game.updateScores(questionB, List.of(answerA, answerB));
+        assertEquals(-10, joePlayer.getScore());
+        assertEquals(0, joePlayer.getStreak());
+
+        assertEquals(-10, susannePlayer.getScore());
+        assertEquals(0, susannePlayer.getStreak());
+    }
 }
