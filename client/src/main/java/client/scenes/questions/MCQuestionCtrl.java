@@ -1,15 +1,16 @@
 package client.scenes.questions;
 
+import client.communication.game.AnswerHandler;
 import com.jfoenix.controls.JFXButton;
+import commons.entities.AnswerDTO;
+import commons.entities.questions.MCQuestionDTO;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import lombok.Generated;
@@ -18,20 +19,7 @@ import lombok.Generated;
  * Multiple Choice Question Controller.
  */
 @Generated
-public class MultipleChoiceQuestionCtrl implements Initializable {
-
-
-    /**
-     * The interface for the answer handler.
-     * Handles the click option event.
-     */
-    public interface AnswerHandler {
-        /**
-         * Handle function of the interface.
-         * Deals with the click of one of the buttons.
-         */
-        void handle();
-    }
+public class MCQuestionCtrl implements Initializable {
 
     @FXML private Label questionLabel;
     @FXML private ImageView imageOptionA;
@@ -48,27 +36,12 @@ public class MultipleChoiceQuestionCtrl implements Initializable {
     @FXML private JFXButton buttonOptionD;
     @FXML private VBox imageVBox;
 
-    private final String questionText;
-    private final List<URL> answersImages;
-    private final List<String> answersText;
-    private final List<AnswerHandler> actions;
+    private final MCQuestionDTO question;
+    private final AnswerHandler answerHandler;
 
-    /**
-     * Constructs the controller for multiple choice question type.
-     *
-     * @param questionText The question in string format.
-     * @param answersImages A list of url images of the answers.
-     * @param answersText A list of texts of the answers.
-     * @param actions A list of actions that each option should perform.
-     */
-    public MultipleChoiceQuestionCtrl(String questionText,
-                                      List<URL> answersImages,
-                                      List<String> answersText,
-                                      List<AnswerHandler> actions) {
-        this.questionText = questionText;
-        this.answersImages = answersImages;
-        this.answersText = answersText;
-        this.actions = actions;
+    public MCQuestionCtrl(MCQuestionDTO question, AnswerHandler answerHandler) {
+        this.question = question;
+        this.answerHandler = answerHandler;
     }
 
     /**
@@ -82,7 +55,7 @@ public class MultipleChoiceQuestionCtrl implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         // Sets the question text
-        this.questionLabel.setText(questionText);
+        this.questionLabel.setText(question.getText());
 
         // Three arrays for the controls of the answers.
         // They are created for easier referencing.
@@ -92,14 +65,11 @@ public class MultipleChoiceQuestionCtrl implements Initializable {
 
         // Looping over they answer controls
         for (int i = 0; i < imageOptionArray.size(); i++) {
-
-
             var imageOption = imageOptionArray.get(i);
-            var imageUrl = answersImages.get(i);
 
             // Sets the image of the imageView to the url specified
             // in answerImages
-            imageOption.setImage(new Image(imageUrl.toString()));
+            imageOption.setImage(null);
 
             // This code resizes the image view to the surrounding vbox.
             // It uses a bind on the minimum of the vbox width and height and multiplies that by 0.8.
@@ -113,14 +83,14 @@ public class MultipleChoiceQuestionCtrl implements Initializable {
             imageOption.fitWidthProperty().bind(imageOption.fitHeightProperty());
 
             var labelOption = labelOptionArray.get(i);
-            var answerText = answersText.get(i);
-            labelOption.setText(answerText);
+            long cost = question.getActivities().get(i).getCost();
+            labelOption.setText(Long.toString(cost));
 
             // Gets the button and assign the action to it from the
             // list of actions
             var buttonOption = buttonOptionArray.get(i);
-            var action = actions.get(i);
-            buttonOption.setOnAction((actionEvent) -> action.handle());
+            // TODO: set after rebase
+            buttonOption.setOnAction((actionEvent) -> answerHandler.handle(new AnswerDTO()));
         }
     }
 }
