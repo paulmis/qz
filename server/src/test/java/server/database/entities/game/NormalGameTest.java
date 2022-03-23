@@ -14,9 +14,9 @@ import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,10 +25,14 @@ import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import server.database.entities.User;
+import server.database.entities.answer.Answer;
+import server.database.entities.answer.AnswerCollection;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
+import server.database.entities.question.Activity;
 import server.database.entities.question.MCQuestion;
 import server.services.SSEManager;
+import server.utils.MathHelpers;
 
 /**
  * Tests for NormalGame class.
@@ -67,7 +71,7 @@ public class NormalGameTest {
         questionB = new MCQuestion();
 
         // Create config
-        config = new NormalGameConfiguration(17, 13, 2, 2, 2f, 100, 0);
+        config = new NormalGameConfiguration(17, 13, 2, 2, 2f, 100, -10);
 
         // Create the game
         game = new NormalGame();
@@ -195,4 +199,109 @@ public class NormalGameTest {
         game.setStatus(GameStatus.FINISHED);
         assertFalse(game.remove(joe.getId()));
     }
+
+    @Test
+    void computeBaseScoreNegative() {
+        assertEquals(-10, game.computeBaseScore(0.0));
+    }
+
+    @Test
+    void computeBaseScore100() {
+        assertEquals(100, game.computeBaseScore(1.0));
+    }
+
+    @Test
+    void computeBaseScoreIncreasing() {
+        var scores = IntStream.range(0, 100)
+                .mapToObj(i -> game.computeBaseScore(i / 100d))
+                .collect(Collectors.toList());
+
+        var sortedScores = scores.stream().sorted().collect(Collectors.toList());
+
+        assertEquals(sortedScores, scores);
+    }
+
+    @Test
+    void computeBaseScoreIllegalArgument() {
+        assertThrows(IllegalArgumentException.class, () -> game.computeBaseScore(-1d));
+        assertThrows(IllegalArgumentException.class, () -> game.computeBaseScore(2d));
+    }
+
+    @Test
+    void computeStreakScoreNoStreak() {
+        joePlayer.setStreak(0);
+        assertEquals(100, game.computeStreakScore(joePlayer, 100));
+    }
+
+    @Test
+    void computeStreakScore1Streak() {
+        joePlayer.setStreak(1);
+        assertEquals(100, game.computeStreakScore(joePlayer, 100));
+    }
+
+    @Test
+    void computeStreakScore2Streak() {
+        joePlayer.setStreak(2);
+        assertEquals(200, game.computeStreakScore(joePlayer, 100));
+    }
+
+    @Test
+    void computeStreakScore3Streak() {
+        joePlayer.setStreak(3);
+        assertEquals(200, game.computeStreakScore(joePlayer, 100));
+    }
+
+    @Test
+    void updateStreakWrong() {
+        joePlayer.setStreak(0);
+
+        game.updateStreak(joePlayer, false);
+        assertEquals(0, joePlayer.getStreak());
+    }
+
+    @Test
+    void updateStreakCorrect() {
+        joePlayer.setStreak(0);
+
+        game.updateStreak(joePlayer, true);
+        assertEquals(1, joePlayer.getStreak());
+    }
+
+    @Test
+    void updateStreakCorrectMultiple() {
+        joePlayer.setStreak(0);
+
+        game.updateStreak(joePlayer, true);
+        game.updateStreak(joePlayer, true);
+        game.updateStreak(joePlayer, true);
+        game.updateStreak(joePlayer, true);
+        assertEquals(4, joePlayer.getStreak());
+    }
+
+    @Test
+    void updateStreakWrongReset() {
+        joePlayer.setStreak(5);
+
+        game.updateStreak(joePlayer, false);
+        assertEquals(0, joePlayer.getStreak());
+    }
+
+    /*
+    @Test
+    void updateScores() {
+        var answerA = new Answer();
+        answerA.setPlayer(joePlayer);
+        answerA.setResponse(List.of(questionA.getAnswer()));
+        answerA.setAnswerCollection(new AnswerCollection());
+
+        var answerB = new Answer();
+        answerB.setPlayer(susannePlayer);
+        answerB.setResponse(List.of(questionA.getAnswer()));
+        answerB.setAnswerCollection(new AnswerCollection());
+
+        game.updateScores(questionA, List.of(answerA, answerB));
+        assertEquals(100, joePlayer.getScore());
+        assertEquals(1, joePlayer.getStreak());
+    }
+     */
 }
