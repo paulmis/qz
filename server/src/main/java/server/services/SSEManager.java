@@ -3,11 +3,11 @@ package server.services;
 import commons.entities.messages.SSEMessage;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.persistence.ElementCollection;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import server.utils.SSE;
 
@@ -15,12 +15,14 @@ import server.utils.SSE;
  * Manager class to handle SSE emitters.
  */
 @Slf4j
+@Service
 public class SSEManager {
     /**
      * The Map which maps user IDs to SSE emitters.
      * As this class can be called from different threads, we need to use a concurrent map.
      */
-    private final Map<UUID, SseEmitter> emitters = new ConcurrentHashMap<>();
+    @ElementCollection
+    private Map<UUID, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     /**
      * Get the number of registered SSE emitters.
@@ -85,7 +87,7 @@ public class SSEManager {
      * @return Whether the message was successfully sent or not.
      * @throws IOException If the message could not be sent.
      */
-    public boolean send(UUID userId, Set<ResponseBodyEmitter.DataWithMediaType> message) throws IOException {
+    public boolean send(UUID userId, SseEmitter.SseEventBuilder message) throws IOException {
         if (!emitters.containsKey(userId)) {
             log.debug("Cannot send message: user {} has no registered emitter", userId);
             return false;
@@ -114,7 +116,7 @@ public class SSEManager {
      * @return Whether the message was sent to all specified users or not.
      * @throws IOException If the message could not be sent.
      */
-    public boolean send(Iterable<UUID> users, Set<ResponseBodyEmitter.DataWithMediaType> message) throws IOException {
+    public boolean send(Iterable<UUID> users, SseEmitter.SseEventBuilder message) throws IOException {
         boolean success = true;
         for (UUID userId : users) {
             success &= send(userId, message);
@@ -140,7 +142,7 @@ public class SSEManager {
      * @param message Message to send.
      * @throws IOException If the message could not be sent.
      */
-    public void sendAll(Set<ResponseBodyEmitter.DataWithMediaType> message) throws IOException {
+    public void sendAll(SseEmitter.SseEventBuilder message) throws IOException {
         for (SseEmitter emitter : emitters.values()) {
             emitter.send(message);
         }
