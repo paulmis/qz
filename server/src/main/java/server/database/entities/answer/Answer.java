@@ -3,24 +3,24 @@ package server.database.entities.answer;
 import static server.utils.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OrderColumn;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import server.database.entities.game.GamePlayer;
-import server.database.entities.question.Activity;
 import server.database.entities.utils.BaseEntity;
 
 /**
@@ -39,14 +39,17 @@ public class Answer extends BaseEntity<AnswerDTO> {
      */
     public Answer(AnswerDTO dto) {
         this.id = getUUID(0);
-        this.response = dto.getResponse().stream().map(Activity::new).collect(Collectors.toList());
+        this.response = dto.getResponse();
     }
 
     /**
-     * The list of activities from the Question given as an answer.
+     * The list of activity costs from the Question given as an answer.
      */
-    @ManyToMany
-    protected List<Activity> response = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "answer_responses", joinColumns = @JoinColumn(name = "answer_id"))
+    @Column(name = "response_value")
+    @OrderColumn(name = "response_idx")
+    protected List<Long> response = new ArrayList<>();
 
     /**
      * The player that gave the answer.
@@ -62,24 +65,10 @@ public class Answer extends BaseEntity<AnswerDTO> {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private AnswerCollection answerCollection;
 
-    /**
-     * Convert user choices to DTO.
-     *
-     * @return a list of ActivityDTOs
-     */
-    protected List<ActivityDTO> getResponseDTO() {
-        return this.response.stream().map(Activity::getDTO).collect(Collectors.toList());
-    }
-
     @Override
     public AnswerDTO getDTO() {
         ModelMapper modelMapper = new ModelMapper();
         TypeMap<Answer, AnswerDTO> propertyMapper = modelMapper.createTypeMap(Answer.class, AnswerDTO.class);
-
-        // Deep conversion of user choice
-        propertyMapper.addMappings(
-                mapper -> mapper.map(Answer::getResponseDTO, AnswerDTO::setResponse)
-        );
 
         // Retrieval of question
         propertyMapper.addMappings(

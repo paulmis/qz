@@ -4,6 +4,7 @@ import commons.entities.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -83,18 +84,18 @@ public class OrderQuestion extends Question {
                         "The number of activities in the answer must be the same as the question.");
             }
             // Check if the order of answers' costs is correct
-            long currentVal = ans.getResponse().get(0).getCost();
+            long currentVal = ans.getResponse().get(0);
             double currentPoints = 0;
             double pointStep = 1.0 / (getActivities().size() - 1);
             if (increasing) {
                 for (int idx = 1; idx < getActivities().size(); idx++) {
-                    if (ans.getResponse().get(idx).getCost() >= ans.getResponse().get(idx - 1).getCost()) {
+                    if (ans.getResponse().get(idx) >= ans.getResponse().get(idx - 1)) {
                         currentPoints += pointStep;
                     }
                 }
             } else {
                 for (int idx = 1; idx < getActivities().size(); idx++) {
-                    if (ans.getResponse().get(idx).getCost() <= ans.getResponse().get(idx - 1).getCost()) {
+                    if (ans.getResponse().get(idx) <= ans.getResponse().get(idx - 1)) {
                         currentPoints += pointStep;
                     }
                 }
@@ -111,7 +112,10 @@ public class OrderQuestion extends Question {
     @Override
     public Answer getRightAnswer() {
         Answer rightAnswer = new Answer();
-        rightAnswer.setResponse(getActivities());
+        rightAnswer.setResponse(getActivities().stream()
+                .map(Activity::getCost)
+                .sorted((o1, o2) -> increasing ? o1.compareTo(o2) : o2.compareTo(o1))
+                .collect(Collectors.toList()));
         return rightAnswer;
     }
     

@@ -43,9 +43,9 @@ class MatchQuestionTest {
 
     @Test
     void getRightAnswerTest() {
-        List<Activity> expectedRightChoice = new ArrayList<>();
+        List<Long> expectedRightChoice = new ArrayList<>();
         for (int idx = 0; idx < q.getActivities().size(); idx++) {
-            expectedRightChoice.add(getActivity(idx));
+            expectedRightChoice.add(getActivity(idx).getCost());
         }
         Answer expectedRightAnswer = new Answer();
         expectedRightAnswer.setResponse(expectedRightChoice);
@@ -55,11 +55,11 @@ class MatchQuestionTest {
     @Test
     void checkAnswerTest() {
         // first user has all correct
-        List<Activity> answerAct = List.of(
-                getActivity(0),
-                getActivity(1),
-                getActivity(2),
-                getActivity(3)
+        List<Long> answerAct = List.of(
+                getActivity(0).getCost(),
+                getActivity(1).getCost(),
+                getActivity(2).getCost(),
+                getActivity(3).getCost()
         );
         Answer a = new Answer();
         a.setResponse(answerAct);
@@ -68,10 +68,10 @@ class MatchQuestionTest {
 
         // second user has all wrong
         answerAct = List.of(
-                getActivity(3),
-                getActivity(2),
-                getActivity(1),
-                getActivity(0)
+                getActivity(3).getCost(),
+                getActivity(2).getCost(),
+                getActivity(1).getCost(),
+                getActivity(0).getCost()
         );
         a = new Answer();
         a.setResponse(answerAct);
@@ -79,10 +79,10 @@ class MatchQuestionTest {
 
         // third user has two switched (2/4 of points)
         answerAct = List.of(
-                getActivity(0),
-                getActivity(2),
-                getActivity(1),
-                getActivity(3)
+                getActivity(0).getCost(),
+                getActivity(2).getCost(),
+                getActivity(1).getCost(),
+                getActivity(3).getCost()
         );
         a = new Answer();
         a.setResponse(answerAct);
@@ -94,11 +94,11 @@ class MatchQuestionTest {
     @Test
     void checkAnswerMismatchingSize() {
         // first user has 4 activities
-        List<Activity> answerAct = List.of(
-                getActivity(0),
-                getActivity(1),
-                getActivity(2),
-                getActivity(3)
+        List<Long> answerAct = List.of(
+                getActivity(0).getCost(),
+                getActivity(1).getCost(),
+                getActivity(2).getCost(),
+                getActivity(3).getCost()
         );
         Answer a = new Answer();
         a.setResponse(answerAct);
@@ -107,11 +107,11 @@ class MatchQuestionTest {
 
         // second user has 5 activities
         answerAct = List.of(
-                getActivity(3),
-                getActivity(2),
-                getActivity(1),
-                getActivity(0),
-                getActivity(12)
+                getActivity(3).getCost(),
+                getActivity(2).getCost(),
+                getActivity(1).getCost(),
+                getActivity(0).getCost(),
+                getActivity(12).getCost()
         );
         a = new Answer();
         a.setResponse(answerAct);
@@ -119,10 +119,10 @@ class MatchQuestionTest {
 
         // third user has 4 activities
         answerAct = List.of(
-                getActivity(0),
-                getActivity(2),
-                getActivity(1),
-                getActivity(3)
+                getActivity(0).getCost(),
+                getActivity(2).getCost(),
+                getActivity(1).getCost(),
+                getActivity(3).getCost()
         );
         a = new Answer();
         a.setResponse(answerAct);

@@ -158,7 +158,7 @@ class AnswerControllerTest {
     public void userAnswerOkTest() throws Exception {
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
-        userAnswer.setResponse(List.of(mockQuestion.getActivities().get(0).getDTO()));
+        userAnswer.setResponse(List.of(mockQuestion.getActivities().get(0).getCost()));
         userAnswer.setQuestionId(mockQuestion.getId());
         this.mockMvc
                 .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))

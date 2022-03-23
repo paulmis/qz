@@ -80,7 +80,7 @@ public class EstimateQuestion extends Question {
             if (ans.getResponse().size() != 1) {
                 throw new IllegalArgumentException("There should be a single activity per answer.");
             }
-            long userError = Math.abs(ans.getResponse().get(0).getCost() - target);
+            long userError = Math.abs(ans.getResponse().get(0) - target);
             errors.add(userError);
             sortedErrors.add(userError);
         }
@@ -109,9 +109,7 @@ public class EstimateQuestion extends Question {
     @Override
     public Answer getRightAnswer() {
         Answer rightAnswer = new Answer();
-        Activity toEstimate = new Activity();
-        toEstimate.setCost(getActivities().get(0).getCost());
-        rightAnswer.setResponse(List.of(toEstimate));
+        rightAnswer.setResponse(List.of(getActivities().get(0).getCost()));
         return rightAnswer;
     }
 
