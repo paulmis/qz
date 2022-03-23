@@ -25,18 +25,12 @@ import commons.entities.UserDTO;
 import commons.entities.game.GameDTO;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.sse.SseEventSource;
 
 /**
  * Utilities for communicating with the server.
@@ -44,10 +38,19 @@ import javax.ws.rs.sse.SseEventSource;
 public class ServerUtils {
 
     private static final String SERVER = "http://localhost:8080/";
-    private static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
+    public static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
             .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
     public static boolean loggedIn = false;
     public static UUID lobbyId = null;
+
+    /**
+     * Provides a request target for the server that can be used to build and invoke a query.
+     *
+     * @return the request target.
+     */
+    public static WebTarget getRequestTarget() {
+        return client.target(SERVER);
+    }
 
     /**
      * This function creates a new client with the mandatory
@@ -65,71 +68,7 @@ public class ServerUtils {
         return ClientBuilder.newClient().register(provider);
     }
 
-    /**
-     * Gets a list of all the emoji urls from the backend.
-     *
-     * @return List of emoji urls
-     */
-    public List<URL> getEmojis() {
-        try {
-            return Arrays.asList(
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
 
-    /**
-     * Gets a list of all the powerUp urls from the backend.
-     *
-     * @return List of emoji urls
-     */
-    public List<URL> getPowerUps() {
-        try {
-            return Arrays.asList(
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * Function that causes the user to leave the game.
-     */
-    public void quitGame() {
-        System.out.println("Quitting game");
-    }
-
-    /** Gets a list of the leaderboard images from the server.
-     *
-     * @return a list of leaderboard images.
-     */
-    public List<URL> getLeaderBoardImages() {
-        try {
-            return Arrays.asList(
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"));
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
 
     public String register(String email, String password) {
         System.out.println("Registering new User...\n");
@@ -374,37 +313,6 @@ public class ServerUtils {
     public String connect() {
         System.out.println("New connection!\n");
         return "200";
-    }
-
-    /**
-     * This function subscribes to the SSE event source.
-     * It calls the SSE open endpoint and handles the events.
-     *
-     * @param sseHandler The handler of sse events, exceptions and completion.
-     */
-    public void subscribeToSSE(SSEHandler sseHandler) {
-        client.target(SERVER).path("/api/lobby/" + lobbyId + "/start")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .put(Entity.entity("", APPLICATION_JSON));
-
-        // This creates the WebTarget that the sse event source will use.
-        var target = client.target(SERVER).path("api/sse/open");
-
-        // Builds the event source with the target.
-        SseEventSource eventSource = SseEventSource.target(target).build();
-
-        // Registers the handling of events, exceptions and completion.
-        eventSource.register(
-                sseHandler::handleEvent,
-                sseHandler::handleException,
-                sseHandler::handleCompletion);
-
-        // Opens the sse listener.
-        eventSource.open();
-
-        // Sets the source of the events in the handler.
-        sseHandler.setSseEventSource(eventSource);
     }
 
     /**
