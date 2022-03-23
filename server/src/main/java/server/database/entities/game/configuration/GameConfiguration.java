@@ -46,6 +46,9 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
     @Column(nullable = false)
     protected Integer pointsWrong = 0;
 
+    @Column(nullable = false)
+    protected Integer correctAnswerThreshold = 75;
+
     /**
      * Creates a new game configuration from a DTO.
      *
@@ -58,5 +61,6 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
         this.streakMultiplier = dto.getStreakMultiplier();
         this.pointsCorrect = dto.getPointsCorrect();
         this.pointsWrong = dto.getPointsWrong();
+        this.correctAnswerThreshold = dto.getCorrectAnswerThreshold();
     }
 }

@@ -37,8 +37,8 @@ public class NormalGameConfiguration extends GameConfiguration {
      * @param answerTime time in seconds for answering a question
      */
     public NormalGameConfiguration(int numQuestions, int answerTime, int capacity, int streakSize, float multiplier,
-                                   int pointsCorrect, int pointsWrong) {
-        super(answerTime, capacity, streakSize, multiplier, pointsCorrect, pointsWrong);
+                                   int pointsCorrect, int pointsWrong, int correctAnswerThreshold) {
+        super(answerTime, capacity, streakSize, multiplier, pointsCorrect, pointsWrong, correctAnswerThreshold);
         this.numQuestions = numQuestions;
     }
 

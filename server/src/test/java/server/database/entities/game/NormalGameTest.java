@@ -94,7 +94,7 @@ public class NormalGameTest {
         questionB.setAnswer(activityB);
 
         // Create config
-        config = new NormalGameConfiguration(17, 13, 2, 2, 2f, 100, -10);
+        config = new NormalGameConfiguration(17, 13, 2, 2, 2f, 100, -10, 75);
 
         // Create the game
         game = new NormalGame();
@@ -322,9 +322,12 @@ public class NormalGameTest {
         game.updateScores(questionA, List.of(answerA, answerB));
         assertEquals(100, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
+        assertEquals(1, joePlayer.getPowerUpPoints());
 
         assertEquals(100, susannePlayer.getScore());
         assertEquals(1, susannePlayer.getStreak());
+        assertEquals(1, susannePlayer.getPowerUpPoints());
+
     }
 
     @Test
@@ -340,9 +343,11 @@ public class NormalGameTest {
         game.updateScores(questionA, List.of(answerA, answerB));
         assertEquals(100, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
+        assertEquals(1, joePlayer.getPowerUpPoints());
 
         assertEquals(-10, susannePlayer.getScore());
         assertEquals(0, susannePlayer.getStreak());
+        assertEquals(0, susannePlayer.getPowerUpPoints());
     }
 
     @Test
@@ -360,8 +365,26 @@ public class NormalGameTest {
         game.updateScores(questionB, List.of(answerA, answerB));
         assertEquals(-10, joePlayer.getScore());
         assertEquals(0, joePlayer.getStreak());
+        assertEquals(0, joePlayer.getPowerUpPoints());
 
         assertEquals(-10, susannePlayer.getScore());
         assertEquals(0, susannePlayer.getStreak());
+        assertEquals(0, susannePlayer.getPowerUpPoints());
+    }
+
+    @Test
+    void updatePowerUpPointsCorrect() {
+        joePlayer.setPowerUpPoints(0);
+
+        game.updatePowerUpPoints(joePlayer, true);
+        assertEquals(1, joePlayer.getPowerUpPoints());
+    }
+
+    @Test
+    void updatePowerUpPointsWrong() {
+        joePlayer.setPowerUpPoints(0);
+
+        game.updatePowerUpPoints(joePlayer, false);
+        assertEquals(0, joePlayer.getPowerUpPoints());
     }
 }

@@ -35,10 +35,12 @@ public class NormalGameConfigurationDTO extends GameConfigurationDTO {
      * @param capacity the capacity of the lobby.
      * @param numQuestions the number of questions in the game.
      */
-    public NormalGameConfigurationDTO(UUID id, Integer answerTime, Integer capacity, Integer numQuestions) {
+    public NormalGameConfigurationDTO(UUID id, Integer answerTime, Integer capacity, Integer numQuestions,
+                                      Integer correctAnswerThreshold) {
         this.id = id;
         this.answerTime = answerTime;
         this.capacity = capacity;
         this.numQuestions = numQuestions;
+        this.correctAnswerThreshold = correctAnswerThreshold;
     }
 }
