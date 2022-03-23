@@ -146,10 +146,10 @@ public class GameCommunication {
         // Built the query invocation
         Invocation invocation =
             ServerUtils.getRequestTarget()
-                .path("/api/lobby/" + ClientState.game.getId() + "/join")
+                .path("/api/lobby/" + gameId + "/join")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .buildPut(Entity.entity("", APPLICATION_JSON));
+                .buildGet();
 
         // Perform the query asynchronously
         invocation.submit(new InvocationCallback<QuestionDTO>() {
@@ -168,4 +168,55 @@ public class GameCommunication {
             }
         });
     }
+
+    /**
+     * Handler for when sending answer to the current question succeeds.
+     */
+    public interface PutAnswerHandlerSuccess {
+        void handle();
+    }
+
+    /**
+     * Handler for when sending answer to the current question fails.
+     */
+    public interface PutAnswerHandlerFail {
+        void handle();
+    }
+
+    /**
+     * Sends the answer to the current question to the server.
+     *
+     * @param gameId the id of the game
+     * @param answer the answer to the current question
+     * @param handlerSuccess the handler for when the request succeeds
+     * @param handlerFailure the handler for when the request fails
+     */
+    public static void putAnswer(UUID gameId, AnswerDTO answer,
+                                 PutAnswerHandlerSuccess handlerSuccess, PutAnswerHandlerFail handlerFailure) {
+        // Built the query invocation
+        Invocation invocation =
+                ServerUtils.getRequestTarget()
+                        .path("/api/lobby/" + gameId + "/answer")
+                        .request(APPLICATION_JSON)
+                        .accept(APPLICATION_JSON)
+                        .buildPut(Entity.entity(answer, APPLICATION_JSON));
+
+        // Perform the query asynchronously
+        invocation.submit(new InvocationCallback<Response>() {
+
+            @Override
+            public void completed(Response response) {
+                System.out.println("Answer sent successfully");
+                handlerSuccess.handle();
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                System.out.println("Answer sent failed");
+                handlerFailure.handle();
+                throwable.printStackTrace();
+            }
+        });
+    }
+
 }
