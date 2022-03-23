@@ -62,7 +62,7 @@ public abstract class GameConfigurationDTO implements DTO {
     protected Integer pointsCorrect;
 
     @DecimalMin(value = "-1000")
-    @DecimalMax(value = "0")
+    @DecimalMax(value = "1000")
     @Description("Points for wrong answer")
     protected Integer pointsWrong;
 }
