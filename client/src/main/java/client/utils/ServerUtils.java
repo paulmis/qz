@@ -263,7 +263,6 @@ public class ServerUtils {
 
             @Override
             public void completed(NormalGameDTO o) {
-                System.out.println(o);
                 ServerUtils.lobbyId = o.getId();
                 createLobbyHandlerSuccess.handle(o);
             }
@@ -308,7 +307,6 @@ public class ServerUtils {
 
             @Override
             public void completed(List<GameDTO> o) {
-                System.out.println(o);
                 getLobbiesHandlerSuccess.handle(o);
             }
 
@@ -353,7 +351,6 @@ public class ServerUtils {
 
             @Override
             public void completed(GameDTO o) {
-                System.out.println(o);
                 ServerUtils.lobbyId = o.getId();
                 joinLobbyHandlerSuccess.handle(o);
             }
@@ -398,7 +395,6 @@ public class ServerUtils {
 
             @Override
             public void completed(UserDTO o) {
-                System.out.println(o);
                 getUserInfoHandlerSuccess.handle(o);
             }
 
