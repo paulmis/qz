@@ -51,7 +51,6 @@ public class Answer extends BaseEntity<AnswerDTO> {
      */
     @ElementCollection
     @CollectionTable(name = "answer_responses", joinColumns = @JoinColumn(name = "answer_id"))
-    @Column(name = "response_value")
     @OrderColumn(name = "response_idx")
     protected List<Long> response = new ArrayList<>();
 
@@ -67,7 +66,7 @@ public class Answer extends BaseEntity<AnswerDTO> {
     @Generated
     @PrePersist
     @PreUpdate
-    protected void onCreate() {
+    protected void onUpdate() {
         answerDate = LocalDateTime.now();
     }
 
