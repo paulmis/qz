@@ -9,5 +9,7 @@ public enum SSEMessageType {
     PLAYER_LEFT,
     GAME_START,
     START_QUESTION,
-    STOP_QUESTION
+    STOP_QUESTION,
+    GAME_STARTED,
+    GAME_FINISHED
 }
