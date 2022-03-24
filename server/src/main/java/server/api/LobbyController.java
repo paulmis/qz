@@ -200,12 +200,12 @@ public class LobbyController {
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
         Optional<Game> lobby = gameRepository.findById(lobbyId);
         if (user.isEmpty() || lobby.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or lobby not found");
         }
 
-        // If the user isn't the lobby head, return 403
+        // If the user isn't the lobby host, return 403
         if (lobby.get().getHost().getUser().getId() != user.get().getId()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the lobby host");
         }
 
         // If the game doesn't start successfully, return 409
@@ -213,9 +213,9 @@ public class LobbyController {
         try {
             gameService.startGame(lobby.get());
         } catch (IllegalStateException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         } catch (IOException ex) {
-            return ResponseEntity.status(HttpStatus.TOO_EARLY).build();
+            return ResponseEntity.status(HttpStatus.TOO_EARLY).body(ex.getMessage());
         }
         // Otherwise, return 200
         return ResponseEntity.ok().build();
@@ -271,20 +271,20 @@ public class LobbyController {
         // If the user or the game don't exist, return 404
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
         if (user.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
         // Check that the user is in a lobby and remove them
         Optional<Game> lobby =
                 gameRepository.findByPlayers_User_IdEqualsAndStatus(user.get().getId(), GameStatus.CREATED);
         if (lobby.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not in a lobby");
         }
 
         try {
             lobbyService.removePlayer(lobby.get(), user.get());
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
         return ResponseEntity.ok().build();
     }
