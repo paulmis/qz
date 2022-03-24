@@ -375,7 +375,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * @throws IllegalArgumentException if the percentage is not in the range [0, 1]
      */
     protected Double computeBaseScore(double percentage) throws IllegalArgumentException {
-        if (percentage < 0.0 || percentage > 1.0) {
+        if (percentage < 0.0 - 1e9 || percentage > 1.0 + 1e9) {
             throw new IllegalArgumentException("Percentage needs to be between 0 and 1.0.");
         }
         return percentage
