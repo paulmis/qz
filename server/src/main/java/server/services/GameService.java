@@ -116,7 +116,7 @@ public class GameService {
         try {
             // If the removal fails, the player has already abandoned the lobby
             if (!game.remove(user.getId())) {
-                throw new IllegalStateException("Impossible to remove the player");
+                throw new IllegalStateException("The player has already abandoned the lobby.");
             }
         } catch (LastPlayerRemovedException ex) {
             // If the player was the last player, conclude the game
