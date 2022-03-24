@@ -451,8 +451,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
                 this.status,
                 this.currentQuestion,
                 this.players.values().stream().map(GamePlayer::getDTO).collect(Collectors.toSet()),
-                this.host == null ? null : this.host.getId(),
-                this.acceptingAnswers);
+                this.host == null ? null : this.host.getId());
     }
 
     public abstract T getDTO();
