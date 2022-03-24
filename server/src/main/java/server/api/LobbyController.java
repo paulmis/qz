@@ -5,6 +5,7 @@ import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
 import server.services.LobbyService;
+import server.services.SSEManager;
 
 
 /**
@@ -56,6 +58,9 @@ public class LobbyController {
 
     @Autowired
     private GameConfigurationRepository gameConfigurationRepository;
+
+    @Autowired
+    private SSEManager sseManager;
 
     /**
      * Endpoint for the creation of new lobbies.
@@ -203,12 +208,14 @@ public class LobbyController {
         }
 
         // If the game doesn't start successfully, return 409
+        // If the SSE events are not yet set-up return 425
         try {
             gameService.startGame(lobby.get());
         } catch (IllegalStateException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (IOException ex) {
+            return ResponseEntity.status(HttpStatus.TOO_EARLY).build();
         }
-
         // Otherwise, return 200
         return ResponseEntity.ok().build();
     }
