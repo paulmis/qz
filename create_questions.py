@@ -98,7 +98,7 @@ if args.count < 1:
     exit(1)
 
 for i in range(args.count):
-    if i % 10 == 0:
+    if (i + 1) % 10 == 0:
         logging.info(f"Creating question {i + 1} of {args.count}")
     else:
         logging.debug(f"Creating question {i + 1} of {args.count}")
