@@ -6,6 +6,12 @@ import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
 
+/**
+ * The class that encompasses the LobbyLeaveScreen.
+ * The purpose of this class is to allow the
+ * initialization of the control inside code.
+ */
+
 @Generated
 public class LobbyLeaveScreenPane extends StackPane {
 
@@ -29,10 +35,10 @@ public class LobbyLeaveScreenPane extends StackPane {
     /**
      * This constructor sets up the lobby leave pane.
      *
-     * @param disbandHandler the action that is to be performed on a disband.
+     * @param leaveHandler the action that is to be performed on a leave.
      */
-    public LobbyLeaveScreenPane(LobbyLeaveScreenCtrl.DisbandHandler disbandHandler) {
-        setUpScreen(new LobbyLeaveScreenCtrl(disbandHandler));
+    public LobbyLeaveScreenPane(LobbyLeaveScreenCtrl.LeaveHandler leaveHandler) {
+        setUpScreen(new LobbyLeaveScreenCtrl(leaveHandler));
     }
 
     public void makeTranslucent() {

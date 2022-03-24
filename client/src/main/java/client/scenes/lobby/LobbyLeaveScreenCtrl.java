@@ -22,23 +22,23 @@ public class LobbyLeaveScreenCtrl implements Initializable {
      * This function will be later applied by the user when clicking
      * the disband button.
      */
-    public interface DisbandHandler {
+    public interface LeaveHandler {
         void handle();
     }
 
     @FXML private JFXButton cancelButton;
-    @FXML private JFXButton disbandButton;
+    @FXML private JFXButton leaveButton;
     @FXML private AnchorPane rootPane;
-    private DisbandHandler disbandHandler;
+    private LeaveHandler leaveHandler;
 
 
     /**
      * The constructor for the LobbyLeaveScreen controller.
      *
-     * @param disbandHandler the action that is to be performed when the user disbands the lobby.
+     * @param leaveHandler the action that is to be performed when the user leaves the lobby.
      */
-    public LobbyLeaveScreenCtrl(DisbandHandler disbandHandler) {
-        this.disbandHandler = disbandHandler;
+    public LobbyLeaveScreenCtrl(LeaveHandler leaveHandler) {
+        this.leaveHandler = leaveHandler;
     }
 
     /**
@@ -50,11 +50,11 @@ public class LobbyLeaveScreenCtrl implements Initializable {
     }
 
     /**
-     * This function handles the disband button click.
+     * This function handles the leave button click.
      */
     @FXML
-    private void disband() {
-        disbandHandler.handle();
+    private void leave() {
+        leaveHandler.handle();
     }
 
     @Override

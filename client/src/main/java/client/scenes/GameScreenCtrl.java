@@ -335,7 +335,6 @@ public class GameScreenCtrl implements Initializable {
      */
     @FXML
     private void quitButtonClick(ActionEvent actionEvent) {
-        //ToDo: Wrap inside a popup.
         mainCtrl.openGameLeaveWarning(() -> {
             mainCtrl.closeGameLeaveWarning();
             this.server.quitGame(new ServerUtils.QuitGameHandler() {

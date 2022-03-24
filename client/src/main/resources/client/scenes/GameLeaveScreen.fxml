@@ -12,7 +12,7 @@
    <children>
       <VBox alignment="CENTER" prefHeight="100.0" prefWidth="250.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label text="Are you sure you want to disband?">
+            <Label text="Are you sure you want to leave?">
                <font>
                   <Font name="FontAwesome" size="13.0" />
                </font>
@@ -30,7 +30,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
                   </JFXButton>
-                  <JFXButton fx:id="disbandButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#disband" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #FF6969;" text="DISBAND" textFill="WHITE">
+                  <JFXButton fx:id="leaveButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#leave" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #FF6969;" text="LEAVE" textFill="WHITE">
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
