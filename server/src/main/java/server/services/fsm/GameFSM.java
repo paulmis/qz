@@ -12,7 +12,7 @@ import server.services.SSEManager;
 public abstract class GameFSM implements Runnable {
     @NonNull private final Game game;
 
-    @NonNull private final SSEManager sseManager;
+    @NonNull private final FSMContext context;
 
     /**
      * Run the finite state machine.

@@ -11,12 +11,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
 import server.database.entities.game.Game;
@@ -24,6 +20,7 @@ import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
 import server.database.repositories.question.QuestionRepository;
 import server.services.fsm.DefiniteGameFSM;
+import server.services.fsm.FSMContext;
 
 /**
  * Get the questions for a specific game.
@@ -97,7 +94,7 @@ public class GameService {
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
             sseManager.send(definiteGame.getPlayers().keySet(), new SSEMessage(SSEMessageType.GAME_START));
 
-            fsmManager.addFSM(definiteGame, new DefiniteGameFSM(definiteGame, sseManager));
+            fsmManager.addFSM(definiteGame, new DefiniteGameFSM(definiteGame, new FSMContext(sseManager, this)));
             fsmManager.startFSM(definiteGame);
         } else {
             throw new UnsupportedOperationException("Starting games other than definite games is not yet supported.");
