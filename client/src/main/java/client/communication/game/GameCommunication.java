@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.sse.SseEventSource;
 
 /**
- * Provides functions responsible for sending and receiving messages to and from the server.
+ * Provides functions retrieving game data from the server.
  */
 public class GameCommunication {
     /**
@@ -157,7 +157,6 @@ public class GameCommunication {
             @Override
             public void completed(QuestionDTO o) {
                 System.out.println(o);
-                ServerUtils.lobbyId = o.getId();
                 handlerSuccess.handle(o);
             }
 

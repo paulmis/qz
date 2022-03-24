@@ -1,6 +1,6 @@
 package client.utils;
 
-import commons.entities.UserDTO;
+import commons.entities.auth.UserDTO;
 import commons.entities.game.GameDTO;
 import commons.entities.questions.QuestionDTO;
 

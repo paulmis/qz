@@ -1,6 +1,6 @@
 package server.api;
 
-import commons.entities.UserDTO;
+import commons.entities.auth.UserDTO;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

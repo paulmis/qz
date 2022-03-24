@@ -3,7 +3,7 @@ package client.scenes.leaderboard;
 import client.scenes.MainCtrl;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
-import commons.entities.UserDTO;
+import commons.entities.auth.UserDTO;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;

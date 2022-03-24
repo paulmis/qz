@@ -1,6 +1,6 @@
 package client.scenes.leaderboard;
 
-import commons.entities.UserDTO;
+import commons.entities.auth.UserDTO;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -34,7 +34,7 @@ public class LeaderboardPane extends StackPane {
                 controller = new LeaderboardCtrl());
         // This loads the fxml
         try {
-            view = (Node) fxmlLoader.load();
+            view = fxmlLoader.load();
         } catch (Exception e) {
             Platform.exit();
             System.exit(0);

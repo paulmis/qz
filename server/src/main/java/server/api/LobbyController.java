@@ -120,6 +120,27 @@ public class LobbyController {
     }
 
     /**
+     * Endpoint for player's current lobby/game.
+     *
+     * @return player's current lobby/game.
+     */
+    @GetMapping
+    ResponseEntity<GameDTO> get() {
+        // Get the user from the context
+        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        if (user.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Retrieve the lobby/game
+        Optional<Game> game = gameRepository.getPlayersGame(user.get().getId());
+        if (game.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(game.get().getDTO());
+    }
+
+    /**
      * Endpoint to get lobby info.
      *
      * @param lobbyId the UUID of the lobby.

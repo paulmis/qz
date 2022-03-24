@@ -1,7 +1,7 @@
 package server.database.entities;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import commons.entities.UserDTO;
+import commons.entities.auth.UserDTO;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;

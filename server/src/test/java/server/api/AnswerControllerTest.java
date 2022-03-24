@@ -10,7 +10,7 @@ import static server.utils.TestHelpers.getUUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.AnswerDTO;
-import commons.entities.UserDTO;
+import commons.entities.auth.UserDTO;
 import commons.entities.game.GameStatus;
 import java.io.IOException;
 import java.net.URI;

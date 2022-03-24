@@ -1,15 +1,15 @@
 package client.scenes.lobby;
 
+import static javafx.application.Platform.runLater;
+
+import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
-import client.scenes.lobby.configuration.ConfigurationScreenPane;
-import client.utils.ServerUtils;
+import client.utils.ClientState;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
+import commons.entities.game.GameStatus;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import lombok.Generated;
 import lombok.Getter;
 
@@ -19,7 +19,7 @@ import lombok.Getter;
 @Getter
 @Generated
 public class LobbyScreenCtrl {
-    private final ServerUtils server;
+    private final LobbyCommunication communication;
     private final MainCtrl mainCtrl;
 
     private String name = "Ligma's Lobby";
@@ -34,20 +34,28 @@ public class LobbyScreenCtrl {
     /**
      * Initialize a new controller using dependency injection.
      *
-     * @param server Reference to communication utilities object.
+     * @param communication Reference to communication utilities object.
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public LobbyScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public LobbyScreenCtrl(LobbyCommunication communication, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
-        this.server = server;
+        this.communication = communication;
     }
 
     /**
      * Fired when the start button is clicked.
      */
     public void startButtonClick() {
-        this.mainCtrl.showGameScreen();
+        LobbyCommunication.startGame(
+            ClientState.game.getId(),
+            // Success
+            () -> runLater(() -> {
+                ClientState.game.setStatus(GameStatus.ONGOING);
+                this.mainCtrl.showGameScreen();
+            }),
+            // Failure
+            () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to start game.")));
     }
 
     /**

@@ -1,6 +1,7 @@
-package client.scenes;
+package client.scenes.game;
 
 import client.communication.game.GameCommunication;
+import client.scenes.MainCtrl;
 import client.scenes.questions.EstimateQuestionPane;
 import client.scenes.questions.MCQuestionPane;
 import client.utils.ClientState;
@@ -355,12 +356,13 @@ public class GameScreenCtrl implements Initializable {
     @SSEEventHandler(SSEMessageType.START_QUESTION)
     void toQuestionStage() {
         // Set the current question
-        GameCommunication.getCurrentQuestion(ClientState.game.getId(),
-                // Success
-                (question) -> javafx.application.Platform.runLater(() -> setQuestion(question)),
-                // Failure
-                () -> javafx.application.Platform.runLater(
-                    () -> mainCtrl.showErrorSnackBar("Unable to retrieve the current question")));
+        GameCommunication.getCurrentQuestion(
+            ClientState.game.getId(),
+            // Success
+            (question) -> javafx.application.Platform.runLater(() -> setQuestion(question)),
+            // Failure
+            () -> javafx.application.Platform.runLater(
+                () -> mainCtrl.showErrorSnackBar("Unable to retrieve the current question")));
 
         // TODO: timer
     }
