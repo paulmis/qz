@@ -79,7 +79,7 @@ public class LobbyController {
 
         // Check that the user isn't in another game
         if (gamePlayerRepository.existsByUserIdAndGameStatusNot(founder.get().getId(), GameStatus.FINISHED)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User is already in a game");
+            throw new IllegalStateException("User is already in a game");
         }
 
         // Create the game
@@ -180,7 +180,7 @@ public class LobbyController {
         // Check that the game hasn't started yet and add the player
         if (lobby.getStatus() != GameStatus.CREATED
                 || !lobby.add(player)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Game is already started.");
+            throw new IllegalStateException("Game is already started.");
         }
 
         lobby = gameRepository.save(lobby);
@@ -212,8 +212,6 @@ public class LobbyController {
         // If the SSE events are not yet set-up return 425
         try {
             gameService.startGame(lobby.get());
-        } catch (IllegalStateException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         } catch (IOException ex) {
             return ResponseEntity.status(HttpStatus.TOO_EARLY).body(ex.getMessage());
         }
@@ -281,11 +279,7 @@ public class LobbyController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not in a lobby");
         }
 
-        try {
-            lobbyService.removePlayer(lobby.get(), user.get());
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+        lobbyService.removePlayer(lobby.get(), user.get());
         return ResponseEntity.ok().build();
     }
 
