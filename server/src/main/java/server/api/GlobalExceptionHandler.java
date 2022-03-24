@@ -1,8 +1,7 @@
 package server.api;
 
-import java.util.List;
-
 import commons.entities.utils.ApiError;
+import java.util.List;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
