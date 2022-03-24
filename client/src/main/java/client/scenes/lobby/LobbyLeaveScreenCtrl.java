@@ -35,7 +35,7 @@ public class LobbyLeaveScreenCtrl implements Initializable {
     /**
      * The constructor for the LobbyLeaveScreen controller.
      *
-     * @param disbandHandler
+     * @param disbandHandler the action that is to be performed when the user disbands the lobby.
      */
     public LobbyLeaveScreenCtrl(DisbandHandler disbandHandler) {
         this.disbandHandler = disbandHandler;

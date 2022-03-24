@@ -34,7 +34,7 @@ public class GameLeaveScreenCtrl implements Initializable {
     /**
      * The constructor for the GameLeaveScreen controller.
      *
-     * @param disbandHandler
+     * @param disbandHandler the action that is to be performed when the user disbands the game.
      */
     public GameLeaveScreenCtrl(DisbandHandler disbandHandler) {
         this.disbandHandler = disbandHandler;
