@@ -175,6 +175,20 @@ public class SSEManager {
     }
 
     /**
+     * Disconnect multiple users' SSE emitters.
+     *
+     * @param users user ids.
+     * @return whether all the users were successfully disconnected or not.
+     */
+    public boolean disconnect(Iterable<UUID> users) {
+        boolean success = true;
+        for (UUID userId : users) {
+            success &= disconnect(userId);
+        }
+        return success;
+    }
+
+    /**
      * Disconnect all registered SSE emitters and clear the map.
      */
     public void disconnectAll() {
