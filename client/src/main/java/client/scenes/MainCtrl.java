@@ -323,6 +323,12 @@ public class MainCtrl {
         lobbySettingsPopUp.hide();
     }
 
+    /**
+     * This function opens a popup with
+     * a disband warning for leaving the lobby.
+     *
+     * @param disbandHandler the action that is to be performed when the user disbands the lobby.
+     */
     public void openLobbyLeaveWarning(LobbyLeaveScreenCtrl.DisbandHandler disbandHandler) {
         lobbyLeavePopUp.setOnShown(e -> {
             lobbyLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
@@ -338,10 +344,19 @@ public class MainCtrl {
         lobbyLeavePopUp.show(primaryStage);
     }
 
+    /**
+     * This function closes the lobby leave popUp.
+     */
     public void closeLobbyLeaveWarning() {
         lobbyLeavePopUp.hide();
     }
 
+    /**
+     * This function opens a popup with
+     * a disband warning for leaving the game.
+     *
+     * @param disbandHandler the action that is to be performed when the user disbands the game.
+     */
     public void openGameLeaveWarning(GameLeaveScreenCtrl.DisbandHandler disbandHandler) {
         gameLeavePopUp.setOnShown(e -> {
             gameLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
@@ -357,6 +372,9 @@ public class MainCtrl {
         gameLeavePopUp.show(primaryStage);
     }
 
+    /**
+     * This function closes the game leave popUp.
+     */
     public void closeGameLeaveWarning() {
         gameLeavePopUp.hide();
     }
