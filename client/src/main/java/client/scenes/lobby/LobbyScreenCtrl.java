@@ -8,6 +8,7 @@ import client.utils.SSEHandler;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
+import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
 import javafx.fxml.FXML;
@@ -86,9 +87,7 @@ public class LobbyScreenCtrl {
      * Fired when the lobby settings button is clicked.
      */
     public void lobbySettingsButtonClick() {
-        var config = new SurvivalGameConfigurationDTO();
-        config.setSpeedModifier(1.5f);
-        config.setAnswerTime(15);
+        var config = new NormalGameConfigurationDTO(null, 60, 1, 20, 3, 2f, 100, 0, 75);
         mainCtrl.openLobbySettings(config, (conf) -> {
             System.out.println(conf);
             mainCtrl.closeLobbySettings();
