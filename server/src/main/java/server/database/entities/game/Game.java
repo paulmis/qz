@@ -354,7 +354,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         // Iterates over the players and updates their streak, computes their streak
         // score and sets their new score accordingly.
         players.values().forEach(gamePlayer -> {
-            var score = scores.get(gamePlayer);
+            double score = Optional.ofNullable(scores.get(gamePlayer)).orElse(0.0);
             var isCorrect =  score >= configuration.getCorrectAnswerThreshold();
 
             updateStreak(gamePlayer, isCorrect);
