@@ -15,9 +15,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -71,8 +69,10 @@ public class GameScreenCtrl implements Initializable {
     @FXML private FontAwesomeIconView volumeIconView;
 
     private SimpleIntegerProperty volume;
-
     private List<FontAwesomeIcon> volumeIconList;
+
+    private SimpleIntegerProperty timeLeft;
+    private Timer timer;
 
 
     /**
@@ -105,6 +105,7 @@ public class GameScreenCtrl implements Initializable {
         setUpPowerUps();
         setUpTopBarLeaderBoard();
         setUpVolume();
+        setUpTimer();
 
         // This loads the estimate question type.
         loadMockEstimate();
@@ -147,6 +148,22 @@ public class GameScreenCtrl implements Initializable {
                 new EstimateQuestionPane(
                         "Short question",
                         System.out::println));
+    }
+
+    private void setUpTimer() {
+        timeLeft = new SimpleIntegerProperty(10);
+        timerLabel.textProperty().bind(timeLeft.asString());
+
+        timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                timeLeft.set(timeLeft.get() - 1);
+                if (timeLeft.get() == 0) {
+                    timer.cancel();
+                }
+            }
+        };
     }
 
     /**
