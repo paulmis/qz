@@ -3,6 +3,7 @@ package server.services;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,9 +16,13 @@ import server.database.repositories.game.GameRepository;
  * Provides business logic for the lobbies.
  */
 @Service
+@Slf4j
 public class LobbyService {
     @Autowired
     private GameRepository gameRepository;
+
+    @Autowired
+    private SSEManager sseManager;
 
     /**
      * Removes the specified user from the lobby. If this was the last player in the lobby, the game is deleted.
@@ -63,13 +68,14 @@ public class LobbyService {
 
         // Update players of the deletion
         try {
-            lobby.getEmitters().sendAll(new SSEMessage(SSEMessageType.LOBBY_DELETED));
+            sseManager.send(lobby.getPlayers().keySet(), new SSEMessage(SSEMessageType.LOBBY_DELETED));
         } catch (IOException e) {
             // Couldn't notify other players, nothing to do
+            log.error("[{}] Couldn't notify other players of lobby deletion", lobby.getGameId(), e);
         }
 
         // Close connection to the players
-        lobby.getEmitters().disconnectAll();
+        sseManager.disconnect(lobby.getPlayers().keySet());
         return true;
     }
 }

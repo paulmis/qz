@@ -240,6 +240,43 @@ class SSEManagerTest {
     }
 
     @Test
+    void testDisconnect() {
+        // Define the emitters.
+        SseEmitter emitter1 = Mockito.spy(new SseEmitter());
+        // Register the emitters.
+        sseManager.register(getUUID(1), emitter1);
+
+        // Disconnect all emitters.
+        sseManager.disconnect(getUUID(1));
+
+        // Verify that the `complete()` function was called for all emitters.
+        verify(emitter1, times(1)).complete();
+    }
+
+    @Test
+    void testDisconnectMultiple() {
+        // Define the emitters.
+        SseEmitter emitter1 = Mockito.spy(new SseEmitter());
+        SseEmitter emitter2 = Mockito.spy(new SseEmitter());
+        SseEmitter emitter3 = Mockito.spy(new SseEmitter());
+        // Register the emitters.
+        sseManager.register(getUUID(1), emitter1);
+        sseManager.register(getUUID(2), emitter2);
+        sseManager.register(getUUID(3), emitter3);
+
+        // UUIDs of the users to disconnect.
+        Set<UUID> uuids = Set.of(getUUID(1), getUUID(2));
+
+        // Disconnect all emitters.
+        sseManager.disconnect(uuids);
+
+        // Verify that the `complete()` function was called for all emitters.
+        verify(emitter1, times(1)).complete();
+        verify(emitter2, times(1)).complete();
+        verify(emitter3, never()).complete();
+    }
+
+    @Test
     void testDisconnectAll() {
         // Define the emitters.
         SseEmitter emitter1 = Mockito.spy(new SseEmitter());
