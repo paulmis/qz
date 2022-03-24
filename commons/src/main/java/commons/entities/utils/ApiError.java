@@ -1,11 +1,10 @@
-package server.api;
+package commons.entities.utils;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import org.springframework.http.HttpStatus;
 
 /**
  * Holds information about API errors.
@@ -21,7 +20,7 @@ public class ApiError {
     /**
      * HTTP status code.
      */
-    private HttpStatus status;
+    private int status;
 
     /**
      * High-level description of the error.
@@ -33,13 +32,16 @@ public class ApiError {
      */
     private List<String> errors = new ArrayList<>();
 
+    public ApiError() {
+    }
+
     /**
      * Initializes the ApiError.
      *
      * @param status the HTTP status to return
      * @param description high-level description of the error
      */
-    public ApiError(HttpStatus status, String description) {
+    public ApiError(int status, String description) {
         this.timestamp = LocalDateTime.now();
         this.status = status;
         this.description = description;

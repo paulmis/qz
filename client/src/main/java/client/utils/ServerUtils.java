@@ -25,11 +25,9 @@ import commons.entities.UserDTO;
 import commons.entities.game.GameDTO;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import commons.entities.utils.ApiError;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -134,15 +132,8 @@ public class ServerUtils {
     /**
      * Handler for when the register succeds.
      */
-    public interface RegisterHandlerSuccess {
-        void handle(String token);
-    }
-
-    /**
-     * Handler for when the register fails.
-     */
-    public interface RegisterHandlerFail {
-        void handle();
+    public interface RegisterHandler {
+        void handle(Response response, ApiError error);
     }
 
     /**
@@ -156,7 +147,7 @@ public class ServerUtils {
      *                 the password of the user.
      */
     public void register(String username, String email, String password,
-                           RegisterHandlerSuccess registerHandlerSuccess, RegisterHandlerFail registerHandlerFail) {
+                           RegisterHandler registerHandler) {
         client = this.newClient();
         UserDTO user = new UserDTO(username, email, password);
         var invocation = client
@@ -164,19 +155,18 @@ public class ServerUtils {
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .buildPost(Entity.entity(user, APPLICATION_JSON));
-        invocation.submit(new InvocationCallback<String>() {
+        invocation.submit(new InvocationCallback<Response>() {
 
             @Override
-            public void completed(String o) {
-                registerHandlerSuccess.handle(o);
-                client = client.register(new Authenticator(o));
+            public void completed(Response o) {
+                registerHandler.handle(o, o.readEntity(ApiError.class));
+                client = client.register(new Authenticator(o.readEntity(String.class)));
                 loggedIn = true;
             }
 
             @Override
             public void failed(Throwable throwable) {
-                registerHandlerFail.handle();
-                System.out.println(throwable);
+                System.out.println("HERE " + throwable.toString());
             }
         });
     }
@@ -226,7 +216,6 @@ public class ServerUtils {
             @Override
             public void failed(Throwable throwable) {
                 logInHandlerFail.handle();
-                System.out.println(throwable);
             }
         });
     }

@@ -1,6 +1,8 @@
 package server.api;
 
 import java.util.List;
+
+import commons.entities.utils.ApiError;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -41,7 +43,7 @@ public class GlobalExceptionHandler {
      * @return API error
      */
     private ApiError processFieldErrors(List<FieldError> fieldErrors, MethodArgumentNotValidException ex) {
-        ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "Validation error");
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), "Validation error");
         for (org.springframework.validation.FieldError fieldError : fieldErrors) {
             error.addError(fieldError.getDefaultMessage());
         }

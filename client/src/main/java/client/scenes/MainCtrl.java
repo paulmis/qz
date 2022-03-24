@@ -317,7 +317,7 @@ public class MainCtrl {
         snack.registerSnackbarContainer((Pane) activeScreen);
         snack.fireEvent(new JFXSnackbar.SnackbarEvent(
                 new JFXSnackbarLayout(message),
-                Duration.seconds(1), new PseudoClass() {
+                Duration.seconds(3), new PseudoClass() {
                     @Override
                     public String getPseudoClassName() {
                         return "error";
@@ -337,7 +337,7 @@ public class MainCtrl {
         snack.registerSnackbarContainer((Pane) activeScreen);
         snack.enqueue(new JFXSnackbar.SnackbarEvent(
                 new JFXSnackbarLayout(message),
-                Duration.seconds(1), null));
+                Duration.seconds(3), null));
         snack.toFront();
         snack.setViewOrder(-1);
     }
