@@ -189,7 +189,7 @@ public class LobbyScreenCtrl implements SSESource {
     }
 
     /**
-     * Fired when the disband button is clicked.
+     * Fired when the leave button is clicked.
      */
     public void disbandButtonClick() {
         mainCtrl.openLobbyDisbandWarning(() -> {
