@@ -92,7 +92,7 @@ public class GameService {
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
-            sseManager.send(definiteGame.getPlayers().keySet(), new SSEMessage(SSEMessageType.GAME_START));
+            sseManager.send(definiteGame.getPlayerIds(), new SSEMessage(SSEMessageType.GAME_START));
 
             fsmManager.addFSM(definiteGame, new DefiniteGameFSM(definiteGame, new FSMContext(sseManager, this)));
             fsmManager.startFSM(definiteGame);
@@ -126,7 +126,7 @@ public class GameService {
         // Disconnect the player and update clients
         sseManager.unregister(user.getId());
         try {
-            sseManager.send(game.getPlayers().keySet(), new SSEMessage(SSEMessageType.PLAYER_LEFT, user.getId()));
+            sseManager.send(game.getPlayerIds(), new SSEMessage(SSEMessageType.PLAYER_LEFT, user.getId()));
         } catch (IOException ex) {
             // Log failure to update clients
             log.error("Unable to send removePlayer message to all players", ex);
@@ -146,7 +146,7 @@ public class GameService {
     public void setAcceptingAnswers(Game game, boolean acceptingAnswers) throws IOException {
         game.setAcceptingAnswers(acceptingAnswers);
 
-        sseManager.send(game.getPlayers().keySet(), new SSEMessage(
+        sseManager.send(game.getPlayerIds(), new SSEMessage(
                 acceptingAnswers
                         ? SSEMessageType.START_QUESTION
                         : SSEMessageType.STOP_QUESTION));
@@ -165,7 +165,7 @@ public class GameService {
     public void setAcceptingAnswers(Game game, boolean acceptingAnswers, long delay) throws IOException {
         game.setAcceptingAnswers(acceptingAnswers);
 
-        sseManager.send(game.getPlayers().keySet(), new SSEMessage(
+        sseManager.send(game.getPlayerIds(), new SSEMessage(
                 acceptingAnswers
                         ? SSEMessageType.START_QUESTION
                         : SSEMessageType.STOP_QUESTION, delay));
