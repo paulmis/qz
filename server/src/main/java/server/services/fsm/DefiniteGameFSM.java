@@ -17,6 +17,15 @@ public class DefiniteGameFSM extends GameFSM {
 
     public DefiniteGameFSM(DefiniteGame game, FSMContext context) {
         super(game, context);
+        if (game.getCurrentQuestion() == game.getQuestionsCount()) {
+            throw new IllegalStateException("Game is already finished.");
+        }
+        if (game.isAcceptingAnswers()) {
+            throw new IllegalStateException("Game is already accepting answers.");
+        }
+        if (game.getCurrentQuestion() != 0) {
+            throw new IllegalStateException("Game is already in progress.");
+        }
     }
 
     /**
@@ -25,23 +34,45 @@ public class DefiniteGameFSM extends GameFSM {
     @SneakyThrows
     @Override
     public void run() {
-        log.trace("[{}] FSM runnable called.", getGame().getId());
-        getContext().getGameService().setAcceptingAnswers(getGame(), !getGame().isAcceptingAnswers());
-        log.trace("[{}] waiting....", getGame().getId());
-        if (getGame().isAcceptingAnswers()) {
-            Thread.sleep(getGame().getConfiguration().getAnswerTime());
-        } else {
-            Thread.sleep(5000L);
+        while (getGame().getCurrentQuestion()
+                != ((NormalGameConfiguration) getGame().getConfiguration()).getNumQuestions()) {
+            log.trace("[{}] FSM runnable called.", getGame().getId());
+
+            if (getGame().isAcceptingAnswers()) {
+                // Disable accepting answers.
+                getContext().getGameService().setAcceptingAnswers(getGame(),
+                        false,
+                        5000L);
+
+                log.trace("[{}] FSM runnable: accepting answers disabled.", getGame().getId());
+
+                // If we are accepting answers, get duration of the question.
+                Thread.sleep(5000L);
+
+                log.trace("[{}] FSM runnable: advancing onto the next question.", getGame().getId());
+                // Move onto the next question.
+                getGame().setCurrentQuestion(getGame().getCurrentQuestion() + 1);
+            } else {
+                // Enable accepting answers.
+                getContext().getGameService().setAcceptingAnswers(getGame(),
+                        true,
+                        getGame().getConfiguration().getAnswerTime() * 1000L);
+
+                log.trace("[{}] FSM runnable: accepting answers enabled.", getGame().getId());
+
+                // If we are not accepting answers, sleep for the duration of leaderboard.
+                Thread.sleep(getGame().getConfiguration().getAnswerTime() * 1000L);
+            }
+
+            // Otherwise, continue running the runnable
+            log.trace("[{}] FSM runnable continuing.", getGame().getId());
         }
 
-        log.trace("[{}] FSM runnable finished.", getGame().getId());
-        getGame().setCurrentQuestion(getGame().getCurrentQuestion() + 1);
-        if (getGame().getCurrentQuestion()
-                == ((NormalGameConfiguration) getGame().getConfiguration()).getNumQuestions()) {
-            getGame().setStatus(GameStatus.FINISHED);
-            getContext().getSseManager().send(getGame().getPlayers().keySet(), new SSEMessage(SSEMessageType.GAME_END));
-        } else {
-            run();
-        }
+        log.debug("[{}] Game is finished.", getGame().getId());
+        // We are not accepting answers anymore.
+        getContext().getGameService().setAcceptingAnswers(getGame(), false);
+        getGame().setStatus(GameStatus.FINISHED);
+        // The game is finished.
+        getContext().getSseManager().send(getGame().getPlayers().keySet(), new SSEMessage(SSEMessageType.GAME_END));
     }
 }

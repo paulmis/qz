@@ -151,4 +151,23 @@ public class GameService {
                         ? SSEMessageType.START_QUESTION
                         : SSEMessageType.STOP_QUESTION));
     }
+
+    /**
+     * Sets the accepting answers boolean to true inside the game and notifies
+     * every user that this change has happened.
+     *
+     * @param game The game object that the action is performed on.
+     * @param acceptingAnswers The requested boolean.
+     * @param delay The delay before the next SSE event is to be expected.
+     * @throws IOException if an SSE connection send failed.
+     */
+    @Transactional
+    public void setAcceptingAnswers(Game game, boolean acceptingAnswers, long delay) throws IOException {
+        game.setAcceptingAnswers(acceptingAnswers);
+
+        sseManager.send(game.getPlayers().keySet(), new SSEMessage(
+                acceptingAnswers
+                        ? SSEMessageType.START_QUESTION
+                        : SSEMessageType.STOP_QUESTION, delay));
+    }
 }

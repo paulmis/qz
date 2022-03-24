@@ -24,6 +24,7 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
     /**
      * Time (in seconds) available for each player to answer each question.
      * In the future, we could switch to a Duration datatype, but JPA/Hibernate doesn't support it out of the box.
+     * TODO: change this to milliseconds
      */
     @Column(nullable = false)
     protected int answerTime = 10;
