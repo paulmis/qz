@@ -25,4 +25,4 @@ spring:
 
 logging:
   level:
-    server: DEBUG
+    server: ${QUIZZZ_LOG_LEVEL:DEBUG}
