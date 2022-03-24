@@ -23,7 +23,7 @@ public class LobbyService {
      * Removes the specified user from the lobby. If this was the last player in the lobby, the game is deleted.
      *
      * @param lobby the lobby to remove the user from
-     * @param user the user to be removed
+     * @param user  the user to be removed
      * @return true if the user was removed, false otherwise
      */
     @Transactional
@@ -45,12 +45,12 @@ public class LobbyService {
      * Deletes the lobby from the database. This action can be performed only by the lobby's host.
      *
      * @param lobby the lobby being deleted
-     * @param user the user performing the action
+     * @param user  the user performing the action
      * @return true if the lobby was successfully deleted, false otherwise
      */
     @Transactional(noRollbackFor = IOException.class)
     public boolean deleteLobby(Game lobby, User user) {
-        // Check if the host is set. If host is null, let anyone can delete the lobby
+        // Check if the host is set. If host is null, let anyone delete the lobby
         if (lobby.getHost() != null) {
             // Check that the user is the lobby host
             if (!lobby.getHost().getUser().equals(user)) {
