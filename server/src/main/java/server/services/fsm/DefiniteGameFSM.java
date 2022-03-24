@@ -15,8 +15,8 @@ import server.services.SSEManager;
 @Slf4j
 public class DefiniteGameFSM extends GameFSM {
 
-    public DefiniteGameFSM(DefiniteGame game, SSEManager sseManager) {
-        super(game, sseManager);
+    public DefiniteGameFSM(DefiniteGame game, FSMContext context) {
+        super(game, context);
     }
 
     /**
@@ -26,7 +26,7 @@ public class DefiniteGameFSM extends GameFSM {
     @Override
     public void run() {
         log.trace("[{}] FSM runnable called.", getGame().getId());
-        getGame().setAcceptingAnswers(!getGame().isAcceptingAnswers());
+        getContext().getGameService().setAcceptingAnswers(getGame(), !getGame().isAcceptingAnswers());
         log.trace("[{}] waiting....", getGame().getId());
         if (getGame().isAcceptingAnswers()) {
             Thread.sleep(getGame().getConfiguration().getAnswerTime());
@@ -39,7 +39,7 @@ public class DefiniteGameFSM extends GameFSM {
         if (getGame().getCurrentQuestion()
                 == ((NormalGameConfiguration) getGame().getConfiguration()).getNumQuestions()) {
             getGame().setStatus(GameStatus.FINISHED);
-            getSseManager().send(getGame().getPlayers().keySet(), new SSEMessage(SSEMessageType.GAME_END));
+            getContext().getSseManager().send(getGame().getPlayers().keySet(), new SSEMessage(SSEMessageType.GAME_END));
         } else {
             run();
         }
