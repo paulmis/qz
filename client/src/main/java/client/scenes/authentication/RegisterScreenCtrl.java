@@ -1,14 +1,15 @@
 package client.scenes.authentication;
 
 
-import static javafx.application.Platform.runLater;
-
 import client.scenes.MainCtrl;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXSnackbar;
+import commons.entities.utils.ApiError;
 import java.io.File;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -23,8 +24,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javax.ws.rs.core.Response;
 import lombok.Generated;
-
 
 
 /**
@@ -86,19 +87,34 @@ public class RegisterScreenCtrl implements Initializable {
     private void setUsername() {
         if (usernameField.getText().length() > 0) {
             System.out.print(usernameField.getText() + emailText + passwordText);
-            server.register(usernameField.getText(),
-                    emailText, passwordText,
-                    (s) -> {
-                        runLater(() -> {
-                            mainCtrl.showLobbyListScreen();
-                            mainCtrl.showInformationalSnackBar("Success!");
-                        });
-                        //If completed the function redirects the user to the lobby screen
-                    },
-                    () -> javafx.application.Platform.runLater(() -> {
-                        mainCtrl.showErrorSnackBar("Invalid Credentials!"); })
-            //If the function fails it triggers the error message.
-            );
+            server.register(usernameField.getText(), emailText,  passwordText, new ServerUtils.RegisterHandler() {
+                @Override
+                public void handle(Response response, ApiError error) {
+                    javafx.application.Platform.runLater(() -> {
+                        switch (response.getStatus()) {
+                            case 200: {
+                                mainCtrl.showLobbyListScreen();
+                                mainCtrl.showInformationalSnackBar("Success!");
+                                break;
+                            }
+                            case 400: {
+                                String s = error.toString();
+                                String[] split1 = s.split("\\[");
+                                mainCtrl.showErrorSnackBar(split1[1]);
+                                break;
+                            }
+                            case 409: {
+                                mainCtrl.showErrorSnackBar("User already exists!");
+                                break;
+                            }
+                            default: {
+                                break;
+                            }
+                            //If the function fails it triggers the error message.
+                        }
+                    });
+                }
+            });
         } else {
             //No username set
         }
