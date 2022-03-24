@@ -83,6 +83,7 @@ public class LobbyController {
             game = new NormalGame(gameDTO);
             game.setGameId(RandomStringUtils.random(6, true, true));
             game.setStatus(GameStatus.CREATED);
+            game.setAcceptingAnswers(false);
 
             // Save the configuration
             NormalGameConfiguration config =

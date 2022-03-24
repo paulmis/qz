@@ -1,15 +1,12 @@
 package client.scenes.lobby;
 
 import client.scenes.MainCtrl;
-import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
+import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import lombok.Generated;
 import lombok.Getter;
 
@@ -54,9 +51,7 @@ public class LobbyScreenCtrl {
      * Fired when the lobby settings button is clicked.
      */
     public void lobbySettingsButtonClick() {
-        var config = new SurvivalGameConfigurationDTO();
-        config.setSpeedModifier(1.5f);
-        config.setAnswerTime(15);
+        var config = new NormalGameConfigurationDTO(null, 60, 1, 20, 3, 2f, 100, 0, 75);
         mainCtrl.openLobbySettings(config, (conf) -> {
             System.out.println(conf);
             mainCtrl.closeLobbySettings();
