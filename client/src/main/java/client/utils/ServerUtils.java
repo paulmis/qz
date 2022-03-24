@@ -30,10 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.sse.SseEventSource;
@@ -163,7 +160,7 @@ public class ServerUtils {
 
         client = this.newClient();
         UserDTO user = new UserDTO("", email, password);
-        var invocation = client
+        Invocation invocation = client
                 .target(SERVER).path("/api/auth/login")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
@@ -214,7 +211,7 @@ public class ServerUtils {
         game.setId(UUID.randomUUID());
         game.setConfiguration(config);
 
-        var invocation = client
+        Invocation invocation = client
                 .target(SERVER).path("/api/lobby")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
@@ -258,7 +255,7 @@ public class ServerUtils {
      */
     public void getLobbies(GetLobbiesHandlerSuccess getLobbiesHandlerSuccess,
                             GetLobbiesHandlerFail getLobbiesHandlerFail) {
-        var invocation = client
+        Invocation invocation = client
                 .target(SERVER).path("/api/lobby/available")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
@@ -302,7 +299,7 @@ public class ServerUtils {
      */
     public void joinLobby(UUID lobbyId, JoinLobbyHandlerSuccess joinLobbyHandlerSuccess,
                            JoinLobbyHandlerFail joinLobbyHandlerFail) {
-        var invocation = client
+        Invocation invocation = client
                 .target(SERVER).path("/api/lobby/" + lobbyId.toString() + "/join")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
@@ -346,7 +343,7 @@ public class ServerUtils {
      */
     public void getMyInfo(GetUserInfoHandlerSuccess getUserInfoHandlerSuccess,
                           GetUserInfoHandlerFail getUserInfoHandlerFail) {
-        var invocation = client
+        Invocation invocation = client
                 .target(SERVER).path("/api/user")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
@@ -412,7 +409,7 @@ public class ServerUtils {
      */
     public void startLobby(StartLobbyHandler startLobbyHandler) {
 
-        var invocation = client.target(SERVER).path("/api/lobby/" + lobbyId + "/start")
+        Invocation invocation = client.target(SERVER).path("/api/lobby/" + lobbyId + "/start")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .buildPut(Entity.entity("", APPLICATION_JSON));

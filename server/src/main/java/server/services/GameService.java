@@ -86,8 +86,6 @@ public class GameService {
         if (game.getStatus() != GameStatus.CREATED || !game.isFull()) {
             throw new IllegalStateException();
         }
-        ConfigurableApplicationContext context = new AnnotationConfigApplicationContext(
-                "com.gauravbytes.hellogb.service");
 
         // Initialize the questions
         if (game instanceof DefiniteGame) {

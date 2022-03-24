@@ -79,8 +79,6 @@ public class LobbyScreenCtrl {
                     mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");
                     break;
             }
-            System.out.println(response);
-
         }));
     }
 
