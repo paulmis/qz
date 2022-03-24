@@ -2,6 +2,8 @@ package server.database.entities.game;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static server.utils.TestHelpers.getUUID;
 
@@ -53,9 +55,6 @@ public class NormalGameTest {
     Activity activityC;
     Activity activityD;
 
-    @Captor
-    private ArgumentCaptor<SSEMessage> sseMessageCaptor;
-
     @BeforeEach
     void init() {
         // Create users
@@ -86,6 +85,7 @@ public class NormalGameTest {
 
         activityD = new Activity();
         activityD.setCost(400);
+
 
         var activities = List.of(activityA, activityB, activityC, activityD);
         questionA.setActivities(activities);
@@ -129,20 +129,14 @@ public class NormalGameTest {
 
     @Test
     void setAcceptingAnswersTrue() throws IOException {
-        SSEManager manager = Mockito.spy(new SSEManager());
-        game.setEmitters(manager);
         game.changeAcceptingAnswers(true);
-        verify(manager).sendAll(sseMessageCaptor.capture());
-        assertEquals(SSEMessageType.START_QUESTION, sseMessageCaptor.getValue().getType());
+        assertEquals(true, game.isAcceptingAnswers());
     }
 
     @Test
     void setAcceptingAnswersFalse() throws IOException {
-        SSEManager manager = Mockito.spy(new SSEManager());
-        game.setEmitters(manager);
         game.changeAcceptingAnswers(false);
-        verify(manager).sendAll(sseMessageCaptor.capture());
-        assertEquals(SSEMessageType.STOP_QUESTION, sseMessageCaptor.getValue().getType());
+        assertEquals(false, game.isAcceptingAnswers());
     }
 
     @Test
