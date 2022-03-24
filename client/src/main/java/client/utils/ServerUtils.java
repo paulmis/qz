@@ -21,7 +21,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import commons.entities.UserDTO;
+import commons.entities.auth.LoginDTO;
+import commons.entities.auth.UserDTO;
 import commons.entities.game.GameDTO;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
@@ -44,7 +45,6 @@ public class ServerUtils {
     public static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
             .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
     public static boolean loggedIn = false;
-    public static UUID lobbyId = null;
 
     /**
      * Provides a request target for the server that can be used to build and invoke a query.
@@ -63,7 +63,6 @@ public class ServerUtils {
      */
     private Client newClient() {
         loggedIn = false;
-        lobbyId = null;
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
@@ -71,6 +70,9 @@ public class ServerUtils {
         return ClientBuilder.newClient().register(provider);
     }
 
+    public String register(String email, String password) {
+        System.out.println("Registering new User...\n");
+        return "200";
 
     /**
      * Handler for when the leave lobby succeeds.
@@ -198,7 +200,7 @@ public class ServerUtils {
      * Handler for when the log in succeeds.
      */
     public interface LogInHandlerSuccess {
-        void handle(String token);
+        void handle(LoginDTO token);
     }
 
     /**
@@ -226,29 +228,29 @@ public class ServerUtils {
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .buildPost(Entity.entity(user, APPLICATION_JSON));
-        invocation.submit(new InvocationCallback<String>() {
+        invocation.submit(new InvocationCallback<LoginDTO>() {
 
             @Override
-            public void completed(String o) {
-                System.out.println(o);
-                logInHandlerSuccess.handle(o);
-                client = client.register(new Authenticator(o));
+            public void completed(LoginDTO loginDTO) {
+                System.out.println(loginDTO);
+                logInHandlerSuccess.handle(loginDTO);
+                client = client.register(new Authenticator(loginDTO.getToken()));
                 loggedIn = true;
             }
 
             @Override
             public void failed(Throwable throwable) {
                 logInHandlerFail.handle();
+                throwable.printStackTrace();
             }
         });
     }
-
 
     /**
      * Handler for when the create lobby succeeds.
      */
     public interface CreateLobbyHandlerSuccess {
-        void handle(NormalGameDTO game);
+        void handle(GameDTO game);
     }
 
     /**
@@ -277,12 +279,13 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON)
                 .buildPost(Entity.entity(game, APPLICATION_JSON));
 
-        invocation.submit(new InvocationCallback<NormalGameDTO>() {
+        invocation.submit(new InvocationCallback<GameDTO>() {
 
             @Override
-            public void completed(NormalGameDTO o) {
-                ServerUtils.lobbyId = o.getId();
-                createLobbyHandlerSuccess.handle(o);
+            public void completed(GameDTO game) {
+                System.out.println(game);
+                ClientState.game = game;
+                createLobbyHandlerSuccess.handle(game);
             }
 
             @Override
@@ -368,9 +371,10 @@ public class ServerUtils {
         invocation.submit(new InvocationCallback<GameDTO>() {
 
             @Override
-            public void completed(GameDTO o) {
-                ServerUtils.lobbyId = o.getId();
-                joinLobbyHandlerSuccess.handle(o);
+            public void completed(GameDTO game) {
+                System.out.println(game);
+                ClientState.game = game;
+                joinLobbyHandlerSuccess.handle(game);
             }
 
             @Override

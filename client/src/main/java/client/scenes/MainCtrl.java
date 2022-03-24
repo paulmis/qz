@@ -19,6 +19,7 @@ package client.scenes;
 import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
+import client.scenes.game.GameScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
 import client.scenes.lobby.LobbyLeaveScreenCtrl;
 import client.scenes.lobby.LobbyLeaveScreenPane;

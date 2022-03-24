@@ -6,6 +6,7 @@ import commons.entities.AnswerDTO;
 import commons.entities.questions.MCQuestionDTO;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
@@ -53,7 +54,6 @@ public class MCQuestionCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         // Sets the question text
         this.questionLabel.setText(question.getText());
 
@@ -86,11 +86,14 @@ public class MCQuestionCtrl implements Initializable {
             long cost = question.getActivities().get(i).getCost();
             labelOption.setText(Long.toString(cost));
 
-            // Gets the button and assign the action to it from the
-            // list of actions
-            var buttonOption = buttonOptionArray.get(i);
-            // TODO: set after rebase
-            buttonOption.setOnAction((actionEvent) -> answerHandler.handle(new AnswerDTO()));
+            // Assign the answer handler to the button
+            buttonOptionArray
+                .get(i)
+                .setOnAction((actionEvent) ->
+                    answerHandler.handle(
+                        new AnswerDTO(
+                            List.of(cost),
+                            question.getId())));
         }
     }
 }

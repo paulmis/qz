@@ -89,13 +89,11 @@ public class LobbyListCtrl implements Initializable {
     @FXML
     private void userButtonClick() {
         if (!userPanelGrid.isVisible()) {
-            server.getMyInfo(userDTO -> {
-                runLater(() -> {
-                    this.usernameField.setText(userDTO.getUsername());
-                    userPanelGrid.setVisible(true);
-                    playerImageView.setImage(new Image("https://upload.wikimedia.org/wikipedia/commons/e/e3/Klaus_Iohannis_din_interviul_cu_Dan_Tapalag%C4%83_cropped.jpg"));
-                });
-            }, () -> runLater(() ->
+            server.getMyInfo(userDTO -> runLater(() -> {
+                this.usernameField.setText(userDTO.getUsername());
+                userPanelGrid.setVisible(true);
+                playerImageView.setImage(new Image("https://upload.wikimedia.org/wikipedia/commons/e/e3/Klaus_Iohannis_din_interviul_cu_Dan_Tapalag%C4%83_cropped.jpg"));
+            }), () -> runLater(() ->
                             mainCtrl.showErrorSnackBar("Something went wrong while fetching your user data.")));
         } else {
             userPanelGrid.setVisible(false);
@@ -104,8 +102,9 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void createLobbyButtonClick() {
-        server.createLobby(game -> runLater(mainCtrl::showLobbyScreen),
-                () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
+        server.createLobby(
+            game -> runLater(mainCtrl::showLobbyScreen),
+            () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
     }
 
     @FXML

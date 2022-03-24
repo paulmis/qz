@@ -2,13 +2,16 @@ package client.scenes.lobby;
 
 import static javafx.application.Platform.runLater;
 
+import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
 import client.utils.SSEEventHandler;
 import client.utils.SSEHandler;
 import client.utils.ServerUtils;
+import client.utils.ClientState;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import commons.entities.game.GameStatus;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
 import java.time.Duration;
@@ -17,14 +20,13 @@ import javax.ws.rs.core.Response;
 import lombok.Generated;
 import lombok.Getter;
 
-
 /**
  * Lobby controller.
  */
 @Getter
 @Generated
 public class LobbyScreenCtrl {
-    private final ServerUtils server;
+    private final LobbyCommunication communication;
     private final MainCtrl mainCtrl;
 
     private SSEHandler sseHandler;
@@ -41,13 +43,13 @@ public class LobbyScreenCtrl {
     /**
      * Initialize a new controller using dependency injection.
      *
-     * @param server Reference to communication utilities object.
+     * @param communication Reference to communication utilities object.
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public LobbyScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public LobbyScreenCtrl(LobbyCommunication communication, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
-        this.server = server;
+        this.communication = communication;
     }
 
     /**
@@ -64,57 +66,32 @@ public class LobbyScreenCtrl {
      * Fired when the start button is clicked.
      */
     public void startButtonClick() {
-        this.server.startLobby(response -> runLater(() -> {
-            switch (response.getStatus()) {
-                case 403:
-                    mainCtrl.showErrorSnackBar("Starting the game failed! You are not the host.");
-                    break;
-                case 409:
-                    mainCtrl.showErrorSnackBar("Something went wrong while starting the game.");
-                    break;
-                case 425:
-                    mainCtrl.showInformationalSnackBar("Try again after a second.");
-                    break;
-                case 200:
-                    mainCtrl.showInformationalSnackBar("Game started!");
-                    break;
-                default:
-                    mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");
-                    break;
-            }
-        }));
-    }
-
-    /**
-     * Fired when the leave button is clicked.
-     */
-    public void leaveButtonClick() {
-        mainCtrl.openLobbyLeaveWarning(() -> {
-            mainCtrl.closeLobbyLeaveWarning();
-            this.server.leaveLobby(new ServerUtils.LeaveGameHandler() {
-                @Override
-                public void handle(Response response) {
-                    javafx.application.Platform.runLater(() -> {
-                        switch (response.getStatus()) {
-                            case 200:
-                                System.out.println("User successfully removed from lobby");
-                                mainCtrl.showLobbyListScreen();
-                                break;
-                            case 404:
-                                System.out.println("User/Game not found");
-                                break;
-                            case 409:
-                                System.out.println("Couldn't remove player");
-                                break;
-                            default:
-                                break;
-                        }
-                    });
+        LobbyCommunication.startGame(
+            ClientState.game.getId(),
+            // Success
+            response -> runLater(() -> {
+                switch (response.getStatus()) {
+                    case 403:
+                        mainCtrl.showErrorSnackBar("Starting the game failed! You are not the host.");
+                        break;
+                    case 409:
+                        mainCtrl.showErrorSnackBar("Something went wrong while starting the game.");
+                        break;
+                    case 425:
+                        mainCtrl.showInformationalSnackBar("Try again after a second.");
+                        break;
+                    case 200:
+                        mainCtrl.showInformationalSnackBar("Game started!");
+                        ClientState.game.setStatus(GameStatus.ONGOING);
+                        this.mainCtrl.showGameScreen();
+                        break;
+                    default:
+                        mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");
+                        break;
                 }
-            });
-        }, () -> {
-            mainCtrl.closeLobbyLeaveWarning();
-        });
+            }),
+            // Failure
+            () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to start game.")));
     }
 
     /**
