@@ -2,6 +2,8 @@ package server.database.entities.game;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static server.utils.TestHelpers.getUUID;
 
@@ -14,9 +16,9 @@ import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,8 +28,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import server.database.entities.User;
+import server.database.entities.answer.Answer;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
+import server.database.entities.question.Activity;
 import server.database.entities.question.MCQuestion;
 import server.database.repositories.question.QuestionRepository;
 import server.services.GameService;
@@ -46,9 +50,10 @@ public class NormalGameTest {
     GamePlayer susannePlayer;
     MCQuestion questionA;
     MCQuestion questionB;
-
-    @Captor
-    private ArgumentCaptor<SSEMessage> sseMessageCaptor;
+    Activity activityA;
+    Activity activityB;
+    Activity activityC;
+    Activity activityD;
 
     @BeforeEach
     void init() {
@@ -69,8 +74,28 @@ public class NormalGameTest {
         questionA = new MCQuestion();
         questionB = new MCQuestion();
 
+        activityA = new Activity();
+        activityA.setCost(100);
+
+        activityB = new Activity();
+        activityB.setCost(200);
+
+        activityC = new Activity();
+        activityC.setCost(300);
+
+        activityD = new Activity();
+        activityD.setCost(400);
+
+
+        var activities = List.of(activityA, activityB, activityC, activityD);
+        questionA.setActivities(activities);
+        questionA.setAnswer(activityA);
+
+        questionB.setActivities(activities);
+        questionB.setAnswer(activityB);
+
         // Create config
-        config = new NormalGameConfiguration(17, 13, 2);
+        config = new NormalGameConfiguration(17, 13, 2, 2, 2f, 100, -10, 75);
 
         // Create the game
         game = new NormalGame();
@@ -100,6 +125,18 @@ public class NormalGameTest {
                 .usingRecursiveComparison()
                 .ignoringFields("players", "questions", "answers", "host", "random")
                 .isEqualTo(repl);
+    }
+
+    @Test
+    void setAcceptingAnswersTrue() throws IOException {
+        game.changeAcceptingAnswers(true);
+        assertEquals(true, game.isAcceptingAnswers());
+    }
+
+    @Test
+    void setAcceptingAnswersFalse() throws IOException {
+        game.changeAcceptingAnswers(false);
+        assertEquals(false, game.isAcceptingAnswers());
     }
 
     @Test
@@ -179,5 +216,170 @@ public class NormalGameTest {
     void removeGameFinished() throws LastPlayerRemovedException {
         game.setStatus(GameStatus.FINISHED);
         assertFalse(game.remove(joe.getId()));
+    }
+
+    @Test
+    void computeBaseScoreNegative() {
+        assertEquals(-10, game.computeBaseScore(0.0));
+    }
+
+    @Test
+    void computeBaseScore100() {
+        assertEquals(100, game.computeBaseScore(1.0));
+    }
+
+    @Test
+    void computeBaseScoreIncreasing() {
+        var scores = IntStream.range(0, 100)
+                .mapToObj(i -> game.computeBaseScore(i / 100d))
+                .collect(Collectors.toList());
+
+        var sortedScores = scores.stream().sorted().collect(Collectors.toList());
+
+        assertEquals(sortedScores, scores);
+    }
+
+    @Test
+    void computeBaseScoreIllegalArgument() {
+        assertThrows(IllegalArgumentException.class, () -> game.computeBaseScore(-1d));
+        assertThrows(IllegalArgumentException.class, () -> game.computeBaseScore(2d));
+    }
+
+    @Test
+    void computeStreakScoreNoStreak() {
+        joePlayer.setStreak(0);
+        assertEquals(100, game.computeStreakScore(joePlayer, 100));
+    }
+
+    @Test
+    void computeStreakScore1Streak() {
+        joePlayer.setStreak(1);
+        assertEquals(100, game.computeStreakScore(joePlayer, 100));
+    }
+
+    @Test
+    void computeStreakScore2Streak() {
+        joePlayer.setStreak(2);
+        assertEquals(200, game.computeStreakScore(joePlayer, 100));
+    }
+
+    @Test
+    void computeStreakScore3Streak() {
+        joePlayer.setStreak(3);
+        assertEquals(200, game.computeStreakScore(joePlayer, 100));
+    }
+
+    @Test
+    void updateStreakWrong() {
+        joePlayer.setStreak(0);
+
+        game.updateStreak(joePlayer, false);
+        assertEquals(0, joePlayer.getStreak());
+    }
+
+    @Test
+    void updateStreakCorrect() {
+        joePlayer.setStreak(0);
+
+        game.updateStreak(joePlayer, true);
+        assertEquals(1, joePlayer.getStreak());
+    }
+
+    @Test
+    void updateStreakCorrectMultiple() {
+        joePlayer.setStreak(0);
+
+        game.updateStreak(joePlayer, true);
+        game.updateStreak(joePlayer, true);
+        game.updateStreak(joePlayer, true);
+        game.updateStreak(joePlayer, true);
+        assertEquals(4, joePlayer.getStreak());
+    }
+
+    @Test
+    void updateStreakWrongReset() {
+        joePlayer.setStreak(5);
+
+        game.updateStreak(joePlayer, false);
+        assertEquals(0, joePlayer.getStreak());
+    }
+
+    @Test
+    void updateScoresCorrect() {
+        var answerA = new Answer();
+        answerA.setPlayer(joePlayer);
+        answerA.setResponse(List.of(questionA.getAnswer().getCost()));
+
+        var answerB = new Answer();
+        answerB.setPlayer(susannePlayer);
+        answerB.setResponse(List.of(questionA.getAnswer().getCost()));
+
+        game.updateScores(questionA, List.of(answerA, answerB));
+        assertEquals(100, joePlayer.getScore());
+        assertEquals(1, joePlayer.getStreak());
+        assertEquals(1, joePlayer.getPowerUpPoints());
+
+        assertEquals(100, susannePlayer.getScore());
+        assertEquals(1, susannePlayer.getStreak());
+        assertEquals(1, susannePlayer.getPowerUpPoints());
+
+    }
+
+    @Test
+    void updateScoresHalf() {
+        var answerA = new Answer();
+        answerA.setPlayer(joePlayer);
+        answerA.setResponse(List.of(questionA.getAnswer().getCost()));
+
+        var answerB = new Answer();
+        answerB.setPlayer(susannePlayer);
+        answerB.setResponse(List.of(300L));
+
+        game.updateScores(questionA, List.of(answerA, answerB));
+        assertEquals(100, joePlayer.getScore());
+        assertEquals(1, joePlayer.getStreak());
+        assertEquals(1, joePlayer.getPowerUpPoints());
+
+        assertEquals(-10, susannePlayer.getScore());
+        assertEquals(0, susannePlayer.getStreak());
+        assertEquals(0, susannePlayer.getPowerUpPoints());
+    }
+
+    @Test
+    void updateScoresWrong() {
+        joePlayer.setStreak(12);
+
+        var answerA = new Answer();
+        answerA.setPlayer(joePlayer);
+        answerA.setResponse(List.of(300L));
+
+        var answerB = new Answer();
+        answerB.setPlayer(susannePlayer);
+        answerB.setResponse(List.of(300L));
+
+        game.updateScores(questionB, List.of(answerA, answerB));
+        assertEquals(-10, joePlayer.getScore());
+        assertEquals(0, joePlayer.getStreak());
+        assertEquals(0, joePlayer.getPowerUpPoints());
+
+        assertEquals(-10, susannePlayer.getScore());
+        assertEquals(0, susannePlayer.getStreak());
+        assertEquals(0, susannePlayer.getPowerUpPoints());
+    }
+
+    @Test
+    void updatePowerUpPointsCorrect() {
+        joePlayer.setPowerUpPoints(0);
+
+        game.updatePowerUpPoints(joePlayer, true);
+        assertEquals(1, joePlayer.getPowerUpPoints());
+    }
+
+    @Test
+    void updatePowerUpPointsWrong() {
+        joePlayer.setPowerUpPoints(0);
+
+        game.updatePowerUpPoints(joePlayer, false);
+        assertEquals(0, joePlayer.getPowerUpPoints());
     }
 }

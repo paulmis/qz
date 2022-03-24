@@ -4,6 +4,7 @@ import static server.utils.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.google.common.collect.Streams;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
@@ -222,7 +223,14 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     protected boolean acceptingAnswers = false;
 
-
+    /**
+     * Toggle whether the players are allowed to submit an answer or not, and notify players about the change.
+     *
+     * @param acceptingAnswers whether the players are allowed to submit an answer or not.
+     */
+    public void changeAcceptingAnswers(boolean acceptingAnswers) throws IOException {
+        this.acceptingAnswers = acceptingAnswers;
+    }
 
     /**
      * Adds questions to the game.
@@ -309,6 +317,92 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         }
         List<Answer> currentAnswersList = answers.get(question).getAnswerList();
         return currentAnswersList;
+    }
+
+    /**
+     * Updates the scores of the users based on the given question
+     * and their answers.
+     *
+     * @param question the question that the answers are for.
+     * @param answers the answers to the question.
+     */
+    public void updateScores(@NonNull Question question, @NonNull List<Answer> answers) {
+        // Zips the game player with the base score of their answer(percentage of correctness).
+        Map<GamePlayer, Double> scores =
+                Streams.zip(
+                        answers.stream().map(Answer::getPlayer),
+                        question.checkAnswer(answers).stream(),
+                        AbstractMap.SimpleEntry::new)
+                        .collect(
+                                Collectors.toMap(e -> e.getKey(),
+                                e  -> computeBaseScore(e.getValue())
+                                ));
+
+        // Iterates over the players and updates their streak, computes their streak
+        // score and sets their new score accordingly.
+        players.values().forEach(gamePlayer -> {
+            double score = Optional.ofNullable(scores.get(gamePlayer)).orElse(0.0);
+            var isCorrect =  score >= configuration.getCorrectAnswerThreshold();
+
+            updateStreak(gamePlayer, isCorrect);
+            updatePowerUpPoints(gamePlayer, isCorrect);
+
+            var streakScore = computeStreakScore(gamePlayer, score);
+            gamePlayer.setScore(gamePlayer.getScore() + (int) Math.round(streakScore));
+        });
+    }
+
+    /**
+     * Computes the base score given a correctness percentage.
+     * A base score means a score without streaks or multipliers applied.
+     *
+     * @param percentage the correctness percentage.
+     * @return the computed base score.
+     * @throws IllegalArgumentException if the percentage is not in the range [0, 1]
+     */
+    protected Double computeBaseScore(double percentage) throws IllegalArgumentException {
+        if (percentage < 0.0 - 1e-9 || percentage > 1.0 + 1e-9) {
+            throw new IllegalArgumentException("Percentage needs to be between 0 and 1.0.");
+        }
+        return percentage
+                * (configuration.getPointsCorrect() - configuration.getPointsWrong())
+                + configuration.getPointsWrong();
+    }
+
+    /**
+     * Computes the streak score given a base score.
+     *
+     * @param gamePlayer the game player that has the streak.
+     * @param baseScore the base score.
+     * @return the new streak score.
+     */
+    protected Double computeStreakScore(GamePlayer gamePlayer, double baseScore) {
+        return (gamePlayer.getStreak() >= configuration.getStreakSize())
+                ? baseScore * configuration.getStreakMultiplier()
+                : baseScore;
+    }
+
+    /**
+     * Updates the streak of the game player based on if his answer was correct.
+     * Resets the streak if an answer was wrong and adds 1 if the answer was right.
+     *
+     * @param gamePlayer the game player.
+     * @param isCorrect the boolean depicting if the answer was correct.
+     */
+    protected void updateStreak(GamePlayer gamePlayer, boolean isCorrect) {
+        gamePlayer.setStreak(isCorrect ? gamePlayer.getStreak() + 1 : 0);
+    }
+
+    /**
+     * Updates the power-up points of the player based on if his answer is correct.
+     *
+     * @param gamePlayer the game player that added the answer.
+     * @param isCorrect if the answer is correct.
+     */
+    protected void updatePowerUpPoints(GamePlayer gamePlayer, boolean isCorrect) {
+        if (isCorrect) {
+            gamePlayer.setPowerUpPoints(gamePlayer.getPowerUpPoints() + 1);
+        }
     }
 
     /**
