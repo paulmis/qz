@@ -24,13 +24,12 @@ import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
 import server.database.entities.utils.BaseEntity;
-import server.services.SSEManager;
 import server.utils.SaveableRandom;
 
 /**
  * Game entity which represents a game and its state.
  */
-@EqualsAndHashCode(callSuper = true, exclude = {"random", "emitters"})
+@EqualsAndHashCode(callSuper = true, exclude = {"random"})
 @Entity
 @Data
 @AllArgsConstructor
@@ -96,13 +95,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     @OneToOne(fetch = FetchType.LAZY)
     protected GamePlayer host;
-
-    /**
-     * Mapping between game players and their corresponding SSE emitters.
-     */
-    @Transient
-    @JsonIgnore
-    public SSEManager emitters = new SSEManager();
 
     /**
      * Questions assigned to this game.
@@ -228,22 +220,9 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Whether the players are allowed to submit an answer or not.
      */
-    @Transient
     protected boolean acceptingAnswers = false;
 
-    /**
-     * Toggle whether the players are allowed to submit an answer or not, and notify players about the change.
-     *
-     * @param acceptingAnswers whether the players are allowed to submit an answer or not.
-     */
-    public void setAcceptingAnswers(boolean acceptingAnswers) throws IOException {
-        this.acceptingAnswers = acceptingAnswers;
 
-        this.emitters.sendAll(new SSEMessage(
-                this.isAcceptingAnswers()
-                        ? SSEMessageType.START_QUESTION
-                        : SSEMessageType.STOP_QUESTION));
-    }
 
     /**
      * Adds questions to the game.
