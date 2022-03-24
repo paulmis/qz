@@ -38,6 +38,9 @@ public class GameServiceTest {
     @Mock
     private QuestionRepository questionRepository;
 
+    @Mock
+    private FSMManager fsmManager;
+
     @InjectMocks
     private GameService gameService;
 
