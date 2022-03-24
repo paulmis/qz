@@ -29,15 +29,10 @@ import client.utils.SSEHandler;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbarLayout;
 import commons.entities.game.configuration.GameConfigurationDTO;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -267,6 +262,7 @@ public class MainCtrl {
     public void showLobbyScreen() {
         this.lobbyScreenCtrl.reset();
         this.showScreenLetterBox(lobbyScene, StageScalingStrategy.Letterbox);
+        lobbyScreenCtrl.updateView();
     }
 
     /**

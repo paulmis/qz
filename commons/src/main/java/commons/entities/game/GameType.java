@@ -11,5 +11,17 @@ public enum GameType {
     /**
      * The game is private, joinable only by invited players.
      */
-    PRIVATE
+    PRIVATE;
+
+    @Override
+    public String toString() {
+        switch (this) {
+            case PRIVATE:
+                return "PRIVATE";
+            case PUBLIC:
+                return "PUBLIC";
+            default:
+                return null;
+        }
+    }
 }
