@@ -23,6 +23,7 @@ import server.database.entities.game.Game;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
 import server.database.repositories.question.QuestionRepository;
+import server.services.fsm.DefiniteGameFSM;
 
 /**
  * Get the questions for a specific game.
@@ -35,6 +36,9 @@ public class GameService {
 
     @Autowired
     private SSEManager sseManager;
+
+    @Autowired
+    private FSMManager fsmManager;
 
     /**
      * Provides the specified amount of questions, excluding the specified questions.
@@ -92,6 +96,9 @@ public class GameService {
             DefiniteGame definiteGame = (DefiniteGame) game;
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
             sseManager.send(definiteGame.getPlayers().keySet(), new SSEMessage(SSEMessageType.GAME_START));
+
+            fsmManager.addFSM(definiteGame, new DefiniteGameFSM(definiteGame, sseManager));
+            fsmManager.startFSM(definiteGame);
         } else {
             throw new UnsupportedOperationException("Starting games other than definite games is not yet supported.");
         }
