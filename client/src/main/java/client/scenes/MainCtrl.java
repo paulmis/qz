@@ -21,6 +21,8 @@ import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
+import client.scenes.lobby.LobbyLeaveScreenCtrl;
+import client.scenes.lobby.LobbyLeaveScreenPane;
 import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
@@ -28,15 +30,10 @@ import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbarLayout;
 import commons.entities.game.configuration.GameConfigurationDTO;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -84,6 +81,8 @@ public class MainCtrl {
     private Parent lobbyListScreen;
 
     private Popup lobbySettingsPopUp;
+    private Popup lobbyLeavePopUp;
+    private Popup gameLeavePopUp;
 
     private Parent activeScreen;
 
@@ -130,6 +129,8 @@ public class MainCtrl {
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
         lobbySettingsPopUp = new Popup();
+        lobbyLeavePopUp = new Popup();
+        gameLeavePopUp = new Popup();
         showServerConnectScreen();
 
         // This makes sure to close every thread when the app is closed.
@@ -320,6 +321,44 @@ public class MainCtrl {
      */
     public void closeLobbySettings() {
         lobbySettingsPopUp.hide();
+    }
+
+    public void openLobbyLeaveWarning(LobbyLeaveScreenCtrl.DisbandHandler disbandHandler) {
+        lobbyLeavePopUp.setOnShown(e -> {
+            lobbyLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - lobbyLeavePopUp.getWidth() / 2);
+
+            lobbyLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - lobbyLeavePopUp.getHeight() / 2);
+        });
+
+        var disbandPane = new LobbyLeaveScreenPane(disbandHandler);
+        lobbyLeavePopUp.getContent().add(disbandPane);
+
+        lobbyLeavePopUp.show(primaryStage);
+    }
+
+    public void closeLobbyLeaveWarning() {
+        lobbyLeavePopUp.hide();
+    }
+
+    public void openGameLeaveWarning(GameLeaveScreenCtrl.DisbandHandler disbandHandler) {
+        gameLeavePopUp.setOnShown(e -> {
+            gameLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - gameLeavePopUp.getWidth() / 2);
+
+            gameLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - gameLeavePopUp.getHeight() / 2);
+        });
+
+        var disbandPane = new GameLeaveScreenPane(disbandHandler);
+        gameLeavePopUp.getContent().add(disbandPane);
+
+        gameLeavePopUp.show(primaryStage);
+    }
+
+    public void closeGameLeaveWarning() {
+        gameLeavePopUp.hide();
     }
 
     /**
