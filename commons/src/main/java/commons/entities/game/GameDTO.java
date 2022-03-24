@@ -65,6 +65,11 @@ public class GameDTO implements DTO {
     protected UUID host;
 
     /**
+     * A boolean indicating if the game is accepting answers.
+     */
+    protected boolean acceptingAnswers;
+
+    /**
      * Copy constructor.
      *
      * @param gameDTO the game DTO to copy
@@ -79,5 +84,6 @@ public class GameDTO implements DTO {
         this.currentQuestion = gameDTO.getCurrentQuestion();
         this.players = gameDTO.getPlayers();
         this.host = gameDTO.getHost();
+        this.acceptingAnswers = gameDTO.isAcceptingAnswers();
     }
 }

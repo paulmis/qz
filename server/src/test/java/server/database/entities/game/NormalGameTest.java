@@ -26,13 +26,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import server.database.entities.User;
 import server.database.entities.answer.Answer;
-import server.database.entities.answer.AnswerCollection;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Activity;
 import server.database.entities.question.MCQuestion;
 import server.services.SSEManager;
-import server.utils.MathHelpers;
 
 /**
  * Tests for NormalGame class.
@@ -130,7 +128,7 @@ public class NormalGameTest {
     void setAcceptingAnswersTrue() throws IOException {
         SSEManager manager = Mockito.spy(new SSEManager());
         game.setEmitters(manager);
-        game.setAcceptingAnswers(true);
+        game.changeAcceptingAnswers(true);
         verify(manager).sendAll(sseMessageCaptor.capture());
         assertEquals(SSEMessageType.START_QUESTION, sseMessageCaptor.getValue().getType());
     }
@@ -139,7 +137,7 @@ public class NormalGameTest {
     void setAcceptingAnswersFalse() throws IOException {
         SSEManager manager = Mockito.spy(new SSEManager());
         game.setEmitters(manager);
-        game.setAcceptingAnswers(false);
+        game.changeAcceptingAnswers(false);
         verify(manager).sendAll(sseMessageCaptor.capture());
         assertEquals(SSEMessageType.STOP_QUESTION, sseMessageCaptor.getValue().getType());
     }

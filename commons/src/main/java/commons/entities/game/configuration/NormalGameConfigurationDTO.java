@@ -34,13 +34,26 @@ public class NormalGameConfigurationDTO extends GameConfigurationDTO {
      * @param answerTime the answer time per question.
      * @param capacity the capacity of the lobby.
      * @param numQuestions the number of questions in the game.
+     * @param streakSize the minimum number of correct answers for a streak to start.
+     * @param streakMultiplier the streak multiplier that will be applied on a streak.
+     * @param pointsCorrect the number of points per correct answer.
+     * @param pointsWrong the number of points per incorrect answer.
+     * @param correctAnswerThreshold the correct answer threshold.
      */
     public NormalGameConfigurationDTO(UUID id, Integer answerTime, Integer capacity, Integer numQuestions,
+                                      Integer streakSize,
+                                      Float streakMultiplier,
+                                      Integer pointsCorrect,
+                                      Integer pointsWrong,
                                       Integer correctAnswerThreshold) {
         this.id = id;
         this.answerTime = answerTime;
         this.capacity = capacity;
         this.numQuestions = numQuestions;
+        this.streakSize = streakSize;
+        this.streakMultiplier = streakMultiplier;
+        this.pointsCorrect = pointsCorrect;
+        this.pointsWrong = pointsWrong;
         this.correctAnswerThreshold = correctAnswerThreshold;
     }
 }

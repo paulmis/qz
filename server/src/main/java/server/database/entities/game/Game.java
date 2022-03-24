@@ -229,7 +229,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Whether the players are allowed to submit an answer or not.
      */
-    @Transient
     protected boolean acceptingAnswers = false;
 
     /**
@@ -237,7 +236,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      *
      * @param acceptingAnswers whether the players are allowed to submit an answer or not.
      */
-    public void setAcceptingAnswers(boolean acceptingAnswers) throws IOException {
+    public void changeAcceptingAnswers(boolean acceptingAnswers) throws IOException {
         this.acceptingAnswers = acceptingAnswers;
 
         this.emitters.sendAll(new SSEMessage(
@@ -375,7 +374,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * @throws IllegalArgumentException if the percentage is not in the range [0, 1]
      */
     protected Double computeBaseScore(double percentage) throws IllegalArgumentException {
-        if (percentage < 0.0 - 1e9 || percentage > 1.0 + 1e9) {
+        if (percentage < 0.0 - 1e-9 || percentage > 1.0 + 1e-9) {
             throw new IllegalArgumentException("Percentage needs to be between 0 and 1.0.");
         }
         return percentage
@@ -452,7 +451,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
                 this.status,
                 this.currentQuestion,
                 this.players.values().stream().map(GamePlayer::getDTO).collect(Collectors.toSet()),
-                this.host == null ? null : this.host.getId());
+                this.host == null ? null : this.host.getId(),
+                this.acceptingAnswers);
     }
 
     public abstract T getDTO();
