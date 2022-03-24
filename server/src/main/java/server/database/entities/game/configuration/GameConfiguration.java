@@ -22,12 +22,12 @@ import server.database.entities.utils.BaseEntity;
 @Entity
 public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO> {
     /**
-     * Time (in seconds) available for each player to answer each question.
+     * Time (in milliseconds) available for each player to answer each question.
      * In the future, we could switch to a Duration datatype, but JPA/Hibernate doesn't support it out of the box.
-     * TODO: change this to milliseconds
+     * TODO: in order to support half-time power-up, we need to modify the getter of this field
      */
     @Column(nullable = false)
-    protected int answerTime = 10;
+    protected int answerTime = 10000;
 
     /**
      * Capacity of the lobby.

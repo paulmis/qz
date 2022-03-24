@@ -4,10 +4,7 @@ import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,12 +132,12 @@ public class GameService {
 
 
     /**
-     * Sets the accepting answers boolean to true inside the game and notifies
+     * Sets whether the game is still accepting answers and notifies
      * every user that this change has happened.
      *
-     * @param game The game object that the action is performed on.
-     * @param acceptingAnswers The requested boolean.
-     * @throws IOException if an sse connection send failed.
+     * @param game             The game object that the action is performed on.
+     * @param acceptingAnswers Whether the game is accepting answers.
+     * @throws IOException if an SSE connection send failed.
      */
     @Transactional
     public void setAcceptingAnswers(Game game, boolean acceptingAnswers) throws IOException {
@@ -156,9 +153,9 @@ public class GameService {
      * Sets the accepting answers boolean to true inside the game and notifies
      * every user that this change has happened.
      *
-     * @param game The game object that the action is performed on.
-     * @param acceptingAnswers The requested boolean.
-     * @param delay The delay before the next SSE event is to be expected.
+     * @param game             The game object that the action is performed on.
+     * @param acceptingAnswers Whether the game is accepting answers.
+     * @param delay            The delay before the next SSE event is to be expected.
      * @throws IOException if an SSE connection send failed.
      */
     @Transactional

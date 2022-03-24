@@ -7,7 +7,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import server.database.entities.game.DefiniteGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
-import server.services.SSEManager;
 
 /**
  * Runnable for definite game finite state machine.
@@ -24,14 +23,10 @@ public class DefiniteGameFSM extends GameFSM {
     public DefiniteGameFSM(DefiniteGame game, FSMContext context) {
         super(game, context);
         if (game.getCurrentQuestion() == game.getQuestionsCount()) {
+            log.warn("[{}] Attempt to construct a FSM on a finished game.", game.getId());
             throw new IllegalStateException("Game is already finished.");
         }
-        if (game.isAcceptingAnswers()) {
-            throw new IllegalStateException("Game is already accepting answers.");
-        }
-        if (game.getCurrentQuestion() != 0) {
-            throw new IllegalStateException("Game is already in progress.");
-        }
+        log.debug("[{}] DefiniteFSM created.", game.getId());
     }
 
     /**
@@ -40,6 +35,7 @@ public class DefiniteGameFSM extends GameFSM {
     @SneakyThrows
     @Override
     public void run() {
+        // TODO: utilize thread pools instead of this loop - susceptible to DoS (thread exhaustion)
         while (getGame().getCurrentQuestion()
                 != ((NormalGameConfiguration) getGame().getConfiguration()).getNumQuestions()) {
             log.trace("[{}] FSM runnable called.", getGame().getId());
@@ -62,16 +58,14 @@ public class DefiniteGameFSM extends GameFSM {
                 // Enable accepting answers.
                 getContext().getGameService().setAcceptingAnswers(getGame(),
                         true,
-                        getGame().getConfiguration().getAnswerTime() * 1000L);
+                        getGame().getConfiguration().getAnswerTime());
 
                 log.trace("[{}] FSM runnable: accepting answers enabled.", getGame().getId());
 
                 // If we are not accepting answers, sleep for the duration of leaderboard.
-                Thread.sleep(getGame().getConfiguration().getAnswerTime() * 1000L);
+                Thread.sleep(getGame().getConfiguration().getAnswerTime());
             }
-
-            // Otherwise, continue running the runnable
-            log.trace("[{}] FSM runnable continuing.", getGame().getId());
+            log.trace("[{}] FSM runnable loop end.", getGame().getId());
         }
 
         log.debug("[{}] Game is finished.", getGame().getId());
