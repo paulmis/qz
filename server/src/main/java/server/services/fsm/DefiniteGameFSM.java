@@ -15,6 +15,12 @@ import server.services.SSEManager;
 @Slf4j
 public class DefiniteGameFSM extends GameFSM {
 
+    /**
+     * Create a new runnable for the finite state machine.
+     *
+     * @param game The game instance.
+     * @param context The execution context of the FSM.
+     */
     public DefiniteGameFSM(DefiniteGame game, FSMContext context) {
         super(game, context);
         if (game.getCurrentQuestion() == game.getQuestionsCount()) {
