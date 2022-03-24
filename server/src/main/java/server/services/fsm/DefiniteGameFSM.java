@@ -69,10 +69,13 @@ public class DefiniteGameFSM extends GameFSM {
         }
 
         log.debug("[{}] Game is finished.", getGame().getId());
+
         // We are not accepting answers anymore.
         getContext().getGameService().setAcceptingAnswers(getGame(), false);
-        getGame().setStatus(GameStatus.FINISHED);
+
         // The game is finished.
-        getContext().getSseManager().send(getGame().getPlayers().keySet(), new SSEMessage(SSEMessageType.GAME_END));
+        getGame().setStatus(GameStatus.FINISHED);
+        getContext().getSseManager().send(getGame().getPlayerIds(),
+                new SSEMessage(SSEMessageType.GAME_END));
     }
 }
