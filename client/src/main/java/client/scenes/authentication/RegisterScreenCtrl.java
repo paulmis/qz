@@ -78,11 +78,11 @@ public class RegisterScreenCtrl implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.userExists.setVisible(false);
     }
+
     /**
      * Function that takes user to lobby list page
      * after they set a username.
      */
-
     @FXML
     private void setUsername() {
         if (usernameField.getText().length() > 0) {
