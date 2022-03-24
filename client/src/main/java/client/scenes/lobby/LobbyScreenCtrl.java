@@ -36,7 +36,7 @@ public class LobbyScreenCtrl {
     @FXML private JFXButton copyLinkButton;
     @FXML private JFXButton startButton;
     @FXML private JFXButton lobbySettingsButton;
-    @FXML private JFXButton disbandButton;
+    @FXML private JFXButton leaveButton;
 
     /**
      * Initialize a new controller using dependency injection.
@@ -86,9 +86,9 @@ public class LobbyScreenCtrl {
     }
 
     /**
-     * Fired when the disband button is clicked.
+     * Fired when the leave button is clicked.
      */
-    public void disbandButtonClick() {
+    public void leaveButtonClick() {
         mainCtrl.openLobbyLeaveWarning(() -> {
             mainCtrl.closeLobbyLeaveWarning();
             this.server.leaveLobby(new ServerUtils.LeaveGameHandler() {

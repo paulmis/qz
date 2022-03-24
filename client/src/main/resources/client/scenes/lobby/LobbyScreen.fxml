@@ -75,8 +75,8 @@
                               <HBox prefHeight="37.0" prefWidth="339.0" spacing="20.0">
                                  <children>
                                     <JFXButton fx:id="startButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#startButtonClick" prefHeight="33.0" prefWidth="63.0" style="-fx-background-color: #8DDC8A;" text="START" textFill="#373838" />
-                                    <JFXButton fx:id="disbandButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#disbandButtonClick" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #FF6969;" text="DISBAND" textFill="WHITE" />
                                     <JFXButton fx:id="lobbySettingsButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#lobbySettingsButtonClick" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #F1CC48;" text="SETTINGS" textFill="#373838" />
+                                    <JFXButton fx:id="leaveButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#leaveButtonClick" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #FF6969;" text="LEAVE" textFill="WHITE" />
                                  </children>
                               </HBox>
                               <HBox alignment="TOP_RIGHT" prefHeight="37.0" prefWidth="347.0">

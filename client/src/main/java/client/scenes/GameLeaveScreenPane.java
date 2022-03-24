@@ -6,6 +6,12 @@ import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
 
+/**
+ * The class that encompasses the GameLeaveScreen.
+ * The purpose of this class is to allow the
+ * initialization of the control inside code.
+ */
+
 @Generated
 public class GameLeaveScreenPane extends StackPane {
 
@@ -29,10 +35,10 @@ public class GameLeaveScreenPane extends StackPane {
     /**
      * This constructor sets up the game leave pane.
      *
-     * @param disbandHandler the action that is to be performed on a disband.
+     * @param leaveHandler the action that is to be performed on a leave.
      */
-    public GameLeaveScreenPane(GameLeaveScreenCtrl.DisbandHandler disbandHandler) {
-        setUpScreen(new GameLeaveScreenCtrl(disbandHandler));
+    public GameLeaveScreenPane(GameLeaveScreenCtrl.LeaveHandler leaveHandler) {
+        setUpScreen(new GameLeaveScreenCtrl(leaveHandler));
     }
 
     public void makeTranslucent() {

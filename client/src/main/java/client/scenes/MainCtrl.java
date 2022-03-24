@@ -312,11 +312,11 @@ public class MainCtrl {
 
     /**
      * This function opens a popup with
-     * a disband warning for leaving the lobby.
+     * a leave warning for leaving the lobby.
      *
-     * @param disbandHandler the action that is to be performed when the user disbands the lobby.
+     * @param leaveHandler the action that is to be performed when the user leaves the lobby.
      */
-    public void openLobbyLeaveWarning(LobbyLeaveScreenCtrl.DisbandHandler disbandHandler) {
+    public void openLobbyLeaveWarning(LobbyLeaveScreenCtrl.LeaveHandler leaveHandler) {
         lobbyLeavePopUp.setOnShown(e -> {
             lobbyLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - lobbyLeavePopUp.getWidth() / 2);
@@ -325,7 +325,7 @@ public class MainCtrl {
                     - lobbyLeavePopUp.getHeight() / 2);
         });
 
-        var disbandPane = new LobbyLeaveScreenPane(disbandHandler);
+        var disbandPane = new LobbyLeaveScreenPane(leaveHandler);
         lobbyLeavePopUp.getContent().add(disbandPane);
 
         lobbyLeavePopUp.show(primaryStage);
@@ -340,11 +340,11 @@ public class MainCtrl {
 
     /**
      * This function opens a popup with
-     * a disband warning for leaving the game.
+     * a leave warning for leaving the game.
      *
-     * @param disbandHandler the action that is to be performed when the user disbands the game.
+     * @param leaveHandler the action that is to be performed when the user leaves the game.
      */
-    public void openGameLeaveWarning(GameLeaveScreenCtrl.DisbandHandler disbandHandler) {
+    public void openGameLeaveWarning(GameLeaveScreenCtrl.LeaveHandler leaveHandler) {
         gameLeavePopUp.setOnShown(e -> {
             gameLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - gameLeavePopUp.getWidth() / 2);
@@ -353,7 +353,7 @@ public class MainCtrl {
                     - gameLeavePopUp.getHeight() / 2);
         });
 
-        var disbandPane = new GameLeaveScreenPane(disbandHandler);
+        var disbandPane = new GameLeaveScreenPane(leaveHandler);
         gameLeavePopUp.getContent().add(disbandPane);
 
         gameLeavePopUp.show(primaryStage);

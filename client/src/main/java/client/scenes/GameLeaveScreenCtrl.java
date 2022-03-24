@@ -16,28 +16,28 @@ import lombok.Generated;
 public class GameLeaveScreenCtrl implements Initializable {
 
     /**
-     * The disband handler interface.
+     * The leave handler interface.
      * The purpose of this is to allow passing of a
      * function to this controller.
      * This function will be later applied by the user when clicking
-     * the disband button.
+     * the leave button.
      */
-    public interface DisbandHandler {
+    public interface LeaveHandler {
         void handle();
     }
 
     @FXML private JFXButton cancelButton;
-    @FXML private JFXButton disbandButton;
+    @FXML private JFXButton leaveButton;
     @FXML private AnchorPane rootPane;
-    private DisbandHandler disbandHandler;
+    private LeaveHandler leaveHandler;
 
     /**
      * The constructor for the GameLeaveScreen controller.
      *
-     * @param disbandHandler the action that is to be performed when the user disbands the game.
+     * @param leaveHandler the action that is to be performed when the user leaves the game.
      */
-    public GameLeaveScreenCtrl(DisbandHandler disbandHandler) {
-        this.disbandHandler = disbandHandler;
+    public GameLeaveScreenCtrl(LeaveHandler leaveHandler) {
+        this.leaveHandler = leaveHandler;
     }
 
     /**
@@ -49,11 +49,11 @@ public class GameLeaveScreenCtrl implements Initializable {
     }
 
     /**
-     * This function handles the disband button click.
+     * This function handles the leave button click.
      */
     @FXML
-    private void disband() {
-        disbandHandler.handle();
+    private void leave() {
+        leaveHandler.handle();
     }
 
     @Override
