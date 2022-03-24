@@ -17,9 +17,6 @@ import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
 import java.time.Duration;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javax.ws.rs.core.Response;
 import lombok.Generated;
 import lombok.Getter;
@@ -142,38 +139,29 @@ public class LobbyScreenCtrl implements SSESource {
      * Fired when the disband button is clicked.
      */
     public void disbandButtonClick() {
-        try {
-            this.server.leaveLobby();
-            this.mainCtrl.showLogInScreen();
-        } catch (IllegalStateException e) {
-            System.out.println(e);
-        }
-    }
-
-    /**
-     * Fired when the disband button is clicked.
-     */
-    public void disbandButtonClick() {
-        this.server.leaveLobby(new ServerUtils.LeaveGameHandler() {
-            @Override
-            public void handle(Response response) {
-                javafx.application.Platform.runLater(() -> {
-                    switch (response.getStatus()) {
-                        case 200:
-                            System.out.println("User successfully removed from lobby");
-                            mainCtrl.showLobbyListScreen();
-                            break;
-                        case 404:
-                            System.out.println("User/Game not found");
-                            break;
-                        case 409:
-                            System.out.println("Couldn't remove player");
-                            break;
-                        default:
-                            break;
-                    }
-                });
-            }
+        mainCtrl.openLobbyLeaveWarning(() -> {
+            mainCtrl.closeLobbyLeaveWarning();
+            this.server.leaveLobby(new ServerUtils.LeaveGameHandler() {
+                @Override
+                public void handle(Response response) {
+                    javafx.application.Platform.runLater(() -> {
+                        switch (response.getStatus()) {
+                            case 200:
+                                System.out.println("User successfully removed from lobby");
+                                mainCtrl.showLobbyListScreen();
+                                break;
+                            case 404:
+                                System.out.println("User/Game not found");
+                                break;
+                            case 409:
+                                System.out.println("Couldn't remove player");
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                }
+            });
         });
     }
 

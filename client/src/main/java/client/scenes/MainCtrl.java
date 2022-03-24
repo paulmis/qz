@@ -330,6 +330,44 @@ public class MainCtrl {
         lobbySettingsPopUp.hide();
     }
 
+    public void openLobbyLeaveWarning(LobbyLeaveScreenCtrl.DisbandHandler disbandHandler) {
+        lobbyLeavePopUp.setOnShown(e -> {
+            lobbyLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - lobbyLeavePopUp.getWidth() / 2);
+
+            lobbyLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - lobbyLeavePopUp.getHeight() / 2);
+        });
+
+        var disbandPane = new LobbyLeaveScreenPane(disbandHandler);
+        lobbyLeavePopUp.getContent().add(disbandPane);
+
+        lobbyLeavePopUp.show(primaryStage);
+    }
+
+    public void closeLobbyLeaveWarning() {
+        lobbyLeavePopUp.hide();
+    }
+
+    public void openGameLeaveWarning(GameLeaveScreenCtrl.DisbandHandler disbandHandler) {
+        gameLeavePopUp.setOnShown(e -> {
+            gameLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - gameLeavePopUp.getWidth() / 2);
+
+            gameLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - gameLeavePopUp.getHeight() / 2);
+        });
+
+        var disbandPane = new GameLeaveScreenPane(disbandHandler);
+        gameLeavePopUp.getContent().add(disbandPane);
+
+        gameLeavePopUp.show(primaryStage);
+    }
+
+    public void closeGameLeaveWarning() {
+        gameLeavePopUp.hide();
+    }
+
     /**
      * This function opens a popup with
      * a leave warning for leaving the lobby.
