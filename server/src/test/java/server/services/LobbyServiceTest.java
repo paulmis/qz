@@ -5,7 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static server.utils.TestHelpers.getUUID;
 
+import commons.entities.messages.SSEMessage;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +30,9 @@ public class LobbyServiceTest {
     @Mock
     private GameRepository gameRepository;
 
+    @Mock
+    private SSEManager sseManager;
+
     @InjectMocks
     private LobbyService lobbyService;
 
@@ -39,7 +45,7 @@ public class LobbyServiceTest {
     GamePlayer jamesPlayer;
 
     @BeforeEach
-    void init() {
+    void init() throws IOException {
         // Create users
         joe = new User("joe", "joe@doe.com", "stinkywinky");
         joe.setId(getUUID(0));
@@ -62,6 +68,9 @@ public class LobbyServiceTest {
         lobby.setConfiguration(new NormalGameConfiguration(3, 13, 2, 2, 2f, 100, 0, 75));
         lobby.add(joePlayer);
         lobby.add(susannePlayer);
+
+        lenient().when(sseManager.send(any(Iterable.class), any(SSEMessage.class))).thenReturn(true);
+        lenient().when(sseManager.disconnect(any(Iterable.class))).thenReturn(true);
     }
 
     @Test
