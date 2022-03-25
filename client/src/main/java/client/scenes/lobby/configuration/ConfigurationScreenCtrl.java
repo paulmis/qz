@@ -25,6 +25,7 @@ import lombok.NonNull;
 @Generated
 public class ConfigurationScreenCtrl implements Initializable {
 
+
     /**
      * The save handler interface.
      * The purpose of this is to allow passing of a
@@ -136,5 +137,12 @@ public class ConfigurationScreenCtrl implements Initializable {
         this.rootPane.setStyle("-fx-background-color: transparent; "
                 + "-fx-background-radius: 0; "
                 + "-fx-effect: none;");
+    }
+
+    /**
+     * Hides the save button if you don't want to display it.
+     */
+    public void hideSaveButton() {
+        this.saveButton.setVisible(false);
     }
 }
