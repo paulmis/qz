@@ -46,17 +46,23 @@ public class FSMManager {
      * @throws IllegalStateException if the finite state machine is already running.
      */
     public boolean startFSM(Game game) {
+        // Check if the game contains a finite state machine
         if (fsmMap.containsKey(game.getId())) {
+
             GameFSM fsm = fsmMap.get(game.getId());
+            // Check if the finite state machine is already running
             if (!fsm.isRunning()) {
+
                 log.debug("Starting FSM for game {}", game.getId());
                 // Start the finite state machine (in a new thread, to avoid blocking the main thread)
                 new Thread(fsm::run).start();
                 return true;
+
             } else {
                 log.warn("FSM for game {} already running", game.getId());
                 throw new IllegalStateException("FSM for game " + game.getId() + " already running");
             }
+
         }
         log.warn("FSM for game {} not found", game.getId());
         return false;

@@ -68,17 +68,20 @@ def status_is_ok(status_code: int) -> bool:
 
 
 def main(args):
+    # Sum of all different question types
     count_total = args.multiple_choice
     if count_total < 1:
         logging.error("Total count must be at least 1")
         exit(1)
 
+    # Create MC questions
     for i in range(args.multiple_choice):
         if (i + 1) % 10 == 0:
             logging.info(f"Creating MC question {i + 1} of {args.multiple_choice}")
         else:
             logging.debug(f"Creating MC question {i + 1} of {args.multiple_choice}")
 
+        # Create MC question (no payload required)
         resp = put(f"{args.api_url}api/question/mc", b"")
         if not status_is_ok(resp.status_code):
             logging.error(f"Failed to create MC question {i + 1}")
