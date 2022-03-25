@@ -42,6 +42,13 @@ public class DefiniteGameFSM extends GameFSM {
         // Mark the FSM as running.
         setRunning(true);
 
+        // At the beginning of the game, give users a few seconds to prepare.
+        if (getState() == FSMState.IDLE) {
+            setState(FSMState.PREPARING);
+            scheduleTask(this::run, Duration.ofSeconds(5));
+            return;
+        }
+
         if (!getGame().isAcceptingAnswers()) {
             // If the game is currently not accepting answers,
             // we start accepting answers (go forward to the next question).
