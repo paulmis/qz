@@ -13,6 +13,8 @@ import javafx.stage.Stage;
 import lombok.Generated;
 import lombok.Getter;
 
+import javax.ws.rs.core.Response;
+
 /**
  * Lobby controller.
  */
@@ -48,6 +50,36 @@ public class LobbyScreenCtrl {
      */
     public void startButtonClick() {
         this.mainCtrl.showGameScreen();
+    }
+
+    /**
+     * Fired when the disband button is clicked.
+     */
+    public void disbandButtonClick() {
+        mainCtrl.openLobbyDisbandWarning(() -> {
+            mainCtrl.closeLobbyDisbandWarning();
+            this.server.disbandLobby(new ServerUtils.DisbandLobbyHandler() {
+                @Override
+                public void handle(Response response) {
+                    javafx.application.Platform.runLater(() -> {
+                        switch (response.getStatus()) {
+                            case 200:
+                                System.out.println("Host successfully disbanded the lobby");
+                                mainCtrl.showLobbyListScreen();
+                                break;
+                            case 404:
+                                System.out.println("User/Game not found");
+                                break;
+                            case 409:
+                                System.out.println("Couldn't remove player");
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                }
+            });
+        });
     }
 
     /**

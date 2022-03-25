@@ -377,6 +377,35 @@ public class ServerUtils {
     }
 
     /**
+     * Handler for when the disband lobby succeeds.
+     */
+    public interface DisbandLobbyHandler {
+        void handle(Response response);
+    }
+
+    /**
+     * Function that causes the user to leave the lobby.
+     */
+    public void disbandLobby(DisbandLobbyHandler disbandLobbyHandler) {
+        var request = client
+                .target(SERVER).path("/api/lobby/leave")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildDelete();
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                disbandLobbyHandler.handle(response);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+
+            }
+        });
+    }
+
+    /**
      * This function subscribes to the SSE event source.
      * It calls the SSE open endpoint and handles the events.
      *
