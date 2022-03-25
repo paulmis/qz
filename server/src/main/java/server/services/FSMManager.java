@@ -3,7 +3,6 @@ package server.services;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.entities.game.Game;
 import server.services.fsm.GameFSM;
@@ -11,12 +10,9 @@ import server.services.fsm.GameFSM;
 /**
  * Class for managing the finite state machines.
  */
-@Service
 @Slf4j
+@Service
 public class FSMManager {
-    @Autowired
-    private SSEManager sseManager;
-
     private final ConcurrentHashMap<UUID, GameFSM> fsmMap = new ConcurrentHashMap<>();
 
     /**
@@ -66,5 +62,14 @@ public class FSMManager {
         }
         log.warn("FSM for game {} not found", game.getId());
         return false;
+    }
+
+    /**
+     * Get the size of the FSM map.
+     *
+     * @return the size of the FSM map.
+     */
+    public int size() {
+        return fsmMap.size();
     }
 }
