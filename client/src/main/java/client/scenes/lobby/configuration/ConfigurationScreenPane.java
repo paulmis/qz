@@ -1,12 +1,9 @@
 package client.scenes.lobby.configuration;
 
-import client.scenes.questions.EstimateQuestionCtrl;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
 
@@ -61,5 +58,9 @@ public class ConfigurationScreenPane extends StackPane {
 
     public void makeTransparent() {
         this.controller.makeTransparent();
+    }
+
+    public void hideSaveButton() {
+        this.controller.hideSaveButton();
     }
 }
