@@ -71,23 +71,27 @@ class DefiniteGameFSMTest {
 
     @Test
     void runAcceptingAnswers() throws IOException {
+        // The game is accepting answers
         game.setAcceptingAnswers(true);
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
         fsm.run();
-        verify(gameService, times(1)).setAcceptingAnswers(any(Game.class),
-                booleanCaptor.capture(), any(Long.class));
+
         // Verify that the game is no longer accepting answers
+        verify(gameService, times(1))
+                .setAcceptingAnswers(any(Game.class), booleanCaptor.capture(), any(Long.class));
         assertFalse(booleanCaptor.getValue());
     }
 
     @Test
     void runNotAcceptingAnswers() throws IOException {
+        // The game is not accepting answers
         game.setAcceptingAnswers(false);
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
         fsm.run();
+
+        // Verify that the game is now accepting answers
         verify(gameService, times(1)).setAcceptingAnswers(any(Game.class),
                 booleanCaptor.capture(), any(Long.class));
-        // Verify that the game is now accepting answers
         assertTrue(booleanCaptor.getValue());
     }
 
@@ -95,7 +99,9 @@ class DefiniteGameFSMTest {
     void runLeaderboard() throws IOException {
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
         fsm.setRunning(true);
+        // Force the game to be in the leaderboard state
         fsm.runLeaderboard();
+
         // Verify that the users are notified of the leaderboard
         verify(sseManager, times(1)).send(any(Iterable.class), sseMessageCaptor.capture());
         assertEquals(SSEMessageType.SHOW_LEADERBOARD, sseMessageCaptor.getValue().getType());
@@ -103,13 +109,16 @@ class DefiniteGameFSMTest {
 
     @Test
     void runAnswerToLeaderboard() throws IOException {
+        // Put the game in a state where leaderboard should be shown
         game.setCurrentQuestion(4);
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
         fsm.setRunning(true);
         fsm.runAnswer();
+
         // Verify that the transition to leaderboard happens
         verify(taskScheduler, times(1)).schedule(runnableCaptor.capture(), any(Date.class));
         runnableCaptor.getValue().run();
+
         // Verify that the leaderboard notification is sent.
         verify(sseManager, times(1)).send(any(Iterable.class), sseMessageCaptor.capture());
         assertEquals(SSEMessageType.SHOW_LEADERBOARD, sseMessageCaptor.getValue().getType());
@@ -125,11 +134,13 @@ class DefiniteGameFSMTest {
 
     @Test
     void runQuestionFinished() throws IOException {
+        // Construct an FSM which should transition into FINISHED state
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
         game.setCurrentQuestion(configuration.getNumQuestions());
         fsm.setRunning(true);
         fsm.runQuestion();
-        // Verify that the users are notified of the game finishing
+
+        // Verify that the users are notified of the game ending
         verify(sseManager, times(1)).send(any(Iterable.class), sseMessageCaptor.capture());
         assertEquals(SSEMessageType.GAME_END, sseMessageCaptor.getValue().getType());
     }

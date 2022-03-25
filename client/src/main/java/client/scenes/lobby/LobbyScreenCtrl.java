@@ -11,6 +11,7 @@ import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
+import java.time.Duration;
 import javafx.fxml.FXML;
 import javax.ws.rs.core.Response;
 import lombok.Generated;
@@ -121,7 +122,7 @@ public class LobbyScreenCtrl {
      * Fired when the lobby settings button is clicked.
      */
     public void lobbySettingsButtonClick() {
-        var config = new NormalGameConfigurationDTO(null, 60, 1, 20, 3, 2f, 100, 0, 75);
+        var config = new NormalGameConfigurationDTO(null, Duration.ofMinutes(1), 1, 20, 3, 2f, 100, 0, 75);
         mainCtrl.openLobbySettings(config, (conf) -> {
             System.out.println(conf);
             mainCtrl.closeLobbySettings();

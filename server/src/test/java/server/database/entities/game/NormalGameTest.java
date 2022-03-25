@@ -15,6 +15,7 @@ import commons.entities.game.NormalGameDTO;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -95,7 +96,7 @@ public class NormalGameTest {
         questionB.setAnswer(activityB);
 
         // Create config
-        config = new NormalGameConfiguration(17, 13, 2, 2, 2f, 100, -10, 75);
+        config = new NormalGameConfiguration(17, Duration.ofSeconds(13), 2, 2, 2f, 100, -10, 75);
 
         // Create the game
         game = new NormalGame();
