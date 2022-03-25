@@ -38,7 +38,8 @@ public class LobbyLeaveScreenPane extends StackPane {
      * @param leaveHandler the action that is to be performed on a leave.
      * @param cancelHandler the action that is to be performed on a cancel.
      */
-    public LobbyLeaveScreenPane(LobbyLeaveScreenCtrl.LeaveHandler leaveHandler, LobbyLeaveScreenCtrl.CancelHandler cancelHandler) {
+    public LobbyLeaveScreenPane(LobbyLeaveScreenCtrl.LeaveHandler leaveHandler,
+                                LobbyLeaveScreenCtrl.CancelHandler cancelHandler) {
         setUpScreen(new LobbyLeaveScreenCtrl(leaveHandler, cancelHandler));
     }
 }
