@@ -11,5 +11,6 @@ public enum SSEMessageType {
     GAME_END,
     START_QUESTION,
     STOP_QUESTION,
+    SHOW_LEADERBOARD,
     LOBBY_DELETED,
 }
