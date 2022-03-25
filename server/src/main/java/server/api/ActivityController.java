@@ -3,9 +3,7 @@ package server.api;
 import com.google.common.io.Files;
 import commons.entities.ActivityDTO;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,5 +79,36 @@ public class ActivityController {
 
         log.debug("Added activity '{}' image: '{}'", activity.getId(), storedPath);
         return new ResponseEntity<>(activity.getDTO(), HttpStatus.CREATED);
+    }
+
+    /**
+     * Add pictures to multiple activities.
+     *
+     * @param files List of pictures to add.
+     * @return DTOs of all added activities.
+     */
+    @PostMapping("/image/batch")
+    ResponseEntity<List<ActivityDTO>> batchAddActivityImage(@RequestBody MultipartFile[] files) {
+        return ResponseEntity.ok(Arrays.stream(files).map(file -> {
+            UUID id = UUID.fromString(file.getName());
+
+            Optional<Activity> activityOpt = activityRepository.findById(id);
+            if (activityOpt.isEmpty()) {
+                return null;
+            }
+            Activity activity = activityOpt.get();
+
+            String newFileName = String.format("%s.%s", id, Files.getFileExtension(
+                    Objects.requireNonNull(file.getOriginalFilename())));
+            // Save the image to the storage service
+            Path storedPath = storageService.store(file, newFileName);
+
+            // Update the activity entity
+            activity.setIcon(newFileName);
+            activityRepository.save(activity);
+
+            log.debug("Added activity '{}' image: '{}'", activity.getId(), storedPath);
+            return activity.getDTO();
+        }).filter(Objects::nonNull).collect(Collectors.toList()));
     }
 }
