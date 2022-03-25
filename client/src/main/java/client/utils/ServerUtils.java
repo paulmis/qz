@@ -30,7 +30,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import javax.ws.rs.client.*;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.sse.SseEventSource;
@@ -105,10 +109,61 @@ public class ServerUtils {
     }
 
     /**
+     * Handler for when the leave lobby succeeds.
+     */
+    public interface LeaveGameHandler {
+        void handle(Response response);
+    }
+
+    /**
+     * Function that causes the user to leave the lobby.
+     */
+    public void leaveLobby(LeaveGameHandler leaveGameHandler) {
+        var request = client
+                .target(SERVER).path("/api/lobby/leave")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildDelete();
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                leaveGameHandler.handle(response);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+
+            }
+        });
+    }
+
+    /**
+     * Handler for when the quitting game succeeds.
+     */
+    public interface QuitGameHandler {
+        void handle(Response response);
+    }
+
+    /**
      * Function that causes the user to leave the game.
      */
-    public void quitGame() {
-        System.out.println("Quitting game");
+    public void quitGame(QuitGameHandler quitGameHandler) {
+        var request = client
+                .target(SERVER).path("/api/game/leave")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPost(Entity.json("{}"));
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                quitGameHandler.handle(response);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                System.out.println(throwable.toString());
+            }
+        });
     }
 
     /** Gets a list of the leaderboard images from the server.

@@ -12,6 +12,7 @@ import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
 import javafx.fxml.FXML;
+import javax.ws.rs.core.Response;
 import lombok.Generated;
 import lombok.Getter;
 
@@ -34,7 +35,7 @@ public class LobbyScreenCtrl {
     @FXML private JFXButton copyLinkButton;
     @FXML private JFXButton startButton;
     @FXML private JFXButton lobbySettingsButton;
-    @FXML private JFXButton disbandButton;
+    @FXML private JFXButton leaveButton;
 
     /**
      * Initialize a new controller using dependency injection.
@@ -81,6 +82,38 @@ public class LobbyScreenCtrl {
                     break;
             }
         }));
+    }
+
+    /**
+     * Fired when the leave button is clicked.
+     */
+    public void leaveButtonClick() {
+        mainCtrl.openLobbyLeaveWarning(() -> {
+            mainCtrl.closeLobbyLeaveWarning();
+            this.server.leaveLobby(new ServerUtils.LeaveGameHandler() {
+                @Override
+                public void handle(Response response) {
+                    javafx.application.Platform.runLater(() -> {
+                        switch (response.getStatus()) {
+                            case 200:
+                                System.out.println("User successfully removed from lobby");
+                                mainCtrl.showLobbyListScreen();
+                                break;
+                            case 404:
+                                System.out.println("User/Game not found");
+                                break;
+                            case 409:
+                                System.out.println("Couldn't remove player");
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                }
+            });
+        }, () -> {
+            mainCtrl.closeLobbyLeaveWarning();
+        });
     }
 
     /**
