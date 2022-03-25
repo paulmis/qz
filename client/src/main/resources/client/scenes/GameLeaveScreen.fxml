@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootPane" minHeight="100.0" minWidth="250.0" prefHeight="100.0" prefWidth="250.0" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.GameLeaveScreenCtrl">
+   <children>
+      <VBox alignment="CENTER" prefHeight="100.0" prefWidth="250.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label text="Are you sure you want to leave?">
+               <font>
+                  <Font name="FontAwesome" size="13.0" />
+               </font>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <HBox alignment="CENTER" prefHeight="50.0" prefWidth="250.0" spacing="50.0">
+               <children>
+                  <JFXButton fx:id="cancelButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#cancel" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #B2B0B0#B2B0B0;" text="CANCEL" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </JFXButton>
+                  <JFXButton fx:id="leaveButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#leave" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #FF6969;" text="LEAVE" textFill="WHITE">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </JFXButton>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
