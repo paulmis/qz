@@ -1,6 +1,7 @@
 package server.database.entities.game.configuration;
 
 import commons.entities.game.configuration.GameConfigurationDTO;
+import java.time.Duration;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -27,7 +28,7 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
      * TODO: in order to support half-time power-up, we need to modify the getter of this field
      */
     @Column(nullable = false)
-    protected int answerTime = 10000;
+    protected Duration answerTime = Duration.ofSeconds(10);
 
     /**
      * Capacity of the lobby.

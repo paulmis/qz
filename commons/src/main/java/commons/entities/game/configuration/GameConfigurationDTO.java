@@ -2,16 +2,17 @@ package commons.entities.game.configuration;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import commons.entities.game.GameDTO;
 import commons.entities.utils.DTO;
+import java.time.Duration;
 import java.util.UUID;
-import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import jdk.jfr.Description;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.time.DurationMax;
+import org.hibernate.validator.constraints.time.DurationMin;
 
 /**
  * DTO for game configuration.
@@ -33,10 +34,10 @@ public abstract class GameConfigurationDTO implements DTO {
     /**
      * Time to answer in milliseconds.
      */
-    @DecimalMin(value = "3")
-    @DecimalMax(value = "60")
+    @DurationMin(seconds = 1)
+    @DurationMax(seconds = 60)
     @Description("Milliseconds per question")
-    protected Integer answerTime;
+    protected Duration answerTime;
 
 
     /**

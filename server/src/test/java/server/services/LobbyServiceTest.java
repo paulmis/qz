@@ -7,6 +7,7 @@ import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.messages.SSEMessage;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +66,7 @@ public class LobbyServiceTest {
         // Create the game
         lobby = new NormalGame();
         lobby.setId(getUUID(0));
-        lobby.setConfiguration(new NormalGameConfiguration(3, 13, 2, 2, 2f, 100, 0, 75));
+        lobby.setConfiguration(new NormalGameConfiguration(3, Duration.ofSeconds(13), 2, 2, 2f, 100, 0, 75));
         lobby.add(joePlayer);
         lobby.add(susannePlayer);
 

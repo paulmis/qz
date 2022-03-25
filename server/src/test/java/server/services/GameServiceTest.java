@@ -8,6 +8,7 @@ import static server.utils.TestHelpers.getUUID;
 import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -93,14 +94,7 @@ public class GameServiceTest {
         // Create the game
         game = new NormalGame();
         game.setId(getUUID(3));
-        game.setConfiguration(new NormalGameConfiguration(3,
-                13,
-                2,
-                2,
-                2f,
-                100,
-                0,
-                75));
+        game.setConfiguration(new NormalGameConfiguration(3, Duration.ofSeconds(13), 2, 2, 2f, 100, 0, 75));
         game.add(joePlayer);
         game.add(susannePlayer);
 
@@ -270,7 +264,7 @@ public class GameServiceTest {
     void setAcceptingAnswersDelayTrue() throws IOException {
         game.setAcceptingAnswers(false);
 
-        gameService.setAcceptingAnswers(game, true, 1000);
+        gameService.setAcceptingAnswers(game, true, 1000L);
 
         assertTrue(game.isAcceptingAnswers());
 
@@ -282,7 +276,7 @@ public class GameServiceTest {
     void setAcceptingAnswersDelayFalse() throws IOException {
         game.setAcceptingAnswers(true);
 
-        gameService.setAcceptingAnswers(game, false, 1000);
+        gameService.setAcceptingAnswers(game, false, 1000L);
 
         assertFalse(game.isAcceptingAnswers());
 

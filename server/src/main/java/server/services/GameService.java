@@ -148,12 +148,7 @@ public class GameService {
      */
     @Transactional
     public void setAcceptingAnswers(Game game, boolean acceptingAnswers) throws IOException {
-        game.setAcceptingAnswers(acceptingAnswers);
-
-        sseManager.send(game.getPlayerIds(), new SSEMessage(
-                acceptingAnswers
-                        ? SSEMessageType.START_QUESTION
-                        : SSEMessageType.STOP_QUESTION));
+        setAcceptingAnswers(game, acceptingAnswers, null);
     }
 
     /**
@@ -162,11 +157,11 @@ public class GameService {
      *
      * @param game             The game object that the action is performed on.
      * @param acceptingAnswers Whether the game is accepting answers.
-     * @param delay            The delay before the next SSE event is to be expected.
+     * @param delay            The delay (in milliseconds) before the next SSE event is to be expected.
      * @throws IOException if an SSE connection send failed.
      */
     @Transactional
-    public void setAcceptingAnswers(Game game, boolean acceptingAnswers, long delay) throws IOException {
+    public void setAcceptingAnswers(Game game, boolean acceptingAnswers, Long delay) throws IOException {
         game.setAcceptingAnswers(acceptingAnswers);
 
         sseManager.send(game.getPlayerIds(), new SSEMessage(
