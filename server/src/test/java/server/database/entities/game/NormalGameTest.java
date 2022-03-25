@@ -147,13 +147,13 @@ public class NormalGameTest {
 
     @Test
     void getQuestionOk() {
-        game.setCurrentQuestion(1);
+        game.setCurrentQuestionNumber(1);
         assertEquals(Optional.of(questionB), game.getQuestion());
     }
 
     @Test
     void getQuestionOutOfBounds() {
-        game.setCurrentQuestion(2);
+        game.setCurrentQuestionNumber(2);
         assertEquals(Optional.empty(), game.getQuestion());
     }
 

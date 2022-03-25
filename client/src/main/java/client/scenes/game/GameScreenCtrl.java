@@ -422,7 +422,7 @@ public class GameScreenCtrl implements Initializable {
      *
      * @param question the question to show.
      */
-    void setQuestion(QuestionDTO question) {
+    public void setQuestion(QuestionDTO question) {
         // Show the question
         if (question instanceof MCQuestionDTO) {
             // Create the question pane

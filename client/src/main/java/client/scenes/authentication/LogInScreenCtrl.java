@@ -76,7 +76,7 @@ public class LogInScreenCtrl implements Initializable {
                     if (s.getGame().getStatus() == GameStatus.CREATED) {
                         mainCtrl.showLobbyScreen();
                     } else {
-                        mainCtrl.showGameScreen();
+                        mainCtrl.showGameScreen(s.getGame().getCurrentQuestion());
                     }
                 } else {
                     mainCtrl.showLobbyListScreen();

@@ -1,7 +1,9 @@
 package server.database.entities.question;
 
 import commons.entities.questions.QuestionDTO;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.*;
 import lombok.*;
 import server.database.entities.answer.Answer;
@@ -28,7 +30,7 @@ public abstract class Question extends BaseEntity<QuestionDTO> {
             inverseJoinColumns = @JoinColumn(name = "activity_id"))
     @ToString.Exclude
     @NonNull
-    protected List<Activity> activities;
+    protected List<Activity> activities = new ArrayList<>();
 
     /**
      * Question asked the user.
@@ -61,4 +63,17 @@ public abstract class Question extends BaseEntity<QuestionDTO> {
      * @return the right answer
      */
     public abstract Answer getRightAnswer();
+
+    /**
+     * Converts the game superclass to a DTO.
+     *
+     * @return the game superclass DTO
+     */
+    protected QuestionDTO toDTO() {
+        return new QuestionDTO(
+            this.id,
+            this.activities.stream().map(Activity::getDTO).collect(Collectors.toList()),
+            this.text
+        );
+    }
 }

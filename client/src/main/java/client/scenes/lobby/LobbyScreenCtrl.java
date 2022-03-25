@@ -83,7 +83,7 @@ public class LobbyScreenCtrl {
                     case 200:
                         mainCtrl.showInformationalSnackBar("Game started!");
                         ClientState.game.setStatus(GameStatus.ONGOING);
-                        this.mainCtrl.showGameScreen();
+                        this.mainCtrl.showGameScreen(null);
                         break;
                     default:
                         mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");

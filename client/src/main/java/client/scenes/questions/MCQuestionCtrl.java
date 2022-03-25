@@ -46,8 +46,7 @@ public class MCQuestionCtrl implements Initializable {
     }
 
     /**
-     * This function runs after every control has
-     * been created and initialized already.
+     * Initializes the controls of this MCQuestionPane.
      *
      * @param location These location parameter.
      * @param resources The resource bundle.
