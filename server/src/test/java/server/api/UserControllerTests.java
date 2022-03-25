@@ -9,6 +9,7 @@ import static server.utils.TestHelpers.getUUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.UserDTO;
+import commons.entities.utils.Views;
 import java.util.Collections;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,7 +81,8 @@ public class UserControllerTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(joeDTO)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(objectMapper.writeValueAsString(joe.getDTO())))
+                .andExpect(content().string(
+                        objectMapper.writerWithView(Views.Private.class).writeValueAsString(joe.getDTO())))
                 .andReturn();
     }
 
