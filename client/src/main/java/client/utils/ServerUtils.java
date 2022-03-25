@@ -164,8 +164,7 @@ public class ServerUtils {
                     registerHandler.handle(o, new ApiError());
                 } else if (o.getStatus() == 400) {
                     registerHandler.handle(o, o.readEntity(ApiError.class));
-                }
-                else if (o.getStatus() == 409) {
+                } else if (o.getStatus() == 409) {
                     registerHandler.handle(o, new ApiError());
                 }
             }
