@@ -11,6 +11,13 @@ import lombok.NonNull;
  */
 @Data
 public class FSMFuture {
+    /**
+     * The future that can be used to cancel the task.
+     */
     @NonNull private Optional<ScheduledFuture<?>> future;
+
+    /**
+     * The time at which the task was scheduled.
+     */
     @NonNull private Date scheduledDate;
 }

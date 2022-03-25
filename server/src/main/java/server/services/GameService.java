@@ -95,6 +95,7 @@ public class GameService {
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
             sseManager.send(definiteGame.getPlayerIds(), new SSEMessage(SSEMessageType.GAME_START));
 
+            // Create and start a FSM for the game.
             fsmManager.addFSM(definiteGame,
                     new DefiniteGameFSM(definiteGame,
                             new FSMContext(sseManager, this, taskScheduler)));

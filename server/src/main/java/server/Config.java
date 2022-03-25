@@ -46,7 +46,7 @@ public class Config {
     @Bean
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(20);
+        scheduler.setPoolSize(5);
         scheduler.setThreadNamePrefix("quiz-");
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         return scheduler;

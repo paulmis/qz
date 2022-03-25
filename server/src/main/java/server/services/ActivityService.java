@@ -27,7 +27,7 @@ public class ActivityService {
         }
         List<Activity> activities = activityRepository.findAll();
         if (activities.size() < count) {
-            throw new IllegalStateException("Requested count is greater than the number of available activities.");
+            throw new IllegalArgumentException("Requested count is greater than the number of available activities.");
         }
         Collections.shuffle(activities);
         return activities.subList(0, count);

@@ -40,44 +40,59 @@ public class DefiniteGameFSM extends GameFSM {
     @Override
     public void run() {
         log.trace("[{}] FSM runnable called.", getGame().getId());
+        // Mark the FSM as running.
         setRunning(true);
+
         if (!getGame().isAcceptingAnswers()) {
+            // If the game is currently not accepting answers,
+            // we start accepting answers (go forward to the next question).
             runQuestion();
         } else {
+            // If the game is currently accepting answers,
+            // we show the answer (and potentially the leaderboard).
             runAnswer();
         }
     }
 
-    void runLeaderboard() throws IOException {
+    @SneakyThrows
+    void runLeaderboard() {
+        // If we received a stop signal, return immediately.
         if (!isRunning()) {
             return;
         }
 
-        int delay = 5000;
+        log.trace("[{}] FSM runLeaderboard called.", getGame().getId());
 
-        log.trace("[{}] FSM runnable: leaderboard.", getGame().getId());
+        // TODO: make this configurable?
+        int delay = 5000; // Delay before progressing to the next stage.
+
+        // Notify all players to show the leaderboard.
         getContext().getSseManager().send(getGame().getPlayerIds(),
             new SSEMessage(SSEMessageType.SHOW_LEADERBOARD, delay));
 
+        // Calculate when to proceed to the next stage.
         Date executionTime = DateUtils.addMilliseconds(new Date(), delay);
-        setFuture(new FSMFuture(Optional.of(getContext().getTaskScheduler().schedule(() -> {
-            try {
-                runQuestion();
-            } catch (IOException e) {
-                log.error("[{}] FSM runnable: error in question stage.", getGame().getId(), e);
-                e.printStackTrace();
-            }
-        }, executionTime)),
-                executionTime));
+        // Schedule the next stage.
+        setFuture(
+                new FSMFuture(
+                        Optional.of(getContext().getTaskScheduler().schedule(this::runQuestion, executionTime)),
+                        executionTime)
+        );
     }
 
-    void runAnswer() throws IOException {
+    @SneakyThrows
+    void runAnswer() {
+        // If we received a stop signal, return immediately.
         if (!isRunning()) {
             return;
         }
 
-        int delay = 5000;
+        log.trace("[{}] FSM runAnswer called.", getGame().getId());
 
+        // Delay before progressing to the next stage.
+        int delay = 5000; // TODO: make this configurable?
+
+        // Stop accepting answers.
         getContext().getGameService().setAcceptingAnswers(getGame(),
                 false,
                 delay);
@@ -85,37 +100,24 @@ public class DefiniteGameFSM extends GameFSM {
 
         // Calculate when to run the next question.
         Date executionTime = DateUtils.addMilliseconds(new Date(), delay);
-        // Show leaderboard on every 5th question.
-        if (getGame().getCurrentQuestion() % 5 == 4) {
-            setFuture(new FSMFuture(Optional.of(getContext().getTaskScheduler().schedule(() -> {
-                try {
-                    runLeaderboard();
-                } catch (IOException e) {
-                    log.error("[{}] FSM runnable: error in leaderboard stage.", getGame().getId(), e);
-                    e.printStackTrace();
-                }
-            }, executionTime)),
-                    executionTime));
-        } else {
-            setFuture(new FSMFuture(Optional.of(getContext().getTaskScheduler().schedule(() -> {
-                try {
-                    runQuestion();
-                } catch (IOException e) {
-                    log.error("[{}] FSM runnable: error in question stage.", getGame().getId(), e);
-                    e.printStackTrace();
-                }
-            }, executionTime)),
-                    executionTime));
-        }
+        // Show leaderboard on every 5th question, and show next question on other questions.
+        setFuture(new FSMFuture(Optional.of(getContext().getTaskScheduler().schedule(
+                (getGame().getCurrentQuestion() % 5 == 4) ?
+                        this::runLeaderboard :
+                        this::runQuestion, executionTime)),
+                executionTime));
     }
 
-    void runQuestion() throws IOException {
+    @SneakyThrows
+    void runQuestion() {
+        // If we received a stop signal, return immediately.
         if (!isRunning()) {
             return;
         }
 
         log.trace("[{}] FSM runQuestion called.", getGame().getId());
 
+        // If the game is finished, run the cleanup function and return immediately.
         if (getGame().getCurrentQuestion()
                 == ((DefiniteGame) getGame()).getQuestionsCount()) {
             finishGame();
@@ -126,27 +128,22 @@ public class DefiniteGameFSM extends GameFSM {
         log.debug("[{}] FSM runnable: advancing onto the next question.", getGame().getId());
         getGame().setCurrentQuestion(getGame().getCurrentQuestion() + 1);
 
-        // Enable accepting answers.
+        // Start accepting answers.
         getContext().getGameService().setAcceptingAnswers(getGame(),
                 true,
                 getGame().getConfiguration().getAnswerTime());
 
         log.trace("[{}] FSM runnable: accepting answers enabled.", getGame().getId());
 
+        // Schedule the "show answer" stage.
         Date executionTime = DateUtils.addMilliseconds(new Date(),
                 getGame().getConfiguration().getAnswerTime());
-        setFuture(new FSMFuture(Optional.of(getContext().getTaskScheduler().schedule(() -> {
-            try {
-                runAnswer();
-            } catch (IOException e) {
-                log.error("[{}] FSM runnable: error in answer stage.", getGame().getId(), e);
-                e.printStackTrace();
-            }
-        }, executionTime)),
-                executionTime));
+        setFuture(new FSMFuture(Optional.of(getContext().getTaskScheduler().schedule(this::runAnswer,
+                executionTime)), executionTime));
     }
 
-    void finishGame() throws IOException {
+    @SneakyThrows
+    void finishGame() {
         log.debug("[{}] Game is finished.", getGame().getId());
 
         // Stop the FSM
@@ -155,8 +152,9 @@ public class DefiniteGameFSM extends GameFSM {
         // We are not accepting answers anymore.
         getContext().getGameService().setAcceptingAnswers(getGame(), false);
 
-        // The game is finished.
+        // Mark game as finished.
         getGame().setStatus(GameStatus.FINISHED);
+        // Notify all players.
         getContext().getSseManager().send(getGame().getPlayerIds(),
                 new SSEMessage(SSEMessageType.GAME_END));
     }

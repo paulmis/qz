@@ -33,11 +33,4 @@ public abstract class GameFSM {
      * Run the finite state machine.
      */
     public abstract void run();
-
-    /**
-     * Stop the FSM.
-     */
-    public void stop() {
-        running = false;
-    }
 }

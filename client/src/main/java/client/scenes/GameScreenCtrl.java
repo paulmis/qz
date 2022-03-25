@@ -150,14 +150,20 @@ public class GameScreenCtrl implements Initializable {
     }
 
     private void setUpTimer() {
+        // Keeps track of the time left.
         timeLeft = new SimpleIntegerProperty(10);
+        // Connect the time left to the label.
         timerLabel.textProperty().bind(timeLeft.asString());
 
+        // Create a new Java timer.
         timer = new Timer();
+        // Create a new timer task.
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
+                // Decrement the time left.
                 timeLeft.set(timeLeft.get() - 1);
+                // If the time left is 0, stop the timer.
                 if (timeLeft.get() == 0) {
                     timer.cancel();
                 }
