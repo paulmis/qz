@@ -21,6 +21,8 @@ import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
+import client.scenes.lobby.LobbyDisbandScreenCtrl;
+import client.scenes.lobby.LobbyDisbandScreenPane;
 import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
@@ -84,6 +86,7 @@ public class MainCtrl {
     private Parent lobbyListScreen;
 
     private Popup lobbySettingsPopUp;
+    private Popup lobbyDisbandPopUp;
 
     private Parent activeScreen;
 
@@ -130,6 +133,7 @@ public class MainCtrl {
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
         lobbySettingsPopUp = new Popup();
+        lobbyDisbandPopUp = new Popup();
         showServerConnectScreen();
 
         // This makes sure to close every thread when the app is closed.
@@ -320,6 +324,34 @@ public class MainCtrl {
      */
     public void closeLobbySettings() {
         lobbySettingsPopUp.hide();
+    }
+
+    /**
+     * This function opens a popup with
+     * a disband warning for disbanding the lobby.
+     *
+     * @param disbandHandler the action that is to be performed when the user disbands the lobby.
+     */
+    public void openLobbyDisbandWarning(LobbyDisbandScreenCtrl.DisbandHandler disbandHandler) {
+        lobbyDisbandPopUp.setOnShown(e -> {
+            lobbyDisbandPopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - lobbyDisbandPopUp.getWidth() / 2);
+
+            lobbyDisbandPopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - lobbyDisbandPopUp.getHeight() / 2);
+        });
+
+        var disbandPane = new LobbyDisbandScreenPane(disbandHandler);
+        lobbyDisbandPopUp.getContent().add(disbandPane);
+
+        lobbyDisbandPopUp.show(primaryStage);
+    }
+
+    /**
+     * This function closes the lobby disband popUp.
+     */
+    public void closeLobbyDisbandWarning() {
+        lobbyDisbandPopUp.hide();
     }
 
     /**
