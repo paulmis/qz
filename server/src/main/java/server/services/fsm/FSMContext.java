@@ -2,6 +2,7 @@ package server.services.fsm;
 
 import lombok.Data;
 import lombok.NonNull;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import server.services.GameService;
 import server.services.SSEManager;
 
@@ -12,4 +13,5 @@ import server.services.SSEManager;
 public class FSMContext {
     @NonNull private SSEManager sseManager;
     @NonNull private GameService gameService;
+    @NonNull private ThreadPoolTaskScheduler taskScheduler;
 }
