@@ -156,12 +156,18 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON)
                 .buildPost(Entity.entity(user, APPLICATION_JSON));
         invocation.submit(new InvocationCallback<Response>() {
-
             @Override
             public void completed(Response o) {
-                registerHandler.handle(o, o.readEntity(ApiError.class));
-                client = client.register(new Authenticator(o.readEntity(String.class)));
-                loggedIn = true;
+                if (o.getStatus() == 201) {
+                    client = client.register(new Authenticator(o.readEntity(String.class)));
+                    loggedIn = true;
+                    registerHandler.handle(o, new ApiError());
+                } else if (o.getStatus() == 400) {
+                    registerHandler.handle(o, o.readEntity(ApiError.class));
+                }
+                else if (o.getStatus() == 409) {
+                    registerHandler.handle(o, new ApiError());
+                }
             }
 
             @Override

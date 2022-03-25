@@ -92,7 +92,7 @@ public class RegisterScreenCtrl implements Initializable {
                 public void handle(Response response, ApiError error) {
                     javafx.application.Platform.runLater(() -> {
                         switch (response.getStatus()) {
-                            case 200: {
+                            case 201: {
                                 mainCtrl.showLobbyListScreen();
                                 mainCtrl.showInformationalSnackBar("Success!");
                                 break;
@@ -227,5 +227,4 @@ public class RegisterScreenCtrl implements Initializable {
             System.out.print("User does not want to be remembered...\n");
         }
     }
-
 }
