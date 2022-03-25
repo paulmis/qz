@@ -36,12 +36,9 @@ public class GameLeaveScreenPane extends StackPane {
      * This constructor sets up the game leave pane.
      *
      * @param leaveHandler the action that is to be performed on a leave.
+     * @param cancelHandler the action that is to be performed on a cancel.
      */
-    public GameLeaveScreenPane(GameLeaveScreenCtrl.LeaveHandler leaveHandler) {
-        setUpScreen(new GameLeaveScreenCtrl(leaveHandler));
-    }
-
-    public void makeTranslucent() {
-        this.controller.makeTranslucent();
+    public GameLeaveScreenPane(GameLeaveScreenCtrl.LeaveHandler leaveHandler, GameLeaveScreenCtrl.CancelHandler cancelHandler) {
+        setUpScreen(new GameLeaveScreenCtrl(leaveHandler, cancelHandler));
     }
 }

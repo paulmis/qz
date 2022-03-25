@@ -357,6 +357,8 @@ public class GameScreenCtrl implements Initializable {
                     });
                 }
             });
+        }, () -> {
+            mainCtrl.closeGameLeaveWarning();
         });
     }
 

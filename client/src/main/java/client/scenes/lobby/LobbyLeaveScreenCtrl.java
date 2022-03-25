@@ -16,11 +16,22 @@ import lombok.Generated;
 public class LobbyLeaveScreenCtrl implements Initializable {
 
     /**
-     * The disband handler interface.
+     * The cancel handler interface.
      * The purpose of this is to allow passing of a
      * function to this controller.
      * This function will be later applied by the user when clicking
-     * the disband button.
+     * the cancel button.
+     */
+    public interface CancelHandler {
+        void handle();
+    }
+
+    /**
+     * The leave handler interface.
+     * The purpose of this is to allow passing of a
+     * function to this controller.
+     * This function will be later applied by the user when clicking
+     * the leave button.
      */
     public interface LeaveHandler {
         void handle();
@@ -30,15 +41,17 @@ public class LobbyLeaveScreenCtrl implements Initializable {
     @FXML private JFXButton leaveButton;
     @FXML private AnchorPane rootPane;
     private LeaveHandler leaveHandler;
-
+    private CancelHandler cancelHandler;
 
     /**
      * The constructor for the LobbyLeaveScreen controller.
      *
      * @param leaveHandler the action that is to be performed when the user leaves the lobby.
+     * @param cancelHandler the action that is to be performed when the user cancels leaving the game.
      */
-    public LobbyLeaveScreenCtrl(LeaveHandler leaveHandler) {
+    public LobbyLeaveScreenCtrl(LeaveHandler leaveHandler, CancelHandler cancelHandler) {
         this.leaveHandler = leaveHandler;
+        this.cancelHandler = cancelHandler;
     }
 
     /**
@@ -46,7 +59,7 @@ public class LobbyLeaveScreenCtrl implements Initializable {
      */
     @FXML
     private void cancel() {
-        //ToDo: Close popup and do nothing.
+        cancelHandler.handle();
     }
 
     /**
@@ -59,14 +72,5 @@ public class LobbyLeaveScreenCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-    }
-
-    /**
-     * This function makes the background of the control translucent.
-     */
-    public void makeTranslucent() {
-        this.rootPane.setStyle("-fx-background-color: translucent; "
-                + "-fx-background-radius: 0; "
-                + "-fx-effect: none;");
     }
 }

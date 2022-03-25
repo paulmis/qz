@@ -112,6 +112,8 @@ public class LobbyScreenCtrl {
                     });
                 }
             });
+        }, () -> {
+            mainCtrl.closeLobbyLeaveWarning();
         });
     }
 
