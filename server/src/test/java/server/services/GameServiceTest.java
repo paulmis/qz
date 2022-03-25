@@ -265,4 +265,28 @@ public class GameServiceTest {
         verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
         verifyNoMoreInteractions(sseManager);
     }
+
+    @Test
+    void setAcceptingAnswersDelayTrue() throws IOException {
+        game.setAcceptingAnswers(false);
+
+        gameService.setAcceptingAnswers(game, true, 1000);
+
+        assertTrue(game.isAcceptingAnswers());
+
+        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
+        verifyNoMoreInteractions(sseManager);
+    }
+
+    @Test
+    void setAcceptingAnswersDelayFalse() throws IOException {
+        game.setAcceptingAnswers(true);
+
+        gameService.setAcceptingAnswers(game, false, 1000);
+
+        assertFalse(game.isAcceptingAnswers());
+
+        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
+        verifyNoMoreInteractions(sseManager);
+    }
 }

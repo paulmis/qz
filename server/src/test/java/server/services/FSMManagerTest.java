@@ -4,12 +4,10 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 import static server.utils.TestHelpers.getUUID;
 
-import commons.entities.game.GameDTO;
 import java.util.Date;
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,16 +15,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import server.database.entities.game.DefiniteGame;
+import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.services.fsm.DefiniteGameFSM;
 import server.services.fsm.FSMContext;
+import server.utils.FSMHelpers;
 
 @ExtendWith(MockitoExtension.class)
 class FSMManagerTest {
     private FSMManager fsmManager;
 
-    private MockGame game;
+    private NormalGame game;
 
     @Mock
     private SSEManager sseManager;
@@ -38,61 +37,17 @@ class FSMManagerTest {
     @InjectMocks
     private FSMContext context;
 
-    static class MockGame extends DefiniteGame {
-        @Override
-        public GameDTO getDTO() {
-            return null;
-        }
-    }
-
-    static class MockFuture<T> implements ScheduledFuture<T> {
-        @Override
-        public long getDelay(TimeUnit timeUnit) {
-            return 0;
-        }
-
-        @Override
-        public boolean cancel(boolean b) {
-            return false;
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return false;
-        }
-
-        @Override
-        public boolean isDone() {
-            return false;
-        }
-
-        @Override
-        public T get() throws InterruptedException, ExecutionException {
-            return null;
-        }
-
-        @Override
-        public T get(long l, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
-            return null;
-        }
-
-        @Override
-        public int compareTo(Delayed delayed) {
-            return 0;
-        }
-    }
-
     @BeforeEach
     void setUp() {
         fsmManager = new FSMManager();
-        game = new MockGame();
+        game = new NormalGame();
         game.setId(getUUID(1));
 
         NormalGameConfiguration config = new NormalGameConfiguration();
         config.setNumQuestions(10);
         game.setConfiguration(config);
 
-        lenient().when(taskScheduler.schedule(any(), any(Date.class))).thenReturn(new MockFuture());
+        lenient().when(taskScheduler.schedule(any(), any(Date.class))).thenReturn(new FSMHelpers.MockFuture<>());
     }
 
     @Test
