@@ -2,11 +2,8 @@ package server.services;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.Data;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import server.database.entities.game.Game;
 import server.services.fsm.GameFSM;
@@ -18,15 +15,9 @@ import server.services.fsm.GameFSM;
 @Slf4j
 public class FSMManager {
     @Autowired
-    SSEManager sseManager;
+    private SSEManager sseManager;
 
-    @Data
-    static class FSMEntry {
-        @NonNull GameFSM fsm;
-        Thread thread;
-    }
-
-    private final ConcurrentHashMap<UUID, FSMEntry> fsmMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, GameFSM> fsmMap = new ConcurrentHashMap<>();
 
     /**
      * Adds a new finite state machine to the manager.
@@ -34,7 +25,7 @@ public class FSMManager {
      * @param fsm the finite state machine to add
      */
     public void addFSM(Game game, GameFSM fsm) {
-        fsmMap.put(game.getId(), new FSMEntry(fsm));
+        fsmMap.put(game.getId(), fsm);
     }
 
     /**
@@ -44,7 +35,7 @@ public class FSMManager {
      * @return the removed finite state machine.
      */
     public GameFSM removeFSM(Game game) {
-        return fsmMap.remove(game.getId()).getFsm();
+        return fsmMap.remove(game.getId());
     }
 
     /**
@@ -52,18 +43,19 @@ public class FSMManager {
      *
      * @param game the game to get the finite state machine for.
      * @return whether the finite state machine was started.
+     * @throws IllegalStateException if the finite state machine is already running.
      */
     public boolean startFSM(Game game) {
         if (fsmMap.containsKey(game.getId())) {
-            FSMEntry entry = fsmMap.get(game.getId());
-            if (entry.thread == null || !entry.thread.isAlive()) {
+            GameFSM fsm = fsmMap.get(game.getId());
+            if (!fsm.isRunning()) {
                 log.debug("Starting FSM for game {}", game.getId());
-                entry.thread = new Thread(entry.fsm);
-                entry.thread.start();
+                // Start the finite state machine (in a new thread, to avoid blocking the main thread)
+                new Thread(fsm::run).start();
                 return true;
             } else {
                 log.warn("FSM for game {} already running", game.getId());
-                return false;
+                throw new IllegalStateException("FSM for game " + game.getId() + " already running");
             }
         }
         log.warn("FSM for game {} not found", game.getId());

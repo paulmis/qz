@@ -20,7 +20,7 @@ public class DefiniteGameFSM extends GameFSM {
     /**
      * Create a new runnable for the finite state machine.
      *
-     * @param game The game instance.
+     * @param game    The game instance.
      * @param context The execution context of the FSM.
      */
     public DefiniteGameFSM(DefiniteGame game, FSMContext context) {
@@ -39,6 +39,7 @@ public class DefiniteGameFSM extends GameFSM {
     @Override
     public void run() {
         log.trace("[{}] FSM runnable called.", getGame().getId());
+        setRunning(true);
         if (!getGame().isAcceptingAnswers()) {
             runQuestion();
         } else {
@@ -47,12 +48,15 @@ public class DefiniteGameFSM extends GameFSM {
     }
 
     void runAnswer() throws IOException {
+        if (!isRunning()) {
+            return;
+        }
+
         int delay = getGame().getCurrentQuestion() % 5 == 4 ? 10000 : 5000;
 
         getContext().getGameService().setAcceptingAnswers(getGame(),
                 false,
                 delay);
-
         log.trace("[{}] FSM runnable: accepting answers disabled.", getGame().getId());
 
         // Calculate when to run the next question.
@@ -70,6 +74,10 @@ public class DefiniteGameFSM extends GameFSM {
     }
 
     void runQuestion() throws IOException {
+        if (!isRunning()) {
+            return;
+        }
+
         log.trace("[{}] FSM runQuestion called.", getGame().getId());
 
         if (getGame().getCurrentQuestion()
@@ -104,6 +112,9 @@ public class DefiniteGameFSM extends GameFSM {
 
     void finishGame() throws IOException {
         log.debug("[{}] Game is finished.", getGame().getId());
+
+        // Stop the FSM
+        setRunning(false);
 
         // We are not accepting answers anymore.
         getContext().getGameService().setAcceptingAnswers(getGame(), false);
