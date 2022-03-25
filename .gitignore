@@ -39,3 +39,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Uploads ###
+server/uploads/
+uploads/
+

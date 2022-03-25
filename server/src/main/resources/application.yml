@@ -22,6 +22,10 @@ spring:
       jdbc:
         lob:
           non_contextual_creation: true
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
 
 logging:
   level:

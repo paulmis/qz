@@ -20,8 +20,18 @@ public interface StorageService {
      * Store a file in the storage service.
      *
      * @param file File to store.
+     * @return stored file path.
      */
-    void store(MultipartFile file);
+    Path store(MultipartFile file);
+
+    /**
+     * Store a file in the storage service.
+     *
+     * @param file File to store.
+     * @param filename Filename to store the file as.
+     * @return stored file path.
+     */
+    Path store(MultipartFile file, String filename);
 
     /**
      * Get a stream of all stored file paths.

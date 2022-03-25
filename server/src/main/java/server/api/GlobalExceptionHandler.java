@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import server.exceptions.NotFoundException;
 
 /**
  * Provides global API exception handling.
@@ -31,6 +32,19 @@ public class GlobalExceptionHandler {
         BindingResult result = ex.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();
         return processFieldErrors(fieldErrors, ex);
+    }
+
+    /**
+     * Handles not found exceptions.
+     *
+     * @param ex caught exception
+     * @return API error
+     */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    @ExceptionHandler(NotFoundException.class)
+    public ApiError handleNotFoundException(NotFoundException ex) {
+        return new ApiError(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     /**

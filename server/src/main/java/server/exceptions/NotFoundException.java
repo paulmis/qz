@@ -6,12 +6,12 @@ import lombok.Generated;
  * Exception thrown when a storage item is not found.
  */
 @Generated
-public class StorageNotFoundException extends RuntimeException {
-    public StorageNotFoundException(String message) {
+public class NotFoundException extends RuntimeException {
+    public NotFoundException(String message) {
         super(message);
     }
 
-    public StorageNotFoundException(String message, Throwable cause) {
+    public NotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 }

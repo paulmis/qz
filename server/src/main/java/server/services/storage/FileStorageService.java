@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 import server.configuration.FileStorageConfiguration;
+import server.exceptions.NotFoundException;
 import server.exceptions.StorageException;
-import server.exceptions.StorageNotFoundException;
 
 /**
  * Service for filesystem storage.
@@ -52,9 +52,22 @@ public class FileStorageService implements StorageService {
      * Store a file in the storage service.
      *
      * @param file File to store.
+     * @return stored file path.
      */
     @Override
-    public void store(MultipartFile file) {
+    public Path store(MultipartFile file) {
+        return store(file, file.getOriginalFilename());
+    }
+
+    /**
+     * Store a file in the storage service.
+     *
+     * @param file     File to store.
+     * @param filename Filename to store the file as.
+     * @return stored file path.
+     */
+    @Override
+    public Path store(MultipartFile file, String filename) {
         try {
             // Verify that the file is not empty
             if (file.isEmpty()) {
@@ -63,7 +76,7 @@ public class FileStorageService implements StorageService {
 
             // Get the destination file path (storage location + relative path)
             Path destinationFile = this.fileStorageLocation.resolve(
-                    Paths.get(Objects.requireNonNull(file.getOriginalFilename())))
+                            Paths.get(filename))
                     .normalize().toAbsolutePath();
 
             // Verify that the file is being uploaded to upload directory
@@ -75,6 +88,7 @@ public class FileStorageService implements StorageService {
             try (InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
             }
+            return destinationFile;
         } catch (IOException e) {
             log.error("Could not store file", e);
             throw new StorageException("Could not store file", e);
@@ -131,11 +145,11 @@ public class FileStorageService implements StorageService {
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
-                throw new StorageNotFoundException("Could not read file: " + filename);
+                throw new NotFoundException("Could not read file: " + filename);
             }
         } catch (MalformedURLException e) {
             log.warn("Could not resolve path " + filename);
-            throw new StorageNotFoundException("Could not read file " + filename, e);
+            throw new NotFoundException("Could not read file " + filename, e);
         }
     }
 
