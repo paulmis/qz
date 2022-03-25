@@ -44,6 +44,7 @@ public class DefiniteGameFSM extends GameFSM {
 
         // At the beginning of the game, give users a few seconds to prepare.
         if (getState() == FSMState.IDLE) {
+            log.debug("[{}] FSM is in PREPARING state.", getGame().getId());
             setState(FSMState.PREPARING);
             scheduleTask(this::run, Duration.ofSeconds(5));
             return;
@@ -68,6 +69,7 @@ public class DefiniteGameFSM extends GameFSM {
     void runLeaderboard() {
         // If we received a stop signal, return immediately.
         if (!isRunning()) {
+            log.debug("[{}] Stop signal received, FSM exiting.", getGame().getId());
             return;
         }
 
@@ -80,6 +82,7 @@ public class DefiniteGameFSM extends GameFSM {
         // Notify all players to show the leaderboard.
         getContext().getSseManager().send(getGame().getPlayerIds(),
             new SSEMessage(SSEMessageType.SHOW_LEADERBOARD, delay));
+        log.trace("[{}] Leaderboard shown.", getGame().getId());
 
         // Calculate when to proceed to the next stage.
         Date executionTime = DateUtils.addMilliseconds(new Date(), delay);
@@ -99,6 +102,7 @@ public class DefiniteGameFSM extends GameFSM {
     void runAnswer() {
         // If we received a stop signal, return immediately.
         if (!isRunning()) {
+            log.debug("[{}] Stop signal received, FSM exiting.", getGame().getId());
             return;
         }
 
@@ -134,6 +138,7 @@ public class DefiniteGameFSM extends GameFSM {
     void runQuestion() {
         // If we received a stop signal, return immediately.
         if (!isRunning()) {
+            log.debug("[{}] Stop signal received, FSM exiting.", getGame().getId());
             return;
         }
 
@@ -176,5 +181,6 @@ public class DefiniteGameFSM extends GameFSM {
         // Mark game as finished and notify all players.
         getGame().setStatus(GameStatus.FINISHED);
         getContext().getSseManager().send(getGame().getPlayerIds(), new SSEMessage(SSEMessageType.GAME_END));
+        log.trace("[{}] FSM runnable: sending game end message.", getGame().getId());
     }
 }

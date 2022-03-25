@@ -6,11 +6,13 @@ import java.util.Date;
 import java.util.Optional;
 import lombok.Data;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import server.database.entities.game.Game;
 
 /**
  * The GameFSM class is a Finite State Machine that is used to manage a game.
  */
+@Slf4j
 @Data
 public abstract class GameFSM {
     /**
@@ -45,6 +47,7 @@ public abstract class GameFSM {
      * @param delay Delay before executing the task.
      */
     public void scheduleTask(Runnable task, Duration delay) {
+        log.debug("[{}] Scheduling task in {}", game.getId(), delay);
         Date executionTime = Date.from(Instant.now().plus(delay));
         setFuture(new FSMFuture(
                 Optional.of(context.getTaskScheduler().schedule(task, executionTime)),
