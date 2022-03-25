@@ -38,7 +38,8 @@ public class GameLeaveScreenPane extends StackPane {
      * @param leaveHandler the action that is to be performed on a leave.
      * @param cancelHandler the action that is to be performed on a cancel.
      */
-    public GameLeaveScreenPane(GameLeaveScreenCtrl.LeaveHandler leaveHandler, GameLeaveScreenCtrl.CancelHandler cancelHandler) {
+    public GameLeaveScreenPane(GameLeaveScreenCtrl.LeaveHandler leaveHandler,
+                               GameLeaveScreenCtrl.CancelHandler cancelHandler) {
         setUpScreen(new GameLeaveScreenCtrl(leaveHandler, cancelHandler));
     }
 }
