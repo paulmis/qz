@@ -55,9 +55,8 @@ public class FSMManager {
 
             } else {
                 log.warn("FSM for game {} is already running or not startable", game.getId());
-                throw new IllegalStateException("FSM for game " + game.getId() + " already running or not startable");
+                return false;
             }
-
         }
         log.warn("FSM for game {} not found", game.getId());
         return false;
