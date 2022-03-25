@@ -3,10 +3,8 @@ package server.services.fsm;
 import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
-import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
-import java.util.function.Function;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
@@ -102,9 +100,9 @@ public class DefiniteGameFSM extends GameFSM {
         Date executionTime = DateUtils.addMilliseconds(new Date(), delay);
         // Show leaderboard on every 5th question, and show next question on other questions.
         setFuture(new FSMFuture(Optional.of(getContext().getTaskScheduler().schedule(
-                (getGame().getCurrentQuestion() % 5 == 4) ?
-                        this::runLeaderboard :
-                        this::runQuestion, executionTime)),
+                (getGame().getCurrentQuestion() % 5 == 4)
+                        ? this::runLeaderboard
+                        : this::runQuestion, executionTime)),
                 executionTime));
     }
 
@@ -120,7 +118,7 @@ public class DefiniteGameFSM extends GameFSM {
         // If the game is finished, run the cleanup function and return immediately.
         if (getGame().getCurrentQuestion()
                 == ((DefiniteGame) getGame()).getQuestionsCount()) {
-            finishGame();
+            runFinish();
             return;
         }
 
@@ -143,7 +141,7 @@ public class DefiniteGameFSM extends GameFSM {
     }
 
     @SneakyThrows
-    void finishGame() {
+    void runFinish() {
         log.debug("[{}] Game is finished.", getGame().getId());
 
         // Stop the FSM
