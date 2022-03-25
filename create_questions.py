@@ -11,6 +11,7 @@ from typing import Any
 import urllib.request
 import urllib.error
 
+
 class Response:
     """
     Wrapper for response from post_data()
@@ -25,6 +26,7 @@ class Response:
         """
         self.data: bytes = resp_data
         self.status_code: int = status_code
+
 
 def put(url: str, put_data: Any, headers=None) -> Response:
     """
@@ -64,49 +66,59 @@ def status_is_ok(status_code: int) -> bool:
     """
     return 200 <= status_code < 300
 
-parser = argparse.ArgumentParser(
-    description="Populate the Quizzz database with questions."
-)
-parser.add_argument(
-    "-u",
-    "--api-url",
-    help="URL of the REST API. (default: %(default)s)",
-    default="http://localhost:8080/",
-)
-parser.add_argument(
-    "-c",
-    "--count",
-    help="Number of questions to generate. (default: %(default)s)",
-    type=int,
-    default=20,
-)
-parser.add_argument(
-    "-v",
-    "--verbose",
-    help="More verbose output. (default: %(default)s)",
-    action="store_true",
-)
-args = parser.parse_args()
 
-logging.basicConfig(
-    level=logging.DEBUG if args.verbose else logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-)
-
-if args.count < 1:
-    logging.error("Count must be at least 1")
-    exit(1)
-
-for i in range(args.count):
-    if (i + 1) % 10 == 0:
-        logging.info(f"Creating question {i + 1} of {args.count}")
-    else:
-        logging.debug(f"Creating question {i + 1} of {args.count}")
-
-    resp = put(f"{args.api_url}api/question/mc", b"")
-    if not status_is_ok(resp.status_code):
-        logging.error(f"Failed to create question {i + 1}")
-        logging.error(f"Status code: {resp.status_code}")
+def main(args):
+    count_total = args.multiple_choice
+    if count_total < 1:
+        logging.error("Total count must be at least 1")
         exit(1)
 
-    logging.debug(f"Created question {i + 1} of {args.count}")
+    for i in range(args.multiple_choice):
+        if (i + 1) % 10 == 0:
+            logging.info(f"Creating MC question {i + 1} of {args.multiple_choice}")
+        else:
+            logging.debug(f"Creating MC question {i + 1} of {args.multiple_choice}")
+
+        resp = put(f"{args.api_url}api/question/mc", b"")
+        if not status_is_ok(resp.status_code):
+            logging.error(f"Failed to create MC question {i + 1}")
+            logging.error(f"Status code: {resp.status_code}")
+            logging.error(f"Response: {resp.data}")
+            exit(1)
+
+        logging.debug(f"Created MC question {i + 1} of {args.multiple_choice}")
+
+    logging.info("All questions generated")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Populate the Quizzz database with questions."
+    )
+    parser.add_argument(
+        "-u",
+        "--api-url",
+        help="URL of the REST API. (default: %(default)s)",
+        default="http://localhost:8080/",
+    )
+    parser.add_argument(
+        "-m",
+        "--multiple-choice",
+        help="Number of MC questions to generate. (default: %(default)s)",
+        type=int,
+        default=20,
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        help="More verbose output. (default: %(default)s)",
+        action="store_true",
+    )
+    args = parser.parse_args()
+
+    logging.basicConfig(
+        level=logging.DEBUG if args.verbose else logging.INFO,
+        format="[%(asctime)s] %(levelname)s - %(filename)s - %(message)s",
+    )
+
+    main(args)
