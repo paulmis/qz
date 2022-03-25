@@ -70,10 +70,20 @@ class DefiniteGameFSMTest {
     }
 
     @Test
+    void run() {
+        DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
+        fsm.run();
+
+        // Verify that the game is in the correct state
+        assertEquals(FSMState.PREPARING, fsm.getState());
+    }
+
+    @Test
     void runAcceptingAnswers() throws IOException {
         // The game is accepting answers
         game.setAcceptingAnswers(true);
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
+        fsm.setState(FSMState.PREPARING); // Simulate game already being started
         fsm.run();
 
         // Verify that the game is no longer accepting answers
@@ -87,6 +97,7 @@ class DefiniteGameFSMTest {
         // The game is not accepting answers
         game.setAcceptingAnswers(false);
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
+        fsm.setState(FSMState.PREPARING); // Simulate game already being started
         fsm.run();
 
         // Verify that the game is now accepting answers
