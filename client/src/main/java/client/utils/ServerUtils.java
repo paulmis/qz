@@ -35,6 +35,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.sse.SseEventSource;
@@ -215,7 +216,7 @@ public class ServerUtils {
 
         client = this.newClient();
         UserDTO user = new UserDTO("", email, password);
-        var invocation = client
+        Invocation invocation = client
                 .target(SERVER).path("/api/auth/login")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
@@ -261,12 +262,12 @@ public class ServerUtils {
      */
     public void createLobby(CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
                             CreateLobbyHandlerFail createLobbyHandlerFail) {
-        var config = new NormalGameConfigurationDTO(null, 60, 1, 20);
+        var config = new NormalGameConfigurationDTO(null, 60, 1, 20, 3, 2f, 100, 0, 75);
         var game = new NormalGameDTO();
         game.setId(UUID.randomUUID());
         game.setConfiguration(config);
 
-        var invocation = client
+        Invocation invocation = client
                 .target(SERVER).path("/api/lobby")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
@@ -276,7 +277,6 @@ public class ServerUtils {
 
             @Override
             public void completed(NormalGameDTO o) {
-                System.out.println(o);
                 ServerUtils.lobbyId = o.getId();
                 createLobbyHandlerSuccess.handle(o);
             }
@@ -311,7 +311,7 @@ public class ServerUtils {
      */
     public void getLobbies(GetLobbiesHandlerSuccess getLobbiesHandlerSuccess,
                             GetLobbiesHandlerFail getLobbiesHandlerFail) {
-        var invocation = client
+        Invocation invocation = client
                 .target(SERVER).path("/api/lobby/available")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
@@ -321,7 +321,6 @@ public class ServerUtils {
 
             @Override
             public void completed(List<GameDTO> o) {
-                System.out.println(o);
                 getLobbiesHandlerSuccess.handle(o);
             }
 
@@ -356,7 +355,7 @@ public class ServerUtils {
      */
     public void joinLobby(UUID lobbyId, JoinLobbyHandlerSuccess joinLobbyHandlerSuccess,
                            JoinLobbyHandlerFail joinLobbyHandlerFail) {
-        var invocation = client
+        Invocation invocation = client
                 .target(SERVER).path("/api/lobby/" + lobbyId.toString() + "/join")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
@@ -366,7 +365,6 @@ public class ServerUtils {
 
             @Override
             public void completed(GameDTO o) {
-                System.out.println(o);
                 ServerUtils.lobbyId = o.getId();
                 joinLobbyHandlerSuccess.handle(o);
             }
@@ -401,7 +399,7 @@ public class ServerUtils {
      */
     public void getMyInfo(GetUserInfoHandlerSuccess getUserInfoHandlerSuccess,
                           GetUserInfoHandlerFail getUserInfoHandlerFail) {
-        var invocation = client
+        Invocation invocation = client
                 .target(SERVER).path("/api/user")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
@@ -411,7 +409,6 @@ public class ServerUtils {
 
             @Override
             public void completed(UserDTO o) {
-                System.out.println(o);
                 getUserInfoHandlerSuccess.handle(o);
             }
 
@@ -435,11 +432,6 @@ public class ServerUtils {
      * @param sseHandler The handler of sse events, exceptions and completion.
      */
     public void subscribeToSSE(SSEHandler sseHandler) {
-        client.target(SERVER).path("/api/lobby/" + lobbyId + "/start")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .put(Entity.entity("", APPLICATION_JSON));
-
         // This creates the WebTarget that the sse event source will use.
         var target = client.target(SERVER).path("api/sse/open");
 
@@ -457,6 +449,39 @@ public class ServerUtils {
 
         // Sets the source of the events in the handler.
         sseHandler.setSseEventSource(eventSource);
+    }
+
+    /**
+     * Handler for starting a game.
+     */
+    public interface StartLobbyHandler {
+        void handle(Response response);
+    }
+
+    /**
+     * This function starts a lobby from the server.
+     *
+     * @param startLobbyHandler the handler of the response.
+     */
+    public void startLobby(StartLobbyHandler startLobbyHandler) {
+
+        Invocation invocation = client.target(SERVER).path("/api/lobby/" + lobbyId + "/start")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPut(Entity.entity("", APPLICATION_JSON));
+
+        invocation.submit(new InvocationCallback<Response>() {
+
+            @Override
+            public void completed(Response o) {
+                startLobbyHandler.handle(o);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+
+            }
+        });
     }
 
     /**

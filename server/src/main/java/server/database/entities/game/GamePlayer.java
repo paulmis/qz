@@ -50,6 +50,11 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     protected Integer streak = 0;
 
     /**
+     * The power-up points of a player which can be used to play power-ups.
+     */
+    protected Integer powerUpPoints = 0;
+
+    /**
      * The date the player joined the lobby.
      */
     @Column(columnDefinition = "TIMESTAMP")

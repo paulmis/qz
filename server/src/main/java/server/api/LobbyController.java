@@ -5,6 +5,7 @@ import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
 import server.services.LobbyService;
+import server.services.SSEManager;
 
 
 /**
@@ -40,13 +42,13 @@ import server.services.LobbyService;
 public class LobbyController {
 
     @Autowired
-    private GameRepository gameRepository;
-
-    @Autowired
     private GameService gameService;
 
     @Autowired
     private LobbyService lobbyService;
+
+    @Autowired
+    private GameRepository gameRepository;
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
@@ -56,6 +58,9 @@ public class LobbyController {
 
     @Autowired
     private GameConfigurationRepository gameConfigurationRepository;
+
+    @Autowired
+    private SSEManager sseManager;
 
     /**
      * Endpoint for the creation of new lobbies.
@@ -83,6 +88,7 @@ public class LobbyController {
             game = new NormalGame(gameDTO);
             game.setGameId(RandomStringUtils.random(6, true, true));
             game.setStatus(GameStatus.CREATED);
+            game.setAcceptingAnswers(false);
 
             // Save the configuration
             NormalGameConfiguration config =
@@ -142,7 +148,7 @@ public class LobbyController {
     @GetMapping("/{lobbyId}/config")
     ResponseEntity<GameConfigurationDTO> lobbyConfigurationInfo(
             @PathVariable UUID lobbyId) {
-        
+
         // Check if the lobby exists.
         Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
         if (lobbyOptional.isEmpty()) {
@@ -155,7 +161,7 @@ public class LobbyController {
     /**
      * Endpoint to allow a user to join a game.
      *
-     * @param lobbyId    UUID of the lobby to join.
+     * @param lobbyId UUID of the lobby to join.
      * @return true if the join was successful, false otherwise.
      */
     @PutMapping("/{lobbyId}/join")
@@ -173,7 +179,7 @@ public class LobbyController {
 
         // Check that the game hasn't started yet and add the player
         if (lobby.getStatus() != GameStatus.CREATED
-            || !lobby.add(player)) {
+                || !lobby.add(player)) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
@@ -203,12 +209,14 @@ public class LobbyController {
         }
 
         // If the game doesn't start successfully, return 409
+        // If the SSE events are not yet set-up return 425
         try {
             gameService.startGame(lobby.get());
         } catch (IllegalStateException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (IOException ex) {
+            return ResponseEntity.status(HttpStatus.TOO_EARLY).build();
         }
-
         // Otherwise, return 200
         return ResponseEntity.ok().build();
     }
@@ -216,7 +224,7 @@ public class LobbyController {
     /**
      * Endpoint to allow the host to change configuration.
      *
-     * @param lobbyId UUID of the lobby to join.
+     * @param lobbyId               UUID of the lobby to join.
      * @param gameConfigurationData The new configuration data.
      * @return An ok status if successful.
      */
@@ -278,6 +286,33 @@ public class LobbyController {
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Endpoint to delete a lobby. Only the host player can perform such action.
+     *
+     * @return 200 on success, 404 is player or lobby are not found, 401 if the player is not the lobby host
+     */
+    @DeleteMapping("/delete")
+    ResponseEntity deleteLobby() {
+        // Retrieve the logged-in user
+        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        if (user.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Find the user's lobby
+        Optional<Game> lobby =
+                gameRepository.findByPlayers_User_IdEqualsAndStatus(user.get().getId(), GameStatus.CREATED);
+        if (lobby.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!lobbyService.deleteLobby(lobby.get(), user.get())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         return ResponseEntity.ok().build();
     }
 }
