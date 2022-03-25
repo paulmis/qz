@@ -8,7 +8,7 @@
 
 <AnchorPane fx:id="topLevelAnchorPane" maxHeight="63.0" maxWidth="549.0" minHeight="63.0" minWidth="549.0" prefHeight="63.0" prefWidth="549.0" style="-fx-background-color: transparent;" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.lobby.LobbyListItemCtrl">
    <children>
-      <AnchorPane fx:id="lobbyInfoPane" layoutX="18.0" layoutY="58.0" prefHeight="75.0" prefWidth="517.0" style="-fx-background-color: lightGray; -fx-background-radius: 0 0 10 10;" visible="false" />
+      <AnchorPane fx:id="lobbyInfoPane" layoutX="18.0" layoutY="58.0" prefHeight="225.0" prefWidth="517.0" style="-fx-background-color: lightGray; -fx-background-radius: 0 0 10 10;" visible="false" />
       <AnchorPane layoutX="10.0" layoutY="8.0" prefHeight="50.0" prefWidth="531.0" style="-fx-background-color: white; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, gray, 2, 1, 0, 0);" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0">
          <children>
             <JFXButton fx:id="showLobbyInfoButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="477.0" layoutY="3.0" onAction="#showLobbyInfoButtonClick" prefHeight="44.0" prefWidth="47.0" text="Leaderboard" textFill="WHITE">

@@ -105,7 +105,7 @@ public class MCQuestion extends Question {
                 throw new IllegalArgumentException("There should be a single activity per answer.");
             }
             // Only the cost is compared because different activities might have the same cost unbeknown to the user
-            if (answer.getCost() == ans.getResponse().get(0).getCost()) {
+            if (answer.getCost() == ans.getResponse().get(0)) {
                 points.add(1.0);
             } else {
                 points.add(0.0);
@@ -117,7 +117,7 @@ public class MCQuestion extends Question {
     @Override
     public Answer getRightAnswer() {
         Answer rightAnswer = new Answer();
-        rightAnswer.setResponse(List.of(getAnswer()));
+        rightAnswer.setResponse(List.of(getAnswer().getCost()));
         return rightAnswer;
     }
     

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.AnswerDTO;
 import commons.entities.UserDTO;
 import commons.entities.game.GameStatus;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -82,7 +83,7 @@ class AnswerControllerTest {
     }
 
     @BeforeEach
-    private void init() {
+    private void init() throws IOException {
         // Setup mock question
         mockQuestion = new MCQuestion();
         mockQuestion.setActivities(List.of(
@@ -99,6 +100,7 @@ class AnswerControllerTest {
         mockLobby.setStatus(GameStatus.ONGOING);
         mockLobby.setQuestions(List.of(mockQuestion));
         mockLobby.setCurrentQuestion(0);
+        mockLobby.changeAcceptingAnswers(true);
         GameConfiguration conf = new NormalGameConfiguration();
         conf.setCapacity(1);
         mockLobby.setConfiguration(conf);
@@ -156,13 +158,27 @@ class AnswerControllerTest {
     public void userAnswerOkTest() throws Exception {
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
-        userAnswer.setResponse(List.of(mockQuestion.getActivities().get(0).getDTO()));
+        userAnswer.setResponse(List.of(mockQuestion.getActivities().get(0).getCost()));
         userAnswer.setQuestionId(mockQuestion.getId());
         this.mockMvc
                 .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userAnswer)))
                 .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void putAnswerNotAcceptingTest() throws Exception {
+        mockLobby.changeAcceptingAnswers(false);
+
+        // Request
+        AnswerDTO userAnswer = new AnswerDTO();
+        this.mockMvc
+                .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userAnswer)))
+                .andExpect(status().isConflict());
     }
 
     @Test

@@ -1,14 +1,12 @@
 package server.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static server.utils.TestHelpers.getUUID;
 
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
@@ -135,7 +133,7 @@ class SSEManagerTest {
         sseManager.register(getUUID(2), emitter2);
 
         // Send a message to the first emitter.
-        assertTrue(sseManager.send(getUUID(1), "test"));
+        assertTrue(sseManager.send(getUUID(1), new SSEMessage(SSEMessageType.INIT)));
 
         // Verify that the `send()` function was called only for the emitter with the given ID.
         verify(emitter1, times(1)).send(any());
@@ -161,7 +159,7 @@ class SSEManagerTest {
         // Get the list of targeted emitters.
         Set<UUID> uuids = Set.of(getUUID(1), getUUID(2));
         // Send the message to the targeted emitters, verify that it was successful.
-        assertTrue(sseManager.send(uuids, "test"));
+        assertTrue(sseManager.send(uuids, new SSEMessage(SSEMessageType.INIT)));
 
         // Verify that the `send()` function was called only for the targeted emitters.
         verify(emitter1, times(1)).send(any());
@@ -186,7 +184,7 @@ class SSEManagerTest {
         sseManager.register(getUUID(3), emitter3);
 
         // Send the message to all emitters.
-        sseManager.sendAll("test");
+        sseManager.sendAll(new SSEMessage(SSEMessageType.INIT));
 
         // Verify that the `send()` function was called for all emitters.
         verify(emitter1, times(1)).send(any());
@@ -202,7 +200,7 @@ class SSEManagerTest {
     @Test
     void testSendUnknown() throws IOException {
         // Function should return false.
-        assertFalse(sseManager.send(getUUID(1), "test"));
+        assertFalse(sseManager.send(getUUID(1), new SSEMessage(SSEMessageType.INIT)));
     }
 
     /**
@@ -225,7 +223,7 @@ class SSEManagerTest {
         Set<UUID> uuids = Set.of(getUUID(1), getUUID(2), getUUID(3));
 
         // Function call should return false, because we have a user without an emitter in the set.
-        assertFalse(sseManager.send(uuids, "test"));
+        assertFalse(sseManager.send(uuids, new SSEMessage(SSEMessageType.INIT)));
 
         // All users that were in the set and have emitters registered should be notified.
         verify(emitter1, times(1)).send(any());
@@ -239,6 +237,43 @@ class SSEManagerTest {
         assertEquals(1, sseManager.size());
         sseManager.register(getUUID(2), new SseEmitter());
         assertEquals(2, sseManager.size());
+    }
+
+    @Test
+    void testDisconnect() {
+        // Define the emitters.
+        SseEmitter emitter1 = Mockito.spy(new SseEmitter());
+        // Register the emitters.
+        sseManager.register(getUUID(1), emitter1);
+
+        // Disconnect all emitters.
+        sseManager.disconnect(getUUID(1));
+
+        // Verify that the `complete()` function was called for all emitters.
+        verify(emitter1, times(1)).complete();
+    }
+
+    @Test
+    void testDisconnectMultiple() {
+        // Define the emitters.
+        SseEmitter emitter1 = Mockito.spy(new SseEmitter());
+        SseEmitter emitter2 = Mockito.spy(new SseEmitter());
+        SseEmitter emitter3 = Mockito.spy(new SseEmitter());
+        // Register the emitters.
+        sseManager.register(getUUID(1), emitter1);
+        sseManager.register(getUUID(2), emitter2);
+        sseManager.register(getUUID(3), emitter3);
+
+        // UUIDs of the users to disconnect.
+        Set<UUID> uuids = Set.of(getUUID(1), getUUID(2));
+
+        // Disconnect all emitters.
+        sseManager.disconnect(uuids);
+
+        // Verify that the `complete()` function was called for all emitters.
+        verify(emitter1, times(1)).complete();
+        verify(emitter2, times(1)).complete();
+        verify(emitter3, never()).complete();
     }
 
     @Test

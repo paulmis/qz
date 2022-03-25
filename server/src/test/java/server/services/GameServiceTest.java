@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.game.GameStatus;
+import commons.entities.messages.SSEMessage;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -84,9 +85,8 @@ public class GameServiceTest {
 
         // Create the game
         game = new NormalGame();
-        game.setEmitters(sseManager);
         game.setId(getUUID(3));
-        game.setConfiguration(new NormalGameConfiguration(3, 13, 2));
+        game.setConfiguration(new NormalGameConfiguration(3, 13, 2, 2, 2f, 100, 0, 75));
         game.add(joePlayer);
         game.add(susannePlayer);
 
@@ -128,7 +128,7 @@ public class GameServiceTest {
     }
 
     @Test
-    void startNormal() {
+    void startNormal() throws IOException {
         // ToDo: fix QuestionRepository::findByIdNotIn
         // Mock the repository
         //when(questionRepository.findByIdNotIn(new ArrayList<>()))
@@ -147,6 +147,7 @@ public class GameServiceTest {
         //verify(questionRepository).findByIdNotIn(new ArrayList<>());
         verify(questionRepository).findAll();
         verifyNoMoreInteractions(questionRepository);
+        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
     }
 
     @Test
@@ -175,8 +176,6 @@ public class GameServiceTest {
 
     @Test
     void removePlayerOk() throws IOException {
-        // Mock the SSE manager
-        when(sseManager.disconnect(joe.getId())).thenReturn(true);
 
         // Set status and then call the service to remove joe
         game.setStatus(GameStatus.ONGOING);
@@ -188,15 +187,13 @@ public class GameServiceTest {
         assertEquals(GameStatus.ONGOING, game.getStatus());
 
         // Verify interactions
-        verify(sseManager, times(1)).disconnect(joe.getId());
-        verify(sseManager, times(1)).sendAll(any());
-        verifyNoMoreInteractions(game.getEmitters());
+        verify(sseManager, times(1)).unregister(joe.getId());
+        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
+        verifyNoMoreInteractions(sseManager);
     }
 
     @Test
     void removePlayerLast() throws LastPlayerRemovedException, IOException {
-        // Mock the SSE manager
-        when(sseManager.disconnect(joe.getId())).thenReturn(true);
 
         // Remove susanne and then call the service to remove joe
         game.setStatus(GameStatus.ONGOING);
@@ -210,9 +207,9 @@ public class GameServiceTest {
         assertEquals(0, game.size());
 
         // Verify interactions
-        verify(sseManager, times(1)).disconnect(joe.getId());
-        verify(sseManager, times(1)).sendAll(any());
-        verifyNoMoreInteractions(game.getEmitters());
+        verify(sseManager, times(1)).unregister(joe.getId());
+        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
+        verifyNoMoreInteractions(sseManager);
     }
 
     @Test
@@ -228,6 +225,30 @@ public class GameServiceTest {
         assertEquals(2, game.getPlayers().size());
 
         // Verify interactions
-        verifyNoMoreInteractions(game.getEmitters());
+        verifyNoMoreInteractions(sseManager);
+    }
+
+    @Test
+    void setAcceptingAnswersTrue() throws IOException {
+        game.setAcceptingAnswers(false);
+
+        gameService.setAcceptingAnswers(game, true);
+
+        assertTrue(game.isAcceptingAnswers());
+
+        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
+        verifyNoMoreInteractions(sseManager);
+    }
+
+    @Test
+    void setAcceptingAnswersFalse() throws IOException {
+        game.setAcceptingAnswers(true);
+
+        gameService.setAcceptingAnswers(game, false);
+
+        assertFalse(game.isAcceptingAnswers());
+
+        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
+        verifyNoMoreInteractions(sseManager);
     }
 }

@@ -1,7 +1,8 @@
 package server.services;
 
-import commons.SSEMessage;
 import commons.entities.game.GameStatus;
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +11,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -28,6 +32,9 @@ import server.database.repositories.question.QuestionRepository;
 public class GameService {
     @Autowired
     private QuestionRepository questionRepository;
+
+    @Autowired
+    private SSEManager sseManager;
 
     /**
      * Provides the specified amount of questions, excluding the specified questions.
@@ -74,7 +81,7 @@ public class GameService {
      */
     @Transactional
     public void startGame(Game game)
-            throws UnsupportedOperationException, IllegalStateException {
+            throws UnsupportedOperationException, IllegalStateException, IOException {
         // Make sure that the lobby is full and not started
         if (game.getStatus() != GameStatus.CREATED || !game.isFull()) {
             throw new IllegalStateException();
@@ -84,6 +91,7 @@ public class GameService {
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
+            sseManager.send(definiteGame.getPlayers().keySet(), new SSEMessage(SSEMessageType.GAME_START));
         } else {
             throw new UnsupportedOperationException("Starting games other than definite games is not yet supported.");
         }
@@ -112,15 +120,31 @@ public class GameService {
         }
 
         // Disconnect the player and update clients
-        game.getEmitters().disconnect(user.getId());
+        sseManager.unregister(user.getId());
         try {
-            game.getEmitters().sendAll(
-                    SseEmitter.event()
-                        .name(SSEMessage.PlayerLeft.toString())
-                        .data(user.getId()));
+            sseManager.send(game.getPlayers().keySet(), new SSEMessage(SSEMessageType.PLAYER_LEFT, user.getId()));
         } catch (IOException ex) {
             // Log failure to update clients
             log.error("Unable to send removePlayer message to all players", ex);
         }
+    }
+
+
+    /**
+     * Sets the accepting answers boolean to true inside the game and notifies
+     * every user that this change has happened.
+     *
+     * @param game The game object that the action is performed on.
+     * @param acceptingAnswers The requested boolean.
+     * @throws IOException if an sse connection send failed.
+     */
+    @Transactional
+    public void setAcceptingAnswers(Game game, boolean acceptingAnswers) throws IOException {
+        game.setAcceptingAnswers(acceptingAnswers);
+
+        sseManager.send(game.getPlayers().keySet(), new SSEMessage(
+                acceptingAnswers
+                        ? SSEMessageType.START_QUESTION
+                        : SSEMessageType.STOP_QUESTION));
     }
 }

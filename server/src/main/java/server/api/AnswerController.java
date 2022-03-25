@@ -1,11 +1,8 @@
 package server.api;
 
-import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +17,6 @@ import server.database.entities.User;
 import server.database.entities.answer.Answer;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
-import server.database.entities.question.Activity;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
@@ -57,7 +53,6 @@ public class AnswerController {
     public ResponseEntity userAnswer(
             @RequestBody AnswerDTO answerData,
             @PathVariable UUID gameId) {
-
         // Retrieve game and user
         Optional<Game> gameOpt = gameRepository.findById(gameId);
         Optional<User> userOpt = userRepository.findByEmail(AuthContext.get());
@@ -74,6 +69,11 @@ public class AnswerController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
+        // Check if the game is accepting answers.
+        if (!game.isAcceptingAnswers()) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
         // Check if question is correct
         Optional<Question> currentQuestion = game.getQuestion();
         if (currentQuestion.isEmpty()) {
@@ -85,29 +85,7 @@ public class AnswerController {
         }
 
         // Update the answer
-        Answer userAnswer = new Answer();
-        // Make sure that the activities referenced in the answer are the same of the repository
-        // This is to ensure that no new activities are created when answering a question
-        userAnswer.setResponse(answerData.getResponse().stream()
-                .map(new Function<ActivityDTO, Optional<Activity>>() {
-                    @Override
-                    public Optional<Activity> apply(ActivityDTO dto) {
-                        Optional<Activity> activity = Optional.empty();
-                        if (dto.getId() != null) {
-                            // Get activity by id
-                            activity = activityRepository.findById(dto.getId());
-                        }
-                        if (activity.isPresent()) {
-                            return activity;
-                        } else {
-                            // Get activity by description and cost if the id wasn't enough
-                            return activityRepository
-                                    .findByDescriptionAndCost(dto.getDescription(), dto.getCost());
-                        }
-                    }
-                }).filter(Optional::isPresent) // exclude activities not found
-                .map(Optional::get)
-                .collect(Collectors.toList()));
+        Answer userAnswer = new Answer(answerData);
         if (game.addAnswer(userAnswer, user.getId())) {
             // Save updated game
             gameRepository.save(game);

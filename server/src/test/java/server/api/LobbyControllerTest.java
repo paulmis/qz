@@ -1,12 +1,7 @@
 package server.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalToObject;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,7 +38,6 @@ import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameConfigurationRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
-import server.database.repositories.question.QuestionRepository;
 import server.services.GameService;
 import server.services.LobbyService;
 
@@ -68,9 +62,6 @@ class LobbyControllerTest {
 
     @MockBean
     private UserRepository userRepository;
-
-    @MockBean
-    private QuestionRepository questionRepository;
 
     @MockBean
     private LobbyService lobbyService;
@@ -112,15 +103,19 @@ class LobbyControllerTest {
         mockLobby = new NormalGame();
         mockLobby.setId(getUUID(3));
         mockLobby.setStatus(GameStatus.CREATED);
-        mockLobbyConfiguration = new NormalGameConfiguration(10, 10, 2);
+        mockLobbyConfiguration = new NormalGameConfiguration(10, 10, 2, 2, 2f, 100, 0, 75);
         mockLobby.setConfiguration(mockLobbyConfiguration);
-        normalGameConfiguration = new NormalGameConfiguration(4, 8, 6);
+        normalGameConfiguration = new NormalGameConfiguration(4, 8, 6, 2, 2f, 100, 0, 75);
 
         // Add players
         johnPlayer = new GamePlayer(john);
-        susannePlayer = new GamePlayer(susanne);
         mockLobby.add(johnPlayer);
+        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(john.getId(), GameStatus.CREATED))
+                .thenReturn(Optional.of(mockLobby));
+        susannePlayer = new GamePlayer(susanne);
         mockLobby.add(susannePlayer);
+        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(susanne.getId(), GameStatus.CREATED))
+                .thenReturn(Optional.of(mockLobby));
 
         // Mock the lobby
         when(gameRepository.findById(mockLobby.getId())).thenReturn(Optional.of(mockLobby));
@@ -132,8 +127,6 @@ class LobbyControllerTest {
                         john.getEmail(),
                         john.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
-        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(john.getId(), GameStatus.CREATED))
-                .thenReturn(Optional.of(mockLobby));
     }
 
     @Test
@@ -308,7 +301,6 @@ class LobbyControllerTest {
     @Test
     public void configPostLobbyNotCreatedTest() throws Exception {
         mockLobby.setStatus(GameStatus.ONGOING);
-        mockLobby.setHost(johnPlayer);
 
         // Request
         this.mockMvc
@@ -459,6 +451,75 @@ class LobbyControllerTest {
         // Request
         this.mockMvc
                 .perform(delete("/api/lobby/leave"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteOk() throws Exception {
+        // Mock the service
+        when(lobbyService.deleteLobby(mockLobby, john)).thenReturn(true);
+
+        // Request
+        this.mockMvc
+                .perform(delete("/api/lobby/delete"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteNotHost() throws Exception {
+        // Set the context user
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        susanne.getEmail(),
+                        susanne.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+
+        // Mock the service
+        when(lobbyService.deleteLobby(mockLobby, susanne)).thenReturn(false);
+
+        // Request
+        this.mockMvc
+                .perform(delete("/api/lobby/delete"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void deleteNoUser() throws Exception {
+        // Set non-existent user
+        User bobby = new User("Bobby", "bobby@solo.com", "stinkywhiskey");
+        bobby.setId(getUUID(3));
+        when(userRepository.findById(bobby.getId())).thenReturn(Optional.of(bobby));
+        when(userRepository.findByEmail(bobby.getEmail())).thenReturn(Optional.empty());
+
+        // Set the context user
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        bobby.getEmail(),
+                        bobby.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(bobby.getId(), GameStatus.CREATED))
+                .thenReturn(Optional.of(mockLobby));
+
+        // Request
+        this.mockMvc
+                .perform(delete("/api/lobby/delete"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteNoGame() throws Exception {
+        // Set the context user
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        sally.getEmail(),
+                        sally.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(sally.getId(), GameStatus.CREATED))
+                .thenReturn(Optional.empty());
+
+        // Request
+        this.mockMvc
+                .perform(delete("/api/lobby/delete"))
                 .andExpect(status().isNotFound());
     }
 }

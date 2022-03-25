@@ -10,7 +10,7 @@ import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
-import commons.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.MalformedURLException;
@@ -113,10 +113,9 @@ public class GameScreenCtrl implements Initializable {
      * This function resets the game screen ctrl.
      * It handles all the required set-up that needs to be done for a game to start.
      */
-    public void reset() {
-        // this starts the sse connection
-        sseHandler = new SSEHandler(this);
-        server.subscribeToSSE(sseHandler);
+    public void reset(SSEHandler sseHandler) {
+        this.sseHandler = sseHandler;
+        sseHandler.initialize(this);
     }
 
     /**
@@ -363,7 +362,7 @@ public class GameScreenCtrl implements Initializable {
     /**
      * Example of a sse event handler.
      */
-    @SSEEventHandler(SSEMessage.PlayerLeft)
+    @SSEEventHandler(SSEMessageType.PLAYER_LEFT)
     public void playerLeft(String playerId) {
 
     }

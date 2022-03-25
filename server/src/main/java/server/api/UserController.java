@@ -15,7 +15,7 @@ import server.database.repositories.UserRepository;
  * Controller that provides user metadata.
  */
 @RestController
-@RequestMapping("api/user")
+@RequestMapping("/api/user")
 public class UserController {
     @Autowired
     UserRepository userRepository;

@@ -1,7 +1,10 @@
 package server.database.entities.game.configuration;
 
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -33,8 +36,9 @@ public class NormalGameConfiguration extends GameConfiguration {
      * @param numQuestions number of questions in the game
      * @param answerTime time in seconds for answering a question
      */
-    public NormalGameConfiguration(int numQuestions, int answerTime, int capacity) {
-        super(answerTime, capacity);
+    public NormalGameConfiguration(int numQuestions, int answerTime, int capacity, int streakSize, float multiplier,
+                                   int pointsCorrect, int pointsWrong, int correctAnswerThreshold) {
+        super(answerTime, capacity, streakSize, multiplier, pointsCorrect, pointsWrong, correctAnswerThreshold);
         this.numQuestions = numQuestions;
     }
 
