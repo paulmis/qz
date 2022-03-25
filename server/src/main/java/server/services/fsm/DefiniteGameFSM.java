@@ -6,6 +6,7 @@ import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
+import java.util.function.Function;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
@@ -47,20 +48,17 @@ public class DefiniteGameFSM extends GameFSM {
         }
     }
 
-    void runAnswer() throws IOException {
+    void runLeaderboard() throws IOException {
         if (!isRunning()) {
             return;
         }
 
-        int delay = getGame().getCurrentQuestion() % 5 == 4 ? 10000 : 5000;
+        int delay = 5000;
 
-        getContext().getGameService().setAcceptingAnswers(getGame(),
-                false,
-                delay);
-        log.trace("[{}] FSM runnable: accepting answers disabled.", getGame().getId());
+        log.trace("[{}] FSM runnable: leaderboard.", getGame().getId());
+        getContext().getSseManager().send(getGame().getPlayerIds(),
+            new SSEMessage(SSEMessageType.SHOW_LEADERBOARD, delay));
 
-        // Calculate when to run the next question.
-        // Show leaderboard on every 5th question.
         Date executionTime = DateUtils.addMilliseconds(new Date(), delay);
         setFuture(new FSMFuture(Optional.of(getContext().getTaskScheduler().schedule(() -> {
             try {
@@ -71,6 +69,44 @@ public class DefiniteGameFSM extends GameFSM {
             }
         }, executionTime)),
                 executionTime));
+    }
+
+    void runAnswer() throws IOException {
+        if (!isRunning()) {
+            return;
+        }
+
+        int delay = 5000;
+
+        getContext().getGameService().setAcceptingAnswers(getGame(),
+                false,
+                delay);
+        log.trace("[{}] FSM runnable: accepting answers disabled.", getGame().getId());
+
+        // Calculate when to run the next question.
+        Date executionTime = DateUtils.addMilliseconds(new Date(), delay);
+        // Show leaderboard on every 5th question.
+        if (getGame().getCurrentQuestion() % 5 == 4) {
+            setFuture(new FSMFuture(Optional.of(getContext().getTaskScheduler().schedule(() -> {
+                try {
+                    runLeaderboard();
+                } catch (IOException e) {
+                    log.error("[{}] FSM runnable: error in leaderboard stage.", getGame().getId(), e);
+                    e.printStackTrace();
+                }
+            }, executionTime)),
+                    executionTime));
+        } else {
+            setFuture(new FSMFuture(Optional.of(getContext().getTaskScheduler().schedule(() -> {
+                try {
+                    runQuestion();
+                } catch (IOException e) {
+                    log.error("[{}] FSM runnable: error in question stage.", getGame().getId(), e);
+                    e.printStackTrace();
+                }
+            }, executionTime)),
+                    executionTime));
+        }
     }
 
     void runQuestion() throws IOException {
