@@ -26,12 +26,13 @@ public class LobbyScreenCtrl {
 
     private String name = "Ligma's Lobby";
 
+    @FXML private JFXButton disbandButton;
     @FXML private JFXButton settingsButton;
     @FXML private JFXButton userButton;
     @FXML private JFXButton copyLinkButton;
     @FXML private JFXButton startButton;
     @FXML private JFXButton lobbySettingsButton;
-    @FXML private JFXButton disbandButton;
+    @FXML private JFXButton leaveButton;
 
     /**
      * Initialize a new controller using dependency injection.
