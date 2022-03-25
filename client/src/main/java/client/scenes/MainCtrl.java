@@ -338,7 +338,8 @@ public class MainCtrl {
      * @param leaveHandler the action that is to be performed when the user leaves the lobby.
      * @param cancelHandler the action that is to be performed when the user cancels leaving the lobby.
      */
-    public void openLobbyLeaveWarning(LobbyLeaveScreenCtrl.LeaveHandler leaveHandler, LobbyLeaveScreenCtrl.CancelHandler cancelHandler) {
+    public void openLobbyLeaveWarning(LobbyLeaveScreenCtrl.LeaveHandler leaveHandler,
+                                      LobbyLeaveScreenCtrl.CancelHandler cancelHandler) {
         lobbyLeavePopUp.setOnShown(e -> {
             lobbyLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - lobbyLeavePopUp.getWidth() / 2);
@@ -368,7 +369,8 @@ public class MainCtrl {
      * @param leaveHandler the action that is to be performed when the user leaves the game.
      * @param cancelHandler the action that is to be performed when the user cancels leaving the lobby.
      */
-    public void openGameLeaveWarning(GameLeaveScreenCtrl.LeaveHandler leaveHandler, GameLeaveScreenCtrl.CancelHandler cancelHandler) {
+    public void openGameLeaveWarning(GameLeaveScreenCtrl.LeaveHandler leaveHandler,
+                                     GameLeaveScreenCtrl.CancelHandler cancelHandler) {
         gameLeavePopUp.setOnShown(e -> {
             gameLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - gameLeavePopUp.getWidth() / 2);
