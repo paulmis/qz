@@ -55,6 +55,23 @@ public abstract class GameFSM {
     }
 
     /**
+     * Stop the finite state machine.
+     */
+    public void stop() {
+        log.debug("[{}] Stopping FSM", game.getId());
+        setRunning(false);
+    }
+
+    /**
+     * Check whether the FSM can be started.
+     *
+     * @return Whether the FSM can be started or not.
+     */
+    public boolean isStartable() {
+        return state == FSMState.IDLE;
+    }
+
+    /**
      * Run the finite state machine.
      */
     public abstract void run();
