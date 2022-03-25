@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.database.entities.User;
@@ -33,6 +34,9 @@ public class GameService {
 
     @Autowired
     private FSMManager fsmManager;
+
+    @Autowired
+    private ThreadPoolTaskScheduler taskScheduler;
 
     /**
      * Provides the specified amount of questions, excluding the specified questions.
@@ -91,7 +95,9 @@ public class GameService {
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
             sseManager.send(definiteGame.getPlayerIds(), new SSEMessage(SSEMessageType.GAME_START));
 
-            fsmManager.addFSM(definiteGame, new DefiniteGameFSM(definiteGame, new FSMContext(sseManager, this)));
+            fsmManager.addFSM(definiteGame,
+                    new DefiniteGameFSM(definiteGame,
+                            new FSMContext(sseManager, this, taskScheduler)));
             fsmManager.startFSM(definiteGame);
         } else {
             throw new UnsupportedOperationException("Starting games other than definite games is not yet supported.");
