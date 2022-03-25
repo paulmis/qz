@@ -58,3 +58,7 @@
 #registerMessage{
     -fx-text-fill: #1ed410;
 }
+
+#backButton{
+    -fx-background-color: #6EB26C;
+}

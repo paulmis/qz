@@ -47,6 +47,11 @@
                      </image>
                   </ImageView>
                   <Label fx:id="uploadImage" layoutX="83.0" layoutY="252.0" onMouseClicked="#uploadPicture" text="Upload an Image" />
+                  <JFXButton fx:id="backButton" layoutX="25.0" layoutY="530.0" onMouseClicked="#reset" text="Back">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </JFXButton>
                </children>
             </Pane>
          </right>
