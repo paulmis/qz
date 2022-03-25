@@ -162,6 +162,8 @@ public class LobbyScreenCtrl implements SSESource {
                     });
                 }
             });
+        }, () -> {
+            mainCtrl.closeLobbyLeaveWarning();
         });
     }
 
