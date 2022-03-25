@@ -9,13 +9,11 @@ import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
-import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
 import javafx.fxml.FXML;
+import javax.ws.rs.core.Response;
 import lombok.Generated;
 import lombok.Getter;
-
-import javax.ws.rs.core.Response;
 
 /**
  * Lobby controller.
@@ -100,11 +98,11 @@ public class LobbyScreenCtrl {
                                 System.out.println("Host successfully disbanded the lobby");
                                 mainCtrl.showLobbyListScreen();
                                 break;
+                            case 401:
+                                System.out.println("Player isn't the host");
+                                break;
                             case 404:
                                 System.out.println("User/Game not found");
-                                break;
-                            case 409:
-                                System.out.println("Couldn't remove player");
                                 break;
                             default:
                                 break;

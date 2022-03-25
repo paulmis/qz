@@ -370,18 +370,18 @@ public class ServerUtils {
     }
 
     /**
-     * Handler for when the disband lobby succeeds.
+     * Handler for when a disband lobby succeeds.
      */
     public interface DisbandLobbyHandler {
         void handle(Response response);
     }
 
     /**
-     * Function that causes the user to leave the lobby.
+     * Function that causes the host to delete the lobby.
      */
     public void disbandLobby(DisbandLobbyHandler disbandLobbyHandler) {
         var request = client
-                .target(SERVER).path("/api/lobby/leave")
+                .target(SERVER).path("/api/lobby/delete")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .buildDelete();
