@@ -110,6 +110,8 @@ public class LobbyScreenCtrl {
                     });
                 }
             });
+        }, () -> {
+            mainCtrl.closeLobbyDisbandWarning();
         });
     }
 

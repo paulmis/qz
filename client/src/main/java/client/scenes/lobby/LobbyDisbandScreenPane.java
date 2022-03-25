@@ -36,12 +36,9 @@ public class LobbyDisbandScreenPane extends StackPane {
      * This constructor sets up the lobby disband pane.
      *
      * @param disbandHandler the action that is to be performed on a disband.
+     * @param cancelHandler the action that is to be performed on a cancel.
      */
-    public LobbyDisbandScreenPane(LobbyDisbandScreenCtrl.DisbandHandler disbandHandler) {
-        setUpScreen(new LobbyDisbandScreenCtrl(disbandHandler));
-    }
-
-    public void makeTranslucent() {
-        this.controller.makeTranslucent();
+    public LobbyDisbandScreenPane(LobbyDisbandScreenCtrl.DisbandHandler disbandHandler, LobbyDisbandScreenCtrl.CancelHandler cancelHandler) {
+        setUpScreen(new LobbyDisbandScreenCtrl(disbandHandler, cancelHandler));
     }
 }

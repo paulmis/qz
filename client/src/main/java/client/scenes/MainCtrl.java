@@ -332,9 +332,10 @@ public class MainCtrl {
      * This function opens a popup with
      * a disband warning for disbanding the lobby.
      *
-     * @param disbandHandler the action that is to be performed when the user disbands the lobby.
+     * @param disbandHandler the action that is to be performed when the host disbands the lobby.
+     * @param cancelHandler the action that is to be performed when the host cancels disbanding the lobby.
      */
-    public void openLobbyDisbandWarning(LobbyDisbandScreenCtrl.DisbandHandler disbandHandler) {
+    public void openLobbyDisbandWarning(LobbyDisbandScreenCtrl.DisbandHandler disbandHandler, LobbyDisbandScreenCtrl.CancelHandler cancelHandler) {
         lobbyDisbandPopUp.setOnShown(e -> {
             lobbyDisbandPopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - lobbyDisbandPopUp.getWidth() / 2);
@@ -343,7 +344,7 @@ public class MainCtrl {
                     - lobbyDisbandPopUp.getHeight() / 2);
         });
 
-        var disbandPane = new LobbyDisbandScreenPane(disbandHandler);
+        var disbandPane = new LobbyDisbandScreenPane(disbandHandler, cancelHandler);
         lobbyDisbandPopUp.getContent().add(disbandPane);
 
         lobbyDisbandPopUp.show(primaryStage);
@@ -354,6 +355,7 @@ public class MainCtrl {
      */
     public void closeLobbyDisbandWarning() {
         lobbyDisbandPopUp.hide();
+        lobbyDisbandPopUp.getContent().clear();
     }
 
     /**
