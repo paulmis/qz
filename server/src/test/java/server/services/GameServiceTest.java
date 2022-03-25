@@ -8,6 +8,7 @@ import static server.utils.TestHelpers.getUUID;
 import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import server.database.entities.User;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.NormalGame;
@@ -37,6 +39,12 @@ public class GameServiceTest {
 
     @Mock
     private QuestionRepository questionRepository;
+
+    @Mock
+    private FSMManager fsmManager;
+
+    @Mock
+    private ThreadPoolTaskScheduler taskScheduler;
 
     @InjectMocks
     private GameService gameService;
@@ -86,7 +94,7 @@ public class GameServiceTest {
         // Create the game
         game = new NormalGame();
         game.setId(getUUID(3));
-        game.setConfiguration(new NormalGameConfiguration(3, 13, 2, 2, 2f, 100, 0, 75));
+        game.setConfiguration(new NormalGameConfiguration(3, Duration.ofSeconds(13), 2, 2, 2f, 100, 0, 75));
         game.add(joePlayer);
         game.add(susannePlayer);
 
@@ -245,6 +253,30 @@ public class GameServiceTest {
         game.setAcceptingAnswers(true);
 
         gameService.setAcceptingAnswers(game, false);
+
+        assertFalse(game.isAcceptingAnswers());
+
+        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
+        verifyNoMoreInteractions(sseManager);
+    }
+
+    @Test
+    void setAcceptingAnswersDelayTrue() throws IOException {
+        game.setAcceptingAnswers(false);
+
+        gameService.setAcceptingAnswers(game, true, 1000L);
+
+        assertTrue(game.isAcceptingAnswers());
+
+        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
+        verifyNoMoreInteractions(sseManager);
+    }
+
+    @Test
+    void setAcceptingAnswersDelayFalse() throws IOException {
+        game.setAcceptingAnswers(true);
+
+        gameService.setAcceptingAnswers(game, false, 1000L);
 
         assertFalse(game.isAcceptingAnswers());
 

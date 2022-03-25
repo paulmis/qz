@@ -11,7 +11,11 @@ import static server.utils.TestHelpers.getUUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.game.GameStatus;
-import java.util.*;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +99,7 @@ public class GameControllerTest {
         game = new NormalGame();
         game.setId(getUUID(3));
         game.setStatus(GameStatus.ONGOING);
-        gameConfiguration = new NormalGameConfiguration(10, 10, 2, 2, 2f, 100, 0, 75);
+        gameConfiguration = new NormalGameConfiguration(10, Duration.ofSeconds(10), 2, 2, 2f, 100, 0, 75);
         game.setConfiguration(gameConfiguration);
         when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
 
