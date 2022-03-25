@@ -46,7 +46,7 @@ public class UserControllerTests {
     /**
      * Initializes the test suite.
      *
-     * @param mockMvc the auto-configured mock mvc
+     * @param mockMvc the autoconfigured mock mvc
      */
     @Autowired
     public UserControllerTests(MockMvc mockMvc) {

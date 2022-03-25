@@ -17,21 +17,33 @@
 package server;
 
 import lombok.Generated;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.servlet.HandlerExceptionResolver;
+import server.configuration.FileStorageConfiguration;
+import server.services.storage.StorageService;
 
 /**
  * Main Spring Boot application class.
  */
+@Generated
 @SpringBootApplication
 @EntityScan(basePackages = { "commons", "server" })
-@Generated
+@EnableConfigurationProperties(FileStorageConfiguration.class)
 public class Main {
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
+    }
+
+    @Bean
+    CommandLineRunner init(StorageService storageService) {
+        return args -> {
+            storageService.deleteAll();
+            storageService.init();
+        };
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package server;
+package server.configuration;
 
 import java.util.Random;
 import lombok.Generated;
