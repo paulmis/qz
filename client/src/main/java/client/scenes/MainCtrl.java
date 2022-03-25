@@ -328,8 +328,9 @@ public class MainCtrl {
      * a leave warning for leaving the lobby.
      *
      * @param leaveHandler the action that is to be performed when the user leaves the lobby.
+     * @param cancelHandler the action that is to be performed when the user cancels leaving the lobby.
      */
-    public void openLobbyLeaveWarning(LobbyLeaveScreenCtrl.LeaveHandler leaveHandler) {
+    public void openLobbyLeaveWarning(LobbyLeaveScreenCtrl.LeaveHandler leaveHandler, LobbyLeaveScreenCtrl.CancelHandler cancelHandler) {
         lobbyLeavePopUp.setOnShown(e -> {
             lobbyLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - lobbyLeavePopUp.getWidth() / 2);
@@ -338,7 +339,7 @@ public class MainCtrl {
                     - lobbyLeavePopUp.getHeight() / 2);
         });
 
-        var disbandPane = new LobbyLeaveScreenPane(leaveHandler);
+        var disbandPane = new LobbyLeaveScreenPane(leaveHandler, cancelHandler);
         lobbyLeavePopUp.getContent().add(disbandPane);
 
         lobbyLeavePopUp.show(primaryStage);
@@ -349,6 +350,7 @@ public class MainCtrl {
      */
     public void closeLobbyLeaveWarning() {
         lobbyLeavePopUp.hide();
+        lobbyLeavePopUp.getContent().clear();
     }
 
     /**
@@ -356,8 +358,9 @@ public class MainCtrl {
      * a leave warning for leaving the game.
      *
      * @param leaveHandler the action that is to be performed when the user leaves the game.
+     * @param cancelHandler the action that is to be performed when the user cancels leaving the lobby.
      */
-    public void openGameLeaveWarning(GameLeaveScreenCtrl.LeaveHandler leaveHandler) {
+    public void openGameLeaveWarning(GameLeaveScreenCtrl.LeaveHandler leaveHandler, GameLeaveScreenCtrl.CancelHandler cancelHandler) {
         gameLeavePopUp.setOnShown(e -> {
             gameLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - gameLeavePopUp.getWidth() / 2);
@@ -366,7 +369,7 @@ public class MainCtrl {
                     - gameLeavePopUp.getHeight() / 2);
         });
 
-        var disbandPane = new GameLeaveScreenPane(leaveHandler);
+        var disbandPane = new GameLeaveScreenPane(leaveHandler, cancelHandler);
         gameLeavePopUp.getContent().add(disbandPane);
 
         gameLeavePopUp.show(primaryStage);
@@ -377,6 +380,7 @@ public class MainCtrl {
      */
     public void closeGameLeaveWarning() {
         gameLeavePopUp.hide();
+        gameLeavePopUp.getContent().clear();
     }
 
     /**

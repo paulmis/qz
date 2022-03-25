@@ -36,12 +36,9 @@ public class LobbyLeaveScreenPane extends StackPane {
      * This constructor sets up the lobby leave pane.
      *
      * @param leaveHandler the action that is to be performed on a leave.
+     * @param cancelHandler the action that is to be performed on a cancel.
      */
-    public LobbyLeaveScreenPane(LobbyLeaveScreenCtrl.LeaveHandler leaveHandler) {
-        setUpScreen(new LobbyLeaveScreenCtrl(leaveHandler));
-    }
-
-    public void makeTranslucent() {
-        this.controller.makeTranslucent();
+    public LobbyLeaveScreenPane(LobbyLeaveScreenCtrl.LeaveHandler leaveHandler, LobbyLeaveScreenCtrl.CancelHandler cancelHandler) {
+        setUpScreen(new LobbyLeaveScreenCtrl(leaveHandler, cancelHandler));
     }
 }
