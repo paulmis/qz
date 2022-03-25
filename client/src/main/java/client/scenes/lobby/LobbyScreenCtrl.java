@@ -52,7 +52,7 @@ public class LobbyScreenCtrl {
             // Success
             () -> runLater(() -> {
                 ClientState.game.setStatus(GameStatus.ONGOING);
-                this.mainCtrl.showGameScreen();
+                this.mainCtrl.showGameScreen(null);
             }),
             // Failure
             () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to start game.")));

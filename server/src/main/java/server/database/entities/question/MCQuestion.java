@@ -1,5 +1,6 @@
 package server.database.entities.question;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import commons.entities.questions.MCQuestionDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import server.database.entities.answer.Answer;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 public class MCQuestion extends Question {
 
     /**
@@ -123,7 +125,7 @@ public class MCQuestion extends Question {
     }
     
     @Override
-    public QuestionDTO getDTO() {
-        return new ModelMapper().map(this, QuestionDTO.class);
+    public MCQuestionDTO getDTO() {
+        return new MCQuestionDTO(super.toDTO(), guessConsumption);
     }
 }

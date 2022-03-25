@@ -85,6 +85,7 @@ public class GameService {
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
+            definiteGame.setCurrentQuestionNumber(0);
         } else {
             throw new UnsupportedOperationException("Starting games other than definite games is not yet supported.");
         }

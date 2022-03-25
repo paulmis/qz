@@ -99,7 +99,7 @@ class AnswerControllerTest {
         mockLobby.setId(getUUID(0));
         mockLobby.setStatus(GameStatus.ONGOING);
         mockLobby.setQuestions(List.of(mockQuestion));
-        mockLobby.setCurrentQuestion(0);
+        mockLobby.setCurrentQuestionNumber(0);
         mockLobby.setAcceptingAnswers(true);
         GameConfiguration conf = new NormalGameConfiguration();
         conf.setCapacity(1);
@@ -234,7 +234,7 @@ class AnswerControllerTest {
                 getActivity(40)));
         ((MCQuestion) secondQuestion).setAnswer(secondQuestion.getActivities().get(0));
         mockLobby.setQuestions(List.of(mockQuestion, secondQuestion));
-        mockLobby.setCurrentQuestion(0);
+        mockLobby.setCurrentQuestionNumber(0);
 
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId(), Optional.of(1))))
@@ -260,7 +260,7 @@ class AnswerControllerTest {
 
     @Test
     public void getCorrectAnswerNoQuestionTest() throws Exception {
-        mockLobby.setCurrentQuestion(1);
+        mockLobby.setCurrentQuestionNumber(1);
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId())))
                 .andExpect(status().isBadRequest());
@@ -302,7 +302,7 @@ class AnswerControllerTest {
 
     @Test
     public void getScoreNoQuestionTest() throws Exception {
-        mockLobby.setCurrentQuestion(1);
+        mockLobby.setCurrentQuestionNumber(1);
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(scoreEndpoint(mockLobby.getId())))
                 .andExpect(status().isBadRequest());

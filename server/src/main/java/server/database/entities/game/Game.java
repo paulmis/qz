@@ -70,7 +70,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Current question number.
      */
-    protected int currentQuestion = 0;
+    @Column(nullable = true)
+    protected Integer currentQuestionNumber = null;
 
     /**
      * Seed used to generate the random numbers.
@@ -145,7 +146,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
             this.configuration = mapper.map(dto.getConfiguration(), NormalGameConfiguration.class);
         }
         this.status = dto.getStatus();
-        this.currentQuestion = dto.getCurrentQuestion();
+        this.currentQuestionNumber = dto.getCurrentQuestionNumber();
         this.gameType = dto.getGameType();
     }
 
@@ -261,8 +262,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public Optional<Question> getQuestion() {
         try {
-            return Optional.of(this.questions.get(this.currentQuestion));
-        } catch (IndexOutOfBoundsException e) {
+            return Optional.of(this.questions.get(this.currentQuestionNumber));
+        } catch (IndexOutOfBoundsException | NullPointerException e) {
             return Optional.empty();
         }
     }
@@ -363,7 +364,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
                 this.gameType,
                 this.configuration.getDTO(),
                 this.status,
-                this.currentQuestion,
+                this.currentQuestionNumber,
+                this.getQuestion().isPresent() ? this.getQuestion().get().getDTO() : null,
                 this.players.values().stream().map(GamePlayer::getDTO).collect(Collectors.toSet()),
                 this.host == null ? null : this.host.getId());
     }

@@ -26,9 +26,12 @@ import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
+import client.utils.ClientState;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbarLayout;
+import commons.entities.GameStage;
 import commons.entities.game.configuration.GameConfigurationDTO;
+import commons.entities.questions.QuestionDTO;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -266,9 +269,10 @@ public class MainCtrl {
     /**
      * This function displays the game screen.
      */
-    public void showGameScreen() {
+    public void showGameScreen(QuestionDTO question) {
         this.showScreenLetterBox(gameScreen, StageScalingStrategy.Letterbox);
         gameScreenCtrl.reset();
+        gameScreenCtrl.setQuestion(question);
     }
 
     /**
@@ -497,6 +501,21 @@ public class MainCtrl {
                 default:
                     break;
             }
+        }
+    }
+
+    /**
+     * Initializes the game scene based on the current stage of the game.
+     */
+    void joinGame() {
+        switch (ClientState.gameStage) {
+            case QUESTION:
+                showGameScreen(null);
+                break;
+            case ANSWER:
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 }

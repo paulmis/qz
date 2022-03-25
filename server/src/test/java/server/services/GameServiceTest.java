@@ -141,6 +141,7 @@ public class GameServiceTest {
         // Check that the questions have been generated and the status was changed
         assertEquals(3, game.getQuestions().size());
         assertEquals(GameStatus.ONGOING, game.getStatus());
+        assertEquals(0, game.getCurrentQuestionNumber());
 
         // Verify interactions
         verify(questionRepository).count();
@@ -181,9 +182,7 @@ public class GameServiceTest {
 
         // Set status and then call the service to remove joe
         game.setStatus(GameStatus.ONGOING);
-        assertDoesNotThrow(() -> {
-            gameService.removePlayer(game, joe);
-        });
+        assertDoesNotThrow(() -> gameService.removePlayer(game, joe));
 
         // Verify that the status hasn't changed
         assertEquals(GameStatus.ONGOING, game.getStatus());
@@ -202,9 +201,7 @@ public class GameServiceTest {
         // Remove susanne and then call the service to remove joe
         game.setStatus(GameStatus.ONGOING);
         game.remove(susanne.getId());
-        assertDoesNotThrow(() -> {
-            gameService.removePlayer(game, joe);
-        });
+        assertDoesNotThrow(() -> gameService.removePlayer(game, joe));
 
         // Verify that the status changed
         assertEquals(GameStatus.FINISHED, game.getStatus());
@@ -220,9 +217,7 @@ public class GameServiceTest {
     void removePlayerNotFound() {
         // Remove a player that is not in the game
         game.setStatus(GameStatus.ONGOING);
-        assertThrows(IllegalStateException.class, () -> {
-            gameService.removePlayer(game, james);
-        });
+        assertThrows(IllegalStateException.class, () -> gameService.removePlayer(game, james));
 
         // Verify that the status hasn't changed
         assertEquals(GameStatus.ONGOING, game.getStatus());
