@@ -125,7 +125,7 @@ class FSMManagerTest {
         // Verify that it's running
         assertTrue(fsm.isRunning());
         // Try to start it again
-        assertThrows(IllegalStateException.class, () -> fsmManager.startFSM(game));
+        assertFalse(fsmManager.startFSM(game));
         // Verify that it's still running
         assertTrue(fsm.isRunning());
     }
