@@ -68,7 +68,7 @@ class FSMManagerTest {
     }
 
     @Test
-    void startFSM() throws InterruptedException {
+    void startFSM() {
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
 
         // Add a new FSM
@@ -81,6 +81,36 @@ class FSMManagerTest {
         await().atMost(250, TimeUnit.MILLISECONDS).until(fsm::isRunning);
         // Verify that it's running
         assertTrue(fsm.isRunning());
+    }
+
+    @Test
+    void stopFSM() {
+        DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
+        fsm.setRunning(true);
+
+        // Add a new FSM
+        fsmManager.addFSM(game, fsm);
+
+        assertTrue(fsmManager.stopFSM(game));
+        // Verify that it's not running
+        assertFalse(fsm.isRunning());
+    }
+
+    @Test
+    void stopFSMNotRunning() {
+        DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
+
+        // Add a new FSM
+        fsmManager.addFSM(game, fsm);
+
+        assertFalse(fsmManager.stopFSM(game));
+        // Verify that it's still not running
+        assertFalse(fsm.isRunning());
+    }
+
+    @Test
+    void stopFSMNotFound() {
+        assertFalse(fsmManager.stopFSM(game));
     }
 
     @Test

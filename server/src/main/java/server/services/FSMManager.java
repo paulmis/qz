@@ -44,10 +44,9 @@ public class FSMManager {
     public boolean startFSM(Game game) {
         // Check if the game contains a finite state machine
         if (fsmMap.containsKey(game.getId())) {
-
             GameFSM fsm = fsmMap.get(game.getId());
             // Check if the finite state machine is already running
-            if (!fsm.isRunning()) {
+            if (!fsm.isRunning() && fsm.isStartable()) {
 
                 log.debug("Starting FSM for game {}", game.getId());
                 // Start the finite state machine (in a new thread, to avoid blocking the main thread)
@@ -55,12 +54,38 @@ public class FSMManager {
                 return true;
 
             } else {
-                log.warn("FSM for game {} already running", game.getId());
-                throw new IllegalStateException("FSM for game " + game.getId() + " already running");
+                log.warn("FSM for game {} is already running or not startable", game.getId());
+                throw new IllegalStateException("FSM for game " + game.getId() + " already running or not startable");
             }
 
         }
         log.warn("FSM for game {} not found", game.getId());
+        return false;
+    }
+
+    /**
+     * Stop the finite state machine for the given game.
+     *
+     * @param game the game to stop the finite state machine for.
+     * @return whether the finite state machine was stopped.
+     */
+    public boolean stopFSM(Game game) {
+        // Check if the game contains a finite state machine
+        if (fsmMap.containsKey(game.getId())) {
+            GameFSM fsm = fsmMap.get(game.getId());
+            // Check if the finite state machine is running
+            if (fsm.isRunning()) {
+                log.debug("Stopping FSM for game {}", game.getId());
+                // Stop the finite state machine
+                fsm.stop();
+                return true;
+            } else {
+                log.trace("FSM for game {} not running", game.getId());
+                return false;
+            }
+
+        }
+        log.trace("FSM for game {} not found", game.getId());
         return false;
     }
 
