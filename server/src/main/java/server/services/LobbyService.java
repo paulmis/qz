@@ -1,5 +1,9 @@
 package server.services;
 
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
+import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,15 +16,19 @@ import server.database.repositories.game.GameRepository;
  * Provides business logic for the lobbies.
  */
 @Service
+@Slf4j
 public class LobbyService {
     @Autowired
     private GameRepository gameRepository;
+
+    @Autowired
+    private SSEManager sseManager;
 
     /**
      * Removes the specified user from the lobby. If this was the last player in the lobby, the game is deleted.
      *
      * @param lobby the lobby to remove the user from
-     * @param user the user to be removed
+     * @param user  the user to be removed
      * @return true if the user was removed, false otherwise
      */
     @Transactional
@@ -35,6 +43,39 @@ public class LobbyService {
         } catch (LastPlayerRemovedException ex) {
             gameRepository.delete(lobby);
         }
+        return true;
+    }
+
+    /**
+     * Deletes the lobby from the database. This action can be performed only by the lobby's host.
+     *
+     * @param lobby the lobby being deleted
+     * @param user  the user performing the action
+     * @return true if the lobby was successfully deleted, false otherwise
+     */
+    @Transactional(noRollbackFor = IOException.class)
+    public boolean deleteLobby(Game lobby, User user) {
+        // Check if the host is set. If host is null, let anyone delete the lobby
+        if (lobby.getHost() != null) {
+            // Check that the user is the lobby host
+            if (!lobby.getHost().getUser().equals(user)) {
+                return false;
+            }
+        }
+
+        // Delete the lobby
+        gameRepository.delete(lobby);
+
+        // Update players of the deletion
+        try {
+            sseManager.send(lobby.getPlayers().keySet(), new SSEMessage(SSEMessageType.LOBBY_DELETED));
+        } catch (IOException e) {
+            // Couldn't notify other players, nothing to do
+            log.error("[{}] Couldn't notify other players of lobby deletion", lobby.getGameId(), e);
+        }
+
+        // Close connection to the players
+        sseManager.disconnect(lobby.getPlayers().keySet());
         return true;
     }
 }

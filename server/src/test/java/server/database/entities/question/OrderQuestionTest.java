@@ -46,9 +46,9 @@ class OrderQuestionTest {
 
     @Test
     void getRightAnswerTest() {
-        List<Activity> expectedRightChoice = new ArrayList<>();
+        List<Long> expectedRightChoice = new ArrayList<>();
         for (int idx = 0; idx < q.getActivities().size(); idx++) {
-            expectedRightChoice.add(getActivity(idx));
+            expectedRightChoice.add(getActivity(idx).getCost());
         }
         Answer expectedRightAnswer = new Answer();
         expectedRightAnswer.setResponse(expectedRightChoice);
@@ -58,11 +58,11 @@ class OrderQuestionTest {
     @Test
     void checkAnswerTest() {
         // first user is right
-        List<Activity> answerAct = List.of(
-                getActivity(0),
-                getActivity(1),
-                getActivity(2),
-                getActivity(3)
+        List<Long> answerAct = List.of(
+                getActivity(0).getCost(),
+                getActivity(1).getCost(),
+                getActivity(2).getCost(),
+                getActivity(3).getCost()
         );
         Answer a = new Answer();
         a.setResponse(answerAct);
@@ -71,10 +71,10 @@ class OrderQuestionTest {
 
         // second user is decreasing
         answerAct = List.of(
-                getActivity(3),
-                getActivity(2),
-                getActivity(1),
-                getActivity(0)
+                getActivity(3).getCost(),
+                getActivity(2).getCost(),
+                getActivity(1).getCost(),
+                getActivity(0).getCost()
         );
         a = new Answer();
         a.setResponse(answerAct);
@@ -82,10 +82,10 @@ class OrderQuestionTest {
 
         // third user has two inverted (2/3 of points)
         answerAct = List.of(
-                getActivity(0),
-                getActivity(2),
-                getActivity(1),
-                getActivity(3)
+                getActivity(0).getCost(),
+                getActivity(2).getCost(),
+                getActivity(1).getCost(),
+                getActivity(3).getCost()
         );
         a = new Answer();
         a.setResponse(answerAct);
@@ -97,11 +97,11 @@ class OrderQuestionTest {
     @Test
     void checkAnswerDecreasing() {
         // first user is increasing
-        List<Activity> answerAct = List.of(
-                getActivity(0),
-                getActivity(1),
-                getActivity(2),
-                getActivity(3)
+        List<Long> answerAct = List.of(
+                getActivity(0).getCost(),
+                getActivity(1).getCost(),
+                getActivity(2).getCost(),
+                getActivity(3).getCost()
         );
         Answer a = new Answer();
         a.setResponse(answerAct);
@@ -110,10 +110,10 @@ class OrderQuestionTest {
 
         // second user is decreasing
         answerAct = List.of(
-                getActivity(30),
-                getActivity(2),
-                getActivity(1),
-                getActivity(0)
+                getActivity(30).getCost(),
+                getActivity(2).getCost(),
+                getActivity(1).getCost(),
+                getActivity(0).getCost()
         );
         a = new Answer();
         a.setResponse(answerAct);
@@ -121,10 +121,10 @@ class OrderQuestionTest {
 
         // third user has two inverted (1/3 of points)
         answerAct = List.of(
-                getActivity(0),
-                getActivity(2),
-                getActivity(1),
-                getActivity(3)
+                getActivity(0).getCost(),
+                getActivity(2).getCost(),
+                getActivity(1).getCost(),
+                getActivity(3).getCost()
         );
         a = new Answer();
         a.setResponse(answerAct);
@@ -137,11 +137,11 @@ class OrderQuestionTest {
     @Test
     void checkAnswerMismatchingSize() {
         // first user has 4 activities
-        List<Activity> answerAct = List.of(
-                getActivity(0),
-                getActivity(1),
-                getActivity(2),
-                getActivity(3)
+        List<Long> answerAct = List.of(
+                getActivity(0).getCost(),
+                getActivity(1).getCost(),
+                getActivity(2).getCost(),
+                getActivity(3).getCost()
         );
         Answer a = new Answer();
         a.setResponse(answerAct);
@@ -150,11 +150,11 @@ class OrderQuestionTest {
 
         // second user has 5 activities
         answerAct = List.of(
-                getActivity(3),
-                getActivity(2),
-                getActivity(1),
-                getActivity(0),
-                getActivity(12)
+                getActivity(3).getCost(),
+                getActivity(2).getCost(),
+                getActivity(1).getCost(),
+                getActivity(0).getCost(),
+                getActivity(12).getCost()
         );
         a = new Answer();
         a.setResponse(answerAct);
@@ -162,10 +162,10 @@ class OrderQuestionTest {
 
         // third user has 4 activities
         answerAct = List.of(
-                getActivity(0),
-                getActivity(2),
-                getActivity(1),
-                getActivity(3)
+                getActivity(0).getCost(),
+                getActivity(2).getCost(),
+                getActivity(1).getCost(),
+                getActivity(3).getCost()
         );
         a = new Answer();
         a.setResponse(answerAct);

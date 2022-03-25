@@ -15,11 +15,11 @@ public class SSE {
      * @param message The message to send.
      * @return The built SSE event.
      */
-    public static Set<ResponseBodyEmitter.DataWithMediaType> createEvent(SSEMessage message) {
+    public static SseEmitter.SseEventBuilder createEvent(SSEMessage message) {
         SseEmitter.SseEventBuilder builder = SseEmitter.event().name(message.getType().name());
         if (message.getData() != null) {
             builder.data(message.getData());
         }
-        return builder.build();
+        return builder;
     }
 }

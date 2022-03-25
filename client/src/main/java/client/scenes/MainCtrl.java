@@ -27,6 +27,7 @@ import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
+import client.utils.SSEHandler;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbarLayout;
 import commons.entities.game.configuration.GameConfigurationDTO;
@@ -268,15 +269,16 @@ public class MainCtrl {
      * Shows the lobby screen.
      */
     public void showLobbyScreen() {
+        this.lobbyScreenCtrl.reset();
         this.showScreenLetterBox(lobbyScene, StageScalingStrategy.Letterbox);
     }
 
     /**
      * This function displays the game screen.
      */
-    public void showGameScreen() {
+    public void showGameScreen(SSEHandler sseHandler) {
         this.showScreenLetterBox(gameScreen, StageScalingStrategy.Letterbox);
-        gameScreenCtrl.reset();
+        gameScreenCtrl.reset(sseHandler);
     }
 
     /**
