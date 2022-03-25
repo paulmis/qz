@@ -9,6 +9,10 @@ public enum FSMState {
      */
     IDLE,
     /**
+     * The game is about to start.
+     */
+    PREPARING,
+    /**
      * The game is currently accepting answers.
      */
     QUESTION,

@@ -32,11 +32,11 @@ public abstract class GameConfigurationDTO implements DTO {
     protected UUID id;
 
     /**
-     * Time to answer in milliseconds.
+     * Available time to answer.
      */
     @DurationMin(seconds = 1)
     @DurationMax(seconds = 60)
-    @Description("Milliseconds per question")
+    @Description("Time per question")
     protected Duration answerTime;
 
 
