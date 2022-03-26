@@ -11,6 +11,7 @@ import commons.entities.game.GameDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
 import java.util.Comparator;
+import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javafx.beans.binding.Bindings;
@@ -42,6 +43,7 @@ public class LobbyListCtrl implements Initializable {
     @FXML private VBox lobbyListVbox;
     @FXML private JFXButton signOutButton;
     @FXML private JFXButton editButton;
+    @FXML private JFXButton joinRandomLobbyButton;
     @FXML private TextField usernameField;
     @FXML private ImageView playerImageView;
     @FXML private FontAwesomeIconView editIcon;
@@ -161,6 +163,27 @@ public class LobbyListCtrl implements Initializable {
     private String createSearchableString(GameDTO game) {
         return game.getPlayers().stream().filter(gamePlayerDTO -> gamePlayerDTO.getId().equals(game.getHost()))
                 .findFirst().get().getNickname();
+    }
+
+    /**
+     * Function that lets the user join a random lobby.
+     */
+    @FXML
+    private void joinRandomLobby() {
+        server.getLobbies(
+            games -> {
+                // Gets a random available lobby and joins it
+                var game = games.get(new Random().nextInt(games.size()));
+                server.joinLobby(game.getId(), gameDTO -> {
+                    runLater(mainCtrl::showLobbyScreen);
+                }, () -> {
+                    mainCtrl.showErrorSnackBar("Couldn't join random game.");
+                });
+            },
+            () -> {
+                // If there are no available games, the user creates a new lobby
+                runLater(this::createLobbyButtonClick);
+            });
     }
 
     @FXML
