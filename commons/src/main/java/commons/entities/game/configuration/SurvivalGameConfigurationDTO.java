@@ -42,7 +42,7 @@ public class SurvivalGameConfigurationDTO extends GameConfigurationDTO {
      * @param pointsWrong the number of points per incorrect answer.
      * @param correctAnswerThreshold the correct answer threshold.
      */
-    public SurvivalGameConfigurationDTO(UUID id, Duration answerTime, Integer capacity, Float speedModifier,
+    public SurvivalGameConfigurationDTO(UUID id, Integer answerTime, Integer capacity, Float speedModifier,
                                         Integer streakSize,
                                         Float streakMultiplier,
                                         Integer pointsCorrect,

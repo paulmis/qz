@@ -171,7 +171,7 @@ public class LobbyScreenCtrl implements SSESource {
      * Fired when the lobby settings button is clicked.
      */
     public void lobbySettingsButtonClick() {
-        var config = new NormalGameConfigurationDTO(null, Duration.ofMinutes(1), 1, 20, 3, 2f, 100, 0, 75);
+        var config = new NormalGameConfigurationDTO();
         mainCtrl.openLobbySettings(config, (conf) -> {
             System.out.println(conf);
             mainCtrl.closeLobbySettings();
