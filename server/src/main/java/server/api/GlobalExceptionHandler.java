@@ -1,5 +1,6 @@
 package server.api;
 
+import commons.entities.utils.ApiError;
 import java.util.List;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -32,6 +33,20 @@ public class GlobalExceptionHandler {
         BindingResult result = ex.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();
         return processFieldErrors(fieldErrors, ex);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    @ExceptionHandler(IllegalStateException.class)
+    public ApiError handleConflictException(IllegalStateException ex) {
+        return new ApiError(HttpStatus.CONFLICT.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ApiError handleBadArgumentException(IllegalArgumentException ex) {
+        return new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
 
     /**
@@ -68,7 +83,7 @@ public class GlobalExceptionHandler {
      * @return API error
      */
     private ApiError processFieldErrors(List<FieldError> fieldErrors, MethodArgumentNotValidException ex) {
-        ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "Validation error");
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), "Validation error");
         for (org.springframework.validation.FieldError fieldError : fieldErrors) {
             error.addError(fieldError.getDefaultMessage());
         }

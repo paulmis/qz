@@ -38,7 +38,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeHttpRequests()
                     .antMatchers("/api/auth/**").permitAll()
                     .antMatchers("/api/leaderboard/**").permitAll()
+                    // TODO: proper access control here
                     .antMatchers("/api/activity/**").permitAll()
+                    // TODO: proper access control here
+                    .antMatchers("/api/question/**").permitAll()
                     .antMatchers("/api/lobby/available").permitAll()
                     .antMatchers("/api/**").hasRole("USER")
                 .anyRequest().authenticated()

@@ -37,6 +37,9 @@ out/
 /nbdist/
 /.nb-gradle/
 
+### Python ###
+__pycache__/
+
 ### VS Code ###
 .vscode/
 
