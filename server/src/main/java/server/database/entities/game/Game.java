@@ -235,15 +235,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     protected boolean acceptingAnswers = false;
 
     /**
-     * Toggle whether the players are allowed to submit an answer or not, and notify players about the change.
-     *
-     * @param acceptingAnswers whether the players are allowed to submit an answer or not.
-     */
-    public void changeAcceptingAnswers(boolean acceptingAnswers) throws IOException {
-        this.acceptingAnswers = acceptingAnswers;
-    }
-
-    /**
      * Adds questions to the game.
      *
      * @param questions The questions to add.

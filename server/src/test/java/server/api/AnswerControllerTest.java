@@ -100,7 +100,7 @@ class AnswerControllerTest {
         mockLobby.setStatus(GameStatus.ONGOING);
         mockLobby.setQuestions(List.of(mockQuestion));
         mockLobby.setCurrentQuestionNumber(0);
-        mockLobby.changeAcceptingAnswers(true);
+        mockLobby.setAcceptingAnswers(true);
         GameConfiguration conf = new NormalGameConfiguration();
         conf.setCapacity(1);
         mockLobby.setConfiguration(conf);
@@ -170,7 +170,7 @@ class AnswerControllerTest {
 
     @Test
     public void putAnswerNotAcceptingTest() throws Exception {
-        mockLobby.changeAcceptingAnswers(false);
+        mockLobby.setAcceptingAnswers(false);
 
         // Request
         AnswerDTO userAnswer = new AnswerDTO();

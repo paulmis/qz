@@ -66,7 +66,6 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     @JsonBackReference
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     protected Game game;
 
     /**

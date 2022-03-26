@@ -28,10 +28,9 @@ import client.scenes.lobby.LobbyScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import client.utils.ClientState;
-import client.utils.SSEHandler;
+import client.utils.communication.ServerUtils;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbarLayout;
-import commons.entities.GameStage;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.questions.QuestionDTO;
 import javafx.application.Platform;
@@ -255,17 +254,16 @@ public class MainCtrl {
      * Shows the lobby screen.
      */
     public void showLobbyScreen() {
-        this.lobbyScreenCtrl.reset();
         this.showScreenLetterBox(lobbyScene, StageScalingStrategy.Letterbox);
     }
 
     /**
      * This function displays the game screen.
      */
-    public void showGameScreen(SSEHandler sseHandler, QuestionDTO question) {
-        this.showScreenLetterBox(gameScreen, StageScalingStrategy.Letterbox);
-        gameScreenCtrl.reset(sseHandler);
+    public void showGameScreen(QuestionDTO question) {
         gameScreenCtrl.setQuestion(question);
+        gameScreenCtrl.bindHandler(ServerUtils.sseHandler);
+        this.showScreenLetterBox(gameScreen, StageScalingStrategy.Letterbox);
     }
 
     /**
@@ -413,9 +411,6 @@ public class MainCtrl {
         snack.setViewOrder(-1);
     }
 
-    public void showInformationalSnackBar() {
-    }
-
     /**
      * The size listener for the scene.
      * We keep a reference to it to be
@@ -436,7 +431,7 @@ public class MainCtrl {
     private void scaling(final Scene scene,
                          final Pane contentPane, float initWidth, float initHeight, StageScalingStrategy strategy) {
 
-        // We remove the listeners so we don't have conflicts.
+        // We remove the listeners, so we don't have conflicts.
         if (sizeListener != null) {
             scene.widthProperty().removeListener(sizeListener);
             scene.heightProperty().removeListener(sizeListener);

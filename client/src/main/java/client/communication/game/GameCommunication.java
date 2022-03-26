@@ -3,8 +3,8 @@ package client.communication.game;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import client.utils.ClientState;
-import client.utils.SSEHandler;
-import client.utils.ServerUtils;
+import client.utils.communication.SSEHandler;
+import client.utils.communication.ServerUtils;
 import commons.entities.AnswerDTO;
 import commons.entities.questions.QuestionDTO;
 import java.net.URL;
@@ -65,10 +65,33 @@ public class GameCommunication {
     }
 
     /**
+     * Handler for when the quitting game succeeds.
+     */
+    public interface QuitGameHandler {
+        void handle(Response response);
+    }
+
+    /**
      * Function that causes the user to leave the game.
      */
-    public void quitGame() {
-        System.out.println("Quitting game");
+    public void quitGame(QuitGameHandler quitGameHandler) {
+        Invocation request = ServerUtils.getRequestTarget()
+            .path("/api/game/leave")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .buildPost(Entity.json("{}"));
+
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                quitGameHandler.handle(response);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                System.out.println(throwable.toString());
+            }
+        });
     }
 
     /** Gets a list of the leaderboard images from the server.

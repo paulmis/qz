@@ -46,6 +46,7 @@ class FSMManagerTest {
         NormalGameConfiguration config = new NormalGameConfiguration();
         config.setNumQuestions(10);
         game.setConfiguration(config);
+        game.setCurrentQuestionNumber(0);
 
         lenient().when(taskScheduler.schedule(any(), any(Date.class))).thenReturn(new FSMHelpers.MockFuture<>());
     }

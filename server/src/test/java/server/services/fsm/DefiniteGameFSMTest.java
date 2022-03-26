@@ -57,6 +57,7 @@ class DefiniteGameFSMTest {
         configuration = new NormalGameConfiguration();
         configuration.setNumQuestions(10);
         game.setConfiguration(configuration);
+        game.setCurrentQuestionNumber(0);
 
         lenient().when(sseManager.send(any(UUID.class), any(SSEMessage.class))).thenReturn(true);
         lenient().when(taskScheduler.schedule(any(), any(Date.class))).thenReturn(new FSMHelpers.MockFuture<>());
@@ -64,7 +65,7 @@ class DefiniteGameFSMTest {
 
     @Test
     void constructorTestFinishedGame() {
-        game.setCurrentQuestion(configuration.getNumQuestions());
+        game.setCurrentQuestionNumber(configuration.getNumQuestions());
         // We should not be able to spawn a new game from a finished game
         assertThrows(IllegalStateException.class, () -> new DefiniteGameFSM(game, context));
     }
@@ -121,7 +122,7 @@ class DefiniteGameFSMTest {
     @Test
     void runAnswerToLeaderboard() throws IOException {
         // Put the game in a state where leaderboard should be shown
-        game.setCurrentQuestion(4);
+        game.setCurrentQuestionNumber(4);
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
         fsm.setRunning(true);
         fsm.runAnswer();
@@ -147,7 +148,7 @@ class DefiniteGameFSMTest {
     void runQuestionFinished() throws IOException {
         // Construct an FSM which should transition into FINISHED state
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
-        game.setCurrentQuestion(configuration.getNumQuestions());
+        game.setCurrentQuestionNumber(configuration.getNumQuestions());
         fsm.setRunning(true);
         fsm.runQuestion();
 

@@ -4,7 +4,7 @@ import static javafx.application.Platform.runLater;
 
 import client.scenes.MainCtrl;
 import client.utils.AlgorithmicUtils;
-import client.utils.ServerUtils;
+import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameDTO;
@@ -63,7 +63,7 @@ public class LobbyListCtrl implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         this.usernameField.textProperty().addListener((observable, oldValue, newValue) -> {
-            //TODO: Replace this with a server call to change the username when it becomes available.
+            // TODO: Replace this with a server call to change the username when it becomes available.
             System.out.println(newValue);
         });
 
@@ -103,7 +103,10 @@ public class LobbyListCtrl implements Initializable {
     @FXML
     private void createLobbyButtonClick() {
         server.createLobby(
-            game -> runLater(mainCtrl::showLobbyScreen),
+            game -> {
+                ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
+                runLater(mainCtrl::showLobbyScreen);
+            },
             () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
     }
 

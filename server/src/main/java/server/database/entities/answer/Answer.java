@@ -80,7 +80,6 @@ public class Answer extends BaseEntity<AnswerDTO> {
     @JsonBackReference
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     protected AnswerCollection answerCollection;
 
     @Override

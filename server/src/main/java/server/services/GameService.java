@@ -108,7 +108,7 @@ public class GameService {
 
         try {
             game.setStatus(GameStatus.ONGOING);
-            game.setAcceptingAnswers(true);
+            setAcceptingAnswers(game, true);
         } catch (IOException e) {
             System.out.println("setAcceptingAnswers's SSE event failed");
         }

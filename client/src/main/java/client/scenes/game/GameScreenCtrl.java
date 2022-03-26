@@ -1,14 +1,15 @@
 package client.scenes.game;
 
+import static javafx.application.Platform.runLater;
+
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.questions.EstimateQuestionPane;
 import client.scenes.questions.MCQuestionPane;
 import client.utils.ClientState;
-import client.scenes.questions.MCQuestionPane;
-import client.utils.ClientState;
-import client.utils.SSEEventHandler;
-import client.utils.SSEHandler;
+import client.utils.communication.SSEEventHandler;
+import client.utils.communication.SSEHandler;
+import client.utils.communication.SSESource;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
@@ -37,7 +38,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
-import javax.ws.rs.core.Response;
 import lombok.Generated;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -47,11 +47,9 @@ import org.apache.commons.lang3.NotImplementedException;
  * Handles question changing and interactivity of the user.
  */
 @Generated
-public class GameScreenCtrl implements Initializable {
+public class GameScreenCtrl implements Initializable, SSESource {
     private final GameCommunication communication;
     private final MainCtrl mainCtrl;
-
-    private SSEHandler sseHandler;
 
     @FXML private BorderPane mainBorderPane;
     @FXML private HBox avatarHBox;
@@ -92,6 +90,9 @@ public class GameScreenCtrl implements Initializable {
         this.communication = communication;
     }
 
+    public void bindHandler(SSEHandler handler) {
+        handler.initialize(this);
+    }
 
     /**
      * This runs after every control has been initialized and
@@ -114,15 +115,6 @@ public class GameScreenCtrl implements Initializable {
 
         // This loads the estimate question type.
         loadMockEstimate();
-    }
-
-    /**
-     * This function resets the game screen ctrl.
-     * It handles all the required set-up that needs to be done for a game to start.
-     */
-    public void reset(SSEHandler sseHandler) {
-        this.sseHandler = sseHandler;
-        sseHandler.initialize(this);
     }
 
     /**
@@ -341,34 +333,35 @@ public class GameScreenCtrl implements Initializable {
      */
     @FXML
     private void quitButtonClick(ActionEvent actionEvent) {
-        mainCtrl.openGameLeaveWarning(() -> {
-            mainCtrl.closeGameLeaveWarning();
-            this.communication.quitGame(new ServerUtils.QuitGameHandler() {
-                @Override
-                public void handle(Response response) {
-                    javafx.application.Platform.runLater(() -> {
+        // Open the warning and wait for user action
+        mainCtrl.openGameLeaveWarning(
+            // If confirmed, exit the game
+            () -> {
+                mainCtrl.closeGameLeaveWarning();
+                this.communication.quitGame(
+                    (response) -> runLater(() -> {
                         switch (response.getStatus()) {
                             case 200:
                                 System.out.println("User successfully removed from game");
                                 mainCtrl.showLobbyListScreen();
+                                ClientState.game = null;
                                 break;
                             case 404:
-                                System.out.println("User/Game not found");
+                                mainCtrl.showErrorSnackBar("Unable to quit the game: user or game doesn't exist");
                                 break;
                             case 409:
-                                System.out.println("Couldn't remove player");
+                                mainCtrl.showErrorSnackBar("Unable to quit the game: "
+                                    + "there was a conflict while removing the player");
                                 break;
                             default:
-                                break;
+                                mainCtrl.showErrorSnackBar("Unable to quit the game: server error");
                         }
-                    });
-                }
-            });
-        }, () -> {
-            mainCtrl.closeGameLeaveWarning();
-        });
+                    }));
+            },
+            // Otherwise, simply close the warning
+            mainCtrl::closeGameLeaveWarning
+        );
     }
-
 
     /**
      * Handles the settings toggle button.

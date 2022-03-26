@@ -25,7 +25,7 @@ public class DefiniteGameFSM extends GameFSM {
      */
     public DefiniteGameFSM(DefiniteGame game, FSMContext context) {
         super(game, context);
-        if (game.getCurrentQuestion() == game.getQuestionsCount()) {
+        if (game.getCurrentQuestionNumber() == game.getQuestionsCount()) {
             log.warn("[{}] Attempt to construct a FSM on a finished game.", game.getId());
             throw new IllegalStateException("Game is already finished.");
         }
@@ -122,7 +122,7 @@ public class DefiniteGameFSM extends GameFSM {
 
         // Show leaderboard on every 5th question, and show next question on other questions.
         scheduleTask(
-                (getGame().getCurrentQuestion() + 1) % leaderboardInterval == 0
+                (getGame().getCurrentQuestionNumber() + 1) % leaderboardInterval == 0
                         ? this::runLeaderboard
                         : this::runQuestion,
                 Duration.ofMillis(delay)
@@ -146,7 +146,7 @@ public class DefiniteGameFSM extends GameFSM {
         setState(FSMState.QUESTION);
 
         // If the game is finished, run the cleanup function and return immediately.
-        if (getGame().getCurrentQuestion()
+        if (getGame().getCurrentQuestionNumber()
                 == ((DefiniteGame) getGame()).getQuestionsCount()) {
             runFinish();
             return;
@@ -154,7 +154,7 @@ public class DefiniteGameFSM extends GameFSM {
 
         // Move onto the next question.
         log.debug("[{}] FSM runnable: advancing onto the next question.", getGame().getId());
-        getGame().setCurrentQuestion(getGame().getCurrentQuestion() + 1);
+        getGame().setCurrentQuestionNumber(getGame().getCurrentQuestionNumber() + 1);
 
         // Start accepting answers.
         getContext().getGameService().setAcceptingAnswers(getGame(),

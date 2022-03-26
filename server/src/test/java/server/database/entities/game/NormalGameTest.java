@@ -129,18 +129,6 @@ public class NormalGameTest {
     }
 
     @Test
-    void setAcceptingAnswersTrue() throws IOException {
-        game.changeAcceptingAnswers(true);
-        assertEquals(true, game.isAcceptingAnswers());
-    }
-
-    @Test
-    void setAcceptingAnswersFalse() throws IOException {
-        game.changeAcceptingAnswers(false);
-        assertEquals(false, game.isAcceptingAnswers());
-    }
-
-    @Test
     void getQuestionsCount() {
         assertEquals(17, game.getQuestionsCount());
     }

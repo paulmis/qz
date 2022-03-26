@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package client.utils;
+package client.utils.communication;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import client.utils.Authenticator;
+import client.utils.ClientState;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -30,11 +32,13 @@ import commons.entities.utils.ApiError;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.sse.SseEventSource;
 
 /**
  * Utilities for communicating with the server.
@@ -42,9 +46,9 @@ import javax.ws.rs.core.Response;
 public class ServerUtils {
 
     private static final String SERVER = "http://localhost:8080/";
+    public static SSEHandler sseHandler = new SSEHandler();
     public static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
             .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
-    public static boolean loggedIn = false;
 
     /**
      * Provides a request target for the server that can be used to build and invoke a query.
@@ -62,74 +66,11 @@ public class ServerUtils {
      * @return the new client.
      */
     private Client newClient() {
-        loggedIn = false;
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
         JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
         return ClientBuilder.newClient().register(provider);
-    }
-
-    public String register(String email, String password) {
-        System.out.println("Registering new User...\n");
-        return "200";
-
-    /**
-     * Handler for when the leave lobby succeeds.
-     */
-    public interface LeaveGameHandler {
-        void handle(Response response);
-    }
-
-    /**
-     * Function that causes the user to leave the lobby.
-     */
-    public void leaveLobby(LeaveGameHandler leaveGameHandler) {
-        var request = client
-                .target(SERVER).path("/api/lobby/leave")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildDelete();
-        request.submit(new InvocationCallback<Response>() {
-            @Override
-            public void completed(Response response) {
-                leaveGameHandler.handle(response);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-
-            }
-        });
-    }
-
-    /**
-     * Handler for when the quitting game succeeds.
-     */
-    public interface QuitGameHandler {
-        void handle(Response response);
-    }
-
-    /**
-     * Function that causes the user to leave the game.
-     */
-    public void quitGame(QuitGameHandler quitGameHandler) {
-        var request = client
-                .target(SERVER).path("/api/game/leave")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildPost(Entity.json("{}"));
-        request.submit(new InvocationCallback<Response>() {
-            @Override
-            public void completed(Response response) {
-                quitGameHandler.handle(response);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                System.out.println(throwable.toString());
-            }
-        });
     }
 
     /** Gets a list of the leaderboard images from the server.
@@ -175,12 +116,13 @@ public class ServerUtils {
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .buildPost(Entity.entity(user, APPLICATION_JSON));
+
         invocation.submit(new InvocationCallback<Response>() {
             @Override
             public void completed(Response o) {
                 if (o.getStatus() == 201) {
                     client = client.register(new Authenticator(o.readEntity(String.class)));
-                    loggedIn = true;
+                    ClientState.user = user;
                     registerHandler.handle(o, new ApiError());
                 } else if (o.getStatus() == 400) {
                     registerHandler.handle(o, o.readEntity(ApiError.class));
@@ -233,9 +175,9 @@ public class ServerUtils {
             @Override
             public void completed(LoginDTO loginDTO) {
                 System.out.println(loginDTO);
-                logInHandlerSuccess.handle(loginDTO);
                 client = client.register(new Authenticator(loginDTO.getToken()));
-                loggedIn = true;
+                ClientState.user = user;
+                logInHandlerSuccess.handle(loginDTO);
             }
 
             @Override
@@ -374,6 +316,7 @@ public class ServerUtils {
             public void completed(GameDTO game) {
                 System.out.println(game);
                 ClientState.game = game;
+                subscribeToSSE(sseHandler);
                 joinLobbyHandlerSuccess.handle(game);
             }
 
@@ -439,9 +382,9 @@ public class ServerUtils {
      *
      * @param sseHandler The handler of sse events, exceptions and completion.
      */
-    public void subscribeToSSE(SSEHandler sseHandler) {
+    public static void subscribeToSSE(SSEHandler sseHandler) {
         // This creates the WebTarget that the sse event source will use.
-        var target = client.target(SERVER).path("api/sse/open");
+        var target = getRequestTarget().path("api/sse/open");
 
         // Builds the event source with the target.
         SseEventSource eventSource = SseEventSource.target(target).build();
@@ -472,8 +415,8 @@ public class ServerUtils {
      * @param startLobbyHandler the handler of the response.
      */
     public void startLobby(StartLobbyHandler startLobbyHandler) {
-
-        Invocation invocation = client.target(SERVER).path("/api/lobby/" + lobbyId + "/start")
+        Invocation invocation = client.target(SERVER)
+            .path("/api/lobby/" + ClientState.game.getId() + "/start")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .buildPut(Entity.entity("", APPLICATION_JSON));

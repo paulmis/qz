@@ -155,8 +155,8 @@ public class GameServiceTest {
         // ToDo: fix QuestionRepository::findByIdNotIn
         //verify(questionRepository).findByIdNotIn(new ArrayList<>());
         verify(questionRepository).findAll();
-        verifyNoMoreInteractions(questionRepository);
-        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
+        verify(sseManager, times(2)).send(any(Iterable.class), any(SSEMessage.class));
+        verifyNoMoreInteractions(questionRepository, sseManager);
     }
 
     @Test

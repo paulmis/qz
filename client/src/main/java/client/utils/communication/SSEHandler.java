@@ -1,4 +1,6 @@
-package client.utils;
+package client.utils.communication;
+
+import static javafx.application.Platform.runLater;
 
 import commons.entities.messages.SSEMessageType;
 import java.util.Map;
@@ -34,6 +36,11 @@ public class SSEHandler {
     Map<SSEMessageType, SSEEventHandler> eventHandlers;
 
     /**
+     * No-args constructor.
+     */
+    public SSEHandler() {}
+
+    /**
      * The constructor of the SSEHandler.
      * It initializes a map from event name
      * to SSEEventHandler and automatically converts the
@@ -51,13 +58,19 @@ public class SSEHandler {
      * It resets the map and changes the source object.
      *
      * @param handlerSource the source of the handlers.
+     * @throws IllegalArgumentException if the source doesn't implement SSESource
      */
-    public void initialize(Object handlerSource) {
+    public void initialize(Object handlerSource) throws IllegalArgumentException {
         this.handlerSource = handlerSource;
+
+        // Check that the source class implements SSESource
+        if (!SSESource.class.isAssignableFrom(handlerSource.getClass())) {
+            throw new IllegalArgumentException("The source class must extend from SSESource");
+        }
 
         // Gets all the methods that have the Name decoration. These are the event handlers.
         var handlers = ReflectionUtils.getAnnotatedMethods(handlerSource,
-                client.utils.SSEEventHandler.class);
+                client.utils.communication.SSEEventHandler.class);
 
         // We get the names of all the event handlers
         var names = handlers.stream().map(ReflectionUtils::getSSEEventName).collect(Collectors.toList());
@@ -80,7 +93,7 @@ public class SSEHandler {
 
                 // Calls the method directly if there are no parameters.
                 if (types.length == 0) {
-                    javafx.application.Platform.runLater(() -> {
+                    runLater(() -> {
                         try {
                             method.invoke(handlerSource);
                         } catch (Exception e) {
@@ -93,7 +106,7 @@ public class SSEHandler {
 
                 // This invokes the function with the object and the source inside a run later so
                 // javafx components can have their state changed.
-                javafx.application.Platform.runLater(() -> {
+                runLater(() -> {
                     try {
                         method.invoke(handlerSource, obj);
                     } catch (Exception e) {

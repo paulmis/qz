@@ -1,7 +1,7 @@
 package client.scenes.leaderboard;
 
 import client.scenes.MainCtrl;
-import client.utils.ServerUtils;
+import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import commons.entities.auth.UserDTO;
 import java.net.URL;

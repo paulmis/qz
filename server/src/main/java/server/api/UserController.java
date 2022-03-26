@@ -1,9 +1,8 @@
 package server.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import commons.entities.UserDTO;
-import commons.entities.utils.Views;
 import commons.entities.auth.UserDTO;
+import commons.entities.utils.Views;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -2,7 +2,7 @@ package client.communication.game;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
-import client.utils.ServerUtils;
+import client.utils.communication.ServerUtils;
 import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -13,11 +13,12 @@ import javax.ws.rs.core.Response;
  * Provides functions retrieving lobby data from the server.
  */
 public class LobbyCommunication {
+
     /**
      * Handler for when getting the current question succeeds.
      */
     public interface StartGameHandlerSuccess {
-        void handle();
+        void handle(Response response);
     }
 
     /**
@@ -49,18 +50,43 @@ public class LobbyCommunication {
 
             @Override
             public void completed(Response response) {
-                if (response.getStatus() == 200) {
-                    handlerSuccess.handle();
-                } else {
-                    System.out.println("Starting game failed");
-                    handlerFail.handle();
-                }
+                handlerSuccess.handle(response);
             }
 
             @Override
             public void failed(Throwable throwable) {
                 System.out.println("Starting game failed");
                 handlerFail.handle();
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Handler for when the leave lobby succeeds.
+     */
+    public interface LeaveGameHandler {
+        void handle(Response response);
+    }
+
+    /**
+     * Function that causes the user to leave the lobby.
+     */
+    public void leaveLobby(LeaveGameHandler leaveGameHandler) {
+        Invocation request = ServerUtils.getRequestTarget()
+            .path("/api/lobby/leave")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .buildDelete();
+
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                leaveGameHandler.handle(response);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
                 throwable.printStackTrace();
             }
         });

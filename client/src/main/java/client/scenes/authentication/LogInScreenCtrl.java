@@ -4,7 +4,7 @@ import static javafx.application.Platform.runLater;
 
 import client.scenes.MainCtrl;
 import client.utils.ClientState;
-import client.utils.ServerUtils;
+import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameStatus;
@@ -73,6 +73,7 @@ public class LogInScreenCtrl implements Initializable {
                 // If the user is in a lobby/game, put them in the apposite screen
                 if (s.getGame() != null) {
                     ClientState.game = s.getGame();
+                    ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
                     if (s.getGame().getStatus() == GameStatus.CREATED) {
                         mainCtrl.showLobbyScreen();
                     } else {

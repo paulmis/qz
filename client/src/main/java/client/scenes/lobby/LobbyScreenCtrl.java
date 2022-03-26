@@ -5,19 +5,17 @@ import static javafx.application.Platform.runLater;
 import client.communication.game.GameCommunication;
 import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
-import client.utils.SSEEventHandler;
-import client.utils.SSEHandler;
-import client.utils.ServerUtils;
 import client.utils.ClientState;
+import client.utils.communication.SSEEventHandler;
+import client.utils.communication.SSEHandler;
+import client.utils.communication.SSESource;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
-import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.game.GameStatus;
-import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
+import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
 import java.time.Duration;
 import javafx.fxml.FXML;
-import javax.ws.rs.core.Response;
 import lombok.Generated;
 import lombok.Getter;
 
@@ -26,11 +24,9 @@ import lombok.Getter;
  */
 @Getter
 @Generated
-public class LobbyScreenCtrl {
+public class LobbyScreenCtrl implements SSESource {
     private final LobbyCommunication communication;
     private final MainCtrl mainCtrl;
-
-    private SSEHandler sseHandler;
 
     private String name = "Ligma's Lobby";
 
@@ -53,14 +49,13 @@ public class LobbyScreenCtrl {
         this.communication = communication;
     }
 
-    /**
-     * This function resets the lobbu screen ctrl.
-     * It handles all the required set-up that needs to be done for a lobby to be displayed.
-     */
-    public void reset() {
-        // this starts the sse connection
-        sseHandler = new SSEHandler(this);
-        server.subscribeToSSE(sseHandler);
+    public void bindHandler(SSEHandler handler) {
+        handler.initialize(this);
+    }
+
+    @SSEEventHandler(SSEMessageType.GAME_START)
+    public void startGame() {
+        mainCtrl.showGameScreen(null);
     }
 
     /**
@@ -70,7 +65,7 @@ public class LobbyScreenCtrl {
         LobbyCommunication.startGame(
             ClientState.game.getId(),
             // Success
-            response -> runLater(() -> {
+            (response) -> runLater(() -> {
                 switch (response.getStatus()) {
                     case 403:
                         mainCtrl.showErrorSnackBar("Starting the game failed! You are not the host.");
@@ -95,6 +90,9 @@ public class LobbyScreenCtrl {
                             () -> runLater(() -> {
                                 mainCtrl.showErrorSnackBar("Failed to get the current question.");
                             }));
+
+                        // Wait for the question to update
+                        // TODO: add init stage
                         try {
                             Thread.sleep(2000);
                         } catch (InterruptedException e) {
@@ -114,6 +112,42 @@ public class LobbyScreenCtrl {
     }
 
     /**
+     * Handles the click of the quit button.
+     * This is handled by the server function call.
+     */
+    @FXML
+    private void leaveButtonClick() {
+        // Open the warning and wait for user action
+        mainCtrl.openLobbyLeaveWarning(
+            // If confirmed, exit the lobby
+            () -> {
+                mainCtrl.closeLobbyLeaveWarning();
+                this.communication.leaveLobby(
+                    (response) -> runLater(() -> {
+                        switch (response.getStatus()) {
+                            case 200:
+                                System.out.println("User successfully removed from lobby");
+                                mainCtrl.showLobbyListScreen();
+                                ClientState.game = null;
+                                break;
+                            case 404:
+                                mainCtrl.showErrorSnackBar("Unable to quit the lobby: user or lobby doesn't exist");
+                                break;
+                            case 409:
+                                mainCtrl.showErrorSnackBar("Unable to quit the lobby: "
+                                    + "there was a conflict while removing the player");
+                                break;
+                            default:
+                                mainCtrl.showErrorSnackBar("Unable to quit the lobby: server error");
+                        }
+                    }));
+            },
+            // Otherwise, simply close the warning
+            mainCtrl::closeLobbyLeaveWarning
+        );
+    }
+
+    /**
      * Fired when the lobby settings button is clicked.
      */
     public void lobbySettingsButtonClick() {
@@ -122,10 +156,5 @@ public class LobbyScreenCtrl {
             System.out.println(conf);
             mainCtrl.closeLobbySettings();
         });
-    }
-
-    @SSEEventHandler(SSEMessageType.GAME_START)
-    public void startGame() {
-        mainCtrl.showGameScreen(this.sseHandler);
     }
 }
