@@ -33,9 +33,9 @@ public abstract class DefiniteGame<T extends DefiniteGameDTO> extends Game<T> {
     }
 
     /**
-     * The amount of questions left in the game.
+     * The amount of questions in the game.
      *
-     * @return The amount of questions left in the game.
+     * @return The amount of questions in the game.
      */
     public int getQuestionsCount() {
         return ((NormalGameConfiguration) getConfiguration()).getNumQuestions();

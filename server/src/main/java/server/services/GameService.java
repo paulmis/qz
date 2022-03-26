@@ -4,25 +4,21 @@ import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
 import server.database.entities.game.Game;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
 import server.database.repositories.question.QuestionRepository;
+import server.services.fsm.DefiniteGameFSM;
+import server.services.fsm.FSMContext;
 
 /**
  * Get the questions for a specific game.
@@ -35,6 +31,12 @@ public class GameService {
 
     @Autowired
     private SSEManager sseManager;
+
+    @Autowired
+    private FSMManager fsmManager;
+
+    @Autowired
+    private ThreadPoolTaskScheduler taskScheduler;
 
     /**
      * Provides the specified amount of questions, excluding the specified questions.
@@ -91,7 +93,13 @@ public class GameService {
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
-            sseManager.send(definiteGame.getPlayers().keySet(), new SSEMessage(SSEMessageType.GAME_START));
+            sseManager.send(definiteGame.getPlayerIds(), new SSEMessage(SSEMessageType.GAME_START));
+
+            // Create and start a FSM for the game.
+            fsmManager.addFSM(definiteGame,
+                    new DefiniteGameFSM(definiteGame,
+                            new FSMContext(sseManager, this, taskScheduler)));
+            fsmManager.startFSM(definiteGame);
         } else {
             throw new UnsupportedOperationException("Starting games other than definite games is not yet supported.");
         }
@@ -112,7 +120,7 @@ public class GameService {
         try {
             // If the removal fails, the player has already abandoned the lobby
             if (!game.remove(user.getId())) {
-                throw new IllegalStateException("Impossible to remove the player");
+                throw new IllegalStateException("The player has already abandoned the lobby.");
             }
         } catch (LastPlayerRemovedException ex) {
             // If the player was the last player, conclude the game
@@ -122,7 +130,7 @@ public class GameService {
         // Disconnect the player and update clients
         sseManager.unregister(user.getId());
         try {
-            sseManager.send(game.getPlayers().keySet(), new SSEMessage(SSEMessageType.PLAYER_LEFT, user.getId()));
+            sseManager.send(game.getPlayerIds(), new SSEMessage(SSEMessageType.PLAYER_LEFT, user.getId()));
         } catch (IOException ex) {
             // Log failure to update clients
             log.error("Unable to send removePlayer message to all players", ex);
@@ -131,20 +139,34 @@ public class GameService {
 
 
     /**
-     * Sets the accepting answers boolean to true inside the game and notifies
+     * Sets whether the game is still accepting answers and notifies
      * every user that this change has happened.
      *
-     * @param game The game object that the action is performed on.
-     * @param acceptingAnswers The requested boolean.
-     * @throws IOException if an sse connection send failed.
+     * @param game             The game object that the action is performed on.
+     * @param acceptingAnswers Whether the game is accepting answers.
+     * @throws IOException if an SSE connection send failed.
      */
     @Transactional
     public void setAcceptingAnswers(Game game, boolean acceptingAnswers) throws IOException {
+        setAcceptingAnswers(game, acceptingAnswers, null);
+    }
+
+    /**
+     * Sets the accepting answers boolean to true inside the game and notifies
+     * every user that this change has happened.
+     *
+     * @param game             The game object that the action is performed on.
+     * @param acceptingAnswers Whether the game is accepting answers.
+     * @param delay            The delay (in milliseconds) before the next SSE event is to be expected.
+     * @throws IOException if an SSE connection send failed.
+     */
+    @Transactional
+    public void setAcceptingAnswers(Game game, boolean acceptingAnswers, Long delay) throws IOException {
         game.setAcceptingAnswers(acceptingAnswers);
 
-        sseManager.send(game.getPlayers().keySet(), new SSEMessage(
+        sseManager.send(game.getPlayerIds(), new SSEMessage(
                 acceptingAnswers
                         ? SSEMessageType.START_QUESTION
-                        : SSEMessageType.STOP_QUESTION));
+                        : SSEMessageType.STOP_QUESTION, delay));
     }
 }

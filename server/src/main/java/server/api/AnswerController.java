@@ -3,6 +3,7 @@ package server.api;
 import commons.entities.AnswerDTO;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import server.database.repositories.question.ActivityRepository;
 /**
  * AnswerController, controller for all api endpoints of question answers.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/game")
 public class AnswerController {
@@ -71,7 +73,7 @@ public class AnswerController {
 
         // Check if the game is accepting answers.
         if (!game.isAcceptingAnswers()) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            throw new IllegalStateException("Game is not accepting answers.");
         }
 
         // Check if question is correct
@@ -81,7 +83,7 @@ public class AnswerController {
         }
         if (!currentQuestion.get().getId().equals(answerData.getQuestionId())) {
             // Trying to answer the wrong question
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            throw new IllegalArgumentException("Trying to answer the wrong question.");
         }
 
         // Update the answer
@@ -92,8 +94,13 @@ public class AnswerController {
 
             // Answer has been received successfully.
             return ResponseEntity.ok().build();
+        } else {
+            log.warn("[{}] Could not add answer from user {} for question {}.",
+                    game.getId(),
+                    user.getId(),
+                    answerData.getQuestionId());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
     /**

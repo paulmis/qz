@@ -1,6 +1,8 @@
 package server.api;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.UserDTO;
+import commons.entities.utils.Views;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ public class UserController {
      * @return details of the currently logged in user
      */
     @GetMapping
+    @JsonView(value = Views.Private.class)
     public ResponseEntity<UserDTO> get() {
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
         if (user.isEmpty()) {
