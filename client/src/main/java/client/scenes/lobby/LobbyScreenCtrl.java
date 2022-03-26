@@ -18,7 +18,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -136,7 +135,16 @@ public class LobbyScreenCtrl {
      */
     public void lobbySettingsButtonClick() {
         // ToDo: get current config from gameDTO
-        var config = new NormalGameConfigurationDTO(null, Duration.ofMinutes(1), 1, 20, 3, 2f, 100, 0, 75);
+        var config = new NormalGameConfigurationDTO(
+                null,
+                Duration.ofMinutes(1),
+                1,
+                20,
+                3,
+                2f,
+                100,
+                0,
+                75);
         mainCtrl.openLobbySettings(config, (conf) -> {
             System.out.println(conf);
             mainCtrl.closeLobbySettings();
@@ -158,7 +166,16 @@ public class LobbyScreenCtrl {
         GameDTO dto = new GameDTO();
         dto.setGameId("ABCD");
         dto.setGameType(GameType.PUBLIC);
-        GameConfigurationDTO confDTO = new NormalGameConfigurationDTO(null, 60, 2, 20, 3, 2f, 100, 0, 75);
+        GameConfigurationDTO confDTO = new NormalGameConfigurationDTO(
+                null,
+                Duration.ofSeconds(60),
+                2,
+                20,
+                3,
+                2f,
+                100,
+                0,
+                75);
         dto.setConfiguration(confDTO);
         GamePlayerDTO sally = new GamePlayerDTO();
         sally.setId(UUID.randomUUID());
