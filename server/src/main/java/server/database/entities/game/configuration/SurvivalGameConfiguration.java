@@ -2,6 +2,7 @@ package server.database.entities.game.configuration;
 
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
+import java.time.Duration;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -42,6 +43,11 @@ public class SurvivalGameConfiguration extends GameConfiguration {
 
     @Override
     public SurvivalGameConfigurationDTO getDTO() {
-        return new ModelMapper().map(this, SurvivalGameConfigurationDTO.class);
+        var mapper = new ModelMapper();
+        mapper.addConverter(
+                context -> (int) context.getSource().toSeconds(),
+                Duration.class, Integer.class);
+
+        return mapper.map(this, SurvivalGameConfigurationDTO.class);
     }
 }
