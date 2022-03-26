@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="113.0" prefWidth="317.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label text="Pinco Palla:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <TextArea text="ciao prova prova">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </TextArea>
+   </children>
+</VBox>
