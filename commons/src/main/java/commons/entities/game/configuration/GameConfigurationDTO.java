@@ -37,10 +37,10 @@ public abstract class GameConfigurationDTO implements DTO {
     /**
      * Available time to answer.
      */
-    @DurationMin(seconds = 1)
-    @DurationMax(seconds = 60)
-    @Description("Time per question")
-    protected Duration answerTime;
+    @DecimalMin(value = "3")
+    @DecimalMax(value = "120")
+    @Description("Seconds per question")
+    protected Integer answerTime = 30;
 
 
     /**
@@ -49,7 +49,7 @@ public abstract class GameConfigurationDTO implements DTO {
     @DecimalMin(value = "1")
     @DecimalMax(value = "8")
     @Description("Capacity of lobby")
-    protected Integer capacity;
+    protected Integer capacity = 1;
 
     /**
      * The streak size required for a streak to be applied.
@@ -57,7 +57,7 @@ public abstract class GameConfigurationDTO implements DTO {
     @DecimalMin(value = "2")
     @DecimalMax(value = "100")
     @Description("Minimum streak size")
-    protected Integer streakSize;
+    protected Integer streakSize = 3;
 
     /**
      * The streak multiplier that is to be applied.
@@ -65,7 +65,7 @@ public abstract class GameConfigurationDTO implements DTO {
     @DecimalMin(value = "1")
     @DecimalMax(value = "10")
     @Description("Streak multiplier")
-    protected Float streakMultiplier;
+    protected Float streakMultiplier = 2f;
 
     /**
      * The number of points per correct answer.
@@ -73,7 +73,7 @@ public abstract class GameConfigurationDTO implements DTO {
     @DecimalMin(value = "0")
     @DecimalMax(value = "1000")
     @Description("Points for correct answer")
-    protected Integer pointsCorrect;
+    protected Integer pointsCorrect = 100;
 
     /**
      * The number of points per incorrect answer.
@@ -81,7 +81,7 @@ public abstract class GameConfigurationDTO implements DTO {
     @DecimalMin(value = "-1000")
     @DecimalMax(value = "1000")
     @Description("Points for wrong answer")
-    protected Integer pointsWrong;
+    protected Integer pointsWrong = -10;
 
     /**
      * The threshold for an answer to be considered correct.
@@ -89,5 +89,5 @@ public abstract class GameConfigurationDTO implements DTO {
     @DecimalMin(value = "0")
     @DecimalMax(value = "100")
     @Description("Correct answer threshold")
-    protected Integer correctAnswerThreshold;
+    protected Integer correctAnswerThreshold = 75;
 }

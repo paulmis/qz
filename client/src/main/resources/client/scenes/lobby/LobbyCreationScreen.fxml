@@ -38,22 +38,22 @@
       </AnchorPane>
       <AnchorPane layoutX="182.0" layoutY="72.0" prefHeight="504.0" prefWidth="657.0" style="-fx-background-color: white; -fx-background-radius: 20 20 0 0;">
          <children>
-            <ScrollPane hbarPolicy="NEVER" layoutX="49.0" layoutY="237.0" prefHeight="259.0" prefWidth="559.0" vbarPolicy="NEVER">
+            <ScrollPane hbarPolicy="NEVER" layoutX="49.0" layoutY="221.0" prefHeight="275.0" prefWidth="559.0" vbarPolicy="NEVER">
                <content>
-                  <VBox fx:id="configurationPanelVbox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="256.0" prefWidth="555.0" />
+                  <VBox fx:id="configurationPanelVbox" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="273.0" prefWidth="555.0" />
                </content>
             </ScrollPane>
-            <Label layoutX="49.0" layoutY="183.0" text="Game mode">
+            <Label layoutX="68.0" layoutY="174.0" prefHeight="35.0" prefWidth="137.0" text="Game mode">
                <font>
-                  <Font name="System Bold" size="36.0" />
+                  <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <JFXButton fx:id="standardGameConfigurationButton" buttonType="RAISED" layoutX="270.0" layoutY="192.0" onAction="#standardGameConfigurationButtonClick" prefHeight="35.0" prefWidth="85.0" style="-fx-background-color: green;" text="Standard" textFill="WHITE">
+            <JFXButton fx:id="standardGameConfigurationButton" buttonType="RAISED" layoutX="217.0" layoutY="174.0" onAction="#standardGameConfigurationButtonClick" prefHeight="35.0" prefWidth="85.0" style="-fx-background-color: green;" text="Standard" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
             </JFXButton>
-            <JFXButton fx:id="survivalGameConfigurationButton" layoutX="379.0" layoutY="192.0" onAction="#survivalGameConfigurationButtonClick" prefHeight="35.0" prefWidth="85.0" style="-fx-background-color: red;" text="Survival" textFill="WHITE">
+            <JFXButton fx:id="survivalGameConfigurationButton" layoutX="325.0" layoutY="174.0" onAction="#survivalGameConfigurationButtonClick" prefHeight="35.0" prefWidth="85.0" style="-fx-background-color: red;" text="Survival" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
@@ -80,19 +80,19 @@
                   </FontAwesomeIconView>
                </graphic>
             </JFXButton>
-            <TextField fx:id="lobbyNameField" layoutX="217.0" layoutY="29.0" prefHeight="53.0" prefWidth="390.0" promptText="Give your lobby a name">
+            <TextField fx:id="lobbyNameField" layoutX="216.0" layoutY="35.0" prefHeight="0.0" prefWidth="387.0" promptText="Give your lobby a name">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </TextField>
+            <Label layoutX="68.0" layoutY="37.0" text="Name">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
-            </TextField>
-            <Label layoutX="49.0" layoutY="29.0" text="Name">
-               <font>
-                  <Font name="System Bold" size="36.0" />
-               </font>
             </Label>
-            <Label fx:id="publicPrivateLabel" layoutX="49.0" layoutY="98.0" text="Public">
+            <Label fx:id="publicPrivateLabel" layoutX="67.0" layoutY="107.0" text="Public">
                <font>
-                  <Font name="System Bold" size="36.0" />
+                  <Font name="System Bold" size="24.0" />
                </font>
             </Label>
          </children>
