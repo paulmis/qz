@@ -33,6 +33,20 @@ public class GlobalExceptionHandler {
         return processFieldErrors(fieldErrors, ex);
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    @ExceptionHandler(IllegalStateException.class)
+    public ApiError handleConflictException(IllegalStateException ex) {
+        return new ApiError(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ApiError handleBadArgumentException(IllegalArgumentException ex) {
+        return new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     /**
      * Processes all exception field errors and packs them into an API error.
      *
