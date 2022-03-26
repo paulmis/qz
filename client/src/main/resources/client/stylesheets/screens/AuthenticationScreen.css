@@ -7,6 +7,10 @@
     -fx-text-fill : red;
 }
 
+#userExists{
+    -fx-text-fill : red;
+}
+
 #passwordField{
     -fx-background-color: #C4C4C4;
 }
@@ -19,11 +23,19 @@
     -fx-background-color: white
 }
 
-#nicknameField{
+#pane1{
+    -fx-background-color: white
+}
+
+#pane2{
+    -fx-background-color: white
+}
+
+#usernameField{
     -fx-background-color: #C4C4C4;
 }
 
-#nicknameSetButton{
+#usernameSetButton{
     -fx-background-color: #6EB26C;
 }
 
@@ -40,5 +52,13 @@
 }
 
 #connectButton{
+    -fx-background-color: #6EB26C;
+}
+
+#registerMessage{
+    -fx-text-fill: #1ed410;
+}
+
+#backButton{
     -fx-background-color: #6EB26C;
 }

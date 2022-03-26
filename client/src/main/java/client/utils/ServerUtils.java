@@ -25,6 +25,7 @@ import commons.entities.UserDTO;
 import commons.entities.game.GameDTO;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import commons.entities.utils.ApiError;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -184,9 +185,51 @@ public class ServerUtils {
         }
     }
 
-    public String register(String email, String password) {
-        System.out.println("Registering new User...\n");
-        return "200";
+    /**
+     * Handler for when the register succeds.
+     */
+    public interface RegisterHandler {
+        void handle(Response response, ApiError error);
+    }
+
+    /**
+     * Function that registers a new user.
+     *
+     * @param username string representing
+     *              the email of the user.
+     * @param email string representing
+     *              the email of the user.
+     * @param password string representing
+     *                 the password of the user.
+     */
+    public void register(String username, String email, String password,
+                           RegisterHandler registerHandler) {
+        client = this.newClient();
+        UserDTO user = new UserDTO(username, email, password);
+        var invocation = client
+                .target(SERVER).path("/api/auth/register")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPost(Entity.entity(user, APPLICATION_JSON));
+        invocation.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response o) {
+                if (o.getStatus() == 201) {
+                    client = client.register(new Authenticator(o.readEntity(String.class)));
+                    loggedIn = true;
+                    registerHandler.handle(o, new ApiError());
+                } else if (o.getStatus() == 400) {
+                    registerHandler.handle(o, o.readEntity(ApiError.class));
+                } else if (o.getStatus() == 409) {
+                    registerHandler.handle(o, new ApiError());
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                System.out.println("HERE " + throwable.toString());
+            }
+        });
     }
 
     /**
@@ -234,7 +277,6 @@ public class ServerUtils {
             @Override
             public void failed(Throwable throwable) {
                 logInHandlerFail.handle();
-                System.out.println(throwable);
             }
         });
     }

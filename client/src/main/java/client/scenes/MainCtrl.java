@@ -17,7 +17,6 @@
 package client.scenes;
 
 import client.scenes.authentication.LogInScreenCtrl;
-import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
@@ -66,9 +65,6 @@ public class MainCtrl {
     private RegisterScreenCtrl registerScreenCtrl;
     private Parent registerScreen;
 
-    private NicknameScreenCtrl nicknameScreenCtrl;
-    private Parent nicknameScreen;
-
     private LobbyScreenCtrl lobbyScreenCtrl;
     private Parent lobbyScene;
 
@@ -96,7 +92,6 @@ public class MainCtrl {
                            Pair<ServerConnectScreenCtrl, Parent> serverConnectScreen,
                            Pair<LogInScreenCtrl, Parent> logInScreen,
                            Pair<RegisterScreenCtrl, Parent> registerScreen,
-                           Pair<NicknameScreenCtrl, Parent> nicknameScreen,
                            Pair<LobbyScreenCtrl, Parent> lobbyScreen,
                            Pair<GameScreenCtrl, Parent> gameScreen,
                            Pair<GlobalLeaderboardCtrl, Parent> globalLeaderboardScreen,
@@ -111,9 +106,6 @@ public class MainCtrl {
 
         this.registerScreen = registerScreen.getValue();
         this.registerScreenCtrl = registerScreen.getKey();
-
-        this.nicknameScreen = nicknameScreen.getValue();
-        this.nicknameScreenCtrl = nicknameScreen.getKey();
 
         this.lobbyScene = lobbyScreen.getValue();
         this.lobbyScreenCtrl = lobbyScreen.getKey();
@@ -251,15 +243,8 @@ public class MainCtrl {
      * This function displays the register screen.
      */
     public void showRegisterScreen() {
+        this.registerScreenCtrl.reset();
         this.showScreenLetterBox(registerScreen, StageScalingStrategy.Letterbox);
-    }
-
-    /**
-     * This function displays the nickname selection screen.
-     */
-    public void showNicknameScreen() {
-        this.showScreenLetterBox(nicknameScreen, StageScalingStrategy.Letterbox);
-        nicknameScreenCtrl.reset();
     }
 
     /**
@@ -398,7 +383,7 @@ public class MainCtrl {
         snack.registerSnackbarContainer((Pane) activeScreen);
         snack.fireEvent(new JFXSnackbar.SnackbarEvent(
                 new JFXSnackbarLayout(message),
-                Duration.seconds(1), new PseudoClass() {
+                Duration.seconds(3), new PseudoClass() {
                     @Override
                     public String getPseudoClassName() {
                         return "error";
@@ -418,9 +403,12 @@ public class MainCtrl {
         snack.registerSnackbarContainer((Pane) activeScreen);
         snack.enqueue(new JFXSnackbar.SnackbarEvent(
                 new JFXSnackbarLayout(message),
-                Duration.seconds(1), null));
+                Duration.seconds(3), null));
         snack.toFront();
         snack.setViewOrder(-1);
+    }
+
+    public void showInformationalSnackBar() {
     }
 
     /**
