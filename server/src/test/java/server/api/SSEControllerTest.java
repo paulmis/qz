@@ -96,7 +96,7 @@ class SSEControllerTest {
         Game game = new MockGame();
         game.setStatus(GameStatus.CREATED);
 
-        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(user.getId(), GameStatus.CREATED))
+        when(gameRepository.getPlayersLobbyOrGame(user.getId()))
                 .thenReturn(Optional.of(game));
 
         MvcResult mvcResult = this.mockMvc.perform(get("/api/sse/open"))

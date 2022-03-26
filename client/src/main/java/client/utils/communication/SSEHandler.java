@@ -155,7 +155,7 @@ public class SSEHandler {
      * @param inboundSseEvent the sse event.
      */
     public void handleEvent(InboundSseEvent inboundSseEvent) {
-        System.out.println("HANDLE EVENT " + inboundSseEvent);
+        System.out.println("HANDLE EVENT " + inboundSseEvent.getName());
         eventHandlers.get(SSEMessageType.valueOf(inboundSseEvent.getName())).handle(inboundSseEvent);
     }
 

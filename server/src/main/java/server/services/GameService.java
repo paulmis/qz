@@ -106,12 +106,7 @@ public class GameService {
             throw new UnsupportedOperationException("Starting games other than definite games is not yet supported.");
         }
 
-        try {
-            game.setStatus(GameStatus.ONGOING);
-            setAcceptingAnswers(game, true);
-        } catch (IOException e) {
-            System.out.println("setAcceptingAnswers's SSE event failed");
-        }
+        game.setStatus(GameStatus.ONGOING);
     }
 
     /**
