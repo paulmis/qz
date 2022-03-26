@@ -1,6 +1,8 @@
 package client.scenes.questions;
 
 import client.communication.game.AnswerHandler;
+import client.communication.game.GameCommunication;
+import client.scenes.MainCtrl;
 import commons.entities.questions.MCQuestionDTO;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -26,22 +28,22 @@ public class MCQuestionPane extends StackPane {
      *
      * @param question the question to be displayed
      */
-    public MCQuestionPane(MCQuestionDTO question, AnswerHandler answerHandler) {
+    public MCQuestionPane(MainCtrl mainCtrl, GameCommunication gameCommunication, MCQuestionDTO question) {
         // Assign the scene and controller
         FXMLLoader loader;
         if (question.isGuessConsumption()) {
             loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionCost.fxml"));
             loader.setControllerFactory(param ->
-                controller = new MCQuestionCostCtrl(question, answerHandler));
+                controller = new MCQuestionCostCtrl(mainCtrl, gameCommunication, question));
         } else {
             loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionActivity.fxml"));
             loader.setControllerFactory(param ->
-                controller = new MCQuestionActivityCtrl(question, answerHandler));
+                controller = new MCQuestionActivityCtrl(mainCtrl, gameCommunication, question));
         }
 
         // Load and add the FXML scene
         try {
-            view = (Node) loader.load();
+            view = loader.load();
             getChildren().add(view);
         } catch (Exception e) {
             Platform.exit();

@@ -1,6 +1,8 @@
 package client.scenes.questions;
 
 import client.communication.game.AnswerHandler;
+import client.communication.game.GameCommunication;
+import client.scenes.MainCtrl;
 import commons.entities.questions.MCQuestionDTO;
 import java.net.URL;
 import java.util.Arrays;
@@ -19,8 +21,8 @@ public class MCQuestionActivityCtrl extends MCQuestionCtrl {
     @FXML private ImageView imageOptionC;
     @FXML private ImageView imageOptionD;
 
-    public MCQuestionActivityCtrl(MCQuestionDTO question, AnswerHandler answerHandler) {
-        super(question, answerHandler);
+    public MCQuestionActivityCtrl(MainCtrl mainCtrl, GameCommunication gameCommunication, MCQuestionDTO question) {
+        super(mainCtrl, gameCommunication, question);
     }
 
     /**

@@ -1,5 +1,6 @@
 package commons.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import commons.entities.utils.DTO;
 import java.util.UUID;
 import lombok.Data;
@@ -43,6 +44,7 @@ public class ActivityDTO implements DTO {
      *
      * @return cost with the unit
      */
+    @JsonIgnore
     public String getCostWithHighestUnit() {
         // Calculate n
         int log = 0;
