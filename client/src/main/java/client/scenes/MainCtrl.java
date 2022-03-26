@@ -260,9 +260,8 @@ public class MainCtrl {
      * Shows the lobby screen.
      */
     public void showLobbyScreen() {
-        this.lobbyScreenCtrl.reset();
         this.showScreenLetterBox(lobbyScene, StageScalingStrategy.Letterbox);
-        lobbyScreenCtrl.updateView();
+        this.lobbyScreenCtrl.reset();
     }
 
     /**

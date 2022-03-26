@@ -13,19 +13,19 @@
          <children>
             <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="400.0" spacing="10.0">
                <children>
-                  <Label text="lt ballman">
+                  <Label fx:id="playerName" text="lt ballman">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <ImageView fitHeight="20.0" fitWidth="20.0">
+                  <ImageView fx:id="hostImg" fitHeight="20.0" fitWidth="20.0">
                      <Image url="@../../images/lobby/crown.png"/>
                   </ImageView>
                </children>
             </HBox>
             <HBox alignment="CENTER_RIGHT" prefHeight="50.0" prefWidth="254.0" spacing="10.0">
                <children>
-                  <Label text="2039">
+                  <Label fx:id="playerScore" text="2039">
                      <font>
                         <Font size="14.0" />
                      </font>

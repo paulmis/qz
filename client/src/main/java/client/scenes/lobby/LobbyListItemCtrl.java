@@ -53,6 +53,7 @@ public class LobbyListItemCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // ToDo use game name
         this.lobbyNameLabel.setText(
                 game.getPlayers().stream().filter(gamePlayerDTO -> gamePlayerDTO.getId().equals(game.getHost()))
                         .collect(Collectors.toList()).get(0).getNickname()

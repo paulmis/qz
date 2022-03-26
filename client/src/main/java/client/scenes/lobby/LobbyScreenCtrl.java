@@ -14,11 +14,14 @@ import commons.entities.game.GameType;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.layout.VBox;
 import lombok.Generated;
 import lombok.Getter;
 
@@ -38,13 +41,13 @@ public class LobbyScreenCtrl {
     @FXML private Label gameId;
     @FXML private Label gameType;
     @FXML private Label gameCapacity;
+    @FXML private VBox playerList;
     @FXML private JFXButton settingsButton;
     @FXML private JFXButton userButton;
     @FXML private JFXButton copyLinkButton;
     @FXML private JFXButton startButton;
     @FXML private JFXButton lobbySettingsButton;
     @FXML private JFXButton disbandButton;
-    @FXML private ListView playerList;
 
     /**
      * Initialize a new controller using dependency injection.
@@ -59,13 +62,14 @@ public class LobbyScreenCtrl {
     }
 
     /**
-     * This function resets the lobbu screen ctrl.
+     * This function resets the lobby screen ctrl.
      * It handles all the required set-up that needs to be done for a lobby to be displayed.
      */
     public void reset() {
         // this starts the sse connection
         sseHandler = new SSEHandler(this);
         server.subscribeToSSE(sseHandler);
+        updateView();
     }
 
     /**
@@ -122,11 +126,16 @@ public class LobbyScreenCtrl {
         dto.setGameType(GameType.PUBLIC);
         GameConfigurationDTO confDTO = new NormalGameConfigurationDTO(null, 60, 2, 20, 3, 2f, 100, 0, 75);
         dto.setConfiguration(confDTO);
-        GamePlayerDTO host = new GamePlayerDTO();
-        host.setId(UUID.randomUUID());
-        host.setNickname("A");
-        dto.setPlayers(Set.of(host));
-        dto.setHost(host.getId());
+        GamePlayerDTO sally = new GamePlayerDTO();
+        sally.setId(UUID.randomUUID());
+        sally.setNickname("Sally");
+        sally.setScore(12);
+        GamePlayerDTO john = new GamePlayerDTO();
+        john.setId(UUID.randomUUID());
+        john.setNickname("John");
+        john.setScore(30);
+        dto.setPlayers(Set.of(sally, john));
+        dto.setHost(sally.getId());
 
         // ToDo: use gameDTO to initialize the scene's view
         gameName.setText("prova");
@@ -136,7 +145,21 @@ public class LobbyScreenCtrl {
         updatePlayerList(dto);
     }
 
-    private void updatePlayerList(GameDTO dto) {
-        // ToDo: update list of players in the lobby
+    /**
+     * Populates the list of players given the game information.
+     *
+     * @param gameDTO structure containing the game information
+     */
+    private void updatePlayerList(GameDTO gameDTO) {
+        playerList.getChildren().clear();
+        List<LobbyPlayerPane> playerElements = gameDTO.getPlayers().stream()
+                .sorted((p1, p2) -> p2.getScore() - p1.getScore())
+                .map(dto -> {
+                    LobbyPlayerPane elem = new LobbyPlayerPane(dto);
+                    elem.setPlayerHost(gameDTO.getHost().equals(dto.getId()));
+                    return elem;
+                })
+                .collect(Collectors.toList());
+        playerList.getChildren().addAll(playerElements);
     }
 }
