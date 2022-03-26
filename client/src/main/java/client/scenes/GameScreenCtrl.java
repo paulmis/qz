@@ -15,9 +15,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,6 +33,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
+import javax.ws.rs.core.Response;
 import lombok.Generated;
 
 
@@ -70,8 +69,10 @@ public class GameScreenCtrl implements Initializable {
     @FXML private FontAwesomeIconView volumeIconView;
 
     private SimpleIntegerProperty volume;
-
     private List<FontAwesomeIcon> volumeIconList;
+
+    private SimpleIntegerProperty timeLeft;
+    private Timer timer;
 
 
     /**
@@ -104,6 +105,7 @@ public class GameScreenCtrl implements Initializable {
         setUpPowerUps();
         setUpTopBarLeaderBoard();
         setUpVolume();
+        setUpTimer();
 
         // This loads the estimate question type.
         loadMockEstimate();
@@ -146,6 +148,28 @@ public class GameScreenCtrl implements Initializable {
                 new EstimateQuestionPane(
                         "Short question",
                         System.out::println));
+    }
+
+    private void setUpTimer() {
+        // Keeps track of the time left.
+        timeLeft = new SimpleIntegerProperty(10);
+        // Connect the time left to the label.
+        timerLabel.textProperty().bind(timeLeft.asString());
+
+        // Create a new Java timer.
+        timer = new Timer();
+        // Create a new timer task.
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                // Decrement the time left.
+                timeLeft.set(timeLeft.get() - 1);
+                // If the time left is 0, stop the timer.
+                if (timeLeft.get() == 0) {
+                    timer.cancel();
+                }
+            }
+        };
     }
 
     /**
@@ -333,7 +357,32 @@ public class GameScreenCtrl implements Initializable {
      */
     @FXML
     private void quitButtonClick(ActionEvent actionEvent) {
-        server.quitGame();
+        mainCtrl.openGameLeaveWarning(() -> {
+            mainCtrl.closeGameLeaveWarning();
+            this.server.quitGame(new ServerUtils.QuitGameHandler() {
+                @Override
+                public void handle(Response response) {
+                    javafx.application.Platform.runLater(() -> {
+                        switch (response.getStatus()) {
+                            case 200:
+                                System.out.println("User successfully removed from game");
+                                mainCtrl.showLobbyListScreen();
+                                break;
+                            case 404:
+                                System.out.println("User/Game not found");
+                                break;
+                            case 409:
+                                System.out.println("Couldn't remove player");
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                }
+            });
+        }, () -> {
+            mainCtrl.closeGameLeaveWarning();
+        });
     }
 
 

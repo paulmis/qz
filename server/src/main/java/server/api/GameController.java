@@ -55,11 +55,7 @@ public class GameController {
         }
 
         // Mark the player as abandoned
-        try {
-            gameService.removePlayer(game.get(), user.get());
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+        gameService.removePlayer(game.get(), user.get());
         gameRepository.save(game.get());
 
         // Return 200
@@ -83,7 +79,7 @@ public class GameController {
         Optional<Question> question = game.get().getQuestion();
         // Check if question is not empty;
         if (question.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            throw new IllegalStateException("Question is empty");
         }
         // Send 200 status and payload if question exists.
         return ResponseEntity.ok(question.get().getDTO());

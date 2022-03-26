@@ -1,6 +1,7 @@
 package commons.entities.game.configuration;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.time.Duration;
 import java.util.UUID;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
@@ -40,7 +41,7 @@ public class NormalGameConfigurationDTO extends GameConfigurationDTO {
      * @param pointsWrong the number of points per incorrect answer.
      * @param correctAnswerThreshold the correct answer threshold.
      */
-    public NormalGameConfigurationDTO(UUID id, Integer answerTime, Integer capacity, Integer numQuestions,
+    public NormalGameConfigurationDTO(UUID id, Duration answerTime, Integer capacity, Integer numQuestions,
                                       Integer streakSize,
                                       Float streakMultiplier,
                                       Integer pointsCorrect,

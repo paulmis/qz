@@ -9,7 +9,9 @@ import static server.utils.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import commons.entities.game.GameStatus;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -78,7 +80,7 @@ class LobbyControllerTest {
     @Autowired
     public LobbyControllerTest(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
-        this.objectMapper = new ObjectMapper().registerModule(new Jdk8Module());
+        this.objectMapper = new ObjectMapper().registerModules(new Jdk8Module(), new JavaTimeModule());
     }
 
     @BeforeEach
@@ -103,9 +105,9 @@ class LobbyControllerTest {
         mockLobby = new NormalGame();
         mockLobby.setId(getUUID(3));
         mockLobby.setStatus(GameStatus.CREATED);
-        mockLobbyConfiguration = new NormalGameConfiguration(10, 10, 2, 2, 2f, 100, 0, 75);
+        mockLobbyConfiguration = new NormalGameConfiguration(10, Duration.ofSeconds(10), 2, 2, 2f, 100, 0, 75);
         mockLobby.setConfiguration(mockLobbyConfiguration);
-        normalGameConfiguration = new NormalGameConfiguration(4, 8, 6, 2, 2f, 100, 0, 75);
+        normalGameConfiguration = new NormalGameConfiguration(4, Duration.ofSeconds(8), 6, 2, 2f, 100, 0, 75);
 
         // Add players
         johnPlayer = new GamePlayer(john);

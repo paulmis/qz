@@ -17,10 +17,11 @@
 package client.scenes;
 
 import client.scenes.authentication.LogInScreenCtrl;
-import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
+import client.scenes.lobby.LobbyLeaveScreenCtrl;
+import client.scenes.lobby.LobbyLeaveScreenPane;
 import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
@@ -64,9 +65,6 @@ public class MainCtrl {
     private RegisterScreenCtrl registerScreenCtrl;
     private Parent registerScreen;
 
-    private NicknameScreenCtrl nicknameScreenCtrl;
-    private Parent nicknameScreen;
-
     private LobbyScreenCtrl lobbyScreenCtrl;
     private Parent lobbyScene;
 
@@ -80,6 +78,8 @@ public class MainCtrl {
     private Parent lobbyListScreen;
 
     private Popup lobbySettingsPopUp;
+    private Popup lobbyLeavePopUp;
+    private Popup gameLeavePopUp;
 
     private Parent activeScreen;
 
@@ -92,7 +92,6 @@ public class MainCtrl {
                            Pair<ServerConnectScreenCtrl, Parent> serverConnectScreen,
                            Pair<LogInScreenCtrl, Parent> logInScreen,
                            Pair<RegisterScreenCtrl, Parent> registerScreen,
-                           Pair<NicknameScreenCtrl, Parent> nicknameScreen,
                            Pair<LobbyScreenCtrl, Parent> lobbyScreen,
                            Pair<GameScreenCtrl, Parent> gameScreen,
                            Pair<GlobalLeaderboardCtrl, Parent> globalLeaderboardScreen,
@@ -107,9 +106,6 @@ public class MainCtrl {
 
         this.registerScreen = registerScreen.getValue();
         this.registerScreenCtrl = registerScreen.getKey();
-
-        this.nicknameScreen = nicknameScreen.getValue();
-        this.nicknameScreenCtrl = nicknameScreen.getKey();
 
         this.lobbyScene = lobbyScreen.getValue();
         this.lobbyScreenCtrl = lobbyScreen.getKey();
@@ -126,6 +122,8 @@ public class MainCtrl {
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
         lobbySettingsPopUp = new Popup();
+        lobbyLeavePopUp = new Popup();
+        gameLeavePopUp = new Popup();
         showServerConnectScreen();
 
         // This makes sure to close every thread when the app is closed.
@@ -245,15 +243,8 @@ public class MainCtrl {
      * This function displays the register screen.
      */
     public void showRegisterScreen() {
+        this.registerScreenCtrl.reset();
         this.showScreenLetterBox(registerScreen, StageScalingStrategy.Letterbox);
-    }
-
-    /**
-     * This function displays the nickname selection screen.
-     */
-    public void showNicknameScreen() {
-        this.showScreenLetterBox(nicknameScreen, StageScalingStrategy.Letterbox);
-        nicknameScreenCtrl.reset();
     }
 
     /**
@@ -320,6 +311,68 @@ public class MainCtrl {
     }
 
     /**
+     * This function opens a popup with
+     * a leave warning for leaving the lobby.
+     *
+     * @param leaveHandler the action that is to be performed when the user leaves the lobby.
+     * @param cancelHandler the action that is to be performed when the user cancels leaving the lobby.
+     */
+    public void openLobbyLeaveWarning(LobbyLeaveScreenCtrl.LeaveHandler leaveHandler,
+                                      LobbyLeaveScreenCtrl.CancelHandler cancelHandler) {
+        lobbyLeavePopUp.setOnShown(e -> {
+            lobbyLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - lobbyLeavePopUp.getWidth() / 2);
+
+            lobbyLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - lobbyLeavePopUp.getHeight() / 2);
+        });
+
+        var disbandPane = new LobbyLeaveScreenPane(leaveHandler, cancelHandler);
+        lobbyLeavePopUp.getContent().add(disbandPane);
+
+        lobbyLeavePopUp.show(primaryStage);
+    }
+
+    /**
+     * This function closes the lobby leave popUp.
+     */
+    public void closeLobbyLeaveWarning() {
+        lobbyLeavePopUp.hide();
+        lobbyLeavePopUp.getContent().clear();
+    }
+
+    /**
+     * This function opens a popup with
+     * a leave warning for leaving the game.
+     *
+     * @param leaveHandler the action that is to be performed when the user leaves the game.
+     * @param cancelHandler the action that is to be performed when the user cancels leaving the lobby.
+     */
+    public void openGameLeaveWarning(GameLeaveScreenCtrl.LeaveHandler leaveHandler,
+                                     GameLeaveScreenCtrl.CancelHandler cancelHandler) {
+        gameLeavePopUp.setOnShown(e -> {
+            gameLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - gameLeavePopUp.getWidth() / 2);
+
+            gameLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - gameLeavePopUp.getHeight() / 2);
+        });
+
+        var disbandPane = new GameLeaveScreenPane(leaveHandler, cancelHandler);
+        gameLeavePopUp.getContent().add(disbandPane);
+
+        gameLeavePopUp.show(primaryStage);
+    }
+
+    /**
+     * This function closes the game leave popUp.
+     */
+    public void closeGameLeaveWarning() {
+        gameLeavePopUp.hide();
+        gameLeavePopUp.getContent().clear();
+    }
+
+    /**
      * Displays an error snackBar to the user.
      *
      * @param message The text message that will be displayed in the snackBar.
@@ -330,7 +383,7 @@ public class MainCtrl {
         snack.registerSnackbarContainer((Pane) activeScreen);
         snack.fireEvent(new JFXSnackbar.SnackbarEvent(
                 new JFXSnackbarLayout(message),
-                Duration.seconds(1), new PseudoClass() {
+                Duration.seconds(3), new PseudoClass() {
                     @Override
                     public String getPseudoClassName() {
                         return "error";
@@ -350,9 +403,12 @@ public class MainCtrl {
         snack.registerSnackbarContainer((Pane) activeScreen);
         snack.enqueue(new JFXSnackbar.SnackbarEvent(
                 new JFXSnackbarLayout(message),
-                Duration.seconds(1), null));
+                Duration.seconds(3), null));
         snack.toFront();
         snack.setViewOrder(-1);
+    }
+
+    public void showInformationalSnackBar() {
     }
 
     /**
