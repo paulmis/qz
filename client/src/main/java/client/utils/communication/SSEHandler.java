@@ -136,6 +136,7 @@ public class SSEHandler {
      */
     public void setSseEventSource(SseEventSource sseEventSource) {
         this.sseEventSource = sseEventSource;
+        System.out.println("SET EVENT SOURCE TO " + sseEventSource);
     }
 
     /**
@@ -154,6 +155,7 @@ public class SSEHandler {
      * @param inboundSseEvent the sse event.
      */
     public void handleEvent(InboundSseEvent inboundSseEvent) {
+        System.out.println("HANDLE EVENT " + inboundSseEvent);
         eventHandlers.get(SSEMessageType.valueOf(inboundSseEvent.getName())).handle(inboundSseEvent);
     }
 

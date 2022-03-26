@@ -74,33 +74,10 @@ public class LobbyScreenCtrl implements SSESource {
                         mainCtrl.showErrorSnackBar("Something went wrong while starting the game.");
                         break;
                     case 425:
-                        mainCtrl.showInformationalSnackBar("Try again after a second.");
+                        mainCtrl.showErrorSnackBar("Try again after a second.");
                         break;
                     case 200:
                         mainCtrl.showInformationalSnackBar("Game started!");
-                        // Temporary - should be replaced by the SSE event
-                        ClientState.game.setStatus(GameStatus.ONGOING);
-
-                        // Update the current question
-                        GameCommunication.updateCurrentQuestion(
-                            ClientState.game.getId(),
-                            // Success
-                            (question) -> {},
-                            // Failure
-                            () -> runLater(() -> {
-                                mainCtrl.showErrorSnackBar("Failed to get the current question.");
-                            }));
-
-                        // Wait for the question to update
-                        // TODO: add init stage
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                        // Show the current screen
-                        this.mainCtrl.showGameScreen(ClientState.game.getCurrentQuestion());
                         break;
                     default:
                         mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");

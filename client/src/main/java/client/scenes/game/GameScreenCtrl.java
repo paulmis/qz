@@ -402,9 +402,9 @@ public class GameScreenCtrl implements Initializable, SSESource {
         GameCommunication.updateCurrentQuestion(
             ClientState.game.getId(),
             // Success
-            (question) -> javafx.application.Platform.runLater(() -> setQuestion(question)),
+            (question) -> runLater(() -> setQuestion(question)),
             // Failure
-            () -> javafx.application.Platform.runLater(
+            () -> runLater(
                 () -> mainCtrl.showErrorSnackBar("Unable to retrieve the current question")));
 
         // TODO: timer

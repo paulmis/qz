@@ -110,39 +110,7 @@ public class GameCommunication {
             return new ArrayList<>();
         }
     }
-
-    /**
-     * This function subscribes to the SSE event source.
-     * It calls the SSE open endpoint and handles the events.
-     *
-     * @param sseHandler The handler of sse events, exceptions and completion.
-     */
-    public void subscribeToSSE(SSEHandler sseHandler) {
-        ServerUtils.getRequestTarget()
-                .path("/api/lobby/" + ClientState.game.getId() + "/start")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .put(Entity.entity("", APPLICATION_JSON));
-
-        // This creates the WebTarget that the sse event source will use.
-        var target = ServerUtils.getRequestTarget().path("api/sse/open");
-
-        // Builds the event source with the target.
-        SseEventSource eventSource = SseEventSource.target(target).build();
-
-        // Registers the handling of events, exceptions and completion.
-        eventSource.register(
-                sseHandler::handleEvent,
-                sseHandler::handleException,
-                sseHandler::handleCompletion);
-
-        // Opens the sse listener.
-        eventSource.open();
-
-        // Sets the source of the events in the handler.
-        sseHandler.setSseEventSource(eventSource);
-    }
-
+    
     /**
      * Handler for when getting the current question succeeds.
      */
