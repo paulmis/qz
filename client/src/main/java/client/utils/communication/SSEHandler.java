@@ -155,8 +155,17 @@ public class SSEHandler {
      * @param inboundSseEvent the sse event.
      */
     public void handleEvent(InboundSseEvent inboundSseEvent) {
-        System.out.println("HANDLE EVENT " + inboundSseEvent.getName());
-        eventHandlers.get(SSEMessageType.valueOf(inboundSseEvent.getName())).handle(inboundSseEvent);
+        System.out.println("--[SSE]-- Handle event " + inboundSseEvent.getName());
+        try {
+            if (eventHandlers.containsKey(SSEMessageType.valueOf(inboundSseEvent.getName()))) {
+                eventHandlers.get(SSEMessageType.valueOf(inboundSseEvent.getName())).handle(inboundSseEvent);
+            } else {
+                System.out.println("--[SSE]-- No handler for event " + inboundSseEvent.getName()
+                    + " (source class:" + handlerSource.getClass().getName() + ")");
+            }
+        } catch (Exception e) {
+            System.out.println("--[SSE]-- Error handling: " + e.getMessage());
+        }
     }
 
     public void handleException(Throwable throwable) {
