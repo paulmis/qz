@@ -2,6 +2,7 @@ package client.scenes.lobby;
 
 import static javafx.application.Platform.runLater;
 
+import client.communication.game.GameCommunication;
 import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
 import client.utils.SSEEventHandler;
@@ -82,8 +83,26 @@ public class LobbyScreenCtrl {
                         break;
                     case 200:
                         mainCtrl.showInformationalSnackBar("Game started!");
+                        // Temporary - should be replaced by the SSE event
                         ClientState.game.setStatus(GameStatus.ONGOING);
-                        this.mainCtrl.showGameScreen(null);
+
+                        // Update the current question
+                        GameCommunication.updateCurrentQuestion(
+                            ClientState.game.getId(),
+                            // Success
+                            (question) -> {},
+                            // Failure
+                            () -> runLater(() -> {
+                                mainCtrl.showErrorSnackBar("Failed to get the current question.");
+                            }));
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        // Show the current screen
+                        this.mainCtrl.showGameScreen(ClientState.game.getCurrentQuestion());
                         break;
                     default:
                         mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");

@@ -123,14 +123,14 @@ public class GameCommunication {
     /**
      * Handler for when getting the current question succeeds.
      */
-    public interface GetQuestionHandlerSuccess {
+    public interface UpdateQuestionHandlerSuccess {
         void handle(QuestionDTO userDTO);
     }
 
     /**
      * Handler for when getting the current question fails.
      */
-    public interface GetQuestionHandlerFail {
+    public interface UpdateQuestionHandlerFail {
         void handle();
     }
 
@@ -141,23 +141,30 @@ public class GameCommunication {
      * @param handlerSuccess the handler for when the request succeeds
      * @param handlerFail the handler for when the request fails
      */
-    public static void getCurrentQuestion(UUID gameId,
-                                   GetQuestionHandlerSuccess handlerSuccess, GetQuestionHandlerFail handlerFail) {
+    public static void updateCurrentQuestion(UUID gameId,
+                                             UpdateQuestionHandlerSuccess handlerSuccess,
+                                             UpdateQuestionHandlerFail handlerFail) {
         // Built the query invocation
         Invocation invocation =
             ServerUtils.getRequestTarget()
-                .path("/api/lobby/" + gameId + "/join")
+                .path("/api/game/" + gameId + "/question")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .buildGet();
 
         // Perform the query asynchronously
-        invocation.submit(new InvocationCallback<QuestionDTO>() {
+        invocation.submit(new InvocationCallback<Response>() {
 
             @Override
-            public void completed(QuestionDTO o) {
-                System.out.println(o);
-                handlerSuccess.handle(o);
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    QuestionDTO question = response.readEntity(QuestionDTO.class);
+                    ClientState.game.setCurrentQuestion(question);
+                    handlerSuccess.handle(question);
+                } else {
+                    handlerFail.handle();
+                }
+
             }
 
             @Override
@@ -195,7 +202,7 @@ public class GameCommunication {
         // Built the query invocation
         Invocation invocation =
                 ServerUtils.getRequestTarget()
-                        .path("/api/lobby/" + gameId + "/answer")
+                        .path("/api/game/" + gameId + "/answer")
                         .request(APPLICATION_JSON)
                         .accept(APPLICATION_JSON)
                         .buildPut(Entity.entity(answer, APPLICATION_JSON));

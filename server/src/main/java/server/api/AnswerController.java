@@ -90,7 +90,7 @@ public class AnswerController {
         Answer userAnswer = new Answer(answerData);
         if (game.addAnswer(userAnswer, user.getId())) {
             // Save updated game
-            gameRepository.save(game);
+            game = gameRepository.save(game);
 
             // Answer has been received successfully.
             return ResponseEntity.ok().build();
