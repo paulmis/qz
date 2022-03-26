@@ -30,7 +30,6 @@ import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
 import server.services.LobbyService;
-import server.services.SSEManager;
 
 
 /**
@@ -58,9 +57,6 @@ public class LobbyController {
 
     @Autowired
     private GameConfigurationRepository gameConfigurationRepository;
-
-    @Autowired
-    private SSEManager sseManager;
 
     /**
      * Endpoint for the creation of new lobbies.

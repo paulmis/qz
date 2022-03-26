@@ -1,5 +1,6 @@
 package server.services.storage;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 import lombok.Generated;
@@ -60,4 +61,12 @@ public interface StorageService {
      * Delete all stored files.
      */
     void deleteAll();
+
+    /**
+     * Get the URI of a file.
+     *
+     * @param filename file path.
+     * @return URI of the file.
+     */
+    URI getURI(String filename);
 }

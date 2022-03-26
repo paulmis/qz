@@ -11,8 +11,4 @@ import server.database.entities.question.Activity;
  */
 public interface ActivityRepository extends JpaRepository<Activity, UUID> {
     Optional<Activity> findByDescriptionAndCost(@NonNull String description, @NonNull long cost);
-
-    //@Override
-    //@lombok.NonNull
-    //Optional<Activity> findById(UUID uuid);
 }

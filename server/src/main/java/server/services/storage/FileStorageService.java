@@ -3,11 +3,11 @@ package server.services.storage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 import server.configuration.FileStorageConfiguration;
-import server.exceptions.NotFoundException;
+import server.exceptions.ResourceNotFoundException;
 import server.exceptions.StorageException;
 
 /**
@@ -27,6 +27,8 @@ import server.exceptions.StorageException;
 @Slf4j
 @Service
 public class FileStorageService implements StorageService {
+    private static final URI BASE_URI = URI.create("http://localhost:8080/api/resource/");
+
     @Getter
     private final Path fileStorageLocation;
 
@@ -145,11 +147,11 @@ public class FileStorageService implements StorageService {
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
-                throw new NotFoundException("Could not read file: " + filename);
+                throw new ResourceNotFoundException("Could not read file: " + filename);
             }
         } catch (MalformedURLException e) {
             log.warn("Could not resolve path " + filename);
-            throw new NotFoundException("Could not read file " + filename, e);
+            throw new ResourceNotFoundException("Could not read file " + filename, e);
         }
     }
 
@@ -159,5 +161,16 @@ public class FileStorageService implements StorageService {
     @Override
     public void deleteAll() {
         FileSystemUtils.deleteRecursively(this.fileStorageLocation.toFile());
+    }
+
+    /**
+     * Get the URI of a file.
+     *
+     * @param filename file path.
+     * @return URI of the file.
+     */
+    @Override
+    public URI getURI(String filename) {
+        return BASE_URI.resolve(filename).normalize();
     }
 }
