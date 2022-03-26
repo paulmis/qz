@@ -27,25 +27,25 @@ public class MCQuestionPane extends StackPane {
      * @param question the question to be displayed
      */
     public MCQuestionPane(MCQuestionDTO question, AnswerHandler answerHandler) {
+        // Assign the scene and controller
+        FXMLLoader loader;
+        if (question.isGuessConsumption()) {
+            loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionCost.fxml"));
+            loader.setControllerFactory(param ->
+                controller = new MCQuestionCostCtrl(question, answerHandler));
+        } else {
+            loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionActivity.fxml"));
+            loader.setControllerFactory(param ->
+                controller = new MCQuestionActivityCtrl(question, answerHandler));
+        }
 
-        // We create the loader for the fxml of the question
-        FXMLLoader fxmlLoader =
-                new FXMLLoader(getClass().getResource("/client/scenes/questions/MultipleChoiceQuestion.fxml"));
-
-        // We set the controller of the fxml to our newly created controller
-        // we also pass in the question text and the answer handler
-        fxmlLoader.setControllerFactory(param ->
-                controller = new MCQuestionCtrl(question, answerHandler));
-
-        // This loads the fxml
+        // Load and add the FXML scene
         try {
-            view = (Node) fxmlLoader.load();
+            view = (Node) loader.load();
+            getChildren().add(view);
         } catch (Exception e) {
             Platform.exit();
             System.exit(0);
         }
-
-        // Adds it to the view of this control(stack pane)
-        getChildren().add(view);
     }
 }

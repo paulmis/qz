@@ -17,82 +17,70 @@ import javafx.scene.layout.VBox;
 import lombok.Generated;
 
 /**
- * Multiple Choice Question Controller.
+ * MCQuestion controller.
  */
 @Generated
-public class MCQuestionCtrl implements Initializable {
+public abstract class MCQuestionCtrl implements Initializable {
 
-    @FXML private Label questionLabel;
-    @FXML private ImageView imageOptionA;
-    @FXML private ImageView imageOptionB;
-    @FXML private ImageView imageOptionC;
-    @FXML private ImageView imageOptionD;
-    @FXML private Label labelOptionA;
-    @FXML private Label labelOptionB;
-    @FXML private Label labelOptionC;
-    @FXML private Label labelOptionD;
-    @FXML private JFXButton buttonOptionA;
-    @FXML private JFXButton buttonOptionB;
-    @FXML private JFXButton buttonOptionC;
-    @FXML private JFXButton buttonOptionD;
-    @FXML private VBox imageVBox;
+    @FXML protected Label questionLabel;
+    @FXML protected Label labelOptionA;
+    @FXML protected Label labelOptionB;
+    @FXML protected Label labelOptionC;
+    @FXML protected Label labelOptionD;
+    @FXML protected JFXButton buttonOptionA;
+    @FXML protected JFXButton buttonOptionB;
+    @FXML protected JFXButton buttonOptionC;
+    @FXML protected JFXButton buttonOptionD;
+    @FXML protected VBox imageVBox;
 
-    private final MCQuestionDTO question;
-    private final AnswerHandler answerHandler;
+    protected final MCQuestionDTO question;
+    protected final AnswerHandler answerHandler;
 
+    /**
+     * Constructor for MCQuestionCtrl.
+     *
+     * @param question the question this controller manages
+     * @param answerHandler handler for when an answer is chosen
+     */
     public MCQuestionCtrl(MCQuestionDTO question, AnswerHandler answerHandler) {
         this.question = question;
         this.answerHandler = answerHandler;
     }
 
-    /**
-     * Initializes the controls of this MCQuestionPane.
-     *
-     * @param location These location parameter.
-     * @param resources The resource bundle.
-     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Sets the question text
         this.questionLabel.setText(question.getText());
 
-        // Three arrays for the controls of the answers.
-        // They are created for easier referencing.
-        var imageOptionArray = Arrays.asList(imageOptionA, imageOptionB, imageOptionC, imageOptionD);
-        var labelOptionArray = Arrays.asList(labelOptionA, labelOptionB, labelOptionC, labelOptionD);
-        var buttonOptionArray = Arrays.asList(buttonOptionA, buttonOptionB, buttonOptionC, buttonOptionD);
-
         // Looping over they answer controls
-        for (int i = 0; i < imageOptionArray.size(); i++) {
-            var imageOption = imageOptionArray.get(i);
-
-            // Sets the image of the imageView to the url specified
-            // in answerImages
-            imageOption.setImage(null);
-
-            // This code resizes the image view to the surrounding vbox.
-            // It uses a bind on the minimum of the vbox width and height and multiplies that by 0.8.
-            // In this way the image resizes properly to a lot of screen sizes.
-            imageOption.fitHeightProperty().bind(Bindings.min(
-                    imageVBox.widthProperty(),
-                    imageVBox.heightProperty()).multiply(0.8));
-
-            // This just binds the width of the image to the height
-            // This is assuming that the images will be feed in as a squares.
-            imageOption.fitWidthProperty().bind(imageOption.fitHeightProperty());
-
-            var labelOption = labelOptionArray.get(i);
-            long cost = question.getActivities().get(i).getCost();
-            labelOption.setText(Long.toString(cost));
-
+        for (int i = 0; i < getLabels().size(); i++) {
             // Assign the answer handler to the button
-            buttonOptionArray
+            int finalI = i;
+            getButtons()
                 .get(i)
                 .setOnAction((actionEvent) ->
                     answerHandler.handle(
                         new AnswerDTO(
-                            List.of(cost),
+                            List.of(question.getActivities().get(finalI).getCost()),
                             question.getId())));
         }
+    }
+
+    /**
+     * Returns all answer label controls.
+     *
+     * @return all answer label controls
+     */
+    protected List<Label> getLabels() {
+        return Arrays.asList(labelOptionA, labelOptionB, labelOptionC, labelOptionD);
+    }
+
+    /**
+     * Returns all answer button controls.
+     *
+     * @return all answer button controls
+     */
+    protected List<JFXButton> getButtons() {
+        return Arrays.asList(buttonOptionA, buttonOptionB, buttonOptionC, buttonOptionD);
     }
 }
