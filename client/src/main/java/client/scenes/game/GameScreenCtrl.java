@@ -426,21 +426,8 @@ public class GameScreenCtrl implements Initializable {
         // Show the question
         if (question instanceof MCQuestionDTO) {
             // Create the question pane
-            MCQuestionPane questionPane = new MCQuestionPane(
-                (MCQuestionDTO) question,           // Question
-                (answer) ->                         // Answer handler
-                    GameCommunication.putAnswer(
-                        ClientState.game.getId(),
-                        answer,
-                        // Success
-                        () -> {
-                        },
-                        // Failure
-                        () -> javafx.application.Platform.runLater(
-                            () -> mainCtrl.showErrorSnackBar("Unable to send the answer"))));
-
-            // Assign the question pane
-            mainBorderPane.setCenter(questionPane);
+            mainBorderPane.setCenter(
+                new MCQuestionPane(mainCtrl, communication, (MCQuestionDTO) question));
         } else {
             throw new NotImplementedException(question.getClass() + " not supported yet");
         }

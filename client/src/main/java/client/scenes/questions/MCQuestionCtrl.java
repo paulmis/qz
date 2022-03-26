@@ -1,6 +1,10 @@
 package client.scenes.questions;
 
-import client.communication.game.AnswerHandler;
+import static javafx.application.Platform.runLater;
+
+import client.communication.game.GameCommunication;
+import client.scenes.MainCtrl;
+import client.utils.ClientState;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.AnswerDTO;
 import commons.entities.questions.MCQuestionDTO;
@@ -8,11 +12,9 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import lombok.Generated;
 
@@ -21,6 +23,8 @@ import lombok.Generated;
  */
 @Generated
 public abstract class MCQuestionCtrl implements Initializable {
+    private final MainCtrl mainCtrl;
+    private final GameCommunication communication;
 
     @FXML protected Label questionLabel;
     @FXML protected Label labelOptionA;
@@ -33,18 +37,19 @@ public abstract class MCQuestionCtrl implements Initializable {
     @FXML protected JFXButton buttonOptionD;
     @FXML protected VBox imageVBox;
 
+    protected JFXButton chosenAnswer = null;
+
     protected final MCQuestionDTO question;
-    protected final AnswerHandler answerHandler;
 
     /**
      * Constructor for MCQuestionCtrl.
      *
      * @param question the question this controller manages
-     * @param answerHandler handler for when an answer is chosen
      */
-    public MCQuestionCtrl(MCQuestionDTO question, AnswerHandler answerHandler) {
+    public MCQuestionCtrl(MainCtrl mainCtrl, GameCommunication gameCommunication, MCQuestionDTO question) {
+        this.mainCtrl = mainCtrl;
+        this.communication = gameCommunication;
         this.question = question;
-        this.answerHandler = answerHandler;
     }
 
     @Override
@@ -52,18 +57,48 @@ public abstract class MCQuestionCtrl implements Initializable {
         // Sets the question text
         this.questionLabel.setText(question.getText());
 
-        // Looping over they answer controls
+        // Specify behaviour on answer click
         for (int i = 0; i < getLabels().size(); i++) {
-            // Assign the answer handler to the button
+            // Get the button
             int finalI = i;
-            getButtons()
-                .get(i)
-                .setOnAction((actionEvent) ->
-                    answerHandler.handle(
-                        new AnswerDTO(
-                            List.of(question.getActivities().get(finalI).getCost()),
-                            question.getId())));
+            JFXButton button = getButtons().get(i);
+
+            // Add the callback
+            button
+                .setOnAction((actionEvent) -> {
+                    if (button != chosenAnswer) {
+                        // Send the answer
+                        GameCommunication.putAnswer(
+                            ClientState.game.getId(),
+                            new AnswerDTO(
+                                List.of(question.getActivities().get(finalI).getCost()),
+                                question.getId()),
+                            // Success
+                            () -> runLater(() -> setCurrentAnswer(button)),
+                            // Failure
+                            () -> runLater(() ->
+                                mainCtrl.showErrorSnackBar("Unable to send the answer")
+                            )
+                        );
+                    }
+                });
         }
+    }
+
+    /**
+     * Sets the current answer.
+     *
+     * @param button the button representing the current answer
+     */
+    protected void setCurrentAnswer(JFXButton button) {
+        // Remove styles from the old answer
+        if (this.chosenAnswer != null) {
+            this.chosenAnswer.getStyleClass().remove("chosen-answer");
+        }
+
+        // Set the new answer
+        button.getStyleClass().add("chosen-answer");
+        chosenAnswer = button;
     }
 
     /**

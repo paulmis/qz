@@ -1,6 +1,8 @@
 package client.scenes.questions;
 
 import client.communication.game.AnswerHandler;
+import client.communication.game.GameCommunication;
+import client.scenes.MainCtrl;
 import commons.entities.questions.MCQuestionDTO;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -9,8 +11,8 @@ import java.util.ResourceBundle;
  * MCQuestion controller for questions with costs as answers.
  */
 public class MCQuestionCostCtrl extends MCQuestionCtrl {
-    public MCQuestionCostCtrl(MCQuestionDTO question, AnswerHandler answerHandler) {
-        super(question, answerHandler);
+    public MCQuestionCostCtrl(MainCtrl mainCtrl, GameCommunication gameCommunication, MCQuestionDTO question) {
+        super(mainCtrl, gameCommunication, question);
     }
 
     @Override
