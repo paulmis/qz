@@ -49,8 +49,12 @@ public class LobbyCommunication {
 
             @Override
             public void completed(Response response) {
-                System.out.println("Game started");
-                handlerSuccess.handle();
+                if (response.getStatus() == 200) {
+                    handlerSuccess.handle();
+                } else {
+                    System.out.println("Starting game failed");
+                    handlerFail.handle();
+                }
             }
 
             @Override

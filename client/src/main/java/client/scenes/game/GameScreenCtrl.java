@@ -356,7 +356,7 @@ public class GameScreenCtrl implements Initializable {
     @SSEEventHandler(SSEMessageType.START_QUESTION)
     void toQuestionStage() {
         // Set the current question
-        GameCommunication.getCurrentQuestion(
+        GameCommunication.updateCurrentQuestion(
             ClientState.game.getId(),
             // Success
             (question) -> javafx.application.Platform.runLater(() -> setQuestion(question)),

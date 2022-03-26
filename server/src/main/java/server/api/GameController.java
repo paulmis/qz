@@ -73,8 +73,7 @@ public class GameController {
      * @return information/object of the current question
      */
     @GetMapping("/{gameId}/question")
-    ResponseEntity<QuestionDTO> currentQuestion(
-            @PathVariable UUID gameId) {
+    ResponseEntity<QuestionDTO> currentQuestion(@PathVariable UUID gameId) {
         // Check if game exists.
         Optional<Game> game = gameRepository.findById(gameId);
         if (game.isEmpty()) {

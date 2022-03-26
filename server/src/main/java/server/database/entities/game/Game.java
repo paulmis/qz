@@ -229,7 +229,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Whether the players are allowed to submit an answer or not.
      */
-    @Transient
     protected boolean acceptingAnswers = false;
 
     /**
