@@ -254,6 +254,7 @@ public class MainCtrl {
      * Shows the lobby screen.
      */
     public void showLobbyScreen() {
+        lobbyScreenCtrl.bindHandler(ServerUtils.sseHandler);
         this.showScreenLetterBox(lobbyScene, StageScalingStrategy.Letterbox);
     }
 

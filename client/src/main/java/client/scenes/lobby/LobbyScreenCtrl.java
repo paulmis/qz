@@ -59,6 +59,14 @@ public class LobbyScreenCtrl implements SSESource {
     }
 
     /**
+     * Example of a sse event handler.
+     */
+    @SSEEventHandler(SSEMessageType.PLAYER_LEFT)
+    public void playerLeft(String playerId) {
+
+    }
+
+    /**
      * Fired when the start button is clicked.
      */
     public void startButtonClick() {

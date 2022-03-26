@@ -44,7 +44,9 @@ public abstract class MCQuestionCtrl implements Initializable {
     /**
      * Constructor for MCQuestionCtrl.
      *
-     * @param question the question this controller manages
+     * @param mainCtrl the main controller
+     * @param gameCommunication the communication class
+     * @param question the question to show
      */
     public MCQuestionCtrl(MainCtrl mainCtrl, GameCommunication gameCommunication, MCQuestionDTO question) {
         this.mainCtrl = mainCtrl;

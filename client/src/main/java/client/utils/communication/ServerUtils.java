@@ -16,6 +16,8 @@
 
 package client.utils.communication;
 
+import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import client.utils.Authenticator;
@@ -210,7 +212,7 @@ public class ServerUtils {
      */
     public void createLobby(CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
                             CreateLobbyHandlerFail createLobbyHandlerFail) {
-        var config = new NormalGameConfigurationDTO(null, Duration.ofMinutes(1), 1, 20, 3, 2f, 100, 0, 75);
+        var config = new NormalGameConfigurationDTO(null, Duration.ofSeconds(10), 1, 10, 3, 2f, 100, 0, 75);
         var game = new NormalGameDTO();
         game.setId(UUID.randomUUID());
         game.setConfiguration(config);
@@ -387,7 +389,7 @@ public class ServerUtils {
         var target = getRequestTarget().path("api/sse/open");
 
         // Builds the event source with the target.
-        SseEventSource eventSource = SseEventSource.target(target).build();
+        SseEventSource eventSource = SseEventSource.target(target).reconnectingEvery(0, MICROSECONDS).build();
 
         // Registers the handling of events, exceptions and completion.
         eventSource.register(

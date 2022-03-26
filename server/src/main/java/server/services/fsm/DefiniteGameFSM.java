@@ -62,36 +62,41 @@ public class DefiniteGameFSM extends GameFSM {
     }
 
     /**
-     * Leaderboard stage. In this stage, the leaderboard is shown for a fixed amount of time.
-     * The FSM then transitions into the question stage.
+     * Question stage. In this stage, the question is shown for some time (amount provided by the Game entity).
+     * Players are allowed to submit answers.
+     * The FSM then transitions into the answer stage, or the finished stage, if the game reached its conclusion.
      */
     @SneakyThrows
-    void runLeaderboard() {
+    void runQuestion() {
         // If we received a stop signal, return immediately.
         if (!isRunning()) {
             log.debug("[{}] Stop signal received, FSM exiting.", getGame().getId());
             return;
         }
 
-        log.trace("[{}] FSM runLeaderboard called.", getGame().getId());
-        setState(FSMState.LEADERBOARD);
+        log.trace("[{}] FSM runQuestion called.", getGame().getId());
+        setState(FSMState.QUESTION);
 
-        // TODO: make this configurable?
-        int delay = 5000; // Delay before progressing to the next stage.
+        // If the game is finished, run the cleanup function and return immediately.
+        if (getGame().getCurrentQuestionNumber()
+            == ((DefiniteGame) getGame()).getQuestionsCount()) {
+            runFinish();
+            return;
+        }
 
-        // Notify all players to show the leaderboard.
-        getContext().getSseManager().send(getGame().getPlayerIds(),
-            new SSEMessage(SSEMessageType.SHOW_LEADERBOARD, delay));
-        log.trace("[{}] Leaderboard shown.", getGame().getId());
+        // Move onto the next question.
+        log.debug("[{}] FSM runnable: advancing onto the next question.", getGame().getId());
+        getGame().setCurrentQuestionNumber(getGame().getCurrentQuestionNumber() + 1);
 
-        // Calculate when to proceed to the next stage.
-        Date executionTime = DateUtils.addMilliseconds(new Date(), delay);
-        // Schedule the next stage.
-        setFuture(
-                new FSMFuture(
-                        Optional.of(getContext().getTaskScheduler().schedule(this::runQuestion, executionTime)),
-                        executionTime)
-        );
+        // Start accepting answers.
+        getContext().getGameService().setAcceptingAnswers(getGame(),
+            true,
+            getGame().getConfiguration().getAnswerTime().toMillis());
+
+        log.trace("[{}] FSM runnable: accepting answers enabled.", getGame().getId());
+
+        // Schedule the "show answer" stage.
+        scheduleTask(this::runAnswer, getGame().getConfiguration().getAnswerTime());
     }
 
     /**
@@ -130,41 +135,36 @@ public class DefiniteGameFSM extends GameFSM {
     }
 
     /**
-     * Question stage. In this stage, the question is shown for some time (amount provided by the Game entity).
-     * Players are allowed to submit answers.
-     * The FSM then transitions into the answer stage, or the finished stage, if the game reached its conclusion.
+     * Leaderboard stage. In this stage, the leaderboard is shown for a fixed amount of time.
+     * The FSM then transitions into the question stage.
      */
     @SneakyThrows
-    void runQuestion() {
+    void runLeaderboard() {
         // If we received a stop signal, return immediately.
         if (!isRunning()) {
             log.debug("[{}] Stop signal received, FSM exiting.", getGame().getId());
             return;
         }
 
-        log.trace("[{}] FSM runQuestion called.", getGame().getId());
-        setState(FSMState.QUESTION);
+        log.trace("[{}] FSM runLeaderboard called.", getGame().getId());
+        setState(FSMState.LEADERBOARD);
 
-        // If the game is finished, run the cleanup function and return immediately.
-        if (getGame().getCurrentQuestionNumber()
-                == ((DefiniteGame) getGame()).getQuestionsCount()) {
-            runFinish();
-            return;
-        }
+        // TODO: make this configurable?
+        int delay = 5000; // Delay before progressing to the next stage.
 
-        // Move onto the next question.
-        log.debug("[{}] FSM runnable: advancing onto the next question.", getGame().getId());
-        getGame().setCurrentQuestionNumber(getGame().getCurrentQuestionNumber() + 1);
+        // Notify all players to show the leaderboard.
+        getContext().getSseManager().send(getGame().getPlayerIds(),
+            new SSEMessage(SSEMessageType.SHOW_LEADERBOARD, delay));
+        log.trace("[{}] Leaderboard shown.", getGame().getId());
 
-        // Start accepting answers.
-        getContext().getGameService().setAcceptingAnswers(getGame(),
-                true,
-                getGame().getConfiguration().getAnswerTime().toMillis());
-
-        log.trace("[{}] FSM runnable: accepting answers enabled.", getGame().getId());
-
-        // Schedule the "show answer" stage.
-        scheduleTask(this::runAnswer, getGame().getConfiguration().getAnswerTime());
+        // Calculate when to proceed to the next stage.
+        Date executionTime = DateUtils.addMilliseconds(new Date(), delay);
+        // Schedule the next stage.
+        setFuture(
+            new FSMFuture(
+                Optional.of(getContext().getTaskScheduler().schedule(this::runQuestion, executionTime)),
+                executionTime)
+        );
     }
 
     @SneakyThrows

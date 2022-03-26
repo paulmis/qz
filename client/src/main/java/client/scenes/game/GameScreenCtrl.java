@@ -5,7 +5,8 @@ import static javafx.application.Platform.runLater;
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.questions.EstimateQuestionPane;
-import client.scenes.questions.MCQuestionPane;
+import client.scenes.questions.QuestionPane;
+import client.scenes.questions.StartGamePane;
 import client.utils.ClientState;
 import client.utils.communication.SSEEventHandler;
 import client.utils.communication.SSEHandler;
@@ -15,7 +16,6 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
 import commons.entities.messages.SSEMessageType;
-import commons.entities.questions.MCQuestionDTO;
 import commons.entities.questions.QuestionDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
@@ -39,7 +39,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import lombok.Generated;
-import org.apache.commons.lang3.NotImplementedException;
 
 
 /**
@@ -116,6 +115,35 @@ public class GameScreenCtrl implements Initializable, SSESource {
         // This loads the estimate question type.
         loadMockEstimate();
     }
+
+    /**
+     * Transits the client to the question stage.
+     */
+    @SSEEventHandler(SSEMessageType.START_QUESTION)
+    public void toQuestionStage() {
+        // Set the current question
+        GameCommunication.updateCurrentQuestion(
+            ClientState.game.getId(),
+            // Success
+            (question) -> runLater(() -> setQuestion(question)),
+            // Failure
+            () -> runLater(
+                () -> mainCtrl.showErrorSnackBar("Unable to retrieve the current question")));
+
+        // TODO: timer
+    }
+
+    /**
+     * Transits the client to the answer stage.
+     */
+    @SSEEventHandler(SSEMessageType.STOP_QUESTION)
+    public void toAnswerStage() {
+        // TODO: implement
+        mainCtrl.showInformationalSnackBar("The question has ended");
+
+        // TODO: timer
+    }
+
 
     /**
      * A mock function that loads the a estimate control.
@@ -386,43 +414,19 @@ public class GameScreenCtrl implements Initializable, SSESource {
     }
 
     /**
-     * Example of a sse event handler.
-     */
-    @SSEEventHandler(SSEMessageType.PLAYER_LEFT)
-    public void playerLeft(String playerId) {
-
-    }
-
-    /**
-     * Transits the client to the question stage.
-     */
-    @SSEEventHandler(SSEMessageType.START_QUESTION)
-    void toQuestionStage() {
-        // Set the current question
-        GameCommunication.updateCurrentQuestion(
-            ClientState.game.getId(),
-            // Success
-            (question) -> runLater(() -> setQuestion(question)),
-            // Failure
-            () -> runLater(
-                () -> mainCtrl.showErrorSnackBar("Unable to retrieve the current question")));
-
-        // TODO: timer
-    }
-
-    /**
      * Shows the question on the screen.
      *
      * @param question the question to show.
      */
     public void setQuestion(QuestionDTO question) {
-        // Show the question
-        if (question instanceof MCQuestionDTO) {
-            // Create the question pane
+        // If the question is null, display an empty start pane
+        if (question == null) {
             mainBorderPane.setCenter(
-                new MCQuestionPane(mainCtrl, communication, (MCQuestionDTO) question));
+                new StartGamePane(mainCtrl, communication));
+        // Otherwise, show a question pane
         } else {
-            throw new NotImplementedException(question.getClass() + " not supported yet");
+            mainBorderPane.setCenter(
+                new QuestionPane(mainCtrl, communication, question));
         }
 
         // Set the current question

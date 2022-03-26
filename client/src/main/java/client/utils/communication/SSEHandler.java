@@ -3,6 +3,7 @@ package client.utils.communication;
 import static javafx.application.Platform.runLater;
 
 import commons.entities.messages.SSEMessageType;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -31,14 +32,23 @@ public class SSEHandler {
         void handle(InboundSseEvent inboundSseEvent);
     }
 
-    Object handlerSource;
+    Object handlerSource = null;
     SseEventSource sseEventSource;
     Map<SSEMessageType, SSEEventHandler> eventHandlers;
 
     /**
      * No-args constructor.
      */
-    public SSEHandler() {}
+    public SSEHandler() {
+        eventHandlers = new HashMap<SSEMessageType, SSEEventHandler>();
+        eventHandlers.put(SSEMessageType.INIT, new SSEEventHandler() {
+            @Override
+            public void handle(InboundSseEvent inboundSseEvent) {
+                System.out.println("Initialized connection SSE.");
+            }
+        });
+    }
+
 
     /**
      * The constructor of the SSEHandler.
@@ -86,8 +96,6 @@ public class SSEHandler {
                         + "of parameters.");
             }
 
-            // Gets the type of the first parameter
-
             // This creates the SSEEvent handler for the event.
             return (SSEEventHandler) inboundSseEvent -> {
 
@@ -100,19 +108,21 @@ public class SSEHandler {
                             e.printStackTrace();
                         }
                     });
-                }
-                // Reads the object with the extracted type.
-                var obj = inboundSseEvent.readData(types[0]);
+                } else {
+                    // Reads the object with the extracted type.
+                    var obj = inboundSseEvent.readData(types[0]);
 
-                // This invokes the function with the object and the source inside a run later so
-                // javafx components can have their state changed.
-                runLater(() -> {
-                    try {
-                        method.invoke(handlerSource, obj);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+                    // This invokes the function with the object and the source inside a run later so
+                    // javafx components can have their state changed.
+                    runLater(() -> {
+                        try {
+                            method.invoke(handlerSource, obj);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
+
             };
         }).collect(Collectors.toList());
 
@@ -160,11 +170,19 @@ public class SSEHandler {
             if (eventHandlers.containsKey(SSEMessageType.valueOf(inboundSseEvent.getName()))) {
                 eventHandlers.get(SSEMessageType.valueOf(inboundSseEvent.getName())).handle(inboundSseEvent);
             } else {
-                System.out.println("--[SSE]-- No handler for event " + inboundSseEvent.getName()
-                    + " (source class:" + handlerSource.getClass().getName() + ")");
+                System.out.println("--[SSE]-- No handler for event " + inboundSseEvent.getName());
+                System.out.println("--[SSE]-- Source class:"
+                    + (this.handlerSource == null
+                        ? "<null>"
+                        : this.handlerSource.getClass().getName())
+                    + " with events:");
+                for (SSEMessageType message : eventHandlers.keySet()) {
+                    System.out.println("    " + message.toString());
+                }
             }
         } catch (Exception e) {
-            System.out.println("--[SSE]-- Error handling: " + e.getMessage());
+            System.out.println("--[SSE]-- Exception: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
