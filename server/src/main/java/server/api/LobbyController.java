@@ -122,7 +122,6 @@ public class LobbyController {
                 .stream()
                 .map(Game::getDTO)
                 .collect(Collectors.toList());
-        System.out.println(lobbies.stream().map(gameDTO -> gameDTO.getConfiguration().getAnswerTime()).collect(Collectors.toList()));
         return ResponseEntity.ok(lobbies);
     }
 
