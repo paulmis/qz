@@ -5,15 +5,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="113.0" prefWidth="317.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="topLevelAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="113.0" prefWidth="317.0" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.chat.ChatMessageCtrl">
    <children>
-      <Label text="Pinco Palla:">
+      <Label fx:id="messageUser" text="Pinco Palla:">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <TextArea text="ciao prova prova">
+      <TextArea fx:id="messageContent" editable="false" text="ciao prova prova">
          <font>
             <Font size="18.0" />
          </font>

@@ -13,4 +13,5 @@ public enum SSEMessageType {
     STOP_QUESTION,
     SHOW_LEADERBOARD,
     LOBBY_DELETED,
+    CHAT_MESSAGE,
 }

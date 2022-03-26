@@ -9,7 +9,6 @@ import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
-import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
 import java.time.Duration;
 import javafx.fxml.FXML;
