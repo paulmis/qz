@@ -104,8 +104,10 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void createLobbyButtonClick() {
-        server.createLobby(game -> runLater(mainCtrl::showLobbyScreen),
-                () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
+        server.createLobby(game -> runLater(() -> {
+            mainCtrl.showLobbyScreen();
+            this.checkHost(game);
+        }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
     }
 
     @FXML
@@ -122,6 +124,27 @@ public class LobbyListCtrl implements Initializable {
     @FXML
     private void searchButtonClick() {
         updateLobbyList(searchField.getText());
+    }
+
+    /** This function checks if the player is the host of the lobby.
+     *
+     * @param gameDTO the gameDTO the user is creating or joining
+     */
+    public void checkHost(GameDTO gameDTO) {
+        this.server.getMyGamePlayerInfo(gamePlayerDTO -> runLater(() -> {
+            //Fetching user's game player data success
+            if (gamePlayerDTO.getId() == gameDTO.getHost()) {
+                System.out.println("Player is host");
+                mainCtrl.showDisbandButton();
+            } else {
+                System.out.println("Player is not host");
+                mainCtrl.hideDisbandButton();
+            }
+        }), () -> runLater(() -> {
+            //Fetching user's game player data failed
+            System.out.println("Something went wrong while fetching user information");
+            mainCtrl.hideDisbandButton();
+        }));
     }
 
     /**
@@ -147,7 +170,10 @@ public class LobbyListCtrl implements Initializable {
                             sortedLobbies.map(gameDTO ->
                                     new LobbyListItemPane(gameDTO, (id) ->
                                             server.joinLobby(id,
-                                                    gameDTO1 -> runLater(mainCtrl::showLobbyScreen),
+                                                    gameDTO1 -> runLater(() -> {
+                                                        mainCtrl.showLobbyScreen();
+                                                        this.checkHost(gameDTO);
+                                                    }),
                                                     () -> runLater(() ->
                                                             mainCtrl.showErrorSnackBar(
                                                                     "Something went wrong while joining the lobby."

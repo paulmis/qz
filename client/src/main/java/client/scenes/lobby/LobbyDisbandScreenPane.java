@@ -38,7 +38,8 @@ public class LobbyDisbandScreenPane extends StackPane {
      * @param disbandHandler the action that is to be performed on a disband.
      * @param cancelHandler the action that is to be performed on a cancel.
      */
-    public LobbyDisbandScreenPane(LobbyDisbandScreenCtrl.DisbandHandler disbandHandler, LobbyDisbandScreenCtrl.CancelHandler cancelHandler) {
+    public LobbyDisbandScreenPane(LobbyDisbandScreenCtrl.DisbandHandler disbandHandler,
+                                  LobbyDisbandScreenCtrl.CancelHandler cancelHandler) {
         setUpScreen(new LobbyDisbandScreenCtrl(disbandHandler, cancelHandler));
     }
 }

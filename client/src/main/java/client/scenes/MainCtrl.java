@@ -45,8 +45,6 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import lombok.Generated;
 
-import java.util.UUID;
-
 /**
  * Main controller for the client application.
  */
@@ -380,7 +378,8 @@ public class MainCtrl {
      * @param disbandHandler the action that is to be performed when the host disbands the lobby.
      * @param cancelHandler the action that is to be performed when the host cancels disbanding the lobby.
      */
-    public void openLobbyDisbandWarning(LobbyDisbandScreenCtrl.DisbandHandler disbandHandler, LobbyDisbandScreenCtrl.CancelHandler cancelHandler) {
+    public void openLobbyDisbandWarning(LobbyDisbandScreenCtrl.DisbandHandler disbandHandler,
+                                        LobbyDisbandScreenCtrl.CancelHandler cancelHandler) {
         lobbyDisbandPopUp.setOnShown(e -> {
             lobbyDisbandPopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - lobbyDisbandPopUp.getWidth() / 2);
@@ -401,6 +400,14 @@ public class MainCtrl {
     public void closeLobbyDisbandWarning() {
         lobbyDisbandPopUp.hide();
         lobbyDisbandPopUp.getContent().clear();
+    }
+
+    public void showDisbandButton() {
+        lobbyScreenCtrl.getDisbandButton().setVisible(true);
+    }
+
+    public void hideDisbandButton() {
+        lobbyScreenCtrl.getDisbandButton().setVisible(false);
     }
 
     /**

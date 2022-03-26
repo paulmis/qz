@@ -9,11 +9,8 @@ import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
-import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
-
 import java.time.Duration;
-import java.util.UUID;
 import javafx.fxml.FXML;
 import javax.ws.rs.core.Response;
 import lombok.Generated;
@@ -31,8 +28,6 @@ public class LobbyScreenCtrl {
     private SSEHandler sseHandler;
 
     private String name = "Ligma's Lobby";
-    private UUID hostId = null;
-    private UUID userId = null;
 
     @FXML private JFXButton disbandButton;
     @FXML private JFXButton settingsButton;
@@ -54,32 +49,7 @@ public class LobbyScreenCtrl {
         this.server = server;
     }
 
-    /** This function checks if the player is the host of the lobby.
-     *
-     */
-    public void checkHost() {
-        this.server.getMyInfo(userDTO -> runLater(() -> {
-                //Fetching user data success
-                this.server.getLobbyInfo(gameDTO -> runLater(() -> {
-                    //Fetching lobby data success
-                    if (userDTO.getId() == gameDTO.getHost()) {
-                        System.out.println("Player is host");
-                        disbandButton.setVisible(true);
-                    } else {
-                        System.out.println("Player is not host");
-                        disbandButton.setVisible(false);
-                    }
-                }), () -> runLater(() -> {
-                    //Fetching lobby data failed
-                    disbandButton.setVisible(false);
-                    System.out.println("Something went wrong while fetching lobby information");
-                }));
-            }), () -> runLater(() -> {
-                //Fetching user data failed
-                disbandButton.setVisible(false);
-                System.out.println("Something went wrong while fetching user information");
-            }));
-    }
+
 
 
     /**
@@ -90,7 +60,6 @@ public class LobbyScreenCtrl {
         // this starts the sse connection
         sseHandler = new SSEHandler(this);
         server.subscribeToSSE(sseHandler);
-        checkHost();
     }
 
     /**
@@ -167,11 +136,14 @@ public class LobbyScreenCtrl {
                                 break;
                             case 401:
                                 System.out.println("Player isn't host");
+                                mainCtrl.showErrorSnackBar("Failed to disband");
                                 break;
                             case 404:
                                 System.out.println("User/Game not found");
+                                mainCtrl.showErrorSnackBar("Failed to disband");
                                 break;
                             default:
+                                mainCtrl.showErrorSnackBar("Failed to disband");
                                 break;
                         }
                     });

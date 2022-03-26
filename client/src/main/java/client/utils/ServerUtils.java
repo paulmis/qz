@@ -23,6 +23,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import commons.entities.UserDTO;
 import commons.entities.game.GameDTO;
+import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.utils.ApiError;
@@ -434,7 +435,7 @@ public class ServerUtils {
     }
 
     /**
-     * Function that gets all the info about the currently logged in player.
+     * Function that gets all the info about the currently logged in user.
      *
      * @param getUserInfoHandlerSuccess The function that will be called if the request is successful.
      * @param getUserInfoHandlerFail The function that will be called if the request is unsuccessful.
@@ -457,6 +458,50 @@ public class ServerUtils {
             @Override
             public void failed(Throwable throwable) {
                 getUserInfoHandlerFail.handle();
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Handler for when getting the game player succeeds.
+     */
+    public interface GetGamePlayerInfoHandlerSuccess {
+        void handle(GamePlayerDTO gamePlayerDTO);
+    }
+
+    /**
+     * Handler for when getting the game player fails.
+     */
+    public interface GetGamePlayerInfoHandlerFail {
+        void handle();
+    }
+
+    /**
+     * Function that gets all the info about the currently logged in game player.
+     *
+     * @param getGamePlayerInfoHandlerSuccess The function that will be called if the request is successful.
+     * @param getGamePlayerInfoHandlerFail The function that will be called if the request is unsuccessful.
+     */
+    public void getMyGamePlayerInfo(GetGamePlayerInfoHandlerSuccess getGamePlayerInfoHandlerSuccess,
+                          GetGamePlayerInfoHandlerFail getGamePlayerInfoHandlerFail) {
+        Invocation invocation = client
+                //ToDo: change path to endpoint of getting game player of the user.
+                .target(SERVER).path("/api/user/")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildGet();
+
+        invocation.submit(new InvocationCallback<GamePlayerDTO>() {
+
+            @Override
+            public void completed(GamePlayerDTO o) {
+                getGamePlayerInfoHandlerSuccess.handle(o);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                getGamePlayerInfoHandlerFail.handle();
                 throwable.printStackTrace();
             }
         });
