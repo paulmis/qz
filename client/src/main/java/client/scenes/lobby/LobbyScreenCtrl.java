@@ -9,6 +9,7 @@ import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
 import java.util.UUID;
 import javafx.fxml.FXML;
@@ -114,6 +115,38 @@ public class LobbyScreenCtrl {
             }
         }));
     }
+    
+    /**
+     * Fired when the leave button is clicked.
+     */
+    public void leaveButtonClick() {
+        mainCtrl.openLobbyLeaveWarning(() -> {
+            mainCtrl.closeLobbyLeaveWarning();
+            this.server.leaveLobby(new ServerUtils.LeaveGameHandler() {
+                @Override
+                public void handle(Response response) {
+                    javafx.application.Platform.runLater(() -> {
+                        switch (response.getStatus()) {
+                            case 200:
+                                System.out.println("User successfully removed from lobby");
+                                mainCtrl.showLobbyListScreen();
+                                break;
+                            case 404:
+                                System.out.println("User/Game not found");
+                                break;
+                            case 409:
+                                System.out.println("Couldn't remove player");
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                }
+            });
+        }, () -> {
+            mainCtrl.closeLobbyLeaveWarning();
+        });
+    }
 
     /**
      * Fired when the disband button is clicked.
@@ -151,7 +184,7 @@ public class LobbyScreenCtrl {
      * Fired when the lobby settings button is clicked.
      */
     public void lobbySettingsButtonClick() {
-        var config = new NormalGameConfigurationDTO(null, 60, 1, 20, 3, 2f, 100, 0, 75);
+        var config = new NormalGameConfigurationDTO(null, Duration.ofMinutes(1), 1, 20, 3, 2f, 100, 0, 75);
         mainCtrl.openLobbySettings(config, (conf) -> {
             System.out.println(conf);
             mainCtrl.closeLobbySettings();

@@ -126,6 +126,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public Game(GameDTO dto) {
         ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setSkipNullEnabled(true);
         if (dto.getId() == null) {
             // This id will change once the game entity is saved, but it must be non-null
             this.id = getUUID(0);
@@ -140,6 +141,15 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         this.status = dto.getStatus();
         this.currentQuestion = dto.getCurrentQuestion();
         this.gameType = dto.getGameType();
+    }
+
+    /**
+     * Get UUIDs of GamePlayers.
+     *
+     * @return UUIDs of all GamePlayers in the current game.
+     */
+    public Set<UUID> getPlayerIds() {
+        return players.keySet();
     }
 
     /**
