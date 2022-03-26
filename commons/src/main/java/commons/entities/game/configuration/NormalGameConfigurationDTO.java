@@ -27,7 +27,7 @@ public class NormalGameConfigurationDTO extends GameConfigurationDTO {
     @DecimalMin(value = "10")
     @DecimalMax(value = "100")
     @Description("Number of questions")
-    protected Integer numQuestions;
+    protected Integer numQuestions = 20;
 
     /**
      * Normal game config constructor.

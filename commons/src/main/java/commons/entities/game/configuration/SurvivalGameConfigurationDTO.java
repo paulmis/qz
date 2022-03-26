@@ -30,7 +30,7 @@ public class SurvivalGameConfigurationDTO extends GameConfigurationDTO {
     @DecimalMin(value = "0.1")
     @DecimalMax(value = "10.0")
     @Description("Speed modifier")
-    protected Float speedModifier;
+    protected Float speedModifier = 1f;
 
     /**
      * Normal game config constructor.

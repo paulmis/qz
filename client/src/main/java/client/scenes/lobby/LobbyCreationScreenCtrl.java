@@ -52,16 +52,19 @@ public class LobbyCreationScreenCtrl implements Initializable {
         this.server = server;
     }
 
-
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // A bindable boolean property so we can automatically change the icon
+        // and text of the private/public label and lock.
         isPrivateProperty = new SimpleBooleanProperty(false);
+
+        // Changes the glyph name automatically (Locked/Unlocked).
         lockButtonIconView.glyphNameProperty().bind(
                 Bindings.when(isPrivateProperty)
                         .then("LOCK")
                         .otherwise("UNLOCK"));
 
+        // Changes the label name automatically.
         publicPrivateLabel.textProperty().bind(
                 Bindings.when(isPrivateProperty)
                         .then("Private")
@@ -103,13 +106,17 @@ public class LobbyCreationScreenCtrl implements Initializable {
 
     @FXML
     private void createLobbyButtonClick() {
-        server.createLobby(config, game -> runLater(mainCtrl::showLobbyScreen),
-                () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
+        server.createLobby(config,
+                // Success
+                game -> runLater(mainCtrl::showLobbyScreen),
+                // Failed
+                () -> runLater(() ->
+                        mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
     }
 
     @FXML
     private void standardGameConfigurationButtonClick() {
-        config = new NormalGameConfigurationDTO(null, 60, 1, 20, 3, 2f, 100, 0, 75);
+        config = new NormalGameConfigurationDTO();
         setUpConfigScreen();
         standardGameConfigurationButton.setButtonType(JFXButton.ButtonType.RAISED);
         survivalGameConfigurationButton.setButtonType(JFXButton.ButtonType.FLAT);
@@ -117,7 +124,7 @@ public class LobbyCreationScreenCtrl implements Initializable {
 
     @FXML
     private void survivalGameConfigurationButtonClick() {
-        config = new SurvivalGameConfigurationDTO(null, 60, 1, 1f, 3, 2f, 100, 0, 75);
+        config = new SurvivalGameConfigurationDTO();
         setUpConfigScreen();
         standardGameConfigurationButton.setButtonType(JFXButton.ButtonType.FLAT);
         survivalGameConfigurationButton.setButtonType(JFXButton.ButtonType.RAISED);
