@@ -304,7 +304,7 @@ public class ServerUtils {
      */
     public void createLobby(CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
                             CreateLobbyHandlerFail createLobbyHandlerFail) {
-        var config = new NormalGameConfigurationDTO(null, Duration.ofMinutes(1), 1, 20, 3, 2f, 100, 0, 75);
+        var config = new NormalGameConfigurationDTO(null, Duration.ofMinutes(60), 3, 20, 3, 2f, 100, 0, 75);
         var game = new NormalGameDTO();
         game.setId(UUID.randomUUID());
         game.setConfiguration(config);

@@ -20,10 +20,7 @@ import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
-import client.scenes.lobby.LobbyDisbandScreenCtrl;
-import client.scenes.lobby.LobbyDisbandScreenPane;
-import client.scenes.lobby.LobbyListCtrl;
-import client.scenes.lobby.LobbyScreenCtrl;
+import client.scenes.lobby.*;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import client.utils.SSEHandler;
@@ -80,6 +77,8 @@ public class MainCtrl {
     private Parent lobbyListScreen;
 
     private Popup lobbySettingsPopUp;
+    private Popup lobbyLeavePopUp;
+    private Popup gameLeavePopUp;
     private Popup lobbyDisbandPopUp;
 
     private Parent activeScreen;
@@ -123,6 +122,8 @@ public class MainCtrl {
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
         lobbySettingsPopUp = new Popup();
+        lobbyLeavePopUp = new Popup();
+        gameLeavePopUp = new Popup();
         lobbyDisbandPopUp = new Popup();
         showServerConnectScreen();
 

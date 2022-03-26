@@ -11,6 +11,8 @@ import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
+
+import java.time.Duration;
 import java.util.UUID;
 import javafx.fxml.FXML;
 import javax.ws.rs.core.Response;
@@ -70,12 +72,12 @@ public class LobbyScreenCtrl {
                 }), () -> runLater(() -> {
                     //Fetching lobby data failed
                     disbandButton.setVisible(false);
-                    mainCtrl.showErrorSnackBar("Something went wrong while fetching lobby information");
+                    System.out.println("Something went wrong while fetching lobby information");
                 }));
             }), () -> runLater(() -> {
                 //Fetching user data failed
                 disbandButton.setVisible(false);
-                mainCtrl.showErrorSnackBar("Something went wrong while fetching user information");
+                System.out.println("Something went wrong while fetching user information");
             }));
     }
 
