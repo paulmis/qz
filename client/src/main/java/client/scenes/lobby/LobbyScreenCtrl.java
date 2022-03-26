@@ -10,6 +10,7 @@ import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
+import java.util.UUID;
 import javafx.fxml.FXML;
 import javax.ws.rs.core.Response;
 import lombok.Generated;
@@ -27,6 +28,8 @@ public class LobbyScreenCtrl {
     private SSEHandler sseHandler;
 
     private String name = "Ligma's Lobby";
+    private UUID hostId = null;
+    private UUID userId = null;
 
     @FXML private JFXButton disbandButton;
     @FXML private JFXButton settingsButton;
@@ -48,14 +51,43 @@ public class LobbyScreenCtrl {
         this.server = server;
     }
 
+    /** This function checks if the player is the host of the lobby.
+     *
+     */
+    public void checkHost() {
+        this.server.getMyInfo(userDTO -> runLater(() -> {
+                //Fetching user data success
+                this.server.getLobbyInfo(gameDTO -> runLater(() -> {
+                    //Fetching lobby data success
+                    if (userDTO.getId() == gameDTO.getHost()) {
+                        System.out.println("Player is host");
+                        disbandButton.setVisible(true);
+                    } else {
+                        System.out.println("Player is not host");
+                        disbandButton.setVisible(false);
+                    }
+                }), () -> runLater(() -> {
+                    //Fetching lobby data failed
+                    disbandButton.setVisible(false);
+                    mainCtrl.showErrorSnackBar("Something went wrong while fetching lobby information");
+                }));
+            }), () -> runLater(() -> {
+                //Fetching user data failed
+                disbandButton.setVisible(false);
+                mainCtrl.showErrorSnackBar("Something went wrong while fetching user information");
+            }));
+    }
+
+
     /**
-     * This function resets the lobbu screen ctrl.
+     * This function resets the lobby screen ctrl.
      * It handles all the required set-up that needs to be done for a lobby to be displayed.
      */
     public void reset() {
         // this starts the sse connection
         sseHandler = new SSEHandler(this);
         server.subscribeToSSE(sseHandler);
+        checkHost();
     }
 
     /**
@@ -99,7 +131,7 @@ public class LobbyScreenCtrl {
                                 mainCtrl.showLobbyListScreen();
                                 break;
                             case 401:
-                                System.out.println("Player isn't the host");
+                                System.out.println("Player isn't host");
                                 break;
                             case 404:
                                 System.out.println("User/Game not found");

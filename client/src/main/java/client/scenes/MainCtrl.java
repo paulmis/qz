@@ -54,6 +54,8 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import lombok.Generated;
 
+import java.util.UUID;
+
 /**
  * Main controller for the client application.
  */

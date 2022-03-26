@@ -206,7 +206,7 @@ public class ServerUtils {
      */
     public void createLobby(CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
                             CreateLobbyHandlerFail createLobbyHandlerFail) {
-        var config = new NormalGameConfigurationDTO(null, 60, 1, 20, 3, 2f, 100, 0, 75);
+        var config = new NormalGameConfigurationDTO(null, 60, 3, 20, 3, 2f, 100, 0, 75);
         var game = new NormalGameDTO();
         game.setId(UUID.randomUUID());
         game.setConfiguration(config);
@@ -364,6 +364,47 @@ public class ServerUtils {
         });
     }
 
+    /**
+     * Handler for getting the lobby info succeeds.
+     */
+    public interface GetLobbyInfoHandlerSuccess {
+        void handle(GameDTO gameDTO);
+    }
+
+    /**
+     * Handler for getting the lobby info fails.
+     */
+    public interface GetLobbyInfoHandlerFail {
+        void handle();
+    }
+
+    /**
+     * Function that gets all the lobby info from the provided lobby id.
+     *
+     * @param getLobbyInfoHandlerSuccess The function that will be called if the request is successful.
+     * @param getLobbyInfoHandlerFail The function that will be called if the request is unsuccessful.
+     */
+    public void getLobbyInfo(GetLobbyInfoHandlerSuccess getLobbyInfoHandlerSuccess,
+                          GetLobbyInfoHandlerFail getLobbyInfoHandlerFail) {
+        Invocation invocation = client
+                .target(SERVER).path("/api/lobby/" + lobbyId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildGet();
+        invocation.submit(new InvocationCallback<GameDTO>() {
+            @Override
+            public void completed(GameDTO o) {
+                getLobbyInfoHandlerSuccess.handle(o);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                getLobbyInfoHandlerFail.handle();
+                throwable.printStackTrace();
+            }
+        });
+    }
+
     public String connect() {
         System.out.println("New connection!\n");
         return "200";
@@ -393,7 +434,7 @@ public class ServerUtils {
 
             @Override
             public void failed(Throwable throwable) {
-
+                throwable.printStackTrace();
             }
         });
     }
