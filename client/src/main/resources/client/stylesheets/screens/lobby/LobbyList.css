@@ -17,3 +17,7 @@
     -fx-background-color: white;
     -fx-background-radius: 10 10 0 0;
 }
+
+#joinRandomLobbyButton{
+    -fx-background-color: #DFD93F;
+}

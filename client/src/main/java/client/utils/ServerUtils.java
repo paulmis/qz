@@ -334,25 +334,25 @@ public class ServerUtils {
     /**
      * Handler for when getting all lobbies succeeds.
      */
-    public interface GetLobbiesHandlerSuccess {
+    public interface GetAvailableLobbiesHandlerSuccess {
         void handle(List<GameDTO> games);
     }
 
     /**
      * Handler for when getting all lobbies fails.
      */
-    public interface GetLobbiesHandlerFail {
+    public interface GetAvailableLobbiesHandlerFail {
         void handle();
     }
 
     /**
      * Function that gets all the lobbies in the database.
      *
-     * @param getLobbiesHandlerSuccess The function that will be called if the request is successful.
-     * @param getLobbiesHandlerFail The function that will be called if the request is unsuccessful.
+     * @param getAvailableLobbiesHandlerSuccess The function that will be called if the request is successful.
+     * @param getAvailableLobbiesHandlerFail The function that will be called if the request is unsuccessful.
      */
-    public void getLobbies(GetLobbiesHandlerSuccess getLobbiesHandlerSuccess,
-                            GetLobbiesHandlerFail getLobbiesHandlerFail) {
+    public void getAvailableLobbies(GetAvailableLobbiesHandlerSuccess getAvailableLobbiesHandlerSuccess,
+                            GetAvailableLobbiesHandlerFail getAvailableLobbiesHandlerFail) {
         Invocation invocation = client
                 .target(SERVER).path("/api/lobby/available")
                 .request(APPLICATION_JSON)
@@ -363,12 +363,55 @@ public class ServerUtils {
 
             @Override
             public void completed(List<GameDTO> o) {
-                getLobbiesHandlerSuccess.handle(o);
+                getAvailableLobbiesHandlerSuccess.handle(o);
             }
 
             @Override
             public void failed(Throwable throwable) {
-                getLobbiesHandlerFail.handle();
+                getAvailableLobbiesHandlerFail.handle();
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Handler for when getting all lobbies succeeds.
+     */
+    public interface GetAllLobbiesHandlerSuccess {
+        void handle(List<GameDTO> games);
+    }
+
+    /**
+     * Handler for when getting all lobbies fails.
+     */
+    public interface GetAllLobbiesHandlerFail {
+        void handle();
+    }
+
+    /**
+     * Function that gets all the lobbies in the database.
+     *
+     * @param getAllLobbiesHandlerSuccess The function that will be called if the request is successful.
+     * @param getAllLobbiesHandlerFail The function that will be called if the request is unsuccessful.
+     */
+    public void getAllLobbies(GetAllLobbiesHandlerSuccess getAllLobbiesHandlerSuccess,
+                           GetAllLobbiesHandlerFail getAllLobbiesHandlerFail) {
+        Invocation invocation = client
+                .target(SERVER).path("/api/lobby/all")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildGet();
+
+        invocation.submit(new InvocationCallback<List<GameDTO>>() {
+
+            @Override
+            public void completed(List<GameDTO> o) {
+                getAllLobbiesHandlerSuccess.handle(o);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                getAllLobbiesHandlerFail.handle();
                 throwable.printStackTrace();
             }
         });

@@ -4,6 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -21,12 +22,7 @@
          <left>
             <Pane fx:id="pane" prefHeight="576.0" prefWidth="262.0" BorderPane.alignment="CENTER">
                <children>
-                  <TextField fx:id="emailField" layoutX="53.0" layoutY="239.0" onKeyTyped="#resetMessage" prefHeight="22.0" prefWidth="161.0">
-                     <font>
-                        <Font size="13.0" />
-                     </font>
-                  </TextField>
-                  <TextField fx:id="passwordField" layoutX="53.0" layoutY="290.0" onKeyTyped="#resetMessage" prefHeight="22.0" prefWidth="161.0">
+                  <TextField fx:id="emailField" layoutX="53.0" layoutY="239.0" prefHeight="22.0" prefWidth="161.0">
                      <font>
                         <Font size="13.0" />
                      </font>
@@ -66,11 +62,7 @@
                         <Image url="@/client/images/logo.png" />
                      </image>
                   </ImageView>
-                  <Label fx:id="wrongCredentials" layoutX="47.0" layoutY="470.0" text="Wrong email or password !">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Label>
+                  <PasswordField fx:id="passwordField" layoutX="54.0" layoutY="293.0" prefHeight="20.0" prefWidth="160.0" />
                </children>
             </Pane>
          </left>
