@@ -105,7 +105,7 @@ class LobbyControllerTest {
         mockLobby = new NormalGame();
         mockLobby.setId(getUUID(3));
         mockLobby.setStatus(GameStatus.CREATED);
-        mockLobbyConfiguration = new NormalGameConfiguration(10, Duration.ofSeconds(10), 2, 2, 2f, 100, 0, 75);
+        mockLobbyConfiguration = new NormalGameConfiguration(10, Duration.ofSeconds(10), 10, 2, 2f, 100, 0, 75);
         mockLobby.setConfiguration(mockLobbyConfiguration);
         normalGameConfiguration = new NormalGameConfiguration(4, Duration.ofSeconds(8), 6, 2, 2f, 100, 0, 75);
 
@@ -129,6 +129,24 @@ class LobbyControllerTest {
                         john.getEmail(),
                         john.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+    }
+
+    @Test
+    public void getAll() throws Exception {
+        // Mock a list of lobbies
+        Game<?> otherLobby = new NormalGame();
+        otherLobby.setId(getUUID(1));
+        otherLobby.setStatus(GameStatus.CREATED);
+        otherLobby.setConfiguration(new NormalGameConfiguration());
+        when(gameRepository.findAllByStatus(GameStatus.CREATED))
+                .thenReturn(new ArrayList<>(List.of(mockLobby, otherLobby)));
+
+        // Request
+        this.mockMvc.perform(get("/api/lobby/all"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(equalToObject(
+                        objectMapper.writeValueAsString(List.of(mockLobby.getDTO(), otherLobby.getDTO()))
+                )));
     }
 
     @Test
