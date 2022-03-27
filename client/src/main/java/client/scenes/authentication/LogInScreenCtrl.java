@@ -86,7 +86,7 @@ public class LogInScreenCtrl implements Initializable {
             // Failure
             () -> runLater(() -> {
                 wrongCredentials.setVisible(true);
-                mainCtrl.showErrorSnackBar("Something went wrong will logging you in.");
+                mainCtrl.showErrorSnackBar("Something went wrong while logging you in.");
             })
         );
     }
