@@ -1,5 +1,8 @@
 package server.configuration;
 
+import java.nio.file.Path;
+import javax.validation.constraints.Min;
+import lombok.Data;
 import lombok.Generated;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -7,25 +10,20 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * Store the configuration of the file storage.
  */
 @Generated
-@ConfigurationProperties(prefix = "storage")
+@Data
+@ConfigurationProperties(prefix = "server.storage")
 public class FileStorageConfiguration {
     private String uploadDir = "uploads";
 
-    /**
-     * Get the upload directory.
-     *
-     * @return the directory to upload to.
-     */
-    public String getUploadDir() {
-        return uploadDir;
-    }
+    @Min(1)
+    private Integer maxRecursionDepth = 5;
 
     /**
-     * Set the upload directory.
+     * Get the path of the upload directory.
      *
-     * @param uploadDir the directory to upload to.
+     * @return the path to the upload directory.
      */
-    public void setUploadDir(String uploadDir) {
-        this.uploadDir = uploadDir;
+    public Path getUploadDirPath() {
+        return Path.of(uploadDir);
     }
 }

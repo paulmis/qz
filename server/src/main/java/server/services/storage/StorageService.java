@@ -1,11 +1,12 @@
 package server.services.storage;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.Generated;
 import org.springframework.core.io.Resource;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Storage service interface.
@@ -20,19 +21,19 @@ public interface StorageService {
     /**
      * Store a file in the storage service.
      *
-     * @param file File to store.
-     * @return stored file path.
+     * @param fileStream File stream to store.
+     * @return resource ID.
      */
-    Path store(MultipartFile file);
+    UUID store(InputStream fileStream);
 
     /**
      * Store a file in the storage service.
      *
-     * @param file File to store.
-     * @param filename Filename to store the file as.
-     * @return stored file path.
+     * @param fileStream File stream to store.
+     * @param resourceId Resource ID to store the file as.
+     * @return resource ID.
      */
-    Path store(MultipartFile file, String filename);
+    UUID store(InputStream fileStream, UUID resourceId);
 
     /**
      * Get a stream of all stored file paths.
@@ -42,20 +43,12 @@ public interface StorageService {
     Stream<Path> loadAll();
 
     /**
-     * Resolve a file path to a resource.
-     *
-     * @param filename file path.
-     * @return resource file path.
-     */
-    Path load(String filename);
-
-    /**
      * Load a file as a resource.
      *
-     * @param filename file path.
+     * @param resourceId ID of the resource to load.
      * @return loaded resource.
      */
-    Resource loadAsResource(String filename);
+    Resource loadAsResource(UUID resourceId);
 
     /**
      * Delete all stored files.
@@ -63,10 +56,10 @@ public interface StorageService {
     void deleteAll();
 
     /**
-     * Get the URI of a file.
+     * Get the URI of a resource.
      *
-     * @param filename file path.
-     * @return URI of the file.
+     * @param resourceId resource ID.
+     * @return URI of the resource.
      */
-    URI getURI(String filename);
+    URI getURI(UUID resourceId);
 }

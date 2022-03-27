@@ -35,6 +35,12 @@ public class GlobalExceptionHandler {
         return processFieldErrors(fieldErrors, ex);
     }
 
+    /**
+     * Handle invalid state exception.
+     *
+     * @param ex the exception.
+     * @return the API error.
+     */
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
     @ExceptionHandler(IllegalStateException.class)
@@ -42,6 +48,12 @@ public class GlobalExceptionHandler {
         return new ApiError(HttpStatus.CONFLICT.value(), ex.getMessage());
     }
 
+    /**
+     * Handle invalid parameters exception.
+     *
+     * @param ex the exception.
+     * @return the API error.
+     */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     @ExceptionHandler(IllegalArgumentException.class)
@@ -59,20 +71,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(ResourceNotFoundException.class)
     public ApiError handleResourceNotFoundException(ResourceNotFoundException ex) {
-        return new ApiError(HttpStatus.NOT_FOUND, ex.getMessage());
-    }
-
-    /**
-     * Handles illegal argument exception.
-     *
-     * @param ex caught exception
-     * @return API error
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ApiError handleIllegalArgumentException(IllegalArgumentException ex) {
-        return new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return new ApiError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 
     /**

@@ -1,6 +1,8 @@
 package server.api;
 
+import java.io.IOException;
 import java.net.URLConnection;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -15,7 +17,7 @@ import server.services.storage.StorageService;
 /**
  * Controller for accessing static files.
  */
-@RequestMapping("/api/resources")
+@RequestMapping("/api/resource")
 @Controller
 public class ResourceController {
     @Autowired
@@ -24,15 +26,17 @@ public class ResourceController {
     /**
      * Access a static file.
      *
-     * @param filename the name of the file to be accessed.
-     * @return the file as a resource.
+     * @param resourceId the UUID of the resource to be accessed.
+     * @return the resource.
      */
-    @GetMapping("/{filename:.+}")
+    @GetMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
-        Resource file = storageService.loadAsResource(filename);
+    public ResponseEntity<Resource> serveFile(@PathVariable UUID resourceId) throws IOException {
+        Resource file = storageService.loadAsResource(resourceId);
         return ResponseEntity.ok()
-                .contentType(MediaType.valueOf(URLConnection.guessContentTypeFromName(file.getFilename())))
+                // TODO: URLConnection.guessContentTypeFromStream is *slow*
+                //  Perhaps we should store MIME type as metadata somewhere? (in the database?)
+                .contentType(MediaType.valueOf(URLConnection.guessContentTypeFromStream(file.getInputStream())))
                 .header("Content-Disposition",
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }

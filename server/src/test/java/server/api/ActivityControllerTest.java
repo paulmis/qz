@@ -1,8 +1,7 @@
 package server.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -11,7 +10,7 @@ import static server.utils.TestHelpers.getUUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.ActivityDTO;
-import java.nio.file.Path;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,15 +24,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import server.database.entities.User;
 import server.database.entities.question.Activity;
@@ -75,67 +70,77 @@ class ActivityControllerTest {
     }
 
     @Test
-    void addMultipleActivities() throws Exception {
-        // Create a list of activities and corresponding DTOs
-        List<Activity> activities = new ArrayList<>();
-        List<ActivityDTO> activitiesDTO = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            Activity activity = new Activity("activity" + i);
-            activities.add(activity);
-            activitiesDTO.add(activity.getDTO());
-        }
+    void getActivityImage() throws Exception {
+        Activity activity = new Activity();
+        activity.setIcon(getUUID(2).toString());
+        when(activityRepository.findById(getUUID(1))).thenReturn(Optional.of(activity));
 
-        // Capture the arguments of the call to saveAll
-        when(activityRepository.saveAll(activityCaptor.capture())).thenReturn(activities);
-
-        // Send the request
-        this.mockMvc.perform(
-                post("/api/activity/batch")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(activitiesDTO)))
+        // Verify that we get the UUID of the resource as a response
+        this.mockMvc.perform(get("/api/activity/{id}/image", getUUID(1)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(objectMapper.writeValueAsString(activitiesDTO)));
-        // Assert that the correct number of activities has been saved
-        assertEquals(10, activityCaptor.getValue().size());
+                .andExpect(content().string(getUUID(2).toString()));
     }
 
     @Test
-    void addImage() throws Exception {
-        Activity activity = new Activity("activity",
-                10000,
-                "image",
-                "source");
-        activity.setId(getUUID(1));
-        when(activityRepository.findById(any())).thenReturn(Optional.of(activity));
-        when(storageService.store(any(), any())).thenReturn(Path.of("/tmp/whatever.png"));
+    void getActivityImageNotFound() throws Exception {
+        when(activityRepository.findById(getUUID(1))).thenReturn(Optional.empty());
+        this.mockMvc.perform(
+                get("/api/activity/{id}/image", getUUID(1))
+        ).andExpect(status().isNotFound());
+    }
 
-        // Create a mock image
-        MockMultipartFile multipartFile = new MockMultipartFile("file",
-                "image.png",
+    @Test
+    void addActivitiesBatch() throws Exception {
+        // Create a list of activities and corresponding DTOs
+        List<Activity> activities = new ArrayList<>();
+        List<ActivityDTO> activitiesDTO = new ArrayList<>();
+
+        Activity activity1 = new Activity("activity1", 100, "activity1.png", "https://example.com/");
+        activity1.setId(getUUID(1));
+        activities.add(activity1);
+        activitiesDTO.add(activity1.getDTO());
+
+        Activity activity2 = new Activity("activity2", 200, "activity2.png", "https://example.com/");
+        activity2.setId(getUUID(2));
+        activities.add(activity2);
+        activitiesDTO.add(activity2.getDTO());
+
+        // Capture the arguments of the call to saveAll
+        when(activityRepository.saveAll(activityCaptor.capture())).thenReturn(activities);
+        // Mock the storage service getURI response
+        final String IMAGE_URI = "https://example.com/";
+        when(storageService.getURI(any())).thenReturn(URI.create(IMAGE_URI));
+
+        MockMultipartFile activitiesMP = new MockMultipartFile(
+                "activities",
+                "blob",
+                "application/json",
+                objectMapper.writeValueAsString(activitiesDTO).getBytes());
+
+        MockMultipartFile image2 = new MockMultipartFile(
+                "images",
+                "activity2.png",
                 "image/png",
-                "image".getBytes());
+                "image2".getBytes());
 
-        // Expected response values
-        Activity activityDTO = new Activity("activity",
-                10000,
-                getUUID(1) + ".png",
-                "source");
-        activityDTO.setId(getUUID(1));
-
-        MockMultipartHttpServletRequestBuilder builder =
-                MockMvcRequestBuilders.multipart("/api/activity/{id}/image", activity.getId());
-        builder.with(request -> {
-            request.setMethod("PUT");
-            return request;
-        });
-        // Perform the mock request
-        this.mockMvc.perform(builder.file(multipartFile))
-                // Expect 201 response code
+        this.mockMvc.perform(
+                multipart("/api/activity/batch")
+                        .file(activitiesMP)
+                        .file(image2))
                 .andExpect(status().isCreated())
-                // Expect response JSON
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                // Assert that the correct activity has been returned
-                .andExpect(content().json(objectMapper.writeValueAsString(activityDTO.getDTO())));
+                .andExpect(content().json(objectMapper.writeValueAsString(activitiesDTO)));
+
+        // Verify that the activities were saved
+        verify(activityRepository, times(1)).saveAll(any());
+        assertEquals(2, activityCaptor.getValue().size());
+
+        // For the second activity, the URI being saved will change.
+        // This is because the URI will be updated to match the one returned by the storage service.
+        // Verify that this happens.
+        assertEquals(IMAGE_URI, activityCaptor.getValue().get(1).getIcon());
+
+        // Verify that the images were saved
+        verify(storageService, times(1)).store(any());
     }
 }

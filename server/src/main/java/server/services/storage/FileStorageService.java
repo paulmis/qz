@@ -8,16 +8,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 import java.util.stream.Stream;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
 import server.configuration.FileStorageConfiguration;
+import server.configuration.ResourceConfiguration;
 import server.exceptions.ResourceNotFoundException;
 import server.exceptions.StorageException;
 
@@ -27,15 +27,11 @@ import server.exceptions.StorageException;
 @Slf4j
 @Service
 public class FileStorageService implements StorageService {
-    private static final URI BASE_URI = URI.create("http://localhost:8080/api/resource/");
-
-    @Getter
-    private final Path fileStorageLocation;
+    @Autowired
+    private FileStorageConfiguration fsConfiguration;
 
     @Autowired
-    public FileStorageService(FileStorageConfiguration fileStorageConfiguration) {
-        this.fileStorageLocation = Paths.get(fileStorageConfiguration.getUploadDir()).toAbsolutePath().normalize();
-    }
+    private ResourceConfiguration resourceConfiguration;
 
     /**
      * Initialize the storage service.
@@ -43,7 +39,7 @@ public class FileStorageService implements StorageService {
     @Override
     public void init() {
         try {
-            Files.createDirectories(this.fileStorageLocation);
+            Files.createDirectories(this.fsConfiguration.getUploadDirPath());
         } catch (IOException e) {
             log.error("Could not initialize storage", e);
             throw new StorageException("Could not initialize storage", e);
@@ -53,44 +49,34 @@ public class FileStorageService implements StorageService {
     /**
      * Store a file in the storage service.
      *
-     * @param file File to store.
-     * @return stored file path.
+     * @param fileStream File stream to store.
+     * @return resource ID.
      */
     @Override
-    public Path store(MultipartFile file) {
-        return store(file, file.getOriginalFilename());
+    public UUID store(InputStream fileStream) {
+        return store(fileStream, UUID.randomUUID());
     }
 
     /**
      * Store a file in the storage service.
      *
-     * @param file     File to store.
-     * @param filename Filename to store the file as.
-     * @return stored file path.
+     * @param fileStream File stream to store.
+     * @param resourceId Resource ID to store the file as.
+     * @return resource ID.
      */
     @Override
-    public Path store(MultipartFile file, String filename) {
+    public UUID store(InputStream fileStream, UUID resourceId) {
         try {
-            // Verify that the file is not empty
-            if (file.isEmpty()) {
-                throw new StorageException("Failed to store empty file " + file.getOriginalFilename());
-            }
-
             // Get the destination file path (storage location + relative path)
-            Path destinationFile = this.fileStorageLocation.resolve(
-                            Paths.get(filename))
+            Path destinationFile = this.fsConfiguration.getUploadDirPath().resolve(
+                            Paths.get(resourceId.toString()))
                     .normalize().toAbsolutePath();
 
-            // Verify that the file is being uploaded to upload directory
-            if (!destinationFile.startsWith(this.fileStorageLocation)) {
-                log.warn("Potential directory traversal attack detected.");
-                throw new StorageException("Could not resolve path " + file.getOriginalFilename());
-            }
             // Save the file
-            try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
-            }
-            return destinationFile;
+            Files.copy(fileStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+            log.trace("Resource {} stored at {}", resourceId, destinationFile);
+
+            return resourceId;
         } catch (IOException e) {
             log.error("Could not store file", e);
             throw new StorageException("Could not store file", e);
@@ -106,9 +92,10 @@ public class FileStorageService implements StorageService {
     public Stream<Path> loadAll() {
         try {
             // Recursively get all files in the upload directory
-            return Files.walk(this.fileStorageLocation, 5)
-                    .filter(path -> !path.equals(this.fileStorageLocation))
-                    .map(this.fileStorageLocation::relativize);
+            return Files.walk(this.fsConfiguration.getUploadDirPath(),
+                            this.fsConfiguration.getMaxRecursionDepth())
+                    .filter(path -> !path.equals(this.fsConfiguration.getUploadDirPath()))
+                    .map(this.fsConfiguration.getUploadDirPath()::relativize);
         } catch (IOException e) {
             log.error("Could not load files", e);
             throw new StorageException("Could not load files", e);
@@ -118,59 +105,51 @@ public class FileStorageService implements StorageService {
     /**
      * Resolve a file path to a resource.
      *
-     * @param filename file path.
+     * @param resourceId resource ID.
      * @return resource file path.
      */
-    @Override
-    public Path load(String filename) {
-        Path path = this.fileStorageLocation.resolve(filename).normalize();
-        // Verify that the path is located within the upload directory
-        if (path.startsWith(this.fileStorageLocation)) {
-            return path;
-        } else {
-            log.warn("Potential directory traversal attack detected.");
-            throw new StorageException("Could not resolve path " + filename);
-        }
+    public Path load(UUID resourceId) {
+        return this.fsConfiguration.getUploadDirPath().resolve(resourceId.toString()).normalize();
     }
 
     /**
      * Load a file as a resource.
      *
-     * @param filename file path.
+     * @param resourceId ID of the resource to load.
      * @return loaded resource.
      */
     @Override
-    public Resource loadAsResource(String filename) {
+    public Resource loadAsResource(UUID resourceId) {
         try {
-            Path file = load(filename);
+            Path file = load(resourceId);
             Resource resource = new UrlResource(file.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
-                throw new ResourceNotFoundException("Could not read file: " + filename);
+                throw new ResourceNotFoundException("Could not read resource: " + resourceId);
             }
         } catch (MalformedURLException e) {
-            log.warn("Could not resolve path " + filename);
-            throw new ResourceNotFoundException("Could not read file " + filename, e);
+            log.warn("Could not resolve resource " + resourceId);
+            throw new ResourceNotFoundException("Could not read file " + resourceId, e);
         }
     }
 
     /**
-     * Delete all stored files.
+     * Delete all stored resources.
      */
     @Override
     public void deleteAll() {
-        FileSystemUtils.deleteRecursively(this.fileStorageLocation.toFile());
+        FileSystemUtils.deleteRecursively(this.fsConfiguration.getUploadDirPath().toFile());
     }
 
     /**
-     * Get the URI of a file.
+     * Get the URI of a resource.
      *
-     * @param filename file path.
-     * @return URI of the file.
+     * @param resourceId resource ID.
+     * @return URI of the resource.
      */
     @Override
-    public URI getURI(String filename) {
-        return BASE_URI.resolve(filename).normalize();
+    public URI getURI(UUID resourceId) {
+        return this.resourceConfiguration.getBaseUri().resolve(resourceId.toString()).normalize();
     }
 }
