@@ -3,7 +3,6 @@ package client.communication.game;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import client.utils.ClientState;
-import client.utils.communication.SSEHandler;
 import client.utils.communication.ServerUtils;
 import commons.entities.AnswerDTO;
 import commons.entities.questions.QuestionDTO;
@@ -16,11 +15,12 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.sse.SseEventSource;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Provides functions retrieving game data from the server.
  */
+@Slf4j
 public class GameCommunication {
     /**
      * Gets a list of all the emoji urls from the backend.
@@ -89,7 +89,7 @@ public class GameCommunication {
 
             @Override
             public void failed(Throwable throwable) {
-                System.out.println(throwable.toString());
+                throwable.printStackTrace();
             }
         });
     }
@@ -203,13 +203,13 @@ public class GameCommunication {
 
             @Override
             public void completed(Response response) {
-                System.out.println("Answer sent successfully");
+                log.info("Answer sent successfully");
                 handlerSuccess.handle();
             }
 
             @Override
             public void failed(Throwable throwable) {
-                System.out.println("Failed to send the answer");
+                log.error("Failed to send the answer");
                 handlerFailure.handle();
                 throwable.printStackTrace();
             }

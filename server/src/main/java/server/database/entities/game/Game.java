@@ -9,9 +9,6 @@ import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
-import commons.entities.messages.SSEMessage;
-import commons.entities.messages.SSEMessageType;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -287,16 +284,11 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * @return true if the answer was correctly added
      */
     public boolean addAnswer(Answer answer, UUID userId) {
-        // Check if player is actually playing in this game
+        // Get the player
         if (!players.containsKey(userId)) {
             return false;
         }
-
-        // Fetch player
         GamePlayer player = players.get(userId);
-        if (player == null) {
-            return false;
-        }
 
         // Set answer's player
         answer.setPlayer(player);

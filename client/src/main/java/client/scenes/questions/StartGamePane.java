@@ -2,7 +2,7 @@ package client.scenes.questions;
 
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
-import javafx.application.Platform;
+import java.io.IOException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
@@ -19,21 +19,16 @@ public class StartGamePane extends StackPane {
      *
      * @param mainCtrl the main controller
      * @param gameCommunication the communication class
+     * @throws IOException if the FXML file could not be loaded
      */
-    public StartGamePane(MainCtrl mainCtrl, GameCommunication gameCommunication) {
+    public StartGamePane(MainCtrl mainCtrl, GameCommunication gameCommunication)
+        throws IOException {
         // Assign the scene and controller
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/StartGameElement.fxml"));
         loader.setControllerFactory(param -> new StartGameElementCtrl(mainCtrl, gameCommunication));
 
         // Load and add the FXML scene
-        try {
-            view = loader.load();
-            getChildren().add(view);
-        } catch (Exception e) {
-            System.out.println("Error loading the FXML file");
-            e.printStackTrace();
-            Platform.exit();
-            System.exit(0);
-        }
+        view = loader.load();
+        getChildren().add(view);
     }
 }

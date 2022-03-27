@@ -10,6 +10,7 @@ import java.util.stream.IntStream;
 import javax.ws.rs.sse.InboundSseEvent;
 import javax.ws.rs.sse.SseEventSource;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -17,6 +18,7 @@ import lombok.Generated;
  * It handles events, exceptions and the end of a connection.
  */
 @Generated
+@Slf4j
 public class SSEHandler {
 
     /**
@@ -40,15 +42,9 @@ public class SSEHandler {
      * No-args constructor.
      */
     public SSEHandler() {
-        eventHandlers = new HashMap<SSEMessageType, SSEEventHandler>();
-        eventHandlers.put(SSEMessageType.INIT, new SSEEventHandler() {
-            @Override
-            public void handle(InboundSseEvent inboundSseEvent) {
-                System.out.println("Initialized connection SSE.");
-            }
-        });
+        eventHandlers = new HashMap<>();
+        eventHandlers.put(SSEMessageType.INIT, inboundSseEvent -> log.info("--[SSE]-- SSE handler initialized"));
     }
-
 
     /**
      * The constructor of the SSEHandler.
@@ -72,6 +68,7 @@ public class SSEHandler {
      */
     public void initialize(Object handlerSource) throws IllegalArgumentException {
         this.handlerSource = handlerSource;
+        log.info("--[SSE]-- Initializing handler with " + handlerSource.getClass().getName());
 
         // Check that the source class implements SSESource
         if (!SSESource.class.isAssignableFrom(handlerSource.getClass())) {
@@ -130,12 +127,7 @@ public class SSEHandler {
         eventHandlers = IntStream.range(0, names.size()).boxed()
                 .collect(Collectors.toMap(names::get, runnables::get));
 
-        eventHandlers.put(SSEMessageType.INIT, new SSEEventHandler() {
-            @Override
-            public void handle(InboundSseEvent inboundSseEvent) {
-                System.out.println("Initialized connection SSE.");
-            }
-        });
+        eventHandlers.put(SSEMessageType.INIT, inboundSseEvent -> log.info("--[SSE]-- SSE handler initialized"));
     }
 
     /**
@@ -153,7 +145,7 @@ public class SSEHandler {
      */
     public void kill() {
         this.sseEventSource.close();
-        System.out.println("Killed the SSE connection");
+        log.info("Killed the SSE connection");
     }
 
     /**
@@ -172,13 +164,13 @@ public class SSEHandler {
      * @param inboundSseEvent the sse event.
      */
     public void handleEvent(InboundSseEvent inboundSseEvent) {
-        System.out.println("--[SSE]-- Handle event " + inboundSseEvent.getName());
+        log.info("--[SSE]-- Handle event " + inboundSseEvent.getName());
         try {
             if (eventHandlers.containsKey(SSEMessageType.valueOf(inboundSseEvent.getName()))) {
                 eventHandlers.get(SSEMessageType.valueOf(inboundSseEvent.getName())).handle(inboundSseEvent);
             } else {
-                System.out.println("--[SSE]-- No handler for event " + inboundSseEvent.getName());
-                System.out.println("--[SSE]-- Source class:"
+                log.error("--[SSE]-- No handler for event " + inboundSseEvent.getName());
+                log.error("--[SSE]-- Source class:"
                     + (this.handlerSource == null
                         ? "<null>"
                         : this.handlerSource.getClass().getName())
@@ -188,7 +180,7 @@ public class SSEHandler {
                 }
             }
         } catch (Exception e) {
-            System.out.println("--[SSE]-- Exception: " + e.getMessage());
+            log.error("--[SSE]-- Exception: " + e.getMessage());
             e.printStackTrace();
         }
     }
