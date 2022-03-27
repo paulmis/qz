@@ -464,50 +464,6 @@ public class ServerUtils {
     }
 
     /**
-     * Handler for when getting the game player succeeds.
-     */
-    public interface GetGamePlayerInfoHandlerSuccess {
-        void handle(GamePlayerDTO gamePlayerDTO);
-    }
-
-    /**
-     * Handler for when getting the game player fails.
-     */
-    public interface GetGamePlayerInfoHandlerFail {
-        void handle();
-    }
-
-    /**
-     * Function that gets all the info about the currently logged in game player.
-     *
-     * @param getGamePlayerInfoHandlerSuccess The function that will be called if the request is successful.
-     * @param getGamePlayerInfoHandlerFail The function that will be called if the request is unsuccessful.
-     */
-    public void getMyGamePlayerInfo(GetGamePlayerInfoHandlerSuccess getGamePlayerInfoHandlerSuccess,
-                          GetGamePlayerInfoHandlerFail getGamePlayerInfoHandlerFail) {
-        Invocation invocation = client
-                //ToDo: change path to endpoint of getting game player of the user.
-                .target(SERVER).path("/api/user/")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildGet();
-
-        invocation.submit(new InvocationCallback<GamePlayerDTO>() {
-
-            @Override
-            public void completed(GamePlayerDTO o) {
-                getGamePlayerInfoHandlerSuccess.handle(o);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                getGamePlayerInfoHandlerFail.handle();
-                throwable.printStackTrace();
-            }
-        });
-    }
-
-    /**
      * Handler for getting the lobby info succeeds.
      */
     public interface GetLobbyInfoHandlerSuccess {

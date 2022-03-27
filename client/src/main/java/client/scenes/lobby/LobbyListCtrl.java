@@ -8,11 +8,13 @@ import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameDTO;
+import commons.entities.game.GamePlayerDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
-import java.util.Comparator;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -128,20 +130,26 @@ public class LobbyListCtrl implements Initializable {
 
     /** This function checks if the player is the host of the lobby.
      *
-     * @param gameDTO the gameDTO the user is creating or joining
+     * @param gameDTO the game data that the player is creating/joining
      */
     public void checkHost(GameDTO gameDTO) {
-        this.server.getMyGamePlayerInfo(gamePlayerDTO -> runLater(() -> {
-            //Fetching user's game player data success
-            if (gamePlayerDTO.getId() == gameDTO.getHost()) {
-                System.out.println("Player is host");
-                mainCtrl.showDisbandButton();
+        this.server.getMyInfo(userDTO -> runLater(() -> {
+            //Fetching user data success
+            Optional<GamePlayerDTO> gamePlayerData = gameDTO.getPlayers().stream().filter(gp -> userDTO.getId().equals(gp.getUserId())).findAny();
+            if (!gamePlayerData.isEmpty()) {
+                if (gamePlayerData.get().getId().equals(gameDTO.getHost())) {
+                    System.out.println("Player is host");
+                    mainCtrl.showDisbandButton();
+                } else {
+                    System.out.println("Player is not host");
+                    mainCtrl.hideDisbandButton();
+                }
             } else {
-                System.out.println("Player is not host");
                 mainCtrl.hideDisbandButton();
+                System.out.println("Couldn't retrieve game player/User is not a game player");
             }
         }), () -> runLater(() -> {
-            //Fetching user's game player data failed
+            //Fetching user data failed
             System.out.println("Something went wrong while fetching user information");
             mainCtrl.hideDisbandButton();
         }));
