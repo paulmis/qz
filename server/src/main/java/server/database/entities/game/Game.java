@@ -70,13 +70,19 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Current question number.
      */
-    protected int currentQuestion = 0;
+    @Column(nullable = true)
+    protected Integer currentQuestionNumber = null;
 
     /**
      * Seed used to generate the random numbers.
      */
     @JsonIgnore
     protected long seed;
+
+    /**
+     * Whether the players are allowed to submit an answer or not.
+     */
+    protected boolean acceptingAnswers = false;
 
     /**
      * PRNG.
@@ -139,7 +145,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
             this.configuration = mapper.map(dto.getConfiguration(), NormalGameConfiguration.class);
         }
         this.status = dto.getStatus();
-        this.currentQuestion = dto.getCurrentQuestion();
+        this.currentQuestionNumber = dto.getCurrentQuestionNumber();
         this.gameType = dto.getGameType();
     }
 
@@ -229,20 +235,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
-     * Whether the players are allowed to submit an answer or not.
-     */
-    protected boolean acceptingAnswers = false;
-
-    /**
-     * Toggle whether the players are allowed to submit an answer or not, and notify players about the change.
-     *
-     * @param acceptingAnswers whether the players are allowed to submit an answer or not.
-     */
-    public void changeAcceptingAnswers(boolean acceptingAnswers) throws IOException {
-        this.acceptingAnswers = acceptingAnswers;
-    }
-
-    /**
      * Adds questions to the game.
      *
      * @param questions The questions to add.
@@ -258,11 +250,34 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public Optional<Question> getQuestion() {
         try {
-            return Optional.of(this.questions.get(this.currentQuestion));
-        } catch (IndexOutOfBoundsException e) {
+            return Optional.of(this.questions.get(this.currentQuestionNumber));
+        } catch (IndexOutOfBoundsException | NullPointerException e) {
             return Optional.empty();
         }
     }
+
+    /**
+     * Increments the current question number.
+     */
+    public void incrementQuestion() {
+        this.currentQuestionNumber = this.currentQuestionNumber == null
+            ? 0
+            : this.currentQuestionNumber + 1;
+    }
+
+    /**
+     * Determines whether this is the last question.
+     *
+     * @return whether this is the last question.
+     */
+    abstract boolean isLastQuestion();
+
+    /**
+     * Determines whether the game should finish.
+     *
+     * @return whether the game should finish.
+     */
+    public abstract boolean shouldFinish();
 
     /**
      * Sets the answer of a player to the current question.
@@ -446,7 +461,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
                 this.gameType,
                 this.configuration.getDTO(),
                 this.status,
-                this.currentQuestion,
+                this.currentQuestionNumber,
+                this.getQuestion().isPresent() ? this.getQuestion().get().getDTO() : null,
                 this.players.values().stream().map(GamePlayer::getDTO).collect(Collectors.toSet()),
                 this.host == null ? null : this.host.getId());
     }

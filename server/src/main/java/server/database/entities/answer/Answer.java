@@ -18,10 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Generated;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import server.database.entities.game.GamePlayer;
@@ -82,6 +79,7 @@ public class Answer extends BaseEntity<AnswerDTO> {
      */
     @JsonBackReference
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @ToString.Exclude
     protected AnswerCollection answerCollection;
 
     @Override

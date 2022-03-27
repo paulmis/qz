@@ -129,31 +129,19 @@ public class NormalGameTest {
     }
 
     @Test
-    void setAcceptingAnswersTrue() throws IOException {
-        game.changeAcceptingAnswers(true);
-        assertEquals(true, game.isAcceptingAnswers());
-    }
-
-    @Test
-    void setAcceptingAnswersFalse() throws IOException {
-        game.changeAcceptingAnswers(false);
-        assertEquals(false, game.isAcceptingAnswers());
-    }
-
-    @Test
     void getQuestionsCount() {
         assertEquals(17, game.getQuestionsCount());
     }
 
     @Test
     void getQuestionOk() {
-        game.setCurrentQuestion(1);
+        game.setCurrentQuestionNumber(1);
         assertEquals(Optional.of(questionB), game.getQuestion());
     }
 
     @Test
     void getQuestionOutOfBounds() {
-        game.setCurrentQuestion(2);
+        game.setCurrentQuestionNumber(2);
         assertEquals(Optional.empty(), game.getQuestion());
     }
 

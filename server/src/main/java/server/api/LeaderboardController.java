@@ -1,7 +1,7 @@
 package server.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import commons.entities.UserDTO;
+import commons.entities.auth.UserDTO;
 import commons.entities.utils.Views;
 import java.util.List;
 import java.util.Optional;

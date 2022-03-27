@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package client.utils;
+package client.utils.communication;
 
+import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import client.utils.Authenticator;
+import client.utils.ClientState;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import commons.entities.UserDTO;
+import commons.entities.auth.LoginDTO;
+import commons.entities.auth.UserDTO;
 import commons.entities.game.GameDTO;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
@@ -32,11 +37,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.sse.SseEventSource;
@@ -47,10 +48,18 @@ import javax.ws.rs.sse.SseEventSource;
 public class ServerUtils {
 
     private static final String SERVER = "http://localhost:8080/";
-    private static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
+    public static SSEHandler sseHandler = new SSEHandler();
+    public static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
             .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
-    public static boolean loggedIn = false;
-    public static UUID lobbyId = null;
+
+    /**
+     * Provides a request target for the server that can be used to build and invoke a query.
+     *
+     * @return the request target.
+     */
+    public static WebTarget getRequestTarget() {
+        return client.target(SERVER);
+    }
 
     /**
      * This function creates a new client with the mandatory
@@ -59,113 +68,11 @@ public class ServerUtils {
      * @return the new client.
      */
     private Client newClient() {
-        loggedIn = false;
-        lobbyId = null;
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
         JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
         return ClientBuilder.newClient().register(provider);
-    }
-
-    /**
-     * Gets a list of all the emoji urls from the backend.
-     *
-     * @return List of emoji urls
-     */
-    public List<URL> getEmojis() {
-        try {
-            return Arrays.asList(
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * Gets a list of all the powerUp urls from the backend.
-     *
-     * @return List of emoji urls
-     */
-    public List<URL> getPowerUps() {
-        try {
-            return Arrays.asList(
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * Handler for when the leave lobby succeeds.
-     */
-    public interface LeaveGameHandler {
-        void handle(Response response);
-    }
-
-    /**
-     * Function that causes the user to leave the lobby.
-     */
-    public void leaveLobby(LeaveGameHandler leaveGameHandler) {
-        var request = client
-                .target(SERVER).path("/api/lobby/leave")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildDelete();
-        request.submit(new InvocationCallback<Response>() {
-            @Override
-            public void completed(Response response) {
-                leaveGameHandler.handle(response);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-
-            }
-        });
-    }
-
-    /**
-     * Handler for when the quitting game succeeds.
-     */
-    public interface QuitGameHandler {
-        void handle(Response response);
-    }
-
-    /**
-     * Function that causes the user to leave the game.
-     */
-    public void quitGame(QuitGameHandler quitGameHandler) {
-        var request = client
-                .target(SERVER).path("/api/game/leave")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildPost(Entity.json("{}"));
-        request.submit(new InvocationCallback<Response>() {
-            @Override
-            public void completed(Response response) {
-                quitGameHandler.handle(response);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                System.out.println(throwable.toString());
-            }
-        });
     }
 
     /** Gets a list of the leaderboard images from the server.
@@ -211,12 +118,13 @@ public class ServerUtils {
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .buildPost(Entity.entity(user, APPLICATION_JSON));
+
         invocation.submit(new InvocationCallback<Response>() {
             @Override
             public void completed(Response o) {
                 if (o.getStatus() == 201) {
                     client = client.register(new Authenticator(o.readEntity(String.class)));
-                    loggedIn = true;
+                    ClientState.user = user;
                     registerHandler.handle(o, new ApiError());
                 } else if (o.getStatus() == 400) {
                     registerHandler.handle(o, o.readEntity(ApiError.class));
@@ -236,7 +144,7 @@ public class ServerUtils {
      * Handler for when the log in succeeds.
      */
     public interface LogInHandlerSuccess {
-        void handle(String token);
+        void handle(LoginDTO token);
     }
 
     /**
@@ -264,29 +172,29 @@ public class ServerUtils {
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .buildPost(Entity.entity(user, APPLICATION_JSON));
-        invocation.submit(new InvocationCallback<String>() {
+        invocation.submit(new InvocationCallback<LoginDTO>() {
 
             @Override
-            public void completed(String o) {
-                System.out.println(o);
-                logInHandlerSuccess.handle(o);
-                client = client.register(new Authenticator(o));
-                loggedIn = true;
+            public void completed(LoginDTO loginDTO) {
+                System.out.println(loginDTO);
+                client = client.register(new Authenticator(loginDTO.getToken()));
+                ClientState.user = user;
+                logInHandlerSuccess.handle(loginDTO);
             }
 
             @Override
             public void failed(Throwable throwable) {
                 logInHandlerFail.handle();
+                throwable.printStackTrace();
             }
         });
     }
-
 
     /**
      * Handler for when the create lobby succeeds.
      */
     public interface CreateLobbyHandlerSuccess {
-        void handle(NormalGameDTO game);
+        void handle(GameDTO game);
     }
 
     /**
@@ -304,7 +212,7 @@ public class ServerUtils {
      */
     public void createLobby(CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
                             CreateLobbyHandlerFail createLobbyHandlerFail) {
-        var config = new NormalGameConfigurationDTO(null, Duration.ofMinutes(1), 1, 20, 3, 2f, 100, 0, 75);
+        var config = new NormalGameConfigurationDTO(null, Duration.ofSeconds(10), 1, 10, 3, 2f, 100, 0, 75);
         var game = new NormalGameDTO();
         game.setId(UUID.randomUUID());
         game.setConfiguration(config);
@@ -315,12 +223,13 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON)
                 .buildPost(Entity.entity(game, APPLICATION_JSON));
 
-        invocation.submit(new InvocationCallback<NormalGameDTO>() {
+        invocation.submit(new InvocationCallback<GameDTO>() {
 
             @Override
-            public void completed(NormalGameDTO o) {
-                ServerUtils.lobbyId = o.getId();
-                createLobbyHandlerSuccess.handle(o);
+            public void completed(GameDTO game) {
+                System.out.println(game);
+                ClientState.game = game;
+                createLobbyHandlerSuccess.handle(game);
             }
 
             @Override
@@ -406,9 +315,11 @@ public class ServerUtils {
         invocation.submit(new InvocationCallback<GameDTO>() {
 
             @Override
-            public void completed(GameDTO o) {
-                ServerUtils.lobbyId = o.getId();
-                joinLobbyHandlerSuccess.handle(o);
+            public void completed(GameDTO game) {
+                System.out.println(game);
+                ClientState.game = game;
+                subscribeToSSE(sseHandler);
+                joinLobbyHandlerSuccess.handle(game);
             }
 
             @Override
@@ -473,12 +384,12 @@ public class ServerUtils {
      *
      * @param sseHandler The handler of sse events, exceptions and completion.
      */
-    public void subscribeToSSE(SSEHandler sseHandler) {
+    public static void subscribeToSSE(SSEHandler sseHandler) {
         // This creates the WebTarget that the sse event source will use.
-        var target = client.target(SERVER).path("api/sse/open");
+        var target = getRequestTarget().path("api/sse/open");
 
         // Builds the event source with the target.
-        SseEventSource eventSource = SseEventSource.target(target).build();
+        SseEventSource eventSource = SseEventSource.target(target).reconnectingEvery(0, MICROSECONDS).build();
 
         // Registers the handling of events, exceptions and completion.
         eventSource.register(
@@ -506,8 +417,8 @@ public class ServerUtils {
      * @param startLobbyHandler the handler of the response.
      */
     public void startLobby(StartLobbyHandler startLobbyHandler) {
-
-        Invocation invocation = client.target(SERVER).path("/api/lobby/" + lobbyId + "/start")
+        Invocation invocation = client.target(SERVER)
+            .path("/api/lobby/" + ClientState.game.getId() + "/start")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .buildPut(Entity.entity("", APPLICATION_JSON));

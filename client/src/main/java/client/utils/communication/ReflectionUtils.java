@@ -1,4 +1,4 @@
-package client.utils;
+package client.utils.communication;
 
 import commons.entities.messages.SSEMessageType;
 import java.lang.annotation.Annotation;

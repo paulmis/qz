@@ -110,7 +110,7 @@ public class GameControllerTest {
         game.add(johnPlayer);
         when(gameRepository.getPlayersGame(john.getId())).thenReturn(Optional.of(game));
         game.add(susannePlayer);
-        when(gameRepository.getPlayersGame(susanne.getId())).thenReturn(Optional.of(game));;
+        when(gameRepository.getPlayersGame(susanne.getId())).thenReturn(Optional.of(game));
 
         // Mock the authentication
         SecurityContextHolder.getContext().setAuthentication(
@@ -124,7 +124,7 @@ public class GameControllerTest {
     public void questionFoundTest() throws Exception {
         // Request question object -> expect a ok status and mock question object
         game.addQuestions(new ArrayList<>(List.of(question)));
-        game.setCurrentQuestion(0);
+        game.setCurrentQuestionNumber(0);
         this.mockMvc
                 .perform(get("/api/game/" + game.getId() + "/question"))
                 .andExpect(status().isOk())

@@ -57,14 +57,23 @@ class DefiniteGameFSMTest {
         configuration = new NormalGameConfiguration();
         configuration.setNumQuestions(10);
         game.setConfiguration(configuration);
+        game.setCurrentQuestionNumber(0);
+        game.setStatus(GameStatus.ONGOING);
 
         lenient().when(sseManager.send(any(UUID.class), any(SSEMessage.class))).thenReturn(true);
         lenient().when(taskScheduler.schedule(any(), any(Date.class))).thenReturn(new FSMHelpers.MockFuture<>());
     }
 
     @Test
+    void constructorTestNotYetStarted() {
+        game.setStatus(GameStatus.CREATED);
+        // We should not be able to spawn a new game from a finished game
+        assertThrows(IllegalStateException.class, () -> new DefiniteGameFSM(game, context));
+    }
+
+    @Test
     void constructorTestFinishedGame() {
-        game.setCurrentQuestion(configuration.getNumQuestions());
+        game.setStatus(GameStatus.FINISHED);
         // We should not be able to spawn a new game from a finished game
         assertThrows(IllegalStateException.class, () -> new DefiniteGameFSM(game, context));
     }
@@ -78,33 +87,6 @@ class DefiniteGameFSMTest {
         assertEquals(FSMState.PREPARING, fsm.getState());
     }
 
-    @Test
-    void runAcceptingAnswers() throws IOException {
-        // The game is accepting answers
-        game.setAcceptingAnswers(true);
-        DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
-        fsm.setState(FSMState.PREPARING); // Simulate game already being started
-        fsm.run();
-
-        // Verify that the game is no longer accepting answers
-        verify(gameService, times(1))
-                .setAcceptingAnswers(any(Game.class), booleanCaptor.capture(), any(Long.class));
-        assertFalse(booleanCaptor.getValue());
-    }
-
-    @Test
-    void runNotAcceptingAnswers() throws IOException {
-        // The game is not accepting answers
-        game.setAcceptingAnswers(false);
-        DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
-        fsm.setState(FSMState.PREPARING); // Simulate game already being started
-        fsm.run();
-
-        // Verify that the game is now accepting answers
-        verify(gameService, times(1)).setAcceptingAnswers(any(Game.class),
-                booleanCaptor.capture(), any(Long.class));
-        assertTrue(booleanCaptor.getValue());
-    }
 
     @Test
     void runLeaderboard() throws IOException {
@@ -121,7 +103,7 @@ class DefiniteGameFSMTest {
     @Test
     void runAnswerToLeaderboard() throws IOException {
         // Put the game in a state where leaderboard should be shown
-        game.setCurrentQuestion(4);
+        game.setCurrentQuestionNumber(4);
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
         fsm.setRunning(true);
         fsm.runAnswer();
@@ -144,19 +126,6 @@ class DefiniteGameFSMTest {
     }
 
     @Test
-    void runQuestionFinished() throws IOException {
-        // Construct an FSM which should transition into FINISHED state
-        DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
-        game.setCurrentQuestion(configuration.getNumQuestions());
-        fsm.setRunning(true);
-        fsm.runQuestion();
-
-        // Verify that the users are notified of the game ending
-        verify(sseManager, times(1)).send(any(Iterable.class), sseMessageCaptor.capture());
-        assertEquals(SSEMessageType.GAME_END, sseMessageCaptor.getValue().getType());
-    }
-
-    @Test
     void runQuestionGameStopped() {
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
         fsm.runQuestion();
@@ -170,23 +139,5 @@ class DefiniteGameFSMTest {
         fsm.runLeaderboard();
         // Verify that the function does not continue normally.
         verifyNoMoreInteractions(context.getGameService());
-    }
-
-    @Test
-    void finishGame() throws IOException {
-        DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
-        fsm.setRunning(true);
-        fsm.runFinish();
-
-        // Verify that the game is no longer running
-        assertFalse(fsm.isRunning());
-        // Verify that the game is no longer accepting answers
-        verify(gameService, times(1)).setAcceptingAnswers(any(Game.class), booleanCaptor.capture());
-        assertFalse(booleanCaptor.getValue());
-        // Verify that the game status is "FINISHED"
-        assertEquals(GameStatus.FINISHED, game.getStatus());
-        // Verify that the users are notified of the game finishing
-        verify(sseManager, times(1)).send(any(Iterable.class), sseMessageCaptor.capture());
-        assertEquals(SSEMessageType.GAME_END, sseMessageCaptor.getValue().getType());
     }
 }

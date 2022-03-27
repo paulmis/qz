@@ -19,6 +19,7 @@ package client.scenes;
 import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
+import client.scenes.game.GameScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
 import client.scenes.lobby.LobbyLeaveScreenCtrl;
 import client.scenes.lobby.LobbyLeaveScreenPane;
@@ -26,10 +27,12 @@ import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
-import client.utils.SSEHandler;
+import client.utils.ClientState;
+import client.utils.communication.ServerUtils;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbarLayout;
 import commons.entities.game.configuration.GameConfigurationDTO;
+import commons.entities.questions.QuestionDTO;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -251,6 +254,7 @@ public class MainCtrl {
      * Shows the lobby screen.
      */
     public void showLobbyScreen() {
+        lobbyScreenCtrl.bindHandler(ServerUtils.sseHandler);
         this.showScreenLetterBox(lobbyScene, StageScalingStrategy.Letterbox);
         this.lobbyScreenCtrl.reset();
     }
@@ -258,9 +262,10 @@ public class MainCtrl {
     /**
      * This function displays the game screen.
      */
-    public void showGameScreen(SSEHandler sseHandler) {
+    public void showGameScreen(QuestionDTO question) {
+        gameScreenCtrl.setQuestion(question);
+        gameScreenCtrl.bindHandler(ServerUtils.sseHandler);
         this.showScreenLetterBox(gameScreen, StageScalingStrategy.Letterbox);
-        gameScreenCtrl.reset(sseHandler);
     }
 
     /**
@@ -408,9 +413,6 @@ public class MainCtrl {
         snack.setViewOrder(-1);
     }
 
-    public void showInformationalSnackBar() {
-    }
-
     /**
      * The size listener for the scene.
      * We keep a reference to it to be
@@ -431,7 +433,7 @@ public class MainCtrl {
     private void scaling(final Scene scene,
                          final Pane contentPane, float initWidth, float initHeight, StageScalingStrategy strategy) {
 
-        // We remove the listeners so we don't have conflicts.
+        // We remove the listeners, so we don't have conflicts.
         if (sizeListener != null) {
             scene.widthProperty().removeListener(sizeListener);
             scene.heightProperty().removeListener(sizeListener);
@@ -554,6 +556,21 @@ public class MainCtrl {
                 default:
                     break;
             }
+        }
+    }
+
+    /**
+     * Initializes the game scene based on the current stage of the game.
+     */
+    void joinGame() {
+        switch (ClientState.gameStage) {
+            case QUESTION:
+                showGameScreen(null);
+                break;
+            case ANSWER:
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 }
