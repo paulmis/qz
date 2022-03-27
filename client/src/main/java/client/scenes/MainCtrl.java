@@ -298,7 +298,6 @@ public class MainCtrl {
         configPane.setPrefHeight(primaryStage.getHeight() / 2);
 
         lobbySettingsPopUp.getContent().add(configPane);
-
         lobbySettingsPopUp.show(primaryStage);
     }
 
@@ -320,15 +319,14 @@ public class MainCtrl {
                                       LobbyLeaveScreenCtrl.CancelHandler cancelHandler) {
         lobbyLeavePopUp.setOnShown(e -> {
             lobbyLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
-                                 - lobbyLeavePopUp.getWidth() / 2);
+                    - lobbyLeavePopUp.getWidth() / 2);
             
             lobbyLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
-                                 - lobbyLeavePopUp.getHeight() / 2);
+                    - lobbyLeavePopUp.getHeight() / 2);
         });
         
-        var disbandPane = new LobbyLeaveScreenPane(leaveHandler, cancelHandler);
-        lobbyLeavePopUp.getContent().add(disbandPane);
-        
+        var lobbyLeavePane = new PopupPane(new LobbyLeaveScreenCtrl(leaveHandler, cancelHandler), "/lobby/LobbyLeaveScreen");
+        lobbyLeavePopUp.getContent().add(lobbyLeavePane);
         lobbyLeavePopUp.show(primaryStage);
     }
     
@@ -351,15 +349,14 @@ public class MainCtrl {
                                      GameLeaveScreenCtrl.CancelHandler cancelHandler) {
         gameLeavePopUp.setOnShown(e -> {
             gameLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
-                                - gameLeavePopUp.getWidth() / 2);
+                    - gameLeavePopUp.getWidth() / 2);
             
             gameLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
-                                - gameLeavePopUp.getHeight() / 2);
+                    - gameLeavePopUp.getHeight() / 2);
         });
         
-        var disbandPane = new GameLeaveScreenPane(leaveHandler, cancelHandler);
-        gameLeavePopUp.getContent().add(disbandPane);
-        
+        var gameLeavePane = new PopupPane(new GameLeaveScreenCtrl(leaveHandler, cancelHandler), "GameLeaveScreen");
+        gameLeavePopUp.getContent().add(gameLeavePane);
         gameLeavePopUp.show(primaryStage);
     }
     
@@ -388,9 +385,8 @@ public class MainCtrl {
                     - lobbyDisbandPopUp.getHeight() / 2);
         });
 
-        var disbandPane = new LobbyDisbandScreenPane(disbandHandler, cancelHandler);
-        lobbyDisbandPopUp.getContent().add(disbandPane);
-
+        var lobbyDisbandPane = new PopupPane(new LobbyDisbandScreenCtrl(disbandHandler, cancelHandler), "/lobby/LobbyDisbandScreen");
+        lobbyDisbandPopUp.getContent().add(lobbyDisbandPane);
         lobbyDisbandPopUp.show(primaryStage);
     }
 
