@@ -393,9 +393,10 @@ public class ServerUtils {
      *
      * @param getLobbyInfoHandlerSuccess The function that will be called if the request is successful.
      * @param getLobbyInfoHandlerFail The function that will be called if the request is unsuccessful.
+     * @param lobbyId The lobby id of the lobby that needs to be found.
      */
     public void getLobbyInfo(GetLobbyInfoHandlerSuccess getLobbyInfoHandlerSuccess,
-                          GetLobbyInfoHandlerFail getLobbyInfoHandlerFail) {
+                          GetLobbyInfoHandlerFail getLobbyInfoHandlerFail, UUID lobbyId) {
         Invocation invocation = client
                 .target(SERVER).path("/api/lobby/" + lobbyId)
                 .request(APPLICATION_JSON)

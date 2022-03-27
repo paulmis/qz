@@ -2,7 +2,6 @@ package client.scenes.lobby;
 
 import static javafx.application.Platform.runLater;
 
-import client.communication.game.GameCommunication;
 import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
 import client.utils.ClientState;
@@ -12,11 +11,11 @@ import client.utils.communication.SSESource;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
-import commons.entities.game.GameStatus;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
 import java.time.Duration;
 import javafx.fxml.FXML;
+import javax.ws.rs.core.Response;
 import lombok.Generated;
 import lombok.Getter;
 
@@ -27,6 +26,7 @@ import lombok.Getter;
 @Generated
 public class LobbyScreenCtrl implements SSESource {
     private final LobbyCommunication communication;
+    private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
     private String name = "Ligma's Lobby";
@@ -46,9 +46,10 @@ public class LobbyScreenCtrl implements SSESource {
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public LobbyScreenCtrl(LobbyCommunication communication, MainCtrl mainCtrl) {
+    public LobbyScreenCtrl(LobbyCommunication communication, MainCtrl mainCtrl, ServerUtils server) {
         this.mainCtrl = mainCtrl;
         this.communication = communication;
+        this.server = server;
     }
 
     public void bindHandler(SSEHandler handler) {
@@ -152,6 +153,8 @@ public class LobbyScreenCtrl implements SSESource {
                             case 200:
                                 System.out.println("Host successfully disbanded the lobby");
                                 mainCtrl.showLobbyListScreen();
+                                ClientState.game = null;
+                                ServerUtils.sseHandler.kill();
                                 break;
                             case 401:
                                 System.out.println("Player isn't host");
