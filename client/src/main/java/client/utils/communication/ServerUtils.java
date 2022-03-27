@@ -212,16 +212,15 @@ public class ServerUtils {
      */
     public void createLobby(CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
                             CreateLobbyHandlerFail createLobbyHandlerFail) {
-        var config = new NormalGameConfigurationDTO(null, Duration.ofSeconds(10), 1, 10, 3, 2f, 100, 0, 75);
-        var game = new NormalGameDTO();
-        game.setId(UUID.randomUUID());
-        game.setConfiguration(config);
+        var defaultConfig = new NormalGameConfigurationDTO(null, Duration.ofSeconds(10), 1, 5, 3, 2f, 100, 0, 75);
+        var defaultGame = new NormalGameDTO();
+        defaultGame.setConfiguration(defaultConfig);
 
         Invocation invocation = client
                 .target(SERVER).path("/api/lobby")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .buildPost(Entity.entity(game, APPLICATION_JSON));
+                .buildPost(Entity.entity(defaultGame, APPLICATION_JSON));
 
         invocation.submit(new InvocationCallback<GameDTO>() {
 
