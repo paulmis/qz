@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import server.database.entities.game.configuration.NormalGameConfiguration;
 
 /**
  * A game in the default game mode.
@@ -38,5 +39,29 @@ public class NormalGame extends DefiniteGame<NormalGameDTO> {
     @Override
     public NormalGameDTO getDTO() {
         return new NormalGameDTO(super.toDTO());
+    }
+
+    /**
+     * Returns the configuration of this game.
+     *
+     * @return the configuration of this game
+     */
+    @Override
+    public NormalGameConfiguration getConfiguration() {
+        return (NormalGameConfiguration) super.getConfiguration();
+    }
+
+    public boolean isLastQuestion() {
+        return this.currentQuestionNumber != null
+            && this.currentQuestionNumber == getConfiguration().getNumQuestions() - 1;
+    }
+
+    /**
+     * Returns whether the game should finish after this question is answered.
+     *
+     * @return whether the game should finish after this question is answered.
+     */
+    public boolean shouldFinish() {
+        return isLastQuestion();
     }
 }

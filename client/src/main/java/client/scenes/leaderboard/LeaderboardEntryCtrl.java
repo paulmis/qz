@@ -1,7 +1,6 @@
 package client.scenes.leaderboard;
 
-import commons.entities.UserDTO;
-import java.net.MalformedURLException;
+import commons.entities.auth.UserDTO;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;

@@ -1,7 +1,12 @@
 package commons.entities.game;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import commons.entities.game.configuration.GameConfigurationDTO;
+import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
+import commons.entities.questions.QuestionDTO;
 import commons.entities.utils.DTO;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -18,6 +23,10 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = DefiniteGameDTO.class, name = "DefiniteGameDTO")
+})
 public class GameDTO implements DTO {
     /**
      * The unique identifier of the game.
@@ -50,9 +59,14 @@ public class GameDTO implements DTO {
     protected GameStatus status;
 
     /**
-     * The current question of the game.
+     * The number of the current question.
      */
-    protected int currentQuestion;
+    protected Integer currentQuestionNumber = null;
+
+    /**
+     * The current question.
+     */
+    protected QuestionDTO currentQuestion;
 
     /**
      * The players in the game.
@@ -76,6 +90,7 @@ public class GameDTO implements DTO {
         this.gameType = gameDTO.getGameType();
         this.configuration = gameDTO.getConfiguration();
         this.status = gameDTO.getStatus();
+        this.currentQuestionNumber = gameDTO.getCurrentQuestionNumber();
         this.currentQuestion = gameDTO.getCurrentQuestion();
         this.players = gameDTO.getPlayers();
         this.host = gameDTO.getHost();

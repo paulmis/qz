@@ -34,4 +34,15 @@ public interface GameRepository extends JpaRepository<Game, UUID> {
             + "LEFT JOIN GamePlayer gp ON g.id = gp.game "
             + "WHERE gp.user.id = ?1 AND g.status = commons.entities.game.GameStatus.ONGOING AND gp.abandoned = false")
     Optional<Game> getPlayersGame(@NonNull UUID userId);
+
+    /**
+     * Find player's active game or lobby.
+     *
+     * @param userId user's id
+     * @return empty optional if there is no active game for the player, otherwise returns game
+     */
+    @Query("SELECT g FROM Game g "
+        + "LEFT JOIN GamePlayer gp ON g.id = gp.game "
+        + "WHERE gp.user.id = ?1 AND g.status <> commons.entities.game.GameStatus.FINISHED AND gp.abandoned = false")
+    Optional<Game> getPlayersLobbyOrGame(@NonNull UUID userId);
 }

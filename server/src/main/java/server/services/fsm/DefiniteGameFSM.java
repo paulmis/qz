@@ -10,6 +10,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import server.database.entities.game.DefiniteGame;
+import server.database.entities.game.exceptions.GameFinishedException;
 
 /**
  * Runnable for definite game finite state machine.
@@ -23,11 +24,11 @@ public class DefiniteGameFSM extends GameFSM {
      * @param game    The game instance.
      * @param context The execution context of the FSM.
      */
-    public DefiniteGameFSM(DefiniteGame game, FSMContext context) {
+    public DefiniteGameFSM(DefiniteGame<?> game, FSMContext context) {
         super(game, context);
-        if (game.getCurrentQuestion() == game.getQuestionsCount()) {
-            log.warn("[{}] Attempt to construct a FSM on a finished game.", game.getId());
-            throw new IllegalStateException("Game is already finished.");
+        if (game.getStatus() != GameStatus.ONGOING) {
+            log.warn("[{}] Attempt to construct a FSM on a " + game.getStatus() + " game", game.getId());
+            throw new IllegalStateException("Attempt to construct a FSM on a " + game.getStatus() + " game");
         }
         log.debug("[{}] DefiniteFSM created.", game.getId());
     }
@@ -62,6 +63,69 @@ public class DefiniteGameFSM extends GameFSM {
     }
 
     /**
+     * Question stage. In this stage, the question is shown for some time (amount provided by the Game entity).
+     * Players are allowed to submit answers.
+     * The FSM then transitions into the answer stage, or the finished stage, if the game reached its conclusion.
+     */
+    @SneakyThrows
+    void runQuestion() {
+        // If we received a stop signal, return immediately.
+        if (!isRunning()) {
+            log.debug("[{}] Stop signal received, FSM exiting.", getGame().getId());
+            return;
+        }
+
+        log.trace("[{}] FSM runQuestion called.", getGame().getId());
+        setState(FSMState.QUESTION);
+
+        // If the game is finished, run the cleanup function and return immediately.
+        try {
+            // Move onto the next question.
+            log.debug("[{}] FSM runnable: advancing onto the next question.", getGame().getId());
+            getContext().getGameService()
+                .nextQuestion(
+                    getGame(),
+                    getGame().getConfiguration().getAnswerTime().toMillis());
+
+            // Schedule the "show answer" stage.
+            scheduleTask(this::runAnswer, getGame().getConfiguration().getAnswerTime());
+        } catch (GameFinishedException e) {
+            runFinish();
+        }
+    }
+
+    /**
+     * Answer stage. In this stage, the players are shown the current question and are allowed to answer.
+     * The FSM then transitions into either the leaderboard stage (every n questions), or question stage.
+     */
+    @SneakyThrows
+    void runAnswer() {
+        // If we received a stop signal, return immediately
+        if (!isRunning()) {
+            log.debug("[{}] Stop signal received, FSM exiting.", getGame().getId());
+            return;
+        }
+
+        log.trace("[{}] FSM runAnswer called.", getGame().getId());
+        setState(FSMState.ANSWER);
+
+        // Delay before progressing to the next stage
+        long delay = 5000; // TODO: make this configurable?
+        // Show the leaderboard every <leaderboardInterval> questions
+        int leaderboardInterval = 5; // TODO: make this configurable?
+
+        // Stop accepting answers
+        getContext().getGameService().showAnswer(getGame(), delay);
+
+        // Show leaderboard on every 5th question, and show next question on other questions
+        scheduleTask(
+                (getGame().getCurrentQuestionNumber() + 1) % leaderboardInterval == 0
+                        ? this::runLeaderboard
+                        : this::runQuestion,
+                Duration.ofMillis(delay));
+    }
+
+    /**
      * Leaderboard stage. In this stage, the leaderboard is shown for a fixed amount of time.
      * The FSM then transitions into the question stage.
      */
@@ -88,99 +152,19 @@ public class DefiniteGameFSM extends GameFSM {
         Date executionTime = DateUtils.addMilliseconds(new Date(), delay);
         // Schedule the next stage.
         setFuture(
-                new FSMFuture(
-                        Optional.of(getContext().getTaskScheduler().schedule(this::runQuestion, executionTime)),
-                        executionTime)
+            new FSMFuture(
+                Optional.of(getContext().getTaskScheduler().schedule(this::runQuestion, executionTime)),
+                executionTime)
         );
-    }
-
-    /**
-     * Answer stage. In this stage, the players are shown the current question and are allowed to answer.
-     * The FSM then transitions into either the leaderboard stage (every n questions), or question stage.
-     */
-    @SneakyThrows
-    void runAnswer() {
-        // If we received a stop signal, return immediately.
-        if (!isRunning()) {
-            log.debug("[{}] Stop signal received, FSM exiting.", getGame().getId());
-            return;
-        }
-
-        log.trace("[{}] FSM runAnswer called.", getGame().getId());
-        setState(FSMState.ANSWER);
-
-        // Delay before progressing to the next stage.
-        int delay = 5000; // TODO: make this configurable?
-        // Show the leaderboard every <leaderboardInterval> questions.
-        int leaderboardInterval = 5; // TODO: make this configurable?
-
-        // Stop accepting answers.
-        getContext().getGameService().setAcceptingAnswers(getGame(),
-                false,
-                (long) delay);
-        log.trace("[{}] FSM runnable: accepting answers disabled.", getGame().getId());
-
-        // Show leaderboard on every 5th question, and show next question on other questions.
-        scheduleTask(
-                (getGame().getCurrentQuestion() + 1) % leaderboardInterval == 0
-                        ? this::runLeaderboard
-                        : this::runQuestion,
-                Duration.ofMillis(delay)
-        );
-    }
-
-    /**
-     * Question stage. In this stage, the question is shown for some time (amount provided by the Game entity).
-     * Players are allowed to submit answers.
-     * The FSM then transitions into the answer stage, or the finished stage, if the game reached its conclusion.
-     */
-    @SneakyThrows
-    void runQuestion() {
-        // If we received a stop signal, return immediately.
-        if (!isRunning()) {
-            log.debug("[{}] Stop signal received, FSM exiting.", getGame().getId());
-            return;
-        }
-
-        log.trace("[{}] FSM runQuestion called.", getGame().getId());
-        setState(FSMState.QUESTION);
-
-        // If the game is finished, run the cleanup function and return immediately.
-        if (getGame().getCurrentQuestion()
-                == ((DefiniteGame) getGame()).getQuestionsCount()) {
-            runFinish();
-            return;
-        }
-
-        // Move onto the next question.
-        log.debug("[{}] FSM runnable: advancing onto the next question.", getGame().getId());
-        getGame().setCurrentQuestion(getGame().getCurrentQuestion() + 1);
-
-        // Start accepting answers.
-        getContext().getGameService().setAcceptingAnswers(getGame(),
-                true,
-                getGame().getConfiguration().getAnswerTime().toMillis());
-
-        log.trace("[{}] FSM runnable: accepting answers enabled.", getGame().getId());
-
-        // Schedule the "show answer" stage.
-        scheduleTask(this::runAnswer, getGame().getConfiguration().getAnswerTime());
     }
 
     @SneakyThrows
     void runFinish() {
-        log.debug("[{}] Game is finished.", getGame().getId());
-        setState(FSMState.FINISHED);
+        // We are not accepting answers anymore.
+        getContext().getGameService().finish(getGame());
 
         // Stop the FSM
+        setState(FSMState.FINISHED);
         setRunning(false);
-
-        // We are not accepting answers anymore.
-        getContext().getGameService().setAcceptingAnswers(getGame(), false);
-
-        // Mark game as finished and notify all players.
-        getGame().setStatus(GameStatus.FINISHED);
-        getContext().getSseManager().send(getGame().getPlayerIds(), new SSEMessage(SSEMessageType.GAME_END));
-        log.trace("[{}] FSM runnable: sending game end message.", getGame().getId());
     }
 }

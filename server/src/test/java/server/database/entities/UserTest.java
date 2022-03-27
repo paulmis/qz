@@ -2,7 +2,7 @@ package server.database.entities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import commons.entities.UserDTO;
+import commons.entities.auth.UserDTO;
 import org.junit.jupiter.api.Test;
 
 class UserTest {

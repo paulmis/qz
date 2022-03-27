@@ -29,3 +29,12 @@
 #labelOptionD {
     -fx-text-fill: answersTextColor;
 }
+
+.chosen-answer {
+    -fx-background-color: chosenAnswerColor;
+}
+
+.chosen-answer > .label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
