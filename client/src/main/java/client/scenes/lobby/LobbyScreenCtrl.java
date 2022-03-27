@@ -145,7 +145,8 @@ public class LobbyScreenCtrl implements SSESource {
                                         ServerUtils.sseHandler.kill();
                                         break;
                                     case 404:
-                                        mainCtrl.showErrorSnackBar("Unable to quit the lobby: user or lobby doesn't exist");
+                                        mainCtrl.showErrorSnackBar("Unable to quit the lobby: "
+                                                + "user or lobby doesn't exist");
                                         break;
                                     case 409:
                                         mainCtrl.showErrorSnackBar("Unable to quit the lobby: "
