@@ -1,6 +1,5 @@
 package client.scenes.chat;
 
-import client.utils.SSEHandler;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -17,17 +16,15 @@ public class ChatPane extends StackPane {
 
     /**
      * Constructor of a chat widget.
-     *
-     * @param handler SSE handler in use by the current game/lobby
      */
-    public ChatPane(SSEHandler handler) {
+    public ChatPane() {
         // Create the loader for the fxml
         FXMLLoader fxmlLoader =
                 new FXMLLoader(getClass().getResource("/client/scenes/chat/ChatWidget.fxml"));
 
         // Set the controller of the fxml
         fxmlLoader.setControllerFactory(param ->
-                controller = new ChatCtrl(handler));
+                controller = new ChatCtrl());
 
         // Load the fxml
         try {

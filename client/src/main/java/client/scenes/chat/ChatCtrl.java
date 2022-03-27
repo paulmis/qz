@@ -1,7 +1,8 @@
 package client.scenes.chat;
 
-import client.utils.SSEEventHandler;
-import client.utils.SSEHandler;
+import client.utils.communication.SSEEventHandler;
+import client.utils.communication.SSEHandler;
+import client.utils.communication.SSESource;
 import commons.entities.messages.SSEMessageType;
 import java.net.URL;
 import java.util.ArrayList;
@@ -17,20 +18,25 @@ import lombok.Generated;
  * Chat controller.
  */
 @Generated
-public class ChatCtrl implements Initializable {
+public class ChatCtrl implements Initializable, SSESource {
 
     @FXML private VBox messageList;
     @FXML private TextField userMessage;
 
-    private SSEHandler sseHandler;
-
     /**
      * Constructor of a chat widget.
-     *
-     * @param handler The SSE handler currently in use in the game/lobby
      */
-    public ChatCtrl(SSEHandler handler) {
-        sseHandler = handler;
+    public ChatCtrl() {
+    }
+
+    @Override
+    public void bindHandler(SSEHandler handler) {
+        handler.initialize(this);
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // ToDo: make send button square
     }
 
     /**
@@ -43,11 +49,6 @@ public class ChatCtrl implements Initializable {
             return;
         }
         // ToDo: connect to endpoint to send a message
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        // ToDo: make send button square
     }
 
     /**
