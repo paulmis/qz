@@ -10,7 +10,7 @@ import static server.utils.TestHelpers.getUUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.AnswerDTO;
-import commons.entities.UserDTO;
+import commons.entities.auth.UserDTO;
 import commons.entities.game.GameStatus;
 import java.io.IOException;
 import java.net.URI;
@@ -99,8 +99,8 @@ class AnswerControllerTest {
         mockLobby.setId(getUUID(0));
         mockLobby.setStatus(GameStatus.ONGOING);
         mockLobby.setQuestions(List.of(mockQuestion));
-        mockLobby.setCurrentQuestion(0);
-        mockLobby.changeAcceptingAnswers(true);
+        mockLobby.setCurrentQuestionNumber(0);
+        mockLobby.setAcceptingAnswers(true);
         GameConfiguration conf = new NormalGameConfiguration();
         conf.setCapacity(1);
         mockLobby.setConfiguration(conf);
@@ -170,7 +170,7 @@ class AnswerControllerTest {
 
     @Test
     public void putAnswerNotAcceptingTest() throws Exception {
-        mockLobby.changeAcceptingAnswers(false);
+        mockLobby.setAcceptingAnswers(false);
 
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
@@ -234,7 +234,7 @@ class AnswerControllerTest {
                 getActivity(40)));
         ((MCQuestion) secondQuestion).setAnswer(secondQuestion.getActivities().get(0));
         mockLobby.setQuestions(List.of(mockQuestion, secondQuestion));
-        mockLobby.setCurrentQuestion(0);
+        mockLobby.setCurrentQuestionNumber(0);
 
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId(), Optional.of(1))))
@@ -260,7 +260,7 @@ class AnswerControllerTest {
 
     @Test
     public void getCorrectAnswerNoQuestionTest() throws Exception {
-        mockLobby.setCurrentQuestion(1);
+        mockLobby.setCurrentQuestionNumber(1);
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId())))
                 .andExpect(status().isBadRequest());
@@ -302,7 +302,7 @@ class AnswerControllerTest {
 
     @Test
     public void getScoreNoQuestionTest() throws Exception {
-        mockLobby.setCurrentQuestion(1);
+        mockLobby.setCurrentQuestionNumber(1);
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(scoreEndpoint(mockLobby.getId())))
                 .andExpect(status().isBadRequest());

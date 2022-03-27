@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static server.utils.TestHelpers.getUUID;
 
+import commons.entities.game.GameStatus;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,10 +43,12 @@ class FSMManagerTest {
         fsmManager = new FSMManager();
         game = new NormalGame();
         game.setId(getUUID(1));
+        game.setStatus(GameStatus.ONGOING);
 
         NormalGameConfiguration config = new NormalGameConfiguration();
         config.setNumQuestions(10);
         game.setConfiguration(config);
+        game.setCurrentQuestionNumber(0);
 
         lenient().when(taskScheduler.schedule(any(), any(Date.class))).thenReturn(new FSMHelpers.MockFuture<>());
     }

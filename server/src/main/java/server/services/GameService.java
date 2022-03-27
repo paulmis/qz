@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
@@ -14,8 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
 import server.database.entities.game.Game;
+import server.database.entities.game.exceptions.GameFinishedException;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
+import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.QuestionRepository;
 import server.services.fsm.DefiniteGameFSM;
 import server.services.fsm.FSMContext;
@@ -28,6 +31,9 @@ import server.services.fsm.FSMContext;
 public class GameService {
     @Autowired
     private QuestionRepository questionRepository;
+
+    @Autowired
+    private GameRepository gameRepository;
 
     @Autowired
     private SSEManager sseManager;
@@ -78,21 +84,27 @@ public class GameService {
      * Starts a new game, by verifying the starting conditions and creating a questions set.
      *
      * @param game the game to start
-     * @throws UnsupportedOperationException if a game other than a definite game is started
-     * @throws IllegalStateException         if the game is already started or there aren't enough questions
+     * @throws NotImplementedException if a game other than a definite game is started
+     * @throws IllegalStateException   if the game is already started or there aren't enough questions
+     * @throws IOException             if sending the GAME_START message fails
      */
     @Transactional
     public void startGame(Game game)
-            throws UnsupportedOperationException, IllegalStateException, IOException {
+            throws NotImplementedException, IllegalStateException, IOException {
         // Make sure that the lobby is full and not started
         if (game.getStatus() != GameStatus.CREATED || !game.isFull()) {
             throw new IllegalStateException();
         }
 
+        // Launch the game
+        game.setStatus(GameStatus.ONGOING);
+
         // Initialize the questions
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
+
+            // Distribute the start event to all players
             sseManager.send(definiteGame.getPlayerIds(), new SSEMessage(SSEMessageType.GAME_START));
 
             // Create and start a FSM for the game.
@@ -101,10 +113,10 @@ public class GameService {
                             new FSMContext(sseManager, this, taskScheduler)));
             fsmManager.startFSM(definiteGame);
         } else {
-            throw new UnsupportedOperationException("Starting games other than definite games is not yet supported.");
+            throw new NotImplementedException("Starting games other than definite games is not yet supported.");
         }
 
-        game.setStatus(GameStatus.ONGOING);
+        gameRepository.save(game);
     }
 
     /**
@@ -137,36 +149,61 @@ public class GameService {
         }
     }
 
-
     /**
-     * Sets whether the game is still accepting answers and notifies
-     * every user that this change has happened.
+     * Transitions the game to the next question stage.
      *
-     * @param game             The game object that the action is performed on.
-     * @param acceptingAnswers Whether the game is accepting answers.
+     * @param game the game to transition
      * @throws IOException if an SSE connection send failed.
      */
     @Transactional
-    public void setAcceptingAnswers(Game game, boolean acceptingAnswers) throws IOException {
-        setAcceptingAnswers(game, acceptingAnswers, null);
+    public void nextQuestion(Game<?> game, Long delay)
+        throws IOException, GameFinishedException {
+        // Check if the game should finish
+        if (game.shouldFinish()) {
+            throw new GameFinishedException();
+        }
+
+        // Set the current question number
+        game.incrementQuestion();
+        game.setAcceptingAnswers(true);
+        game = gameRepository.save(game);
+
+        // Distribute the event to all players
+        log.trace("[{}] FSM runnable: accepting answers enabled.", game.getId());
+        sseManager.send(game.getPlayerIds(), new SSEMessage(SSEMessageType.START_QUESTION, delay));
     }
 
     /**
-     * Sets the accepting answers boolean to true inside the game and notifies
-     * every user that this change has happened.
+     * Transitions the game to the answer stage.
      *
-     * @param game             The game object that the action is performed on.
-     * @param acceptingAnswers Whether the game is accepting answers.
-     * @param delay            The delay (in milliseconds) before the next SSE event is to be expected.
+     * @param game the game to transition
      * @throws IOException if an SSE connection send failed.
      */
-    @Transactional
-    public void setAcceptingAnswers(Game game, boolean acceptingAnswers, Long delay) throws IOException {
-        game.setAcceptingAnswers(acceptingAnswers);
+    public void showAnswer(Game<?> game, Long delay)
+        throws IOException {
+        // Disable answering
+        game.setAcceptingAnswers(false);
+        game = gameRepository.save(game);
 
-        sseManager.send(game.getPlayerIds(), new SSEMessage(
-                acceptingAnswers
-                        ? SSEMessageType.START_QUESTION
-                        : SSEMessageType.STOP_QUESTION, delay));
+        // Distribute the event to all players
+        log.trace("[{}] FSM runnable: accepting answers disabled.", game.getId());
+        sseManager.send(game.getPlayerIds(), new SSEMessage(SSEMessageType.STOP_QUESTION, delay));
+    }
+
+    /**
+     * Finishes the game.
+     *
+     * @param game the game to transition
+     * @throws IOException if an SSE connection send failed.
+     */
+    public void finish(Game<?> game)
+        throws IOException {
+        // Mark the game as finished
+        game.setStatus(GameStatus.FINISHED);
+        game = gameRepository.save(game);
+
+        // Distribute the event to all players
+        log.debug("[{}] Game is finished.", game.getId());
+        sseManager.send(game.getPlayerIds(), new SSEMessage(SSEMessageType.GAME_END));
     }
 }

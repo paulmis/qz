@@ -4,7 +4,7 @@ import static javafx.application.Platform.runLater;
 
 import client.scenes.MainCtrl;
 import client.utils.AlgorithmicUtils;
-import client.utils.ServerUtils;
+import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameDTO;
@@ -63,7 +63,7 @@ public class LobbyListCtrl implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         this.usernameField.textProperty().addListener((observable, oldValue, newValue) -> {
-            //TODO: Replace this with a server call to change the username when it becomes available.
+            // TODO: Replace this with a server call to change the username when it becomes available.
             System.out.println(newValue);
         });
 
@@ -89,13 +89,11 @@ public class LobbyListCtrl implements Initializable {
     @FXML
     private void userButtonClick() {
         if (!userPanelGrid.isVisible()) {
-            server.getMyInfo(userDTO -> {
-                runLater(() -> {
-                    this.usernameField.setText(userDTO.getUsername());
-                    userPanelGrid.setVisible(true);
-                    playerImageView.setImage(new Image("https://upload.wikimedia.org/wikipedia/commons/e/e3/Klaus_Iohannis_din_interviul_cu_Dan_Tapalag%C4%83_cropped.jpg"));
-                });
-            }, () -> runLater(() ->
+            server.getMyInfo(userDTO -> runLater(() -> {
+                this.usernameField.setText(userDTO.getUsername());
+                userPanelGrid.setVisible(true);
+                playerImageView.setImage(new Image("https://upload.wikimedia.org/wikipedia/commons/e/e3/Klaus_Iohannis_din_interviul_cu_Dan_Tapalag%C4%83_cropped.jpg"));
+            }), () -> runLater(() ->
                             mainCtrl.showErrorSnackBar("Something went wrong while fetching your user data.")));
         } else {
             userPanelGrid.setVisible(false);
@@ -104,10 +102,12 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void createLobbyButtonClick() {
-        server.createLobby(game -> runLater(() -> {
-            mainCtrl.showLobbyScreen();
-            this.checkHost(game);
-        }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
+        server.createLobby(game ->
+            ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
+            runLater(() -> {
+                mainCtrl.showLobbyScreen();
+                this.checkHost(game);
+            }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
     }
 
     @FXML

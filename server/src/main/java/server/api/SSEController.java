@@ -43,26 +43,26 @@ public class SSEController {
      */
     @GetMapping("/open")
     public ResponseEntity<SseEmitter> open() {
+        // TODO: add a cooldown per user
         // Create a new SSE emitter
         var emitter = new SseEmitter(Long.MAX_VALUE);
         try {
             // Get current user
             User user = userRepository.findByEmail(AuthContext.get())
                     .orElseThrow(() -> new NoSuchElementException("User not found"));
-
             // The user must currently be in a game
-            gameRepository.findByPlayers_User_IdEqualsAndStatus(user.getId(), GameStatus.CREATED)
+            gameRepository.getPlayersLobbyOrGame(user.getId())
                     .orElseThrow(() -> new IllegalStateException("User not in a game"));
 
             // Register emitter callbacks.
-            emitter.onCompletion(() -> sseManager.unregister(user.getId()));
+            emitter.onCompletion(() -> sseManager.unregister(user.getId(), emitter));
             emitter.onTimeout(() -> {
                 log.warn("SSE connection timed out");
-                sseManager.unregister(user.getId());
+                sseManager.unregister(user.getId(), emitter);
             });
             emitter.onError(throwable -> {
                 log.error("Error in SSE connection", throwable);
-                sseManager.unregister(user.getId());
+                sseManager.unregister(user.getId(), emitter);
             });
 
             // Register emitter to the SSE manager.
