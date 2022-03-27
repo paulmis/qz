@@ -13,16 +13,8 @@ import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GamePlayerDTO;
-import commons.entities.game.NormalGameDTO;
-import commons.entities.game.configuration.GameConfigurationDTO;
-import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -79,14 +71,23 @@ public class LobbyScreenCtrl implements SSESource {
     }
 
     /**
-     * Example of an SSE event handler.
+     * Reacts to a player joining the lobby.
      */
-    @SSEEventHandler(SSEMessageType.PLAYER_LEFT)
-    public void playerLeft(String playerId) {
+    @SSEEventHandler(SSEMessageType.PLAYER_JOINED)
+    public void playerJoined() {
+        updateView();
     }
 
     /**
-     * Starts a game remotely activated.
+     * Reacts to a player leaving the lobby.
+     */
+    @SSEEventHandler(SSEMessageType.PLAYER_LEFT)
+    public void playerLeft() {
+        updateView();
+    }
+
+    /**
+     * Reacts to the game being started by another player.
      */
     @SSEEventHandler(SSEMessageType.GAME_START)
     public void gameStarted() {
@@ -175,10 +176,19 @@ public class LobbyScreenCtrl implements SSESource {
      */
     public void lobbySettingsButtonClick() {
         mainCtrl.openLobbySettings(ClientState.game.getConfiguration(), (conf) -> {
-            System.out.println(conf);
+            // Close pop-up
             mainCtrl.closeLobbySettings();
-            // ToDo: call endpoint to change config
-            updateView();
+
+            // Call endpoint to change config
+            communication.saveConfig(
+                    ClientState.game.getId(),
+                    conf,
+                    // Success
+                    () -> runLater(() -> {
+                        updateView();
+                    }),
+                    // Failure
+                    () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to update the configuration.")));
         });
     }
 
