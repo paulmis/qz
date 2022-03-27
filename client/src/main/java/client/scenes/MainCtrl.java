@@ -325,7 +325,8 @@ public class MainCtrl {
                     - lobbyLeavePopUp.getHeight() / 2);
         });
         
-        var lobbyLeavePane = new PopupPane(new LobbyLeaveScreenCtrl(leaveHandler, cancelHandler), "/lobby/LobbyLeaveScreen");
+        var lobbyLeavePane = new PopupPane(new LobbyLeaveScreenCtrl(leaveHandler, cancelHandler),
+                "/lobby/LobbyLeaveScreen");
         lobbyLeavePopUp.getContent().add(lobbyLeavePane);
         lobbyLeavePopUp.show(primaryStage);
     }
@@ -355,7 +356,8 @@ public class MainCtrl {
                     - gameLeavePopUp.getHeight() / 2);
         });
         
-        var gameLeavePane = new PopupPane(new GameLeaveScreenCtrl(leaveHandler, cancelHandler), "GameLeaveScreen");
+        var gameLeavePane = new PopupPane(new GameLeaveScreenCtrl(leaveHandler, cancelHandler),
+                "GameLeaveScreen");
         gameLeavePopUp.getContent().add(gameLeavePane);
         gameLeavePopUp.show(primaryStage);
     }
