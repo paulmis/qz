@@ -179,33 +179,6 @@ public class LobbyScreenCtrl implements SSESource {
      */
     public void updateView() {
         GameDTO dto = ClientState.game;
-        /*
-        GameDTO dto = new GameDTO();
-        dto.setGameId("ABCD");
-        dto.setGameType(GameType.PUBLIC);
-        GameConfigurationDTO confDTO = new NormalGameConfigurationDTO(
-                null,
-                Duration.ofSeconds(60),
-                2,
-                20,
-                3,
-                2f,
-                100,
-                0,
-                75);
-        dto.setConfiguration(confDTO);
-        GamePlayerDTO sally = new GamePlayerDTO();
-        sally.setId(UUID.randomUUID());
-        sally.setNickname("Sally");
-        sally.setScore(12);
-        GamePlayerDTO john = new GamePlayerDTO();
-        john.setId(UUID.randomUUID());
-        john.setNickname("John");
-        john.setScore(30);
-        dto.setPlayers(Set.of(sally, john));
-        dto.setHost(sally.getId());
-         */
-
         // ToDo: have a game name in gameDTO
         String hostNickname = dto.getPlayers().stream()
                 .filter(player -> player.getId() == dto.getHost())
@@ -214,7 +187,10 @@ public class LobbyScreenCtrl implements SSESource {
                 .orElse("Ligma");
         gameName.setText(hostNickname + "'s game");
         gameId.setText(dto.getGameId());
-        gameType.setText(dto.getGameType() == null ? "N.A." : dto.getGameType().toString());
+        System.out.println(dto.getClass().getName());
+        gameType.setText(dto.getClass().getName()
+                .replaceAll(".*\\.", "")
+                .replaceAll("GameDTO", ""));
         gameCapacity.setText(dto.getPlayers().size() + "/" + dto.getConfiguration().getCapacity());
         updatePlayerList(dto);
     }
