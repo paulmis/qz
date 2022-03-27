@@ -4,12 +4,12 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
+import commons.entities.game.configuration.GameConfigurationDTO;
 import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Response;
-import commons.entities.game.configuration.GameConfigurationDTO;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -118,7 +118,8 @@ public class LobbyCommunication {
      * @param handlerSuccess  the handler for when the request succeeds
      * @param handlerFail the handler for when the request fails
      */
-    public void saveConfig(UUID gameId, GameConfigurationDTO config, SaveConfigHandler handlerSuccess, SaveConfigurationFailHandler handlerFail) {
+    public void saveConfig(UUID gameId, GameConfigurationDTO config,
+                           SaveConfigHandler handlerSuccess, SaveConfigurationFailHandler handlerFail) {
         Invocation request = ServerUtils.getRequestTarget()
                 .path("/api/lobby/" + gameId + "/config")
                 .request(APPLICATION_JSON)
