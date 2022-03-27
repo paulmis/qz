@@ -124,7 +124,7 @@ public class ServerUtils {
             public void completed(Response o) {
                 if (o.getStatus() == 201) {
                     client = client.register(new Authenticator(o.readEntity(String.class)));
-                    ClientState.user = user;
+                    getMyInfo((dto) -> {}, () -> {});
                     registerHandler.handle(o, new ApiError());
                 } else if (o.getStatus() == 400) {
                     registerHandler.handle(o, o.readEntity(ApiError.class));
@@ -178,7 +178,7 @@ public class ServerUtils {
             public void completed(LoginDTO loginDTO) {
                 System.out.println(loginDTO);
                 client = client.register(new Authenticator(loginDTO.getToken()));
-                ClientState.user = user;
+                getMyInfo((dto) -> {}, () -> {});
                 logInHandlerSuccess.handle(loginDTO);
             }
 
@@ -361,6 +361,7 @@ public class ServerUtils {
 
             @Override
             public void completed(UserDTO o) {
+                ClientState.user = o;
                 getUserInfoHandlerSuccess.handle(o);
             }
 

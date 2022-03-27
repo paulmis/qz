@@ -5,23 +5,11 @@ package commons.entities.game;
  */
 public enum GameType {
     /**
-     * The game is public, joinable by anyone.
+     * The game is public, anyone can join it.
      */
     PUBLIC,
     /**
-     * The game is private, joinable only by invited players.
+     * The game is private, only invited players can join it.
      */
-    PRIVATE;
-
-    @Override
-    public String toString() {
-        switch (this) {
-            case PRIVATE:
-                return "PRIVATE";
-            case PUBLIC:
-                return "PUBLIC";
-            default:
-                return null;
-        }
-    }
+    PRIVATE,
 }

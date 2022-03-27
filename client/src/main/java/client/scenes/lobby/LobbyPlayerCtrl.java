@@ -1,5 +1,6 @@
 package client.scenes.lobby;
 
+import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GamePlayerDTO;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -15,8 +16,9 @@ import lombok.Generated;
 @Generated
 public class LobbyPlayerCtrl implements Initializable {
     @FXML private Label playerName;
-    @FXML private ImageView hostImg;
+    @FXML private ImageView leadingCrown;
     @FXML private Label playerScore;
+    @FXML private JFXButton kickOutBtn;
 
     private GamePlayerDTO playerDTO;
 
@@ -24,14 +26,28 @@ public class LobbyPlayerCtrl implements Initializable {
         this.playerDTO = playerDTO;
     }
 
+    public void setPlayerLeading(boolean isLeading) {
+        leadingCrown.setVisible(isLeading);
+    }
+
+    public void showRemovePlayerBtn(boolean doShow) {
+        kickOutBtn.setVisible(doShow);
+    }
+
     public void setPlayerHost(boolean isHost) {
-        hostImg.setVisible(isHost);
+        playerName.setText((isHost ? "(Host) " : "") + playerDTO.getNickname());
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        playerName.setText(playerDTO.getNickname());
         playerScore.setText(playerDTO.getScore().toString());
+        setPlayerLeading(false);
         setPlayerHost(false);
+        showRemovePlayerBtn(false);
+    }
+
+    @FXML
+    private void kickOutPlayer() {
+        // ToDo: contact endpoint to kick out player
     }
 }

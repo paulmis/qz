@@ -13,8 +13,16 @@ import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GamePlayerDTO;
+import commons.entities.game.NormalGameDTO;
+import commons.entities.game.configuration.GameConfigurationDTO;
+import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -178,7 +186,42 @@ public class LobbyScreenCtrl implements SSESource {
      * Set up the screen elements according to the stored GameDTO.
      */
     public void updateView() {
+        /* // For testing
+        GameDTO dto = new NormalGameDTO();
+        dto.setGameId("ABCD");
+        GameConfigurationDTO confDTO = new NormalGameConfigurationDTO(
+                null,
+                Duration.ofSeconds(60),
+                2,
+                20,
+                3,
+                2f,
+                100,
+                0,
+                75);
+        dto.setConfiguration(confDTO);
+        GamePlayerDTO sally = new GamePlayerDTO();
+        sally.setId(UUID.randomUUID());
+        sally.setNickname("Sally");
+        sally.setScore(12);
+        sally.setUserId(ClientState.user.getId());
+        sally.setJoinDate(LocalDateTime.now());
+        Set<GamePlayerDTO> players = new HashSet<>();
+        players.add(sally);
+        for (int idx = 0; idx < 40; idx++) {
+            GamePlayerDTO john = new GamePlayerDTO();
+            john.setId(UUID.randomUUID());
+            john.setNickname("John" + idx);
+            john.setScore(30 + idx);
+            john.setUserId(UUID.randomUUID());
+            john.setJoinDate(LocalDateTime.now().minusMinutes(idx));
+            players.add(john);
+        }
+        dto.setPlayers(players);
+        dto.setHost(sally.getId());
+        */
         GameDTO dto = ClientState.game;
+
         // ToDo: have a game name in gameDTO
         String hostNickname = dto.getPlayers().stream()
                 .filter(player -> player.getId() == dto.getHost())
@@ -187,7 +230,6 @@ public class LobbyScreenCtrl implements SSESource {
                 .orElse("Ligma");
         gameName.setText(hostNickname + "'s game");
         gameId.setText(dto.getGameId());
-        System.out.println(dto.getClass().getName());
         gameType.setText(dto.getClass().getName()
                 .replaceAll(".*\\.", "")
                 .replaceAll("GameDTO", ""));
@@ -202,14 +244,33 @@ public class LobbyScreenCtrl implements SSESource {
      */
     private void updatePlayerList(GameDTO gameDTO) {
         playerList.getChildren().clear();
+        int highestScore = gameDTO.getPlayers().stream()
+                .mapToInt(GamePlayerDTO::getScore)
+                .max()
+                .orElse(Integer.MIN_VALUE);
+        boolean isHost = gameDTO.getPlayers().stream()
+                .filter(dto -> ClientState.user.getId().equals(dto.getUserId()))
+                .anyMatch(dto -> gameDTO.getHost().equals(dto.getId()));
         List<LobbyPlayerPane> playerElements = gameDTO.getPlayers().stream()
-                .sorted((p1, p2) -> p2.getScore() - p1.getScore())
+                .sorted((p1, p2) ->
+                        // Sort by join date, host always first
+                        gameDTO.getHost().equals(p1.getId()) == gameDTO.getHost().equals(p2.getId())
+                                ? p1.getJoinDate().compareTo(p2.getJoinDate())
+                                : (gameDTO.getHost().equals(p1.getId()) ? -1 : 1))
                 .map(dto -> {
                     LobbyPlayerPane elem = new LobbyPlayerPane(dto);
+                    // Show highest-scoring player
+                    elem.setPlayerLeading(dto.getScore() == highestScore);
+                    // Show kick-out buttons only to host
+                    elem.showRemovePlayerBtn(isHost);
+                    // Indicate if the player is the host
                     elem.setPlayerHost(gameDTO.getHost().equals(dto.getId()));
                     return elem;
                 })
                 .collect(Collectors.toList());
         playerList.getChildren().addAll(playerElements);
+
+        // Set player list spacing
+        playerList.setSpacing(5);
     }
 }
