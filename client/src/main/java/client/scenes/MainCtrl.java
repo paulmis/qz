@@ -387,7 +387,8 @@ public class MainCtrl {
                     - lobbyDisbandPopUp.getHeight() / 2);
         });
 
-        var lobbyDisbandPane = new PopupPane(new LobbyDisbandScreenCtrl(disbandHandler, cancelHandler), "/lobby/LobbyDisbandScreen");
+        var lobbyDisbandPane = new PopupPane(new LobbyDisbandScreenCtrl(disbandHandler, cancelHandler),
+                "/lobby/LobbyDisbandScreen");
         lobbyDisbandPopUp.getContent().add(lobbyDisbandPane);
         lobbyDisbandPopUp.show(primaryStage);
     }
