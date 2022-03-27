@@ -92,8 +92,10 @@ public class FileSystemStorageService implements StorageService {
     public Stream<Path> loadAll() {
         try {
             // Recursively get all files in the upload directory
-            return Files.walk(this.fsConfiguration.getUploadDirPath(),
-                            this.fsConfiguration.getMaxRecursionDepth())
+            return Files.walk(
+                            this.fsConfiguration.getUploadDirPath(),
+                            this.fsConfiguration.getMaxRecursionDepth()
+                    )
                     .filter(path -> !path.equals(this.fsConfiguration.getUploadDirPath()))
                     .map(this.fsConfiguration.getUploadDirPath()::relativize);
         } catch (IOException e) {

@@ -1,7 +1,5 @@
 package server.api;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-
 import com.google.common.collect.Maps;
 import commons.entities.ActivityDTO;
 import java.io.IOException;
@@ -40,12 +38,13 @@ public class ActivityController {
      */
     @PostMapping("/batch/images")
     ResponseEntity batchAddActivityWithImages(@RequestPart List<ActivityDTO> activities,
-                                              @RequestPart MultipartFile[] images) {
+                                              @RequestPart(required = false) MultipartFile[] images) {
         // Map filenames to images
-        Map<String, MultipartFile> imageMap = Maps.uniqueIndex(
-                firstNonNull(Arrays.asList(images), new ArrayList<>(0)),
-                MultipartFile::getOriginalFilename);
+        Map<String, MultipartFile> imageMap = images == null ?
+                Collections.emptyMap() :
+                Maps.uniqueIndex(Arrays.asList(images), MultipartFile::getOriginalFilename);
 
+        // Convert DTOs to entities and save images
         List<Activity> activitiesToAdd = activities.stream().map(activityDTO -> {
             MultipartFile image;
             // If the image is not specified or is not in the map, just save the activity
@@ -67,7 +66,7 @@ public class ActivityController {
             return new Activity(activityDTO);
         }).collect(Collectors.toList());
 
-        // Save the activities
+        // Save the activity entities
         List<Activity> savedActivities = activityRepository.saveAll(activitiesToAdd);
         log.debug("Saved {} activities", savedActivities.size());
 
@@ -82,28 +81,34 @@ public class ActivityController {
      * @return DTOs of all added activities.
      */
     @PostMapping("/batch")
-    ResponseEntity batchAddActivity(@RequestBody List<ActivityDTO> activities) {
-        List<Activity> activitiesToAdd = activities.stream().map(Activity::new).collect(Collectors.toList());
-
-        // Save the activities
-        List<Activity> savedActivities = activityRepository.saveAll(activitiesToAdd);
-        log.debug("Saved {} activities", savedActivities.size());
-
-        // Return the DTOs of the saved activities
-        return new ResponseEntity<>(savedActivities.stream().map(Activity::getDTO), HttpStatus.CREATED);
+    ResponseEntity<List<ActivityDTO>> batchAddActivity(@RequestBody List<ActivityDTO> activities) {
+        // TODO: proper access control on this endpoint
+        // Convert DTOs to entities
+        List<Activity> activityList = activities.stream().map(Activity::new).collect(Collectors.toList());
+        // Save the entities
+        try {
+            List<ActivityDTO> activityDTOList = activityRepository.saveAll(activityList).stream()
+                    .map(Activity::getDTO).collect(Collectors.toList());
+            log.debug("Added {} activities", activityDTOList.size());
+            return new ResponseEntity<>(activityDTOList, HttpStatus.OK);
+        } catch (Exception e) {
+            // This can occur due to malformed data (for example, URL longer than 255 characters)
+            log.warn("Failed to save activities: {}", e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     /**
      * Get the URL of the image for the specified activity.
      *
-     * @param id ID of the activity to get.
+     * @param activityId ID of the activity to get.
      * @return URL of the image associated with the activity.
      */
-    @GetMapping("/{id}/image")
-    ResponseEntity getActivityImage(@PathVariable UUID id) {
-        log.trace("Getting image for activity '{}'", id);
+    @GetMapping("/{activityId}/image")
+    ResponseEntity getActivityImage(@PathVariable UUID activityId) {
+        log.trace("Getting image for activity '{}'", activityId);
 
-        return activityRepository.findById(id).map(Activity::getIcon).map(icon -> {
+        return activityRepository.findById(activityId).map(Activity::getIcon).map(icon -> {
             HttpHeaders headers = new HttpHeaders();
             headers.setLocation(storageService.getURI(UUID.fromString(icon)));
             return new ResponseEntity<>(headers, HttpStatus.FOUND);

@@ -3,18 +3,23 @@ package server.configuration;
 import java.nio.file.Path;
 import javax.validation.constraints.Min;
 import lombok.Data;
-import lombok.Generated;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Store the configuration of the file storage.
  */
-@Generated
 @Data
 @ConfigurationProperties(prefix = "server.storage")
 public class FileSystemStorageConfiguration {
+    /**
+     * The root path of the file storage.
+     * Can be a relative or an absolute path.
+     */
     private String uploadDir = "uploads";
 
+    /**
+     * When scanning the upload directory, ignore files that are nested deeper than this value.
+     */
     @Min(1)
     private Integer maxRecursionDepth = 5;
 

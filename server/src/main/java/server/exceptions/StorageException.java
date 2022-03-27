@@ -1,11 +1,8 @@
 package server.exceptions;
 
-import lombok.Generated;
-
 /**
  * Exception thrown when there is a problem with the storage.
  */
-@Generated
 public class StorageException extends RuntimeException {
     /**
      * StorageException constructor.

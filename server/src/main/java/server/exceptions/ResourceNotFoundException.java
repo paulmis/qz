@@ -1,11 +1,8 @@
 package server.exceptions;
 
-import lombok.Generated;
-
 /**
  * Exception thrown when a storage item is not found.
  */
-@Generated
 public class ResourceNotFoundException extends RuntimeException {
     /**
      * ResourceNotFoundException constructor.
