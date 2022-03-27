@@ -55,14 +55,14 @@ public class SSEController {
                     .orElseThrow(() -> new IllegalStateException("User not in a game"));
 
             // Register emitter callbacks.
-            emitter.onCompletion(() -> sseManager.unregister(user.getId()));
+            emitter.onCompletion(() -> sseManager.unregister(user.getId(), emitter));
             emitter.onTimeout(() -> {
                 log.warn("SSE connection timed out");
-                sseManager.unregister(user.getId());
+                sseManager.unregister(user.getId(), emitter);
             });
             emitter.onError(throwable -> {
                 log.error("Error in SSE connection", throwable);
-                sseManager.unregister(user.getId());
+                sseManager.unregister(user.getId(), emitter);
             });
 
             // Register emitter to the SSE manager.
