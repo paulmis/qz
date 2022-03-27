@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import server.database.entities.game.Game;
+import server.services.GameService;
 
 /**
  * The GameFSM class is a Finite State Machine that is used to manage a game.
@@ -18,7 +19,7 @@ public abstract class GameFSM {
     /**
      * Game that is being managed.
      */
-    @NonNull private final Game game;
+    @NonNull private Game game;
 
     /**
      * Execution context of the FSM.

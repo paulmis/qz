@@ -20,7 +20,7 @@ public class GameLeaveScreenPane extends StackPane {
 
     private void setUpScreen(GameLeaveScreenCtrl ctrl) {
         FXMLLoader fxmlLoader =
-                new FXMLLoader(getClass().getResource("/client/scenes/lobby/GameLeaveScreen.fxml"));
+                new FXMLLoader(getClass().getResource("/client/scenes/GameLeaveScreen.fxml"));
         fxmlLoader.setControllerFactory(param ->
                 controller = ctrl);
         try {

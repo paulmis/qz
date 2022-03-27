@@ -3,6 +3,10 @@ package client.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import client.utils.communication.ReflectionUtils;
+import client.utils.communication.SSEEventHandler;
+import client.utils.communication.SSEHandler;
+import client.utils.communication.SSESource;
 import commons.entities.messages.SSEMessageType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -23,7 +27,7 @@ import org.junit.jupiter.api.Test;
 public class ReflectionUtilsTest {
 
     @AllArgsConstructor
-    class Person {
+    class Person implements SSESource {
         @Description("name")
         public String fullName;
 
@@ -40,6 +44,10 @@ public class ReflectionUtilsTest {
         @Description("balance in euros")
         public Float balance;
         public Integer brothers;
+
+        public void bindHandler(SSEHandler handler) {
+            handler.initialize(this);
+        }
 
         @SSEEventHandler(SSEMessageType.INIT)
         public void getBalance() {
