@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
@@ -83,12 +84,13 @@ public class GameService {
      * Starts a new game, by verifying the starting conditions and creating a questions set.
      *
      * @param game the game to start
-     * @throws UnsupportedOperationException if a game other than a definite game is started
-     * @throws IllegalStateException         if the game is already started or there aren't enough questions
+     * @throws NotImplementedException if a game other than a definite game is started
+     * @throws IllegalStateException   if the game is already started or there aren't enough questions
+     * @throws IOException             if sending the GAME_START message fails
      */
     @Transactional
     public void startGame(Game game)
-            throws UnsupportedOperationException, IllegalStateException, IOException {
+            throws NotImplementedException, IllegalStateException, IOException {
         // Make sure that the lobby is full and not started
         if (game.getStatus() != GameStatus.CREATED || !game.isFull()) {
             throw new IllegalStateException();
@@ -111,7 +113,7 @@ public class GameService {
                             new FSMContext(sseManager, this, taskScheduler)));
             fsmManager.startFSM(definiteGame);
         } else {
-            throw new UnsupportedOperationException("Starting games other than definite games is not yet supported.");
+            throw new NotImplementedException("Starting games other than definite games is not yet supported.");
         }
 
         gameRepository.save(game);
@@ -180,7 +182,7 @@ public class GameService {
     public void showAnswer(Game<?> game, Long delay)
         throws IOException {
         // Disable answering
-        game.setAcceptingAnswers(true);
+        game.setAcceptingAnswers(false);
         game = gameRepository.save(game);
 
         // Distribute the event to all players

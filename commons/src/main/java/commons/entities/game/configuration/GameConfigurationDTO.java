@@ -25,7 +25,8 @@ import org.hibernate.validator.constraints.time.DurationMin;
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = NormalGameConfigurationDTO.class, name = "NormalGameConfigurationDTO"),
-    @JsonSubTypes.Type(value = SurvivalGameConfigurationDTO.class, name = "SurvivalGameConfigurationDTO")
+    @JsonSubTypes.Type(value = SurvivalGameConfigurationDTO.class, name = "SurvivalGameConfigurationDTO"),
+    @JsonSubTypes.Type(value = MockGameConfigurationDTO.class, name = "MockGameConfigurationDTO")
 })
 public abstract class GameConfigurationDTO implements DTO {
     /**
