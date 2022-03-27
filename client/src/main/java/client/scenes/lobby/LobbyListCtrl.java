@@ -133,7 +133,10 @@ public class LobbyListCtrl implements Initializable {
     public void checkHost(GameDTO gameDTO) {
         this.server.getMyInfo(userDTO -> runLater(() -> {
             //Fetching user data success
-            Optional<GamePlayerDTO> gamePlayerData = gameDTO.getPlayers().stream().filter(gp -> userDTO.getId().equals(gp.getUserId())).findAny();
+            Optional<GamePlayerDTO> gamePlayerData = gameDTO.getPlayers()
+                    .stream()
+                    .filter(gp -> userDTO.getId().equals(gp.getUserId()))
+                    .findAny();
             if (!gamePlayerData.isEmpty()) {
                 if (gamePlayerData.get().getId().equals(gameDTO.getHost())) {
                     System.out.println("Player is host");
