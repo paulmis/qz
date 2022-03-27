@@ -103,12 +103,11 @@ public class LobbyListCtrl implements Initializable {
     @FXML
     private void createLobbyButtonClick() {
         server.createLobby(game -> {
-                    ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
-                    runLater(() -> {
-                        mainCtrl.showLobbyScreen();
-                        this.checkHost(game);
-                    });
-                }, () -> runLater(() ->
+            ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
+            runLater(() -> {
+                mainCtrl.showLobbyScreen();
+                this.checkHost(game);
+            });}, () -> runLater(() ->
                 mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
     }
 
