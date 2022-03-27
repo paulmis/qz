@@ -107,7 +107,8 @@ public class LobbyListCtrl implements Initializable {
             runLater(() -> {
                 mainCtrl.showLobbyScreen();
                 this.checkHost(game);
-            });}, () -> runLater(() ->
+            });
+            }, () -> runLater(() ->
                 mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
     }
 
