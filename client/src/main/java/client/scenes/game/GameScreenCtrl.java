@@ -1,21 +1,29 @@
-package client.scenes;
+package client.scenes.game;
 
+import static javafx.application.Platform.runLater;
+
+import client.communication.game.GameCommunication;
+import client.scenes.MainCtrl;
 import client.scenes.questions.EstimateQuestionPane;
-import client.scenes.questions.MultipleChoiceQuestionCtrl;
-import client.scenes.questions.MultipleChoiceQuestionPane;
-import client.utils.SSEEventHandler;
-import client.utils.SSEHandler;
-import client.utils.ServerUtils;
+import client.scenes.questions.QuestionPane;
+import client.scenes.questions.StartGamePane;
+import client.utils.ClientState;
+import client.utils.communication.SSEEventHandler;
+import client.utils.communication.SSEHandler;
+import client.utils.communication.SSESource;
+import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
 import commons.entities.messages.SSEMessageType;
+import commons.entities.questions.QuestionDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -33,7 +41,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
-import javax.ws.rs.core.Response;
 import lombok.Generated;
 
 
@@ -42,11 +49,9 @@ import lombok.Generated;
  * Handles question changing and interactivity of the user.
  */
 @Generated
-public class GameScreenCtrl implements Initializable {
-    private final ServerUtils server;
+public class GameScreenCtrl implements Initializable, SSESource {
+    private final GameCommunication communication;
     private final MainCtrl mainCtrl;
-
-    private SSEHandler sseHandler;
 
     @FXML private BorderPane mainBorderPane;
     @FXML private HBox avatarHBox;
@@ -78,15 +83,18 @@ public class GameScreenCtrl implements Initializable {
     /**
      * Initialize a new controller using dependency injection.
      *
-     * @param server Reference to communication utilities object.
+     * @param communication Reference to communication utilities object.
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public GameScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public GameScreenCtrl(GameCommunication communication, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
-        this.server = server;
+        this.communication = communication;
     }
 
+    public void bindHandler(SSEHandler handler) {
+        handler.initialize(this);
+    }
 
     /**
      * This runs after every control has been initialized and
@@ -112,36 +120,50 @@ public class GameScreenCtrl implements Initializable {
     }
 
     /**
-     * This function resets the game screen ctrl.
-     * It handles all the required set-up that needs to be done for a game to start.
+     * Transits the client to the question stage.
      */
-    public void reset(SSEHandler sseHandler) {
-        this.sseHandler = sseHandler;
-        sseHandler.initialize(this);
+    @SSEEventHandler(SSEMessageType.START_QUESTION)
+    public void toQuestionStage() {
+        // Set the current question
+        GameCommunication.updateCurrentQuestion(
+            ClientState.game.getId(),
+            // Success
+            (question) -> runLater(() -> setQuestion(question)),
+            // Failure
+            () -> runLater(
+                () -> mainCtrl.showErrorSnackBar("Unable to retrieve the current question")));
+
+        // TODO: timer
     }
 
     /**
-     * A mock function that loads the mcq control.
+     * Transits the client to the answer stage.
      */
-    private void loadMockMCQ() {
-        try {
-            MultipleChoiceQuestionCtrl.AnswerHandler doSomething = () -> {};
+    @SSEEventHandler(SSEMessageType.STOP_QUESTION)
+    public void toAnswerStage() {
+        // TODO: implement
+        mainCtrl.showInformationalSnackBar("The question has ended");
 
-            mainBorderPane.setCenter(new MultipleChoiceQuestionPane("Short question",
-                    Arrays.asList("answer 12", "asdasd", "asdasdasd", "asdasda"),
-                    Arrays.asList(
-                            new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                            new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                            new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                            new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50")),
-                    Arrays.asList(doSomething, doSomething, doSomething, doSomething)));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        // TODO: timer
     }
 
     /**
-     * A mock function that loads the a estimate control.
+     * Transits the client to the finish stage.
+     */
+    @SSEEventHandler(SSEMessageType.GAME_END)
+    public void toFinishStage() {
+        // Clean up the game and kill the connection
+        ClientState.game = null;
+        ServerUtils.sseHandler.kill();
+
+        // TODO: display final standings instead
+        mainCtrl.showInformationalSnackBar("The game has ended");
+        mainCtrl.showLobbyListScreen();
+    }
+
+
+    /**
+     * A mock function that loads the estimate control.
      */
     private void loadMockEstimate() {
         mainBorderPane.setCenter(
@@ -216,8 +238,7 @@ public class GameScreenCtrl implements Initializable {
         emojiHBox.getChildren().clear();
 
         // Gets the emojis from the server.
-        var emojiUrls = server.getEmojis();
-
+        var emojiUrls = communication.getEmojis();
 
         try {
 
@@ -258,7 +279,7 @@ public class GameScreenCtrl implements Initializable {
 
         // Gets the power ups from the server.
         // This is subject to change in the future.
-        var powerUpUrls = server.getPowerUps();
+        var powerUpUrls = communication.getPowerUps();
 
         try {
             powerUpUrls.forEach(powerUpUrl -> {
@@ -295,7 +316,7 @@ public class GameScreenCtrl implements Initializable {
         avatarHBox.getChildren().clear();
 
         // Gets the leaderboard image urls from the server.
-        var leaderBoardUrls = server.getLeaderBoardImages();
+        var leaderBoardUrls = communication.getLeaderBoardImages();
 
         try {
 
@@ -357,34 +378,36 @@ public class GameScreenCtrl implements Initializable {
      */
     @FXML
     private void quitButtonClick(ActionEvent actionEvent) {
-        mainCtrl.openGameLeaveWarning(() -> {
-            mainCtrl.closeGameLeaveWarning();
-            this.server.quitGame(new ServerUtils.QuitGameHandler() {
-                @Override
-                public void handle(Response response) {
-                    javafx.application.Platform.runLater(() -> {
+        // Open the warning and wait for user action
+        mainCtrl.openGameLeaveWarning(
+            // If confirmed, exit the game
+            () -> {
+                mainCtrl.closeGameLeaveWarning();
+                this.communication.quitGame(
+                    (response) -> runLater(() -> {
                         switch (response.getStatus()) {
                             case 200:
                                 System.out.println("User successfully removed from game");
                                 mainCtrl.showLobbyListScreen();
+                                ClientState.game = null;
+                                ServerUtils.sseHandler.kill();
                                 break;
                             case 404:
-                                System.out.println("User/Game not found");
+                                mainCtrl.showErrorSnackBar("Unable to quit the game: user or game doesn't exist");
                                 break;
                             case 409:
-                                System.out.println("Couldn't remove player");
+                                mainCtrl.showErrorSnackBar("Unable to quit the game: "
+                                    + "there was a conflict while removing the player");
                                 break;
                             default:
-                                break;
+                                mainCtrl.showErrorSnackBar("Unable to quit the game: server error");
                         }
-                    });
-                }
-            });
-        }, () -> {
-            mainCtrl.closeGameLeaveWarning();
-        });
+                    }));
+            },
+            // Otherwise, simply close the warning
+            mainCtrl::closeGameLeaveWarning
+        );
     }
-
 
     /**
      * Handles the settings toggle button.
@@ -409,10 +432,29 @@ public class GameScreenCtrl implements Initializable {
     }
 
     /**
-     * Example of a sse event handler.
+     * Shows the question on the screen.
+     *
+     * @param question the question to show.
      */
-    @SSEEventHandler(SSEMessageType.PLAYER_LEFT)
-    public void playerLeft(String playerId) {
+    public void setQuestion(QuestionDTO question) {
+        // If the question is null, display an empty start pane
+        try {
+            if (question == null) {
+                mainBorderPane.setCenter(
+                    new StartGamePane(mainCtrl, communication));
+                // Otherwise, show a question pane
+            } else {
+                mainBorderPane.setCenter(
+                    new QuestionPane(mainCtrl, communication, question));
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading the FXML file");
+            e.printStackTrace();
+            Platform.exit();
+            System.exit(0);
+        }
 
+        // Set the current question
+        ClientState.currentQuestion = question;
     }
 }

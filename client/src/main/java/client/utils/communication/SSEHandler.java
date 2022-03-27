@@ -1,12 +1,16 @@
-package client.utils;
+package client.utils.communication;
+
+import static javafx.application.Platform.runLater;
 
 import commons.entities.messages.SSEMessageType;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.ws.rs.sse.InboundSseEvent;
 import javax.ws.rs.sse.SseEventSource;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -14,6 +18,7 @@ import lombok.Generated;
  * It handles events, exceptions and the end of a connection.
  */
 @Generated
+@Slf4j
 public class SSEHandler {
 
     /**
@@ -29,9 +34,17 @@ public class SSEHandler {
         void handle(InboundSseEvent inboundSseEvent);
     }
 
-    Object handlerSource;
+    Object handlerSource = null;
     SseEventSource sseEventSource;
     Map<SSEMessageType, SSEEventHandler> eventHandlers;
+
+    /**
+     * No-args constructor.
+     */
+    public SSEHandler() {
+        eventHandlers = new HashMap<>();
+        eventHandlers.put(SSEMessageType.INIT, inboundSseEvent -> log.info("--[SSE]-- SSE handler initialized"));
+    }
 
     /**
      * The constructor of the SSEHandler.
@@ -51,13 +64,20 @@ public class SSEHandler {
      * It resets the map and changes the source object.
      *
      * @param handlerSource the source of the handlers.
+     * @throws IllegalArgumentException if the source doesn't implement SSESource
      */
-    public void initialize(Object handlerSource) {
+    public void initialize(Object handlerSource) throws IllegalArgumentException {
         this.handlerSource = handlerSource;
+        log.info("--[SSE]-- Initializing handler with " + handlerSource.getClass().getName());
+
+        // Check that the source class implements SSESource
+        if (!SSESource.class.isAssignableFrom(handlerSource.getClass())) {
+            throw new IllegalArgumentException("The source class must extend from SSESource");
+        }
 
         // Gets all the methods that have the Name decoration. These are the event handlers.
         var handlers = ReflectionUtils.getAnnotatedMethods(handlerSource,
-                client.utils.SSEEventHandler.class);
+                client.utils.communication.SSEEventHandler.class);
 
         // We get the names of all the event handlers
         var names = handlers.stream().map(ReflectionUtils::getSSEEventName).collect(Collectors.toList());
@@ -73,33 +93,33 @@ public class SSEHandler {
                         + "of parameters.");
             }
 
-            // Gets the type of the first parameter
-
             // This creates the SSEEvent handler for the event.
             return (SSEEventHandler) inboundSseEvent -> {
 
                 // Calls the method directly if there are no parameters.
                 if (types.length == 0) {
-                    javafx.application.Platform.runLater(() -> {
+                    runLater(() -> {
                         try {
                             method.invoke(handlerSource);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     });
-                }
-                // Reads the object with the extracted type.
-                var obj = inboundSseEvent.readData(types[0]);
+                } else {
+                    // Reads the object with the extracted type.
+                    var obj = inboundSseEvent.readData(types[0]);
 
-                // This invokes the function with the object and the source inside a run later so
-                // javafx components can have their state changed.
-                javafx.application.Platform.runLater(() -> {
-                    try {
-                        method.invoke(handlerSource, obj);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+                    // This invokes the function with the object and the source inside a run later so
+                    // javafx components can have their state changed.
+                    runLater(() -> {
+                        try {
+                            method.invoke(handlerSource, obj);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
+
             };
         }).collect(Collectors.toList());
 
@@ -107,12 +127,7 @@ public class SSEHandler {
         eventHandlers = IntStream.range(0, names.size()).boxed()
                 .collect(Collectors.toMap(names::get, runnables::get));
 
-        eventHandlers.put(SSEMessageType.INIT, new SSEEventHandler() {
-            @Override
-            public void handle(InboundSseEvent inboundSseEvent) {
-                System.out.println("Initialized connection SSE.");
-            }
-        });
+        eventHandlers.put(SSEMessageType.INIT, inboundSseEvent -> log.info("--[SSE]-- SSE handler initialized"));
     }
 
     /**
@@ -123,6 +138,14 @@ public class SSEHandler {
      */
     public void setSseEventSource(SseEventSource sseEventSource) {
         this.sseEventSource = sseEventSource;
+    }
+
+    /**
+     * Kills the current SSE connection.
+     */
+    public void kill() {
+        this.sseEventSource.close();
+        log.info("Killed the SSE connection");
     }
 
     /**
@@ -141,7 +164,25 @@ public class SSEHandler {
      * @param inboundSseEvent the sse event.
      */
     public void handleEvent(InboundSseEvent inboundSseEvent) {
-        eventHandlers.get(SSEMessageType.valueOf(inboundSseEvent.getName())).handle(inboundSseEvent);
+        log.info("--[SSE]-- Handle event " + inboundSseEvent.getName());
+        try {
+            if (eventHandlers.containsKey(SSEMessageType.valueOf(inboundSseEvent.getName()))) {
+                eventHandlers.get(SSEMessageType.valueOf(inboundSseEvent.getName())).handle(inboundSseEvent);
+            } else {
+                log.error("--[SSE]-- No handler for event " + inboundSseEvent.getName());
+                log.error("--[SSE]-- Source class:"
+                    + (this.handlerSource == null
+                        ? "<null>"
+                        : this.handlerSource.getClass().getName())
+                    + " with events:");
+                for (SSEMessageType message : eventHandlers.keySet()) {
+                    System.out.println("    " + message.toString());
+                }
+            }
+        } catch (Exception e) {
+            log.error("--[SSE]-- Exception: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void handleException(Throwable throwable) {

@@ -1,6 +1,6 @@
 package server.api;
 
-import commons.entities.QuestionDTO;
+import commons.entities.questions.QuestionDTO;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +69,7 @@ public class GameController {
      * @return information/object of the current question
      */
     @GetMapping("/{gameId}/question")
-    ResponseEntity<QuestionDTO> currentQuestion(
-            @PathVariable UUID gameId) {
+    ResponseEntity<QuestionDTO> currentQuestion(@PathVariable UUID gameId) {
         // Check if game exists.
         Optional<Game> game = gameRepository.findById(gameId);
         if (game.isEmpty()) {

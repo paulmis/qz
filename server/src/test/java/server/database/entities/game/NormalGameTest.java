@@ -129,31 +129,19 @@ public class NormalGameTest {
     }
 
     @Test
-    void setAcceptingAnswersTrue() throws IOException {
-        game.changeAcceptingAnswers(true);
-        assertEquals(true, game.isAcceptingAnswers());
-    }
-
-    @Test
-    void setAcceptingAnswersFalse() throws IOException {
-        game.changeAcceptingAnswers(false);
-        assertEquals(false, game.isAcceptingAnswers());
-    }
-
-    @Test
     void getQuestionsCount() {
         assertEquals(17, game.getQuestionsCount());
     }
 
     @Test
     void getQuestionOk() {
-        game.setCurrentQuestion(1);
+        game.setCurrentQuestionNumber(1);
         assertEquals(Optional.of(questionB), game.getQuestion());
     }
 
     @Test
     void getQuestionOutOfBounds() {
-        game.setCurrentQuestion(2);
+        game.setCurrentQuestionNumber(2);
         assertEquals(Optional.empty(), game.getQuestion());
     }
 
@@ -382,5 +370,24 @@ public class NormalGameTest {
 
         game.updatePowerUpPoints(joePlayer, false);
         assertEquals(0, joePlayer.getPowerUpPoints());
+    }
+
+    @Test
+    void incrementQuestionNull() {
+        game.incrementQuestion();
+        assertEquals(0, game.getCurrentQuestionNumber());
+    }
+
+    @Test
+    void incrementQuestionNonNull() {
+        game.setCurrentQuestionNumber(2);
+        game.incrementQuestion();
+        assertEquals(3, game.getCurrentQuestionNumber());
+    }
+
+    @Test
+    void isLastQuestion() {
+        game.setCurrentQuestionNumber(2);
+        assertFalse(game.isLastQuestion());
     }
 }

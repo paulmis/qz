@@ -1,6 +1,8 @@
 package server.database.entities.question;
 
-import commons.entities.QuestionDTO;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import commons.entities.questions.MCQuestionDTO;
+import commons.entities.questions.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,16 +21,8 @@ import server.database.entities.answer.Answer;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 public class MCQuestion extends Question {
-
-    /**
-     * Construct a new entity from a DTO.
-     *
-     * @param dto DTO to map to entity.
-     */
-    public MCQuestion(QuestionDTO dto) {
-        new ModelMapper().map(dto, this);
-    }
 
     /**
      * Activity corresponding to the correct answer.
@@ -42,6 +36,15 @@ public class MCQuestion extends Question {
      * or the corresponding activity.
      */
     protected boolean guessConsumption = true;
+
+    /**
+     * Construct a new entity from a DTO.
+     *
+     * @param dto DTO to map to entity.
+     */
+    public MCQuestion(MCQuestionDTO dto) {
+        new ModelMapper().map(dto, this);
+    }
 
     /**
      * Constructor for the MCQuestion class.
@@ -122,7 +125,7 @@ public class MCQuestion extends Question {
     }
     
     @Override
-    public QuestionDTO getDTO() {
-        return new ModelMapper().map(this, QuestionDTO.class);
+    public MCQuestionDTO getDTO() {
+        return new MCQuestionDTO(super.toDTO(), guessConsumption);
     }
 }
