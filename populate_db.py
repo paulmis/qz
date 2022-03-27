@@ -8,7 +8,6 @@ import argparse
 import json
 import logging
 import io
-import uuid
 import os
 from typing import Any
 
@@ -239,8 +238,10 @@ if args.images:
         import requests
     except ImportError:
         logging.error(
-            "The --images flag was set, but the 'requests' module is not installed. "
-            "Please install it and re-run this script."
+            "Image upload was requested, but the 'requests' module is not installed."
+        )
+        logging.error(
+            "Please install it via 'pip install requests' and re-run this script."
         )
         exit(1)
 
