@@ -13,8 +13,6 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
