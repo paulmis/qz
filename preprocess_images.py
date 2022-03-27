@@ -19,8 +19,8 @@ for filename in glob.iglob(path + '**/*.jpg', recursive=True):
         src_h, src_w, _ = src.shape
     dst = seam_carving.resize(
         src, (min(src_h, src_w), min(src_h, src_w)),
-        energy_mode='backward',   # Choose from {backward, forward}
-        order='width-first',  # Choose from {width-first, height-first}
+        energy_mode='backward',
+        order='width-first',
         keep_mask=None
     )
     Image.fromarray(dst).save(filename)
