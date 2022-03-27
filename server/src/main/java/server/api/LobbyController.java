@@ -121,6 +121,27 @@ public class LobbyController {
                 .stream()
                 .map(Game::getDTO)
                 .collect(Collectors.toList());
+        lobbies.removeIf(game -> (game.getConfiguration().getCapacity() <= game.getPlayers().size()));
+        if (lobbies.size() == 0) {
+            // if the list is empty we return null so the endpoint knows to fail the async function
+            return null;
+        }
+        return ResponseEntity.ok(lobbies);
+    }
+
+    /**
+     * Endpoint for available lobbies.
+     *
+     * @return a list of available lobbies.
+     */
+    @GetMapping("/all")
+    ResponseEntity<List<GameDTO>> allLobbies() {
+        // It returns games with status Created
+        List<GameDTO> lobbies = gameRepository
+                .findAllByStatus(GameStatus.CREATED)
+                .stream()
+                .map(Game::getDTO)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(lobbies);
     }
 

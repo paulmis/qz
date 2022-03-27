@@ -136,7 +136,7 @@ public class LobbyListCtrl implements Initializable {
     }
 
     private void updateLobbyList(String filter) {
-        server.getLobbies(
+        server.getAllLobbies(
                 games -> runLater(() -> {
                     lobbyListVbox.getChildren().clear();
 
@@ -170,7 +170,7 @@ public class LobbyListCtrl implements Initializable {
      */
     @FXML
     private void joinRandomLobby() {
-        server.getLobbies(
+        server.getAvailableLobbies(
             games -> {
                 // Gets a random available lobby and joins it
                 var game = games.get(new Random().nextInt(games.size()));
@@ -184,7 +184,9 @@ public class LobbyListCtrl implements Initializable {
             },
             () -> {
                 // If there are no available games, the user creates a new lobby
-                runLater(this::createLobbyButtonClick);
+                runLater(() -> {
+                    this.createLobbyButtonClick();
+                });
             });
     }
 
