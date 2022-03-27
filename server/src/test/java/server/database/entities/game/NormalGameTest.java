@@ -371,4 +371,23 @@ public class NormalGameTest {
         game.updatePowerUpPoints(joePlayer, false);
         assertEquals(0, joePlayer.getPowerUpPoints());
     }
+
+    @Test
+    void incrementQuestionNull() {
+        game.incrementQuestion();
+        assertEquals(0, game.getCurrentQuestionNumber());
+    }
+
+    @Test
+    void incrementQuestionNonNull() {
+        game.setCurrentQuestionNumber(2);
+        game.incrementQuestion();
+        assertEquals(3, game.getCurrentQuestionNumber());
+    }
+
+    @Test
+    void isLastQuestion() {
+        game.setCurrentQuestionNumber(2);
+        assertFalse(game.isLastQuestion());
+    }
 }
