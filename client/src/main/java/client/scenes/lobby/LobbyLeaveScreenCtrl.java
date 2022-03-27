@@ -37,8 +37,8 @@ public class LobbyLeaveScreenCtrl implements Initializable {
         void handle();
     }
 
-    @FXML private JFXButton cancelButton;
-    @FXML private JFXButton leaveButton;
+    @FXML private JFXButton cancelLeaveLobbyButton;
+    @FXML private JFXButton leaveLobbyButton;
     @FXML private AnchorPane rootPane;
     private LeaveHandler leaveHandler;
     private CancelHandler cancelHandler;
@@ -58,7 +58,7 @@ public class LobbyLeaveScreenCtrl implements Initializable {
      * This function handles the cancel button click.
      */
     @FXML
-    private void cancel() {
+    private void cancelLeaveLobby() {
         cancelHandler.handle();
     }
 
@@ -66,7 +66,7 @@ public class LobbyLeaveScreenCtrl implements Initializable {
      * This function handles the leave button click.
      */
     @FXML
-    private void leave() {
+    private void leaveLobby() {
         leaveHandler.handle();
     }
 

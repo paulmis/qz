@@ -37,8 +37,8 @@ public class LobbyDisbandScreenCtrl implements Initializable {
         void handle();
     }
 
-    @FXML private JFXButton cancelButton;
-    @FXML private JFXButton leaveButton;
+    @FXML private JFXButton cancelDisbandLobbyButton;
+    @FXML private JFXButton disbandLobbyButton;
     @FXML private AnchorPane rootPane;
     private CancelHandler cancelHandler;
     private DisbandHandler disbandHandler;
@@ -58,7 +58,7 @@ public class LobbyDisbandScreenCtrl implements Initializable {
      * This function handles the cancel button click.
      */
     @FXML
-    private void cancel() {
+    private void cancelDisbandLobby() {
         cancelHandler.handle();
     }
 
@@ -66,7 +66,7 @@ public class LobbyDisbandScreenCtrl implements Initializable {
      * This function handles the disband button click.
      */
     @FXML
-    private void disband() {
+    private void disbandLobby() {
         disbandHandler.handle();
     }
 
