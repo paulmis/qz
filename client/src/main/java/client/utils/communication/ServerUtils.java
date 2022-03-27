@@ -386,7 +386,7 @@ public class ServerUtils {
      */
     public static void subscribeToSSE(SSEHandler sseHandler) {
         // This creates the WebTarget that the sse event source will use.
-        var target = getRequestTarget().path("api/sse/open");
+        var target = getRequestTarget().path("/api/sse/open");
 
         // Builds the event source with the target.
         SseEventSource eventSource = SseEventSource.target(target).reconnectingEvery(0, MICROSECONDS).build();

@@ -20,8 +20,10 @@ import commons.entities.messages.SSEMessageType;
 import commons.entities.questions.QuestionDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -436,13 +438,20 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     public void setQuestion(QuestionDTO question) {
         // If the question is null, display an empty start pane
-        if (question == null) {
-            mainBorderPane.setCenter(
-                new StartGamePane(mainCtrl, communication));
-        // Otherwise, show a question pane
-        } else {
-            mainBorderPane.setCenter(
-                new QuestionPane(mainCtrl, communication, question));
+        try {
+            if (question == null) {
+                mainBorderPane.setCenter(
+                    new StartGamePane(mainCtrl, communication));
+                // Otherwise, show a question pane
+            } else {
+                mainBorderPane.setCenter(
+                    new QuestionPane(mainCtrl, communication, question));
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading the FXML file");
+            e.printStackTrace();
+            Platform.exit();
+            System.exit(0);
         }
 
         // Set the current question

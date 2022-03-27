@@ -8,10 +8,12 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Response;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Provides functions retrieving lobby data from the server.
  */
+@Slf4j
 public class LobbyCommunication {
 
     /**
@@ -55,7 +57,7 @@ public class LobbyCommunication {
 
             @Override
             public void failed(Throwable throwable) {
-                System.out.println("Starting game failed");
+                log.error("Starting game failed");
                 handlerFail.handle();
                 throwable.printStackTrace();
             }

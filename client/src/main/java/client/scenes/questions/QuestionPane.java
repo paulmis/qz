@@ -4,12 +4,14 @@ import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
 import commons.entities.questions.MCQuestionDTO;
 import commons.entities.questions.QuestionDTO;
-import javafx.application.Platform;
+import java.io.IOException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
 import org.apache.commons.lang3.NotImplementedException;
+
+
 
 /**
  * The class that encompasses the multiple
@@ -29,8 +31,10 @@ public class QuestionPane extends StackPane {
      *
      * @param mainCtrl the main controller
      * @param gameCommunication the communication class
+     * @throws IOException if the FXML file cannot be loaded
      */
-    public QuestionPane(MainCtrl mainCtrl, GameCommunication gameCommunication, QuestionDTO question) {
+    public QuestionPane(MainCtrl mainCtrl, GameCommunication gameCommunication, QuestionDTO question)
+        throws IOException {
         // Assign the scene and controller
         FXMLLoader loader;
         if (question instanceof MCQuestionDTO) {
@@ -51,14 +55,7 @@ public class QuestionPane extends StackPane {
         }
 
         // Load and add the FXML scene
-        try {
-            view = loader.load();
-            getChildren().add(view);
-        } catch (Exception e) {
-            System.out.println("Error loading the FXML file");
-            e.printStackTrace();
-            Platform.exit();
-            System.exit(0);
-        }
+        view = loader.load();
+        getChildren().add(view);
     }
 }
