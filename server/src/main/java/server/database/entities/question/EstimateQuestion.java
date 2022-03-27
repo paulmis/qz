@@ -1,6 +1,6 @@
 package server.database.entities.question;
 
-import commons.entities.QuestionDTO;
+import commons.entities.questions.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

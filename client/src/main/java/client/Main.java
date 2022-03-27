@@ -18,11 +18,11 @@ package client;
 
 import static com.google.inject.Guice.createInjector;
 
-import client.scenes.GameScreenCtrl;
 import client.scenes.MainCtrl;
 import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
+import client.scenes.game.GameScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
 import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;

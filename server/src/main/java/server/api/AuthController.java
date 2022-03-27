@@ -1,6 +1,8 @@
 package server.api;
 
-import commons.entities.UserDTO;
+import commons.entities.auth.LoginDTO;
+import commons.entities.auth.UserDTO;
+import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,12 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import server.database.entities.User;
 import server.database.entities.auth.config.JWTHandler;
+import server.database.entities.game.Game;
 import server.database.repositories.UserRepository;
+import server.database.repositories.game.GameRepository;
 
 /**
  * Controller that handles authentication requests.
@@ -27,6 +30,9 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private GameRepository gameRepository;
 
     @Autowired
     private JWTHandler handler;
@@ -68,7 +74,7 @@ public class AuthController {
      *     200 and the auth token otherwise
      */
     @PostMapping("login")
-    public ResponseEntity<String> login(@RequestBody UserDTO userData) {
+    public ResponseEntity<LoginDTO> login(@RequestBody UserDTO userData) {
         try {
             // TODO: allow authentication with both mail and username
             // Authenticate the user
@@ -78,12 +84,22 @@ public class AuthController {
                             (authenticationManager.authenticate(authToken)).getPrincipal();
 
             // Find the user
-            User user = userRepository
-                    .findByEmail(userPrincipal.getUsername())
-                    .orElseThrow(() -> new UsernameNotFoundException("User not present in the repository"));
+            Optional<User> user = userRepository
+                    .findByEmail(userPrincipal.getUsername());
 
-            // Generate a JWT token and return it with 200
-            return ResponseEntity.ok(handler.generateToken(user.getEmail()));
+            // If the user doesn't exist, return 401
+            if (user.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            // Find the current lobby or game
+            Optional<Game> game = gameRepository.getPlayersLobbyOrGame(user.get().getId());
+
+            // Return 200, the token and the lobby or game
+            return ResponseEntity.ok(
+                new LoginDTO(
+                    handler.generateToken(user.get().getEmail()),
+                    game.isEmpty() ? null : game.get().getDTO()));
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

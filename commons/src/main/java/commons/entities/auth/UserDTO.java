@@ -1,4 +1,4 @@
-package commons.entities;
+package commons.entities.auth;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.utils.DTO;

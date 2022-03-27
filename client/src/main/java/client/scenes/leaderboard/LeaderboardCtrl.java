@@ -1,6 +1,6 @@
 package client.scenes.leaderboard;
 
-import commons.entities.UserDTO;
+import commons.entities.auth.UserDTO;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;

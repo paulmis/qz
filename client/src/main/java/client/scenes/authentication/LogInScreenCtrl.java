@@ -1,9 +1,13 @@
 package client.scenes.authentication;
 
+import static javafx.application.Platform.runLater;
+
 import client.scenes.MainCtrl;
-import client.utils.ServerUtils;
+import client.utils.ClientState;
+import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
+import commons.entities.game.GameStatus;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.animation.TranslateTransition;
@@ -62,12 +66,28 @@ public class LogInScreenCtrl implements Initializable {
      */
     @FXML
     private void logInButtonClick() {
-        server.logIn(emailField.getText(), passwordField.getText(),
-                (s) -> javafx.application.Platform.runLater(mainCtrl::showLobbyListScreen),
-                () -> javafx.application.Platform.runLater(() -> {
-                    wrongCredentials.setVisible(true);
-                    mainCtrl.showErrorSnackBar("Something went wrong will logging you in.");
-                })
+        server.logIn(
+            emailField.getText(), passwordField.getText(),
+            // Success
+            (s) -> runLater(() -> {
+                // If the user is in a lobby/game, put them in the apposite screen
+                if (s.getGame() != null) {
+                    ClientState.game = s.getGame();
+                    ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
+                    if (s.getGame().getStatus() == GameStatus.CREATED) {
+                        mainCtrl.showLobbyScreen();
+                    } else {
+                        mainCtrl.showGameScreen(s.getGame().getCurrentQuestion());
+                    }
+                } else {
+                    mainCtrl.showLobbyListScreen();
+                }
+            }),
+            // Failure
+            () -> runLater(() -> {
+                wrongCredentials.setVisible(true);
+                mainCtrl.showErrorSnackBar("Something went wrong while logging you in.");
+            })
         );
     }
 

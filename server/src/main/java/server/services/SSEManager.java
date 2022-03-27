@@ -58,6 +58,23 @@ public class SSEManager {
     }
 
     /**
+     * Safely removes an SSE emitter, verifying that the specific instance is the one removed, and not
+     * any emitter assigned to the user.
+     *
+     * @param userId the id of the user
+     * @param emitter the emitter to remove
+     * @return whether the SSE emitter was successfully removed or not
+     */
+    public boolean unregister(UUID userId, SseEmitter emitter) {
+        if (emitters.get(userId) != emitter) {
+            emitters.remove(userId);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get an SSE emitter.
      *
      * @param userId User ID to get SSE emitter for.

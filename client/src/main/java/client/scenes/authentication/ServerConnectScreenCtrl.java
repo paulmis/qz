@@ -1,7 +1,7 @@
 package client.scenes.authentication;
 
 import client.scenes.MainCtrl;
-import client.utils.ServerUtils;
+import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import java.net.URL;

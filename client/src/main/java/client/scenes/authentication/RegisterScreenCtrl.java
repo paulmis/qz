@@ -2,14 +2,12 @@ package client.scenes.authentication;
 
 
 import client.scenes.MainCtrl;
-import client.utils.ServerUtils;
+import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXSnackbar;
 import commons.entities.utils.ApiError;
 import java.io.File;
 import java.net.URL;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
