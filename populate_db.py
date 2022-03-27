@@ -139,7 +139,7 @@ parser.add_argument(
 parser.add_argument(
     "-i",
     "--images",
-    help="Upload images with the activities (requires 'requests' module). (default: %(default)s)",
+    help="Do not upload images with the activities (avoids dependency on 'requests' module).",
     action="store_false",
 )
 parser.add_argument(
@@ -243,6 +243,9 @@ if args.images:
         logging.error(
             "Please install it via 'pip install requests' and re-run this script."
         )
+        logging.error(
+            "Alternatively, you can run this script with -i to disable image upload."
+        )
         exit(1)
 
 # Define all extra headers to be sent with the request
@@ -283,7 +286,11 @@ else:
     logging.info("Authentication disabled")
 
 # Get the API endpoint URL
-API_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/activity/batch")
+if args.images:
+    API_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/activity/batch/images")
+else:
+    API_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/activity/batch")
+
 logging.debug(f"Using API endpoint: {API_ENDPOINT}")
 
 # Load activities from the provided JSON

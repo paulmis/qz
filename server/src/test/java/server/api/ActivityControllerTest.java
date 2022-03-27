@@ -84,7 +84,7 @@ class ActivityControllerTest {
     }
 
     @Test
-    void addActivitiesBatch() throws Exception {
+    void addActivitiesBatchWithImages() throws Exception {
         // Create a list of activities and corresponding DTOs
         List<Activity> activities = new ArrayList<>();
         List<ActivityDTO> activitiesDTO = new ArrayList<>();
@@ -119,7 +119,7 @@ class ActivityControllerTest {
                 "image2".getBytes());
 
         this.mockMvc.perform(
-                multipart("/api/activity/batch")
+                multipart("/api/activity/batch/images")
                         .file(activitiesMP)
                         .file(image2))
                 .andExpect(status().isCreated())
@@ -139,4 +139,31 @@ class ActivityControllerTest {
         // Verify that the images were saved
         verify(storageService, times(1)).store(any());
     }
+
+    @Test
+    void addActivitiesBatch() throws Exception {
+        // Create a list of activities and corresponding DTOs
+        List<Activity> activities = new ArrayList<>();
+        List<ActivityDTO> activitiesDTO = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Activity activity = new Activity("activity" + i);
+            activities.add(activity);
+            activitiesDTO.add(activity.getDTO());
+        }
+
+        // Capture the arguments of the call to saveAll
+        when(activityRepository.saveAll(activityCaptor.capture())).thenReturn(activities);
+
+        // Send the request
+        this.mockMvc.perform(
+                        post("/api/activity/batch")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(activitiesDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(objectMapper.writeValueAsString(activitiesDTO)));
+        // Assert that the correct number of activities has been saved
+        assertEquals(10, activityCaptor.getValue().size());
+    }
+
 }

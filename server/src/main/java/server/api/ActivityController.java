@@ -32,15 +32,15 @@ public class ActivityController {
     private StorageService storageService;
 
     /**
-     * Batch create/update activities.
+     * Batch create/update activities with added images.
      *
      * @param activities List of activities to add.
      * @param images     List of pictures to add.
      * @return DTOs of all added activities.
      */
-    @PostMapping("/batch")
-    ResponseEntity batchAddActivity(@RequestPart List<ActivityDTO> activities,
-                                    @RequestPart MultipartFile[] images) {
+    @PostMapping("/batch/images")
+    ResponseEntity batchAddActivityWithImages(@RequestPart List<ActivityDTO> activities,
+                                              @RequestPart MultipartFile[] images) {
         // Map filenames to images
         Map<String, MultipartFile> imageMap = Maps.uniqueIndex(
                 firstNonNull(Arrays.asList(images), new ArrayList<>(0)),
@@ -66,6 +66,24 @@ public class ActivityController {
             }
             return new Activity(activityDTO);
         }).collect(Collectors.toList());
+
+        // Save the activities
+        List<Activity> savedActivities = activityRepository.saveAll(activitiesToAdd);
+        log.debug("Saved {} activities", savedActivities.size());
+
+        // Return the DTOs of the saved activities
+        return new ResponseEntity<>(savedActivities.stream().map(Activity::getDTO), HttpStatus.CREATED);
+    }
+
+    /**
+     * Get all activities.
+     *
+     * @param activities List of activities to add.
+     * @return DTOs of all added activities.
+     */
+    @PostMapping("/batch")
+    ResponseEntity batchAddActivity(@RequestBody List<ActivityDTO> activities) {
+        List<Activity> activitiesToAdd = activities.stream().map(Activity::new).collect(Collectors.toList());
 
         // Save the activities
         List<Activity> savedActivities = activityRepository.saveAll(activitiesToAdd);
