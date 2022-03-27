@@ -80,6 +80,11 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     protected long seed;
 
     /**
+     * Whether the players are allowed to submit an answer or not.
+     */
+    protected boolean acceptingAnswers = false;
+
+    /**
      * PRNG.
      */
     @Transient
@@ -230,11 +235,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
-     * Whether the players are allowed to submit an answer or not.
-     */
-    protected boolean acceptingAnswers = false;
-
-    /**
      * Adds questions to the game.
      *
      * @param questions The questions to add.
@@ -255,6 +255,29 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
             return Optional.empty();
         }
     }
+
+    /**
+     * Increments the current question number.
+     */
+    public void incrementQuestion() {
+        this.currentQuestionNumber = this.currentQuestionNumber == null
+            ? 0
+            : this.currentQuestionNumber + 1;
+    }
+
+    /**
+     * Determines whether this is the last question.
+     *
+     * @return whether this is the last question.
+     */
+    abstract boolean isLastQuestion();
+
+    /**
+     * Determines whether the game should finish.
+     *
+     * @return whether the game should finish.
+     */
+    public abstract boolean shouldFinish();
 
     /**
      * Sets the answer of a player to the current question.

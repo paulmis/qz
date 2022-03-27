@@ -146,7 +146,14 @@ public class SSEHandler {
      */
     public void setSseEventSource(SseEventSource sseEventSource) {
         this.sseEventSource = sseEventSource;
-        System.out.println("SET EVENT SOURCE TO " + sseEventSource);
+    }
+
+    /**
+     * Kills the current SSE connection.
+     */
+    public void kill() {
+        this.sseEventSource.close();
+        System.out.println("Killed the SSE connection");
     }
 
     /**

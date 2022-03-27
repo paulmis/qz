@@ -33,6 +33,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import server.database.entities.User;
 import server.database.entities.game.Game;
+import server.database.entities.game.NormalGame;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.SSEManager;
@@ -72,13 +73,6 @@ class SSEControllerTest {
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
     }
 
-    static class MockGame extends Game {
-        @Override
-        public GameDTO getDTO() {
-            return null;
-        }
-    }
-
     @Test
     void testOpenNotInGame() throws Exception {
         MvcResult mvcResult = this.mockMvc.perform(get("/api/sse/open"))
@@ -93,7 +87,7 @@ class SSEControllerTest {
     @Test
     void testOpenInGame() throws Exception {
         // Create a game
-        Game game = new MockGame();
+        Game game = new NormalGame();
         game.setStatus(GameStatus.CREATED);
 
         when(gameRepository.getPlayersLobbyOrGame(user.getId()))

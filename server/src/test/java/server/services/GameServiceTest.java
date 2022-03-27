@@ -27,6 +27,7 @@ import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
+import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.QuestionRepository;
 
 /**
@@ -39,6 +40,9 @@ public class GameServiceTest {
 
     @Mock
     private QuestionRepository questionRepository;
+
+    @Mock
+    private GameRepository gameRepository;
 
     @Mock
     private FSMManager fsmManager;
@@ -148,7 +152,7 @@ public class GameServiceTest {
         // Check that the questions have been generated and the status was changed
         assertEquals(3, game.getQuestions().size());
         assertEquals(GameStatus.ONGOING, game.getStatus());
-        assertEquals(0, game.getCurrentQuestionNumber());
+        assertNull(game.getCurrentQuestionNumber());
 
         // Verify interactions
         verify(questionRepository).count();
@@ -228,54 +232,6 @@ public class GameServiceTest {
         assertEquals(2, game.getPlayers().size());
 
         // Verify interactions
-        verifyNoMoreInteractions(sseManager);
-    }
-
-    @Test
-    void setAcceptingAnswersTrue() throws IOException {
-        game.setAcceptingAnswers(false);
-
-        gameService.setAcceptingAnswers(game, true);
-
-        assertTrue(game.isAcceptingAnswers());
-
-        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
-        verifyNoMoreInteractions(sseManager);
-    }
-
-    @Test
-    void setAcceptingAnswersFalse() throws IOException {
-        game.setAcceptingAnswers(true);
-
-        gameService.setAcceptingAnswers(game, false);
-
-        assertFalse(game.isAcceptingAnswers());
-
-        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
-        verifyNoMoreInteractions(sseManager);
-    }
-
-    @Test
-    void setAcceptingAnswersDelayTrue() throws IOException {
-        game.setAcceptingAnswers(false);
-
-        gameService.setAcceptingAnswers(game, true, 1000L);
-
-        assertTrue(game.isAcceptingAnswers());
-
-        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
-        verifyNoMoreInteractions(sseManager);
-    }
-
-    @Test
-    void setAcceptingAnswersDelayFalse() throws IOException {
-        game.setAcceptingAnswers(true);
-
-        gameService.setAcceptingAnswers(game, false, 1000L);
-
-        assertFalse(game.isAcceptingAnswers());
-
-        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
         verifyNoMoreInteractions(sseManager);
     }
 }

@@ -43,6 +43,7 @@ public class SSEController {
      */
     @GetMapping("/open")
     public ResponseEntity<SseEmitter> open() {
+        // TODO: add a cooldown per user
         // Create a new SSE emitter
         var emitter = new SseEmitter(Long.MAX_VALUE);
         try {

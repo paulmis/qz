@@ -9,6 +9,7 @@ import client.utils.ClientState;
 import client.utils.communication.SSEEventHandler;
 import client.utils.communication.SSEHandler;
 import client.utils.communication.SSESource;
+import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameStatus;
@@ -114,6 +115,7 @@ public class LobbyScreenCtrl implements SSESource {
                                 System.out.println("User successfully removed from lobby");
                                 mainCtrl.showLobbyListScreen();
                                 ClientState.game = null;
+                                ServerUtils.sseHandler.kill();
                                 break;
                             case 404:
                                 mainCtrl.showErrorSnackBar("Unable to quit the lobby: user or lobby doesn't exist");

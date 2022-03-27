@@ -11,6 +11,7 @@ import client.utils.ClientState;
 import client.utils.communication.SSEEventHandler;
 import client.utils.communication.SSEHandler;
 import client.utils.communication.SSESource;
+import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
@@ -144,9 +145,23 @@ public class GameScreenCtrl implements Initializable, SSESource {
         // TODO: timer
     }
 
+    /**
+     * Transits the client to the finish stage.
+     */
+    @SSEEventHandler(SSEMessageType.GAME_END)
+    public void toFinishStage() {
+        // Clean up the game and kill the connection
+        ClientState.game = null;
+        ServerUtils.sseHandler.kill();
+
+        // TODO: display final standings instead
+        mainCtrl.showInformationalSnackBar("The game has ended");
+        mainCtrl.showLobbyListScreen();
+    }
+
 
     /**
-     * A mock function that loads the a estimate control.
+     * A mock function that loads the estimate control.
      */
     private void loadMockEstimate() {
         mainBorderPane.setCenter(
@@ -373,6 +388,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
                                 System.out.println("User successfully removed from game");
                                 mainCtrl.showLobbyListScreen();
                                 ClientState.game = null;
+                                ServerUtils.sseHandler.kill();
                                 break;
                             case 404:
                                 mainCtrl.showErrorSnackBar("Unable to quit the game: user or game doesn't exist");
