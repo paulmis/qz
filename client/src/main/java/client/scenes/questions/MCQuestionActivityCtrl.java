@@ -43,7 +43,7 @@ public class MCQuestionActivityCtrl extends MCQuestionCtrl {
             getLabels().get(i).setText(question.getActivities().get(i).getDescription());
         }
 
-        // Looping over they answer controls
+        // Looping over the answer controls
         for (ImageView imageOption : imageOptionArray) {
             // Sets the image of the imageView to the url specified
             // in answerImages

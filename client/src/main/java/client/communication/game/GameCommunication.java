@@ -135,7 +135,7 @@ public class GameCommunication {
     public static void updateCurrentQuestion(UUID gameId,
                                              UpdateQuestionHandlerSuccess handlerSuccess,
                                              UpdateQuestionHandlerFail handlerFail) {
-        // Built the query invocation
+        // Build the query invocation
         Invocation invocation =
             ServerUtils.getRequestTarget()
                 .path("/api/game/" + gameId + "/question")
@@ -190,7 +190,7 @@ public class GameCommunication {
      */
     public static void putAnswer(UUID gameId, AnswerDTO answer,
                                  PutAnswerHandlerSuccess handlerSuccess, PutAnswerHandlerFail handlerFailure) {
-        // Built the query invocation
+        // Build the query invocation
         Invocation invocation =
                 ServerUtils.getRequestTarget()
                         .path("/api/game/" + gameId + "/answer")
@@ -209,7 +209,7 @@ public class GameCommunication {
 
             @Override
             public void failed(Throwable throwable) {
-                System.out.println("Answer sent failed");
+                System.out.println("Failed to send the answer");
                 handlerFailure.handle();
                 throwable.printStackTrace();
             }

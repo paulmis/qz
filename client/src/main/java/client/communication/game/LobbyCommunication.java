@@ -15,14 +15,14 @@ import javax.ws.rs.core.Response;
 public class LobbyCommunication {
 
     /**
-     * Handler for when getting the current question succeeds.
+     * Handler for when starting the game succeeds.
      */
     public interface StartGameHandlerSuccess {
         void handle(Response response);
     }
 
     /**
-     * Handler for when getting the current question fails.
+     * Handler for when starting the game fails.
      */
     public interface StartGameHandlerFail {
         void handle();
@@ -37,7 +37,7 @@ public class LobbyCommunication {
      */
     public static void startGame(UUID gameId,
                                  StartGameHandlerSuccess handlerSuccess, StartGameHandlerFail handlerFail) {
-        // Built the query invocation
+        // Build the query invocation
         Invocation invocation =
             ServerUtils.getRequestTarget()
                 .path("/api/lobby/" + gameId + "/start")
