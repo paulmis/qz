@@ -114,7 +114,7 @@
                         </HBox>
                         <ScrollPane hbarPolicy="NEVER" prefHeight="369.0" prefWidth="600.0">
                            <content>
-                              <VBox fx:id="playerList" minWidth="-Infinity" prefHeight="87.0" prefWidth="598.0" />
+                              <VBox fx:id="playerList" minWidth="-Infinity" prefHeight="87.0" prefWidth="598.0" spacing="5" />
                            </content>
                         </ScrollPane>
                      </children>

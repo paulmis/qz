@@ -269,8 +269,5 @@ public class LobbyScreenCtrl implements SSESource {
                 })
                 .collect(Collectors.toList());
         playerList.getChildren().addAll(playerElements);
-
-        // Set player list spacing
-        playerList.setSpacing(5);
     }
 }
