@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
-import server.configuration.FileStorageConfiguration;
+import server.configuration.FileSystemStorageConfiguration;
 import server.configuration.ResourceConfiguration;
 import server.exceptions.ResourceNotFoundException;
 
@@ -27,13 +27,13 @@ import server.exceptions.ResourceNotFoundException;
 @ExtendWith(MockitoExtension.class)
 class FileStorageServiceTest {
     @Mock
-    private FileStorageConfiguration fileStorageConfiguration;
+    private FileSystemStorageConfiguration fileStorageConfiguration;
 
     @Mock
     private ResourceConfiguration resourceConfiguration;
 
     @InjectMocks
-    private FileStorageService fileStorageService;
+    private FileSystemStorageService fileStorageService;
 
     private void writeToFile(String fileName, String content) throws IOException {
         File file = new File(fileName);

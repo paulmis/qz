@@ -23,7 +23,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import server.configuration.FileStorageConfiguration;
+import server.configuration.FileSystemStorageConfiguration;
 import server.configuration.ResourceConfiguration;
 import server.services.storage.StorageService;
 
@@ -33,7 +33,7 @@ import server.services.storage.StorageService;
 @Generated
 @SpringBootApplication
 @EntityScan(basePackages = { "commons", "server" })
-@EnableConfigurationProperties({FileStorageConfiguration.class, ResourceConfiguration.class})
+@EnableConfigurationProperties({FileSystemStorageConfiguration.class, ResourceConfiguration.class})
 public class Main {
 
     public static void main(String[] args) {

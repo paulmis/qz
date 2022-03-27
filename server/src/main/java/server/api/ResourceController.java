@@ -1,5 +1,7 @@
 package server.api;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 import java.io.IOException;
 import java.net.URLConnection;
 import java.util.UUID;
@@ -24,20 +26,22 @@ public class ResourceController {
     private StorageService storageService;
 
     /**
-     * Access a static file.
+     * Access a static resource.
      *
-     * @param resourceId the UUID of the resource to be accessed.
+     * @param id the UUID of the resource to be accessed.
      * @return the resource.
      */
     @GetMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<Resource> serveFile(@PathVariable UUID resourceId) throws IOException {
-        Resource file = storageService.loadAsResource(resourceId);
+    public ResponseEntity<Resource> serveResource(@PathVariable UUID id) throws IOException {
+        Resource file = storageService.loadAsResource(id);
         return ResponseEntity.ok()
                 // TODO: URLConnection.guessContentTypeFromStream is *slow*
-                //  Perhaps we should store MIME type as metadata somewhere? (in the database?)
-                .contentType(MediaType.valueOf(URLConnection.guessContentTypeFromStream(file.getInputStream())))
+                // Perhaps we should store MIME type as metadata somewhere? (in the database?)
+                .contentType(MediaType.valueOf(firstNonNull(
+                        URLConnection.guessContentTypeFromStream(file.getInputStream()),
+                        MediaType.APPLICATION_OCTET_STREAM_VALUE)))
                 .header("Content-Disposition",
-                "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+                        "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 }

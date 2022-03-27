@@ -5,11 +5,11 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import com.google.common.collect.Maps;
 import commons.entities.ActivityDTO;
 import java.io.IOException;
-import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +35,7 @@ public class ActivityController {
      * Batch create/update activities.
      *
      * @param activities List of activities to add.
-     * @param images List of pictures to add.
+     * @param images     List of pictures to add.
      * @return DTOs of all added activities.
      */
     @PostMapping("/batch")
@@ -56,12 +56,11 @@ public class ActivityController {
             try {
                 // Save the image to the storage
                 UUID imageId = storageService.store(image.getInputStream());
-                // Get the URL under which the image is accessible
-                URI imageUri = storageService.getURI(imageId);
                 log.trace("Stored image '{}' for activity '{}'", imageId, activityDTO.getId());
 
-                // Set the image URL and return the activity
-                activityDTO.setIcon(imageUri.toString());
+                // Set the image resource ID and return the activity
+                activityDTO.setIcon(imageId.toString());
+
             } catch (IOException e) {
                 log.error("Failed to store image for activity '{}'", activityDTO.getId(), e);
             }
@@ -85,8 +84,11 @@ public class ActivityController {
     @GetMapping("/{id}/image")
     ResponseEntity getActivityImage(@PathVariable UUID id) {
         log.trace("Getting image for activity '{}'", id);
-        return activityRepository.findById(id)
-                .map(activity -> ResponseEntity.ok(activity.getIcon()))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Activity not found"));
+
+        return activityRepository.findById(id).map(Activity::getIcon).map(icon -> {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(storageService.getURI(UUID.fromString(icon)));
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+        }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Activity not found"));
     }
 }

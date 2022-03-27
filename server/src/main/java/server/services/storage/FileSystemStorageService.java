@@ -16,7 +16,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
-import server.configuration.FileStorageConfiguration;
+import server.configuration.FileSystemStorageConfiguration;
 import server.configuration.ResourceConfiguration;
 import server.exceptions.ResourceNotFoundException;
 import server.exceptions.StorageException;
@@ -26,9 +26,9 @@ import server.exceptions.StorageException;
  */
 @Slf4j
 @Service
-public class FileStorageService implements StorageService {
+public class FileSystemStorageService implements StorageService {
     @Autowired
-    private FileStorageConfiguration fsConfiguration;
+    private FileSystemStorageConfiguration fsConfiguration;
 
     @Autowired
     private ResourceConfiguration resourceConfiguration;
@@ -121,8 +121,11 @@ public class FileStorageService implements StorageService {
     @Override
     public Resource loadAsResource(UUID resourceId) {
         try {
+            // Get the resource path.
             Path file = load(resourceId);
+            // Construct the resource.
             Resource resource = new UrlResource(file.toUri());
+            // Verify that it exists and is readable.
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {

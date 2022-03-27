@@ -12,7 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Generated
 @Data
 @ConfigurationProperties(prefix = "server.storage")
-public class FileStorageConfiguration {
+public class FileSystemStorageConfiguration {
     private String uploadDir = "uploads";
 
     @Min(1)
