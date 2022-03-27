@@ -31,7 +31,6 @@ public class LogInScreenCtrl implements Initializable {
     @FXML private CheckBox rememberMe;
     @FXML private TextField emailField;
     @FXML private TextField passwordField;
-    @FXML private Label wrongCredentials;
     @FXML private Pane pane;
 
     /**
@@ -53,7 +52,6 @@ public class LogInScreenCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.wrongCredentials.setVisible(false);
     }
 
     /**
@@ -63,10 +61,12 @@ public class LogInScreenCtrl implements Initializable {
     @FXML
     private void logInButtonClick() {
         server.logIn(emailField.getText(), passwordField.getText(),
-                (s) -> javafx.application.Platform.runLater(mainCtrl::showLobbyListScreen),
+                (s) -> javafx.application.Platform.runLater(() -> {
+                    mainCtrl.showLobbyListScreen();
+                    mainCtrl.showInformationalSnackBar("Success!");
+                }),
                 () -> javafx.application.Platform.runLater(() -> {
-                    wrongCredentials.setVisible(true);
-                    mainCtrl.showErrorSnackBar("Something went wrong will logging you in.");
+                    mainCtrl.showErrorSnackBar("Wrong email or password!");
                 })
         );
     }
@@ -78,15 +78,6 @@ public class LogInScreenCtrl implements Initializable {
     @FXML
     private void createAccountButtonClick() {
         panelTransition();
-    }
-
-    /**
-     * Function that resets the message
-     * when entering a new email / password.
-     */
-    @FXML
-    private void resetMessage() {
-        this.wrongCredentials.setVisible(false);
     }
 
     /**

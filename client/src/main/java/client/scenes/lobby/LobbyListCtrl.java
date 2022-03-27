@@ -177,7 +177,9 @@ public class LobbyListCtrl implements Initializable {
                 server.joinLobby(game.getId(), gameDTO -> {
                     runLater(mainCtrl::showLobbyScreen);
                 }, () -> {
-                    mainCtrl.showErrorSnackBar("Couldn't join random game.");
+                    runLater(() -> {
+                        mainCtrl.showErrorSnackBar("Couldn't join random game.");
+                    });
                 });
             },
             () -> {
