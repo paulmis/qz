@@ -49,6 +49,6 @@ class ActivityServiceTest {
 
     @Test
     void testGetActivitiesOutOfRange() {
-        assertThrows(IndexOutOfBoundsException.class, () -> activityService.getActivities(11));
+        assertThrows(IllegalArgumentException.class, () -> activityService.getActivities(11));
     }
 }

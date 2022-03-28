@@ -5,6 +5,7 @@ import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
 import server.services.LobbyService;
+import server.services.SSEManager;
 
 
 /**
@@ -40,13 +42,13 @@ import server.services.LobbyService;
 public class LobbyController {
 
     @Autowired
-    private GameRepository gameRepository;
-
-    @Autowired
     private GameService gameService;
 
     @Autowired
     private LobbyService lobbyService;
+
+    @Autowired
+    private GameRepository gameRepository;
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
@@ -57,6 +59,9 @@ public class LobbyController {
     @Autowired
     private GameConfigurationRepository gameConfigurationRepository;
 
+    @Autowired
+    private SSEManager sseManager;
+
     /**
      * Endpoint for the creation of new lobbies.
      *
@@ -65,7 +70,7 @@ public class LobbyController {
      *      already in a lobby or a game, 201 and the game otherwise
      */
     @PostMapping
-    ResponseEntity<NormalGameDTO> create(@RequestBody NormalGameDTO gameDTO) {
+    ResponseEntity create(@RequestBody NormalGameDTO gameDTO) {
         // If the user doesn't exist, return 404
         Optional<User> founder = userRepository.findByEmail(AuthContext.get());
         if (founder.isEmpty()) {
@@ -74,7 +79,7 @@ public class LobbyController {
 
         // Check that the user isn't in another game
         if (gamePlayerRepository.existsByUserIdAndGameStatusNot(founder.get().getId(), GameStatus.FINISHED)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            throw new IllegalStateException("User is already in a game");
         }
 
         // Create the game
@@ -83,6 +88,7 @@ public class LobbyController {
             game = new NormalGame(gameDTO);
             game.setGameId(RandomStringUtils.random(6, true, true));
             game.setStatus(GameStatus.CREATED);
+            game.setAcceptingAnswers(false);
 
             // Save the configuration
             NormalGameConfiguration config =
@@ -96,7 +102,7 @@ public class LobbyController {
             // Save the game with the added host and player
             game = gameRepository.save(game);
         } catch (ConstraintViolationException | PersistenceException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
         // Return 201
@@ -120,6 +126,27 @@ public class LobbyController {
     }
 
     /**
+     * Endpoint for player's current lobby/game.
+     *
+     * @return player's current lobby/game.
+     */
+    @GetMapping
+    ResponseEntity<GameDTO> get() {
+        // Get the user from the context
+        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        if (user.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Retrieve the lobby/game
+        Optional<Game> game = gameRepository.getPlayersGame(user.get().getId());
+        if (game.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(game.get().getDTO());
+    }
+
+    /**
      * Endpoint to get lobby info.
      *
      * @param lobbyId the UUID of the lobby.
@@ -140,13 +167,13 @@ public class LobbyController {
      * @return information on the configuration of the requested lobby.
      */
     @GetMapping("/{lobbyId}/config")
-    ResponseEntity<GameConfigurationDTO> lobbyConfigurationInfo(
+    ResponseEntity lobbyConfigurationInfo(
             @PathVariable UUID lobbyId) {
-        
+
         // Check if the lobby exists.
         Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
         if (lobbyOptional.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lobby not found");
         }
         // Return ok status with configuration payload
         return ResponseEntity.ok(lobbyOptional.get().getConfiguration().getDTO());
@@ -155,7 +182,7 @@ public class LobbyController {
     /**
      * Endpoint to allow a user to join a game.
      *
-     * @param lobbyId    UUID of the lobby to join.
+     * @param lobbyId UUID of the lobby to join.
      * @return true if the join was successful, false otherwise.
      */
     @PutMapping("/{lobbyId}/join")
@@ -164,7 +191,7 @@ public class LobbyController {
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
         Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
         if (user.isEmpty() || lobbyOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or lobby not found");
         }
         Game lobby = lobbyOptional.get();
 
@@ -173,8 +200,8 @@ public class LobbyController {
 
         // Check that the game hasn't started yet and add the player
         if (lobby.getStatus() != GameStatus.CREATED
-            || !lobby.add(player)) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+                || !lobby.add(player)) {
+            throw new IllegalStateException("Game is already started.");
         }
 
         lobby = gameRepository.save(lobby);
@@ -194,21 +221,21 @@ public class LobbyController {
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
         Optional<Game> lobby = gameRepository.findById(lobbyId);
         if (user.isEmpty() || lobby.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or lobby not found");
         }
 
-        // If the user isn't the lobby head, return 403
+        // If the user isn't the lobby host, return 403
         if (lobby.get().getHost().getUser().getId() != user.get().getId()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the lobby host");
         }
 
         // If the game doesn't start successfully, return 409
+        // If the SSE events are not yet set-up return 425
         try {
             gameService.startGame(lobby.get());
-        } catch (IllegalStateException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (IOException ex) {
+            return ResponseEntity.status(HttpStatus.TOO_EARLY).body(ex.getMessage());
         }
-
         // Otherwise, return 200
         return ResponseEntity.ok().build();
     }
@@ -216,7 +243,7 @@ public class LobbyController {
     /**
      * Endpoint to allow the host to change configuration.
      *
-     * @param lobbyId UUID of the lobby to join.
+     * @param lobbyId               UUID of the lobby to join.
      * @param gameConfigurationData The new configuration data.
      * @return An ok status if successful.
      */
@@ -263,21 +290,44 @@ public class LobbyController {
         // If the user or the game don't exist, return 404
         Optional<User> user = userRepository.findByEmail(AuthContext.get());
         if (user.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
         // Check that the user is in a lobby and remove them
         Optional<Game> lobby =
                 gameRepository.findByPlayers_User_IdEqualsAndStatus(user.get().getId(), GameStatus.CREATED);
         if (lobby.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not in a lobby");
+        }
+
+        lobbyService.removePlayer(lobby.get(), user.get());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Endpoint to delete a lobby. Only the host player can perform such action.
+     *
+     * @return 200 on success, 404 is player or lobby are not found, 401 if the player is not the lobby host
+     */
+    @DeleteMapping("/delete")
+    ResponseEntity deleteLobby() {
+        // Retrieve the logged-in user
+        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        if (user.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        try {
-            lobbyService.removePlayer(lobby.get(), user.get());
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        // Find the user's lobby
+        Optional<Game> lobby =
+                gameRepository.findByPlayers_User_IdEqualsAndStatus(user.get().getId(), GameStatus.CREATED);
+        if (lobby.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
+
+        if (!lobbyService.deleteLobby(lobby.get(), user.get())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         return ResponseEntity.ok().build();
     }
 }

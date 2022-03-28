@@ -1,7 +1,6 @@
 package server.api;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -11,8 +10,10 @@ import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
+import commons.entities.messages.SSEMessage;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,10 +30,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import server.database.entities.User;
 import server.database.entities.game.Game;
+import server.database.entities.game.NormalGame;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
+import server.services.SSEManager;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -46,6 +50,9 @@ class SSEControllerTest {
 
     @MockBean
     private GameRepository gameRepository;
+
+    @MockBean
+    private SSEManager sseManager;
 
     @Autowired
     public SSEControllerTest(MockMvc mockMvc) {
@@ -66,13 +73,6 @@ class SSEControllerTest {
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
     }
 
-    static class MockGame extends Game {
-        @Override
-        public GameDTO getDTO() {
-            return null;
-        }
-    }
-
     @Test
     void testOpenNotInGame() throws Exception {
         MvcResult mvcResult = this.mockMvc.perform(get("/api/sse/open"))
@@ -87,10 +87,10 @@ class SSEControllerTest {
     @Test
     void testOpenInGame() throws Exception {
         // Create a game
-        Game game = new MockGame();
-        game.setStatus(GameStatus.ONGOING);         // Set the game to ongoing
+        Game game = new NormalGame();
+        game.setStatus(GameStatus.CREATED);
 
-        when(gameRepository.getPlayersGame(user.getId()))
+        when(gameRepository.getPlayersLobbyOrGame(user.getId()))
                 .thenReturn(Optional.of(game));
 
         MvcResult mvcResult = this.mockMvc.perform(get("/api/sse/open"))
@@ -109,9 +109,8 @@ class SSEControllerTest {
             }
         });
 
-        // Check if the connection was added properly.
-        assertEquals(1, game.emitters.size());
-        game.emitters.disconnectAll();  // Disconnect all the emitters to allow the async worker to terminate
-        assertEquals(0, game.emitters.size());
+        verify(sseManager, times(1)).register(any(UUID.class), any(SseEmitter.class));
+        verify(sseManager, times(1)).send(any(UUID.class), any(SSEMessage.class));
+        verifyNoMoreInteractions(sseManager);
     }
 }

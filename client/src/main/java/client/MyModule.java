@@ -16,8 +16,8 @@
 
 package client;
 
-import client.scenes.GameScreenCtrl;
 import client.scenes.MainCtrl;
+import client.scenes.game.GameScreenCtrl;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;

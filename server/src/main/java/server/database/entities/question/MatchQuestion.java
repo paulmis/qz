@@ -1,9 +1,10 @@
 package server.database.entities.question;
 
-import commons.entities.QuestionDTO;
+import commons.entities.questions.QuestionDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -76,7 +77,7 @@ public class MatchQuestion extends Question {
             double currentPoints = 0;
             double pointStep = 1.0 / getActivities().size();
             for (int idx = 0; idx < getActivities().size(); idx++) {
-                if (getActivities().get(idx).getCost() == ans.getResponse().get(idx).getCost()) {
+                if (getActivities().get(idx).getCost() == ans.getResponse().get(idx)) {
                     currentPoints += pointStep;
                 }
             }
@@ -92,7 +93,8 @@ public class MatchQuestion extends Question {
     @Override
     public Answer getRightAnswer() {
         Answer rightAnswer = new Answer();
-        rightAnswer.setResponse(getActivities());
+        rightAnswer.setResponse(getActivities().stream()
+                .map(Activity::getCost).collect(Collectors.toList()));
         return rightAnswer;
     }
     

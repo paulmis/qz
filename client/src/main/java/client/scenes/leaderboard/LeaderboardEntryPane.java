@@ -1,11 +1,9 @@
 package client.scenes.leaderboard;
 
-import client.scenes.leaderboard.LeaderboardEntryCtrl;
-import commons.entities.UserDTO;
+import commons.entities.auth.UserDTO;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
 
@@ -41,7 +39,7 @@ public class LeaderboardEntryPane extends StackPane {
 
         // This loads the fxml
         try {
-            view = (Node) fxmlLoader.load();
+            view = fxmlLoader.load();
         } catch (Exception e) {
             Platform.exit();
             System.exit(0);

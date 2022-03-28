@@ -20,9 +20,10 @@ import java.util.Random;
 import lombok.Generated;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
- * Configuration of the quote application.
+ * Configuration of the quiz application.
  */
 @Generated
 @Configuration
@@ -35,5 +36,19 @@ public class Config {
     @Bean
     public Random getRandom() {
         return new Random();
+    }
+
+    /**
+     * Get a new task scheduler.
+     *
+     * @return A new thread pool task scheduler.
+     */
+    @Bean
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(5);
+        scheduler.setThreadNamePrefix("quiz-");
+        scheduler.setWaitForTasksToCompleteOnShutdown(true);
+        return scheduler;
     }
 }

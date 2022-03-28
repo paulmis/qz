@@ -11,7 +11,11 @@ import static server.utils.TestHelpers.getUUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import commons.entities.game.GameStatus;
-import java.util.*;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +99,7 @@ public class GameControllerTest {
         game = new NormalGame();
         game.setId(getUUID(3));
         game.setStatus(GameStatus.ONGOING);
-        gameConfiguration = new NormalGameConfiguration(10, 10, 2);
+        gameConfiguration = new NormalGameConfiguration(10, Duration.ofSeconds(10), 2, 2, 2f, 100, 0, 75);
         game.setConfiguration(gameConfiguration);
         when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
 
@@ -106,7 +110,7 @@ public class GameControllerTest {
         game.add(johnPlayer);
         when(gameRepository.getPlayersGame(john.getId())).thenReturn(Optional.of(game));
         game.add(susannePlayer);
-        when(gameRepository.getPlayersGame(susanne.getId())).thenReturn(Optional.of(game));;
+        when(gameRepository.getPlayersGame(susanne.getId())).thenReturn(Optional.of(game));
 
         // Mock the authentication
         SecurityContextHolder.getContext().setAuthentication(
@@ -120,7 +124,7 @@ public class GameControllerTest {
     public void questionFoundTest() throws Exception {
         // Request question object -> expect a ok status and mock question object
         game.addQuestions(new ArrayList<>(List.of(question)));
-        game.setCurrentQuestion(0);
+        game.setCurrentQuestionNumber(0);
         this.mockMvc
                 .perform(get("/api/game/" + game.getId() + "/question"))
                 .andExpect(status().isOk())
