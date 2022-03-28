@@ -112,11 +112,11 @@ class LobbyControllerTest {
         // Add players
         johnPlayer = new GamePlayer(john);
         mockLobby.add(johnPlayer);
-        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(john.getId(), GameStatus.CREATED))
+        when(gameRepository.getPlayersLobby(john.getId()))
                 .thenReturn(Optional.of(mockLobby));
         susannePlayer = new GamePlayer(susanne);
         mockLobby.add(susannePlayer);
-        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(susanne.getId(), GameStatus.CREATED))
+        when(gameRepository.getPlayersLobby(susanne.getId()))
                 .thenReturn(Optional.of(mockLobby));
 
         // Mock the lobby
@@ -496,7 +496,7 @@ class LobbyControllerTest {
                         bobby.getEmail(),
                         bobby.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
-        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(bobby.getId(), GameStatus.CREATED))
+        when(gameRepository.getPlayersLobby(bobby.getId()))
                 .thenReturn(Optional.of(mockLobby));
 
         // Request
@@ -513,7 +513,7 @@ class LobbyControllerTest {
                         sally.getEmail(),
                         sally.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
-        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(sally.getId(), GameStatus.CREATED))
+        when(gameRepository.getPlayersLobby(sally.getId()))
                 .thenReturn(Optional.empty());
 
         // Request
