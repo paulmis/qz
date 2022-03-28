@@ -261,22 +261,33 @@ public class LobbyScreenCtrl implements SSESource {
         GameDTO gameDTO = ClientState.game;
 
         // ToDo: have a game name in gameDTO
+        // Set game's name as "host's game"
         String hostNickname = gameDTO.getPlayers().stream()
                 .filter(player -> player.getId() == gameDTO.getHost())
                 .findFirst()
                 .map(GamePlayerDTO::getNickname)
                 .orElse("Ligma");
         gameName.setText(hostNickname + "'s game");
+
+        // Set game id
         gameId.setText(gameDTO.getGameId());
+
+        // Set game class
         gameType.setText(gameDTO.getClass().getName()
                 .replaceAll(".*\\.", "")
                 .replaceAll("GameDTO", ""));
+
+        // Show game capacity and current occupancy
         gameCapacity.setText(gameDTO.getPlayers().size() + "/" + gameDTO.getConfiguration().getCapacity());
+
+        // Check if logged in player is the host
         boolean isHost = gameDTO.getPlayers().stream()
                 .filter(dto -> ClientState.user.getId().equals(dto.getUserId()))
                 .anyMatch(dto -> gameDTO.getHost().equals(dto.getId()));
         lobbySettingsButton.setDisable(!isHost);
         startButton.setDisable(!isHost);
+
+        // Show list of participants
         updatePlayerList(gameDTO, isHost);
     }
 
@@ -287,6 +298,7 @@ public class LobbyScreenCtrl implements SSESource {
      */
     private void updatePlayerList(GameDTO gameDTO, boolean isHost) {
         playerList.getChildren().clear();
+
         List<LobbyPlayerPane> playerElements = gameDTO.getPlayers().stream()
                 .sorted((p1, p2) ->
                         // Sort by join date, host always first
@@ -302,6 +314,7 @@ public class LobbyScreenCtrl implements SSESource {
                     return elem;
                 })
                 .collect(Collectors.toList());
+
         playerList.getChildren().addAll(playerElements);
     }
 }
