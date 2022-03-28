@@ -36,6 +36,10 @@ public class LobbyPlayerCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Stop managing the kick out button when it's not visible
+        kickOutBtn.managedProperty().bind(kickOutBtn.visibleProperty());
+
+        // Default setup
         playerScore.setText(playerDTO.getScore().toString());
         setPlayerHost(false);
         showRemovePlayerBtn(false);
