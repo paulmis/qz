@@ -17,11 +17,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * MCQuestion controller.
  */
 @Generated
+@Slf4j
 public abstract class MCQuestionCtrl implements Initializable {
     private final MainCtrl mainCtrl;
     private final GameCommunication communication;
@@ -86,6 +88,22 @@ public abstract class MCQuestionCtrl implements Initializable {
                 });
         }
     }
+
+    /**
+     * Shows the correct answer in the UI.
+     *
+     * @param answer the correct answer.
+     */
+    protected void showAnswer(AnswerDTO answer) {
+        if (this.question.getId() != answer.getQuestionId()) {
+            log.warn("Received answer for a different question: expected {} but got {}",
+                this.question.getId(), answer.getQuestionId());
+            return;
+        }
+
+        // Get the correct answer
+        // TODO
+    };
 
     /**
      * Sets the current answer.

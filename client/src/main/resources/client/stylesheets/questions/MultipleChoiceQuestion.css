@@ -38,3 +38,16 @@
     -fx-font-size: 20px;
     -fx-font-weight: bold;
 }
+
+.correct-answer {
+    -fx-background-color: correctAnswerColor;
+}
+
+.correct-answer > .label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.incorrect-answer {
+    -fx-background-color: incorrectAnswerColor;
+}

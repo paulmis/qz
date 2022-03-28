@@ -2,6 +2,7 @@ package client.scenes.questions;
 
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
+import commons.entities.AnswerDTO;
 import commons.entities.questions.MCQuestionDTO;
 import commons.entities.questions.QuestionDTO;
 import java.io.IOException;
@@ -57,5 +58,14 @@ public class QuestionPane extends StackPane {
         // Load and add the FXML scene
         view = loader.load();
         getChildren().add(view);
+    }
+
+    /**
+     * Show the correct answer.
+     *
+     * @param answer the answer to show to the player.
+     */
+    public void showAnswer(AnswerDTO answer) {
+        controller.showAnswer(answer);
     }
 }

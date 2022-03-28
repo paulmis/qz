@@ -16,6 +16,7 @@ import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
+import commons.entities.AnswerDTO;
 import commons.entities.messages.SSEMessageType;
 import commons.entities.questions.QuestionDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
@@ -39,6 +40,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
@@ -75,6 +77,8 @@ public class GameScreenCtrl implements Initializable, SSESource {
     @FXML private JFXSlider volumeSlider;
     @FXML private JFXToggleButton muteEveryoneToggleButton;
     @FXML private FontAwesomeIconView volumeIconView;
+
+    private StackPane centerPane;
 
     private SimpleIntegerProperty volume;
     private List<FontAwesomeIcon> volumeIconList;
@@ -127,6 +131,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @SSEEventHandler(SSEMessageType.START_QUESTION)
     public void toQuestionStage() {
+        log.debug("Question stage handler triggered.");
         // Set the current question
         GameCommunication.updateCurrentQuestion(
             ClientState.game.getId(),
@@ -145,9 +150,37 @@ public class GameScreenCtrl implements Initializable, SSESource {
     @SSEEventHandler(SSEMessageType.STOP_QUESTION)
     public void toAnswerStage() {
         // TODO: implement
-        mainCtrl.showInformationalSnackBar("The question has ended");
+        log.debug("The answer stage has been reached.");
+        GameCommunication.updateCurrentAnswer(
+                ClientState.game.getId(),
+                // Success
+                (answer) -> runLater(() -> setAnswer(answer)),
+                // Failure
+                () -> runLater(
+                        () -> mainCtrl.showErrorSnackBar("Unable to retrieve the current answer")
+                )
+        );
 
         // TODO: timer
+    }
+
+    /**
+     * Show the answer in the UI.
+     *
+     * @param answer The answer to set.
+     */
+    private void setAnswer(AnswerDTO answer) {
+        if (answer == null) {
+            mainCtrl.showErrorSnackBar("Unable to retrieve the current answer");
+            log.warn("setAnswer: answer is null");
+            return;
+        }
+        if (!(this.centerPane instanceof QuestionPane)) {
+            log.warn("setAnswer: centerPane is not a QuestionPane, it is a {}", this.centerPane.getClass());
+            return;
+        }
+
+
     }
 
     /**
@@ -169,10 +202,10 @@ public class GameScreenCtrl implements Initializable, SSESource {
      * A mock function that loads the estimate control.
      */
     private void loadMockEstimate() {
-        mainBorderPane.setCenter(
-                new EstimateQuestionPane(
-                        "Short question",
-                        System.out::println));
+        this.centerPane = new EstimateQuestionPane(
+                "Short question",
+                log::debug);
+        mainBorderPane.setCenter(this.centerPane);
     }
 
     private void setUpTimer() {
@@ -440,15 +473,17 @@ public class GameScreenCtrl implements Initializable, SSESource {
         // If the question is null, display an empty start pane
         try {
             if (question == null) {
-                mainBorderPane.setCenter(
-                    new StartGamePane(mainCtrl, communication));
+                log.debug("Question is null, showing start game pane");
+                this.centerPane = new StartGamePane(mainCtrl, communication);
+                mainBorderPane.setCenter(this.centerPane);
                 // Otherwise, show a question pane
             } else {
-                mainBorderPane.setCenter(
-                    new QuestionPane(mainCtrl, communication, question));
+                log.debug("Showing question pane");
+                this.centerPane = new QuestionPane(mainCtrl, communication, question);
+                mainBorderPane.setCenter(this.centerPane);
             }
         } catch (IOException e) {
-            System.out.println("Error loading the FXML file");
+            log.error("Error loading the FXML file");
             e.printStackTrace();
             Platform.exit();
             System.exit(0);
