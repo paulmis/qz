@@ -40,11 +40,12 @@ import java.util.UUID;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.sse.SseEventSource;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Utilities for communicating with the server.
  */
+@Slf4j
 public class ServerUtils {
 
     private static final String SERVER = "http://localhost:8080/";
@@ -123,8 +124,9 @@ public class ServerUtils {
             @Override
             public void completed(Response o) {
                 if (o.getStatus() == 201) {
-                    client = client.register(new Authenticator(o.readEntity(String.class)));
-                    ClientState.user = user;
+                    LoginDTO loginDTO = o.readEntity(LoginDTO.class);
+                    client = client.register(new Authenticator(loginDTO.getToken()));
+                    ClientState.user = loginDTO.getUser();
                     registerHandler.handle(o, new ApiError());
                 } else if (o.getStatus() == 400) {
                     registerHandler.handle(o, o.readEntity(ApiError.class));
@@ -155,12 +157,10 @@ public class ServerUtils {
     }
 
     /**
-     * Function that checks user credentials.
+     * Logs the user in, granting access to the API.
      *
-     * @param email string representing
-     *              the email of the user.
-     * @param password string representing
-     *                 the password of the user.
+     * @param email string representing the email of the user.
+     * @param password string representing the password of the user.
      */
     public void logIn(String email, String password,
                       LogInHandlerSuccess logInHandlerSuccess, LogInHandlerFail logInHandlerFail) {
@@ -176,9 +176,9 @@ public class ServerUtils {
 
             @Override
             public void completed(LoginDTO loginDTO) {
-                System.out.println(loginDTO);
+                log.info("Logged in: " + loginDTO.getUser());
                 client = client.register(new Authenticator(loginDTO.getToken()));
-                ClientState.user = user;
+                ClientState.user = loginDTO.getUser();
                 logInHandlerSuccess.handle(loginDTO);
             }
 

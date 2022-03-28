@@ -4,6 +4,7 @@ import static javafx.application.Platform.runLater;
 
 import client.scenes.MainCtrl;
 import client.utils.AlgorithmicUtils;
+import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
@@ -87,17 +88,17 @@ public class LobbyListCtrl implements Initializable {
     }
 
     @FXML
-    private void userButtonClick() {
+    private void clickUserButton() {
+        // Display the user panel
         if (!userPanelGrid.isVisible()) {
-            server.getMyInfo(userDTO -> runLater(() -> {
-                this.usernameField.setText(userDTO.getUsername());
+            runLater(() -> {
+                this.usernameField.setText(ClientState.user.getUsername());
                 userPanelGrid.setVisible(true);
                 playerImageView.setImage(new Image("https://upload.wikimedia.org/wikipedia/commons/e/e3/Klaus_Iohannis_din_interviul_cu_Dan_Tapalag%C4%83_cropped.jpg"));
-            }), () -> runLater(() ->
-                            mainCtrl.showErrorSnackBar("Something went wrong while fetching your user data.")));
-        } else {
-            userPanelGrid.setVisible(false);
+            });
         }
+
+        userPanelGrid.setVisible(!userPanelGrid.isVisible());
     }
 
     @FXML

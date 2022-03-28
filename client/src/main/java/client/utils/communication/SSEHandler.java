@@ -88,11 +88,14 @@ public class SSEHandler {
     }
 
     /**
-     * Kills the current SSE connection.
+     * Asynchronously kills the current SSE connection.
      */
     public void kill() {
-        this.sseEventSource.close();
-        log.info("Killed the SSE connection");
+        new Thread(() -> {
+            log.info("--[SSE]-- Killing the SSE connection...");
+            this.sseEventSource.close();
+            log.info("--[SSE]-- Killed the SSE connection");
+        }).start();
     }
 
     /**

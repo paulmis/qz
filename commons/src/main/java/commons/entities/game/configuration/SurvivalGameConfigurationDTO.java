@@ -2,6 +2,8 @@ package commons.entities.game.configuration;
 
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonView;
+import commons.entities.utils.Views;
 import java.time.Duration;
 import java.util.UUID;
 import javax.validation.constraints.DecimalMax;
@@ -20,6 +22,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
+@JsonView(Views.Public.class)
 public class SurvivalGameConfigurationDTO extends GameConfigurationDTO {
     /**
      * Speed modifier for the game.
