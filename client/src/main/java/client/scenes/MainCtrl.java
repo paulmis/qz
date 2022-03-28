@@ -28,6 +28,7 @@ import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbarLayout;
+import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.questions.QuestionDTO;
 import javafx.application.Platform;
@@ -47,6 +48,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import lombok.Generated;
+
+import java.util.Optional;
 
 /**
  * Main controller for the client application.
@@ -253,6 +256,8 @@ public class MainCtrl {
      * Shows the lobby screen.
      */
     public void showLobbyScreen() {
+        //ToDo: add `this.checkHost();` here when ClientState.user is updated on login.
+        this.checkHost();
         lobbyScreenCtrl.bindHandler(ServerUtils.sseHandler);
         this.showScreenLetterBox(lobbyScene, StageScalingStrategy.Letterbox);
     }
@@ -403,6 +408,34 @@ public class MainCtrl {
     public void closeLobbyDisbandWarning() {
         lobbyDisbandPopUp.hide();
         lobbyDisbandPopUp.getContent().clear();
+    }
+
+    /**
+     * This function checks if the player is the host of the lobby.
+     *
+     */
+
+    //ToDo: This will work only when ClientState.user is updated on login.
+    public void checkHost() {
+        //Request user's data
+        Optional<GamePlayerDTO> gamePlayerData = ClientState.game.getPlayers()
+                .stream()
+                .filter(gp -> ClientState.user.getId().equals(gp.getUserId()))
+                .findAny();
+        //Check if game player data is empty
+        if (!gamePlayerData.isEmpty()) {
+            // Compare gamePlayer id with lobby host id to check if player is host
+            if (gamePlayerData.get().getId().equals(ClientState.game.getHost())) {
+                System.out.println("Player is host");
+                this.showDisbandButton();
+            } else {
+                System.out.println("Player is not host");
+                this.hideDisbandButton();
+            }
+        } else {
+            System.out.println("Couldn't retrieve game player/User is not a game player");
+            this.hideDisbandButton();
+        }
     }
 
     public void showDisbandButton() {

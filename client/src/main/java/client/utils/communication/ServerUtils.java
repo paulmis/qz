@@ -374,80 +374,9 @@ public class ServerUtils {
         });
     }
 
-    /**
-     * Handler for getting the lobby info succeeds.
-     */
-    public interface GetLobbyInfoHandlerSuccess {
-        void handle(GameDTO gameDTO);
-    }
-
-    /**
-     * Handler for getting the lobby info fails.
-     */
-    public interface GetLobbyInfoHandlerFail {
-        void handle();
-    }
-
-    /**
-     * Function that gets all the lobby info from the provided lobby id.
-     *
-     * @param getLobbyInfoHandlerSuccess The function that will be called if the request is successful.
-     * @param getLobbyInfoHandlerFail The function that will be called if the request is unsuccessful.
-     * @param lobbyId The lobby id of the lobby that needs to be found.
-     */
-    public void getLobbyInfo(GetLobbyInfoHandlerSuccess getLobbyInfoHandlerSuccess,
-                          GetLobbyInfoHandlerFail getLobbyInfoHandlerFail, UUID lobbyId) {
-        Invocation invocation = client
-                .target(SERVER).path("/api/lobby/" + lobbyId)
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildGet();
-        invocation.submit(new InvocationCallback<GameDTO>() {
-            @Override
-            public void completed(GameDTO o) {
-                getLobbyInfoHandlerSuccess.handle(o);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                getLobbyInfoHandlerFail.handle();
-                throwable.printStackTrace();
-            }
-        });
-    }
-
     public String connect() {
         System.out.println("New connection!\n");
         return "200";
-    }
-
-    /**
-     * Handler for when a disband lobby succeeds.
-     */
-    public interface DisbandLobbyHandler {
-        void handle(Response response);
-    }
-
-    /**
-     * Function that causes the host to delete the lobby.
-     */
-    public void disbandLobby(DisbandLobbyHandler disbandLobbyHandler) {
-        var request = client
-                .target(SERVER).path("/api/lobby/delete")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildDelete();
-        request.submit(new InvocationCallback<Response>() {
-            @Override
-            public void completed(Response response) {
-                disbandLobbyHandler.handle(response);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        });
     }
 
     /**

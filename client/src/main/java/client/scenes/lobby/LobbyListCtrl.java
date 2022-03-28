@@ -2,13 +2,13 @@ package client.scenes.lobby;
 
 import static javafx.application.Platform.runLater;
 
+import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
 import client.utils.AlgorithmicUtils;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameDTO;
-import commons.entities.game.GamePlayerDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
 import java.util.*;
@@ -53,7 +53,7 @@ public class LobbyListCtrl implements Initializable {
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public LobbyListCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public LobbyListCtrl(ServerUtils server, MainCtrl mainCtrl, LobbyCommunication communication) {
         this.mainCtrl = mainCtrl;
         this.server = server;
     }
@@ -106,7 +106,6 @@ public class LobbyListCtrl implements Initializable {
             ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
             runLater(() -> {
                 mainCtrl.showLobbyScreen();
-                this.checkHost(game);
             });
         }, () -> runLater(() ->
                 mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
@@ -126,36 +125,6 @@ public class LobbyListCtrl implements Initializable {
     @FXML
     private void searchButtonClick() {
         updateLobbyList(searchField.getText());
-    }
-
-    /** This function checks if the player is the host of the lobby.
-     *
-     * @param gameDTO the game data that the player is creating/joining
-     */
-    public void checkHost(GameDTO gameDTO) {
-        this.server.getMyInfo(userDTO -> runLater(() -> {
-            //Fetching user data success
-            Optional<GamePlayerDTO> gamePlayerData = gameDTO.getPlayers()
-                    .stream()
-                    .filter(gp -> userDTO.getId().equals(gp.getUserId()))
-                    .findAny();
-            if (!gamePlayerData.isEmpty()) {
-                if (gamePlayerData.get().getId().equals(gameDTO.getHost())) {
-                    System.out.println("Player is host");
-                    mainCtrl.showDisbandButton();
-                } else {
-                    System.out.println("Player is not host");
-                    mainCtrl.hideDisbandButton();
-                }
-            } else {
-                mainCtrl.hideDisbandButton();
-                System.out.println("Couldn't retrieve game player/User is not a game player");
-            }
-        }), () -> runLater(() -> {
-            //Fetching user data failed
-            System.out.println("Something went wrong while fetching user information");
-            mainCtrl.hideDisbandButton();
-        }));
     }
 
     /**
@@ -183,7 +152,6 @@ public class LobbyListCtrl implements Initializable {
                                             server.joinLobby(id,
                                                     gameDTO1 -> runLater(() -> {
                                                         mainCtrl.showLobbyScreen();
-                                                        this.checkHost(gameDTO);
                                                     }),
                                                     () -> runLater(() ->
                                                             mainCtrl.showErrorSnackBar(

@@ -15,7 +15,6 @@ import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
 import java.time.Duration;
 import javafx.fxml.FXML;
-import javax.ws.rs.core.Response;
 import lombok.Generated;
 import lombok.Getter;
 
@@ -26,7 +25,6 @@ import lombok.Getter;
 @Generated
 public class LobbyScreenCtrl implements SSESource {
     private final LobbyCommunication communication;
-    private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
     private String name = "Ligma's Lobby";
@@ -49,7 +47,6 @@ public class LobbyScreenCtrl implements SSESource {
     public LobbyScreenCtrl(LobbyCommunication communication, MainCtrl mainCtrl, ServerUtils server) {
         this.mainCtrl = mainCtrl;
         this.communication = communication;
-        this.server = server;
     }
 
     public void bindHandler(SSEHandler handler) {
@@ -113,26 +110,24 @@ public class LobbyScreenCtrl implements SSESource {
             // If confirmed, exit the lobby
             () -> {
                 mainCtrl.closeLobbyLeaveWarning();
-                this.communication.leaveLobby(
-                    (response) -> runLater(() -> {
+                this.communication.leaveLobby(response -> runLater(() -> {
                         switch (response.getStatus()) {
+                            case 404:
+                                mainCtrl.showErrorSnackBar("Unable to leave the lobby.");
+                                break;
+                            case 409:
+                                mainCtrl.showErrorSnackBar("Something went wrong while leaving the lobby");
+                                break;
                             case 200:
-                                System.out.println("User successfully removed from lobby");
+                                mainCtrl.showInformationalSnackBar("Successfully left the lobby");
                                 mainCtrl.showLobbyListScreen();
                                 ClientState.game = null;
                                 ServerUtils.sseHandler.kill();
                                 break;
-                            case 404:
-                                mainCtrl.showErrorSnackBar("Unable to quit the lobby: user or lobby doesn't exist");
-                                break;
-                            case 409:
-                                mainCtrl.showErrorSnackBar("Unable to quit the lobby: "
-                                    + "there was a conflict while removing the player");
-                                break;
                             default:
-                                mainCtrl.showErrorSnackBar("Unable to quit the lobby: server error");
+                                mainCtrl.showErrorSnackBar("Unable to leave the lobby");
                         }
-                    }));
+                    }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Unable to leave the lobby")));
             },
             // Otherwise, simply close the warning
             mainCtrl::closeLobbyLeaveWarning
@@ -145,35 +140,28 @@ public class LobbyScreenCtrl implements SSESource {
     public void disbandButtonClick() {
         mainCtrl.openLobbyDisbandWarning(() -> {
             mainCtrl.closeLobbyDisbandWarning();
-            this.server.disbandLobby(new ServerUtils.DisbandLobbyHandler() {
-                @Override
-                public void handle(Response response) {
-                    javafx.application.Platform.runLater(() -> {
-                        switch (response.getStatus()) {
-                            case 200:
-                                System.out.println("Host successfully disbanded the lobby");
-                                mainCtrl.showLobbyListScreen();
-                                ClientState.game = null;
-                                ServerUtils.sseHandler.kill();
-                                break;
-                            case 401:
-                                System.out.println("Player isn't host");
-                                mainCtrl.showErrorSnackBar("Failed to disband");
-                                break;
-                            case 404:
-                                System.out.println("User/Game not found");
-                                mainCtrl.showErrorSnackBar("Failed to disband");
-                                break;
-                            default:
-                                mainCtrl.showErrorSnackBar("Failed to disband");
-                                break;
-                        }
-                    });
+            this.communication.disbandLobby(response -> runLater(() -> {
+                switch (response.getStatus()) {
+                    case 401:
+                        mainCtrl.showErrorSnackBar("Failed to disband lobby. " +
+                                "You are not the host");
+                        break;
+                    case 404:
+                        mainCtrl.showErrorSnackBar("Failed to disband lobby. " +
+                                "Information couldn't be retrieved");
+                        break;
+                    case 200:
+                        mainCtrl.showInformationalSnackBar("Successfully disbanded the lobby");
+                        mainCtrl.showLobbyListScreen();
+                        ClientState.game = null;
+                        ServerUtils.sseHandler.kill();
+                        break;
+                    default:
+                        mainCtrl.showErrorSnackBar("Failed to disband lobby");
+                        break;
                 }
-            });
-        }, () -> {
-            mainCtrl.closeLobbyDisbandWarning();
-        });
+            }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to disband lobby")));
+        }, () -> runLater(mainCtrl::closeLobbyDisbandWarning));
     }
 
     /**
