@@ -16,6 +16,7 @@ import commons.entities.game.GameDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.messages.SSEMessageType;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -263,10 +264,10 @@ public class LobbyScreenCtrl implements SSESource {
         // ToDo: have a game name in gameDTO
         // Set game's name as "host's game"
         String hostNickname = gameDTO.getPlayers().stream()
-                .filter(player -> player.getId() == gameDTO.getHost())
+                .filter(player -> player.getId().equals(gameDTO.getHost()))
                 .findFirst()
                 .map(GamePlayerDTO::getNickname)
-                .orElse("Ligma");
+                .orElse("N.A.");
         gameName.setText(hostNickname + "'s game");
 
         // Set game id

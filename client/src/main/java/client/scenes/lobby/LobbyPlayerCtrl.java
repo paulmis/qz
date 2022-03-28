@@ -40,6 +40,7 @@ public class LobbyPlayerCtrl implements Initializable {
         kickOutBtn.managedProperty().bind(kickOutBtn.visibleProperty());
 
         // Default setup
+        playerName.setText(playerDTO.getNickname());
         playerScore.setText(playerDTO.getScore().toString());
         setPlayerHost(false);
         showRemovePlayerBtn(false);
