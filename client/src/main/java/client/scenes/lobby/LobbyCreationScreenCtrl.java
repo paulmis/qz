@@ -2,9 +2,12 @@ package client.scenes.lobby;
 
 import static javafx.application.Platform.runLater;
 
+import client.communication.game.GameCommunication;
+import client.communication.game.LobbyCommunication;
 import client.communication.game.LobbyListCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
+import client.utils.communication.ReflectionUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.GameConfigurationDTO;
@@ -20,6 +23,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import jdk.jfr.Description;
 
 
 /**
@@ -28,16 +32,25 @@ import javafx.scene.layout.VBox;
 public class LobbyCreationScreenCtrl implements Initializable {
     private final MainCtrl mainCtrl;
     private final LobbyListCommunication server;
+    private final LobbyCommunication serverLobby;
 
     @FXML private FontAwesomeIconView lockButtonIconView;
     @FXML private JFXButton standardGameConfigurationButton;
     @FXML private JFXButton survivalGameConfigurationButton;
+    @FXML private JFXButton singleplayerGameButton;
+    @FXML private JFXButton multiplayerGameButton;
+    @FXML private JFXButton createLobbyGameButton;
+
     @FXML private TextField lobbyNameField;
     @FXML private VBox configurationPanelVbox;
     @FXML private Label publicPrivateLabel;
 
     private SimpleBooleanProperty isPrivateProperty;
     private GameConfigurationDTO config;
+
+    private ConfigurationScreenPane configPane;
+
+    private SimpleBooleanProperty isMultiplayer;
 
     /**
      * Initialize a new controller using dependency injection.
@@ -46,9 +59,10 @@ public class LobbyCreationScreenCtrl implements Initializable {
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public LobbyCreationScreenCtrl(LobbyListCommunication server, MainCtrl mainCtrl) {
+    public LobbyCreationScreenCtrl(LobbyListCommunication server, LobbyCommunication serverLobby, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
+        this.serverLobby = serverLobby;
     }
 
     @Override
@@ -70,6 +84,13 @@ public class LobbyCreationScreenCtrl implements Initializable {
                         .otherwise("Public"));
 
         isPrivateProperty.set(false);
+
+        isMultiplayer = new SimpleBooleanProperty(true);
+
+        isMultiplayer.addListener((observable, oldValue, newValue) -> {
+            setUpGameType();
+        });
+        isMultiplayer.setValue(true);
     }
 
     /**
@@ -79,18 +100,45 @@ public class LobbyCreationScreenCtrl implements Initializable {
         standardGameConfigurationButton.setButtonType(JFXButton.ButtonType.RAISED);
         survivalGameConfigurationButton.setButtonType(JFXButton.ButtonType.FLAT);
         this.lobbyNameField.setText("");
+
         isPrivateProperty.set(false);
+        isMultiplayer.set(true);
         config = new NormalGameConfigurationDTO(null, 60, 1, 20, 3, 2f, 100, 0, 75);
         setUpConfigScreen();
     }
 
     private void setUpConfigScreen() {
         configurationPanelVbox.getChildren().clear();
-        var configPane = new ConfigurationScreenPane(config, config -> { });
-
+        configPane = new ConfigurationScreenPane(config, config -> { });
         configPane.makeTransparent();
         configPane.hideSaveButton();
         configurationPanelVbox.getChildren().add(configPane);
+    }
+
+    /**
+     * Sets up the game type.
+     * Does this by recreating the config screen, setting the capacity field to read only or write
+     * depending if the lobby is singleplayer or multiplayer and changes the buttons and text of the
+     * create lobby button.
+     */
+    private void setUpGameType() {
+        var capacityField = ReflectionUtils.getAnnotatedFields(config, Description.class).stream()
+                .filter(field -> field.getName().equals("capacity")).findFirst().get();
+
+        if (isMultiplayer.get()) {
+            setUpConfigScreen();
+            configPane.setFieldEdit(capacityField);
+            singleplayerGameButton.setButtonType(JFXButton.ButtonType.FLAT);
+            multiplayerGameButton.setButtonType(JFXButton.ButtonType.RAISED);
+            createLobbyGameButton.setText("Create");
+        } else {
+            config.setCapacity(1);
+            setUpConfigScreen();
+            configPane.setFieldReadOnly(capacityField);
+            singleplayerGameButton.setButtonType(JFXButton.ButtonType.RAISED);
+            multiplayerGameButton.setButtonType(JFXButton.ButtonType.FLAT);
+            createLobbyGameButton.setText("Start");
+        }
     }
 
     @FXML
@@ -106,9 +154,32 @@ public class LobbyCreationScreenCtrl implements Initializable {
     @FXML
     private void createLobbyButtonClick() {
         server.createLobby(config,
-                // Success
-                game -> runLater(mainCtrl::showLobbyScreen),
-                // Failed
+                game -> runLater(() -> {
+                    if (isMultiplayer.get()) {
+                        mainCtrl.showLobbyScreen();
+                    } else {
+                        LobbyCommunication.startGame(game.getId(), (response) -> runLater(() -> {
+                            switch (response.getStatus()) {
+                                case 403:
+                                    mainCtrl.showErrorSnackBar("Starting the game failed! You are not the host.");
+                                    break;
+                                case 409:
+                                    mainCtrl.showErrorSnackBar("Something went wrong while starting the game.");
+                                    break;
+                                case 425:
+                                    mainCtrl.showErrorSnackBar("Try again after a second.");
+                                    break;
+                                case 200:
+                                    mainCtrl.showInformationalSnackBar("Game started!");
+                                    mainCtrl.showGameScreen(null);
+                                    break;
+                                default:
+                                    mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");
+                                    break;
+                            }
+                        }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to start game.")));
+                    }
+                }),
                 () -> runLater(() ->
                         mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
     }
@@ -116,7 +187,9 @@ public class LobbyCreationScreenCtrl implements Initializable {
     @FXML
     private void standardGameConfigurationButtonClick() {
         config = new NormalGameConfigurationDTO();
+        isMultiplayer.setValue(isMultiplayer.getValue());
         setUpConfigScreen();
+        setUpGameType();
         standardGameConfigurationButton.setButtonType(JFXButton.ButtonType.RAISED);
         survivalGameConfigurationButton.setButtonType(JFXButton.ButtonType.FLAT);
     }
@@ -124,8 +197,20 @@ public class LobbyCreationScreenCtrl implements Initializable {
     @FXML
     private void survivalGameConfigurationButtonClick() {
         config = new SurvivalGameConfigurationDTO();
+        isMultiplayer.setValue(isMultiplayer.getValue());
         setUpConfigScreen();
+        setUpGameType();
         standardGameConfigurationButton.setButtonType(JFXButton.ButtonType.FLAT);
         survivalGameConfigurationButton.setButtonType(JFXButton.ButtonType.RAISED);
+    }
+
+    @FXML
+    private void singleplayerGameButtonClick() {
+        isMultiplayer.setValue(false);
+    }
+
+    @FXML
+    private void multiplayerGameButtonClick() {
+        isMultiplayer.setValue(true);
     }
 }
