@@ -19,7 +19,7 @@
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <ImageView fx:id="leadingCrown" fitHeight="20.0" fitWidth="20.0">
+                  <ImageView fx:id="hostCrown" fitHeight="20.0" fitWidth="20.0">
                      <Image url="@../../images/lobby/crown.png"/>
                   </ImageView>
                </children>

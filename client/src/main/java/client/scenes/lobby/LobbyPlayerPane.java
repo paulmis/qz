@@ -55,10 +55,6 @@ public class LobbyPlayerPane extends StackPane {
         this.maxHeightProperty().bind(top.maxHeightProperty());
     }
 
-    public void setPlayerLeading(boolean isLeading) {
-        controller.setPlayerLeading(isLeading);
-    }
-
     public void setPlayerHost(boolean isHost) {
         controller.setPlayerHost(isHost);
     }

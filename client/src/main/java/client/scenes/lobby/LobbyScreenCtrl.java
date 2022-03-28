@@ -287,10 +287,6 @@ public class LobbyScreenCtrl implements SSESource {
      */
     private void updatePlayerList(GameDTO gameDTO, boolean isHost) {
         playerList.getChildren().clear();
-        int highestScore = gameDTO.getPlayers().stream()
-                .mapToInt(GamePlayerDTO::getScore)
-                .max()
-                .orElse(Integer.MIN_VALUE);
         List<LobbyPlayerPane> playerElements = gameDTO.getPlayers().stream()
                 .sorted((p1, p2) ->
                         // Sort by join date, host always first
@@ -299,8 +295,6 @@ public class LobbyScreenCtrl implements SSESource {
                                 : (gameDTO.getHost().equals(p1.getId()) ? -1 : 1))
                 .map(dto -> {
                     LobbyPlayerPane elem = new LobbyPlayerPane(dto);
-                    // Show highest-scoring player
-                    elem.setPlayerLeading(dto.getScore() == highestScore);
                     // Show kick-out buttons only to host
                     elem.showRemovePlayerBtn(isHost);
                     // Indicate if the player is the host

@@ -139,7 +139,6 @@ public class LobbyCommunication {
 
             @Override
             public void failed(Throwable throwable) {
-                System.out.println("a fail:");
                 throwable.printStackTrace();
                 handlerFail.handle();
             }

@@ -16,7 +16,7 @@ import lombok.Generated;
 @Generated
 public class LobbyPlayerCtrl implements Initializable {
     @FXML private Label playerName;
-    @FXML private ImageView leadingCrown;
+    @FXML private ImageView hostCrown;
     @FXML private Label playerScore;
     @FXML private JFXButton kickOutBtn;
 
@@ -26,22 +26,17 @@ public class LobbyPlayerCtrl implements Initializable {
         this.playerDTO = playerDTO;
     }
 
-    public void setPlayerLeading(boolean isLeading) {
-        leadingCrown.setVisible(isLeading);
-    }
-
     public void showRemovePlayerBtn(boolean doShow) {
         kickOutBtn.setVisible(doShow);
     }
 
     public void setPlayerHost(boolean isHost) {
-        playerName.setText((isHost ? "(Host) " : "") + playerDTO.getNickname());
+        hostCrown.setVisible(isHost);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         playerScore.setText(playerDTO.getScore().toString());
-        setPlayerLeading(false);
         setPlayerHost(false);
         showRemovePlayerBtn(false);
     }
