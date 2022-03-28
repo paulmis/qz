@@ -157,7 +157,7 @@ public class LobbyScreenCtrl implements SSESource {
     private void leaveButtonClick() {
         // Open the warning and wait for user action
         mainCtrl.openLobbyLeaveWarning(
-           // If confirmed, exit the lobby
+            // If confirmed, exit the lobby
             () -> {
                 mainCtrl.closeLobbyLeaveWarning();
                 this.communication.leaveLobby(response -> runLater(() -> {
