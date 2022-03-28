@@ -346,35 +346,6 @@ public class ServerUtils {
     }
 
     /**
-     * Function that gets all the lobbies in the database.
-     *
-     * @param getAvailableLobbiesHandlerSuccess The function that will be called if the request is successful.
-     * @param getAvailableLobbiesHandlerFail The function that will be called if the request is unsuccessful.
-     */
-    public void getAvailableLobbies(GetAvailableLobbiesHandlerSuccess getAvailableLobbiesHandlerSuccess,
-                            GetAvailableLobbiesHandlerFail getAvailableLobbiesHandlerFail) {
-        Invocation invocation = client
-                .target(SERVER).path("/api/lobby/available")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildGet();
-
-        invocation.submit(new InvocationCallback<List<GameDTO>>() {
-
-            @Override
-            public void completed(List<GameDTO> o) {
-                getAvailableLobbiesHandlerSuccess.handle(o);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                getAvailableLobbiesHandlerFail.handle();
-                throwable.printStackTrace();
-            }
-        });
-    }
-
-    /**
      * Handler for when getting all lobbies succeeds.
      */
     public interface GetAllLobbiesHandlerSuccess {

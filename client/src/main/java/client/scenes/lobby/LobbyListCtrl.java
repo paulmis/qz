@@ -170,17 +170,22 @@ public class LobbyListCtrl implements Initializable {
      */
     @FXML
     private void joinRandomLobby() {
-        server.getAvailableLobbies(
+        server.getAllLobbies(
             games -> {
                 // Gets a random available lobby and joins it
-                var game = games.get(new Random().nextInt(games.size()));
-                server.joinLobby(game.getId(), gameDTO -> {
-                    runLater(mainCtrl::showLobbyScreen);
-                }, () -> {
-                    runLater(() -> {
-                        mainCtrl.showErrorSnackBar("Couldn't join random game.");
+                games.removeIf(game -> (game.getConfiguration().getCapacity() <= game.getPlayers().size()));
+                if (games.size() <= 0)
+                    this.createLobbyButtonClick();
+                else {
+                    var game = games.get(new Random().nextInt(games.size()));
+                    server.joinLobby(game.getId(), gameDTO -> {
+                        runLater(mainCtrl::showLobbyScreen);
+                    }, () -> {
+                        runLater(() -> {
+                            mainCtrl.showErrorSnackBar("Couldn't join random game.");
+                        });
                     });
-                });
+                }
             },
             () -> {
                 // If there are no available games, the user creates a new lobby
