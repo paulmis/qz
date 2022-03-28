@@ -1,21 +1,23 @@
 package client.communication.game;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
 import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import commons.entities.auth.UserDTO;
 import commons.entities.game.GameDTO;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
-import commons.entities.game.configuration.NormalGameConfigurationDTO;
-
+import java.util.List;
+import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
-import java.util.List;
-import java.util.UUID;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-
+/**
+ * Handles the communication that is done inside the lobby list screen
+ * and other related screens.
+ */
 public class LobbyListCommunication {
     /**
      * Handler for when the create lobby succeeds.
