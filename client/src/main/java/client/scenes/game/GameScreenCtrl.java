@@ -23,6 +23,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
@@ -42,6 +43,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -49,6 +51,7 @@ import lombok.Generated;
  * Handles question changing and interactivity of the user.
  */
 @Generated
+@Slf4j
 public class GameScreenCtrl implements Initializable, SSESource {
     private final GameCommunication communication;
     private final MainCtrl mainCtrl;
@@ -108,7 +111,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
     public void initialize(URL location, ResourceBundle resources) {
 
         // The following function calls handle
-        // the set up of the emojis, powerUps, leaderBoard and volume controls.
+        // the set-up of the emojis, powerUps, leaderBoard and volume controls.
         setUpEmojis();
         setUpPowerUps();
         setUpTopBarLeaderBoard();
@@ -238,32 +241,29 @@ public class GameScreenCtrl implements Initializable, SSESource {
         emojiHBox.getChildren().clear();
 
         // Gets the emojis from the server.
-        var emojiUrls = communication.getEmojis();
+        List<URL> emojiUrls = communication.getEmojis();
 
         try {
-
             // Iterates over the emojis
-            emojiUrls.forEach(emojiUrl -> {
+            emojiHBox.getChildren().addAll(
+                    emojiUrls.stream().map(emojiUrl -> {
+                        JFXButton jfxButton = new JFXButton();
+                        jfxButton.setPadding(Insets.EMPTY);
+                        jfxButton.setRipplerFill(Color.WHITESMOKE);
 
-                // Every emoji will be inside of a
-                // button so that it is interactive.
-                var jfxButton = new JFXButton();
-                jfxButton.setPadding(Insets.EMPTY);
-                jfxButton.setRipplerFill(Color.WHITESMOKE);
+                        jfxButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 
-                jfxButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                        ImageView image = new ImageView();
+                        image.setImage(new Image(String.valueOf(emojiUrl),
+                                35,
+                                35,
+                                false,
+                                true));
+                        jfxButton.setGraphic(image);
 
-                var image = new ImageView();
-
-                image.setImage(new Image(String.valueOf(emojiUrl),
-                        35,
-                        35,
-                        false,
-                        true));
-                jfxButton.setGraphic(image);
-
-                emojiHBox.getChildren().add(jfxButton);
-            });
+                        return jfxButton;
+                    }).collect(Collectors.toList())
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -279,17 +279,17 @@ public class GameScreenCtrl implements Initializable, SSESource {
 
         // Gets the power ups from the server.
         // This is subject to change in the future.
-        var powerUpUrls = communication.getPowerUps();
+        List<URL> powerUpUrls = communication.getPowerUps();
 
         try {
             powerUpUrls.forEach(powerUpUrl -> {
-                var jfxButton = new JFXButton();
+                JFXButton jfxButton = new JFXButton();
                 jfxButton.setPadding(Insets.EMPTY);
                 jfxButton.setRipplerFill(Color.WHITESMOKE);
 
                 jfxButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 
-                var image = new ImageView();
+                ImageView image = new ImageView();
 
                 image.setImage(new Image(String.valueOf(powerUpUrl),
                         35,
@@ -316,7 +316,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
         avatarHBox.getChildren().clear();
 
         // Gets the leaderboard image urls from the server.
-        var leaderBoardUrls = communication.getLeaderBoardImages();
+        List<URL> leaderBoardUrls = communication.getLeaderBoardImages();
 
         try {
 
@@ -325,8 +325,8 @@ public class GameScreenCtrl implements Initializable, SSESource {
 
                 // We need to use a circle in order to make the
                 // avatar frame.
-                var imageCircle = new Circle(19);
-                var imageUrl = leaderBoardUrls.get(i);
+                Circle imageCircle = new Circle(19);
+                URL imageUrl = leaderBoardUrls.get(i);
 
                 // We set the id of the circle to Rank + the place in the rank.
                 // This is done in order to style it in the css of the control.

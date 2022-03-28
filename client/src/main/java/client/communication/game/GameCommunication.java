@@ -23,6 +23,121 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GameCommunication {
     /**
+     * Requests the answer from the server.
+     *
+     * @param gameId         the id of the game.
+     * @param handlerSuccess the handler for when the request succeeds.
+     * @param handlerFailure the handler for when the request fails.
+     */
+    public static void updateCurrentAnswer(UUID gameId,
+                                           UpdateAnswerHandlerSuccess handlerSuccess,
+                                           UpdateAnswerHandlerFailure handlerFailure) {
+
+        log.debug("Updating current answer");
+
+        // Build the query invocation
+        Invocation invocation = ServerUtils.getRequestTarget()
+                .path("/api/answer/" + gameId + "/answer")
+                .request(APPLICATION_JSON)
+                .buildGet();
+
+        // Perform the query asynchronously
+        invocation.submit(new InvocationCallback<Response>() {
+
+            @Override
+            public void completed(Response response) {
+                if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                    handlerSuccess.handle(response.readEntity(AnswerDTO.class));
+                } else {
+                    log.error("Failed to update current answer: {}", response.getStatus());
+                    handlerFailure.handle();
+                }
+            }
+            @Override
+            public void failed(Throwable throwable) {
+                log.error("Failed to update current answer", throwable);
+                handlerFailure.handle();
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Requests the current question from the server.
+     *
+     * @param gameId         the id of the game
+     * @param handlerSuccess the handler for when the request succeeds
+     * @param handlerFail    the handler for when the request fails
+     */
+    public static void updateCurrentQuestion(UUID gameId,
+                                             UpdateQuestionHandlerSuccess handlerSuccess,
+                                             UpdateQuestionHandlerFail handlerFail) {
+        // Build the query invocation
+        Invocation invocation =
+                ServerUtils.getRequestTarget()
+                        .path("/api/game/" + gameId + "/question")
+                        .request(APPLICATION_JSON)
+                        .buildGet();
+
+        // Perform the query asynchronously
+        invocation.submit(new InvocationCallback<Response>() {
+
+            @Override
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    QuestionDTO question = response.readEntity(QuestionDTO.class);
+                    ClientState.game.setCurrentQuestion(question);
+                    handlerSuccess.handle(question);
+                } else {
+                    handlerFail.handle();
+                }
+
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                handlerFail.handle();
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Sends the answer to the current question to the server.
+     *
+     * @param gameId         the id of the game
+     * @param answer         the answer to the current question
+     * @param handlerSuccess the handler for when the request succeeds
+     * @param handlerFailure the handler for when the request fails
+     */
+    public static void putAnswer(UUID gameId, AnswerDTO answer,
+                                 PutAnswerHandlerSuccess handlerSuccess, PutAnswerHandlerFail handlerFailure) {
+        // Build the query invocation
+        Invocation invocation =
+                ServerUtils.getRequestTarget()
+                        .path("/api/game/" + gameId + "/answer")
+                        .request(APPLICATION_JSON)
+                        .buildPut(Entity.entity(answer, APPLICATION_JSON));
+
+        // Perform the query asynchronously
+        invocation.submit(new InvocationCallback<Response>() {
+
+            @Override
+            public void completed(Response response) {
+                log.info("Answer sent successfully");
+                handlerSuccess.handle();
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                log.error("Failed to send the answer");
+                handlerFailure.handle();
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
      * Gets a list of all the emoji urls from the backend.
      *
      * @return List of emoji urls
@@ -65,21 +180,14 @@ public class GameCommunication {
     }
 
     /**
-     * Handler for when the quitting game succeeds.
-     */
-    public interface QuitGameHandler {
-        void handle(Response response);
-    }
-
-    /**
      * Function that causes the user to leave the game.
      */
     public void quitGame(QuitGameHandler quitGameHandler) {
         Invocation request = ServerUtils.getRequestTarget()
-            .path("/api/game/leave")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .buildPost(Entity.json("{}"));
+                .path("/api/game/leave")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPost(Entity.json("{}"));
 
         request.submit(new InvocationCallback<Response>() {
             @Override
@@ -94,7 +202,8 @@ public class GameCommunication {
         });
     }
 
-    /** Gets a list of the leaderboard images from the server.
+    /**
+     * Gets a list of the leaderboard images from the server.
      *
      * @return a list of leaderboard images.
      */
@@ -110,7 +219,14 @@ public class GameCommunication {
             return new ArrayList<>();
         }
     }
-    
+
+    /**
+     * Handler for when the quitting game succeeds.
+     */
+    public interface QuitGameHandler {
+        void handle(Response response);
+    }
+
     /**
      * Handler for when getting the current question succeeds.
      */
@@ -126,44 +242,17 @@ public class GameCommunication {
     }
 
     /**
-     * Requests the current question from the server.
-     *
-     * @param gameId the id of the game
-     * @param handlerSuccess the handler for when the request succeeds
-     * @param handlerFail the handler for when the request fails
+     * Handler for when getting the answer succeeds.
      */
-    public static void updateCurrentQuestion(UUID gameId,
-                                             UpdateQuestionHandlerSuccess handlerSuccess,
-                                             UpdateQuestionHandlerFail handlerFail) {
-        // Build the query invocation
-        Invocation invocation =
-            ServerUtils.getRequestTarget()
-                .path("/api/game/" + gameId + "/question")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildGet();
+    public interface UpdateAnswerHandlerSuccess {
+        void handle(AnswerDTO answerDTO);
+    }
 
-        // Perform the query asynchronously
-        invocation.submit(new InvocationCallback<Response>() {
-
-            @Override
-            public void completed(Response response) {
-                if (response.getStatus() == 200) {
-                    QuestionDTO question = response.readEntity(QuestionDTO.class);
-                    ClientState.game.setCurrentQuestion(question);
-                    handlerSuccess.handle(question);
-                } else {
-                    handlerFail.handle();
-                }
-
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                handlerFail.handle();
-                throwable.printStackTrace();
-            }
-        });
+    /**
+     * Handler for when getting the current answer fails.
+     */
+    public interface UpdateAnswerHandlerFailure {
+        void handle();
     }
 
     /**
@@ -178,42 +267,6 @@ public class GameCommunication {
      */
     public interface PutAnswerHandlerFail {
         void handle();
-    }
-
-    /**
-     * Sends the answer to the current question to the server.
-     *
-     * @param gameId the id of the game
-     * @param answer the answer to the current question
-     * @param handlerSuccess the handler for when the request succeeds
-     * @param handlerFailure the handler for when the request fails
-     */
-    public static void putAnswer(UUID gameId, AnswerDTO answer,
-                                 PutAnswerHandlerSuccess handlerSuccess, PutAnswerHandlerFail handlerFailure) {
-        // Build the query invocation
-        Invocation invocation =
-                ServerUtils.getRequestTarget()
-                        .path("/api/game/" + gameId + "/answer")
-                        .request(APPLICATION_JSON)
-                        .accept(APPLICATION_JSON)
-                        .buildPut(Entity.entity(answer, APPLICATION_JSON));
-
-        // Perform the query asynchronously
-        invocation.submit(new InvocationCallback<Response>() {
-
-            @Override
-            public void completed(Response response) {
-                log.info("Answer sent successfully");
-                handlerSuccess.handle();
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                log.error("Failed to send the answer");
-                handlerFailure.handle();
-                throwable.printStackTrace();
-            }
-        });
     }
 
 }
