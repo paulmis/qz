@@ -1,11 +1,14 @@
 package server.api;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.question.Activity;
 import server.database.entities.question.MCQuestion;
@@ -32,16 +35,23 @@ public class QuestionController {
      * @return Whether the question was successfully created.
      */
     @PutMapping("/mc")
-    public ResponseEntity<HttpStatus> mcCreate() {
-        // TODO: this should accept a list of activities
-        List<Activity> activities = activityService.getActivities(4);
+    public ResponseEntity<HttpStatus> mcCreate(
+        @RequestParam(value = "amount", required = false, defaultValue = "1") Integer amount) {
+        List<Question> questions = new ArrayList<>();
+        for (int i = 0; i < amount; i++) {
+            // Get random activities and pick one as an answer
+            List<Activity> activities = activityService.getActivities(4);
+            Activity answer = activities.get(new Random().ints(0, activities.size()).findFirst().getAsInt());
 
-        Question question = new MCQuestion(activities,
-                "Question X",
-                activities.get(0));
+            // Create the question
+            questions.add(new MCQuestion(
+                activities,
+                answer.getDescription(),
+                answer));
+        }
 
-        questionRepository.save(question);
-
+        // Save the questions and return success
+        questionRepository.saveAll(questions);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
