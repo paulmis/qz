@@ -26,7 +26,7 @@ import lombok.Generated;
  */
 @Generated
 public class LobbyListCtrl implements Initializable {
-    private final ServerUtils server;
+    private final LobbyListCommunication server;
     private final MainCtrl mainCtrl;
 
     @FXML private AnchorPane lobbyListAnchorPane;
@@ -90,6 +90,18 @@ public class LobbyListCtrl implements Initializable {
             runLater(mainCtrl::showLobbyScreen);
         }, () -> runLater(() ->
                 mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
+        mainCtrl.showLobbyCreationScreen();
+    }
+
+    @FXML
+    private void signOutButtonClick() {
+        ClientState.user = null;
+        mainCtrl.showServerConnectScreen();
+    }
+
+    @FXML
+    private void editButtonClick() {
+        this.usernameField.setEditable(!this.usernameField.isEditable());
     }
 
     @FXML
