@@ -111,23 +111,23 @@ public class LobbyScreenCtrl implements SSESource {
             () -> {
                 mainCtrl.closeLobbyLeaveWarning();
                 this.communication.leaveLobby(response -> runLater(() -> {
-                        switch (response.getStatus()) {
-                            case 404:
-                                mainCtrl.showErrorSnackBar("Unable to leave the lobby.");
-                                break;
-                            case 409:
-                                mainCtrl.showErrorSnackBar("Something went wrong while leaving the lobby");
-                                break;
-                            case 200:
-                                mainCtrl.showInformationalSnackBar("Successfully left the lobby");
-                                mainCtrl.showLobbyListScreen();
-                                ClientState.game = null;
-                                ServerUtils.sseHandler.kill();
-                                break;
-                            default:
-                                mainCtrl.showErrorSnackBar("Unable to leave the lobby");
-                        }
-                    }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Unable to leave the lobby")));
+                    switch (response.getStatus()) {
+                        case 404:
+                            mainCtrl.showErrorSnackBar("Unable to leave the lobby.");
+                            break;
+                        case 409:
+                            mainCtrl.showErrorSnackBar("Something went wrong while leaving the lobby");
+                            break;
+                        case 200:
+                            mainCtrl.showInformationalSnackBar("Successfully left the lobby");
+                            mainCtrl.showLobbyListScreen();
+                            ClientState.game = null;
+                            ServerUtils.sseHandler.kill();
+                            break;
+                        default:
+                            mainCtrl.showErrorSnackBar("Unable to leave the lobby");
+                    }
+                }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Unable to leave the lobby")));
             },
             // Otherwise, simply close the warning
             mainCtrl::closeLobbyLeaveWarning
@@ -143,12 +143,10 @@ public class LobbyScreenCtrl implements SSESource {
             this.communication.disbandLobby(response -> runLater(() -> {
                 switch (response.getStatus()) {
                     case 401:
-                        mainCtrl.showErrorSnackBar("Failed to disband lobby. " +
-                                "You are not the host");
+                        mainCtrl.showErrorSnackBar("Failed to disband lobby. You are not the host");
                         break;
                     case 404:
-                        mainCtrl.showErrorSnackBar("Failed to disband lobby. " +
-                                "Information couldn't be retrieved");
+                        mainCtrl.showErrorSnackBar("Failed to disband lobby. Information couldn't be retrieved");
                         break;
                     case 200:
                         mainCtrl.showInformationalSnackBar("Successfully disbanded the lobby");

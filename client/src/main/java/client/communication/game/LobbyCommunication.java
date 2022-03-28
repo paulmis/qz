@@ -3,13 +3,12 @@ package client.communication.game;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import client.utils.communication.ServerUtils;
+import commons.entities.game.GameDTO;
 import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Response;
-
-import commons.entities.game.GameDTO;
 import lombok.extern.slf4j.Slf4j;
 
 /**
