@@ -66,7 +66,7 @@ public class SSEManager {
      * @return whether the SSE emitter was successfully removed or not
      */
     public boolean unregister(UUID userId, SseEmitter emitter) {
-        if (emitters.get(userId) != emitter) {
+        if (emitters.get(userId) == emitter) {
             emitters.remove(userId);
             return true;
         }

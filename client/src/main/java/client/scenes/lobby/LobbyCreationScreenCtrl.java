@@ -2,9 +2,9 @@ package client.scenes.lobby;
 
 import static javafx.application.Platform.runLater;
 
+import client.communication.game.LobbyListCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
-import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.GameConfigurationDTO;
@@ -26,9 +26,8 @@ import javafx.scene.layout.VBox;
  * The lobby creation screen controller. Controls the lobby creation screen.
  */
 public class LobbyCreationScreenCtrl implements Initializable {
-    private final ServerUtils server;
     private final MainCtrl mainCtrl;
-
+    private final LobbyListCommunication server;
 
     @FXML private FontAwesomeIconView lockButtonIconView;
     @FXML private JFXButton standardGameConfigurationButton;
@@ -47,7 +46,7 @@ public class LobbyCreationScreenCtrl implements Initializable {
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public LobbyCreationScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public LobbyCreationScreenCtrl(LobbyListCommunication server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
     }

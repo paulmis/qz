@@ -2,8 +2,10 @@ package client.scenes.lobby;
 
 import static javafx.application.Platform.runLater;
 
+import client.communication.game.LobbyListCommunication;
 import client.scenes.MainCtrl;
 import client.utils.AlgorithmicUtils;
+import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
@@ -28,7 +30,7 @@ import lombok.Generated;
  */
 @Generated
 public class LobbyListCtrl implements Initializable {
-    private final ServerUtils server;
+    private final LobbyListCommunication server;
     private final MainCtrl mainCtrl;
 
     @FXML private JFXButton leaderboardButton;
@@ -53,7 +55,7 @@ public class LobbyListCtrl implements Initializable {
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public LobbyListCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public LobbyListCtrl(LobbyListCommunication server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
     }
@@ -102,17 +104,12 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void createLobbyButtonClick() {
-        server.createLobby(
-            game -> {
-                ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
-                runLater(mainCtrl::showLobbyScreen);
-            },
-            () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
+        mainCtrl.showLobbyCreationScreen();
     }
 
     @FXML
     private void signOutButtonClick() {
-        server.signOut();
+        ClientState.user = null;
         mainCtrl.showServerConnectScreen();
     }
 

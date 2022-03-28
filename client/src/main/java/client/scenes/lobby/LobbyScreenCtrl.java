@@ -136,38 +136,6 @@ public class LobbyScreenCtrl implements SSESource {
     }
 
     /**
-     * Fired when the leave button is clicked.
-     */
-    public void leaveButtonClick() {
-        mainCtrl.openLobbyLeaveWarning(() -> {
-            mainCtrl.closeLobbyLeaveWarning();
-            this.server.leaveLobby(new ServerUtils.LeaveGameHandler() {
-                @Override
-                public void handle(Response response) {
-                    javafx.application.Platform.runLater(() -> {
-                        switch (response.getStatus()) {
-                            case 200:
-                                System.out.println("User successfully removed from lobby");
-                                mainCtrl.showLobbyListScreen();
-                                break;
-                            case 404:
-                                System.out.println("User/Game not found");
-                                break;
-                            case 409:
-                                System.out.println("Couldn't remove player");
-                                break;
-                            default:
-                                break;
-                        }
-                    });
-                }
-            });
-        }, () -> {
-            mainCtrl.closeLobbyLeaveWarning();
-        });
-    }
-
-    /**
      * Fired when the lobby settings button is clicked.
      */
     public void lobbySettingsButtonClick() {
