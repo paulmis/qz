@@ -200,11 +200,11 @@ public class MainCtrl {
             case Stretch:
             case ForcedScaled:
             case Letterbox:
-                var stac = new StackPane(parent);
-                topGroup.getChildren().set(0, new Group(stac));
+                var pane = new StackPane(parent);
+                topGroup.getChildren().set(0, new Group(pane));
 
                 primaryStage.show();
-                scaling(scene, stac, 1024, 576, strategy);
+                scaling(scene, pane, 1024, 576, strategy);
                 break;
             default:
                 break;
@@ -254,6 +254,7 @@ public class MainCtrl {
      * Shows the lobby screen.
      */
     public void showLobbyScreen() {
+        this.lobbyScreenCtrl.reset();
         lobbyScreenCtrl.bindHandler(ServerUtils.sseHandler);
         this.showScreenLetterBox(lobbyScene, StageScalingStrategy.Letterbox);
     }
