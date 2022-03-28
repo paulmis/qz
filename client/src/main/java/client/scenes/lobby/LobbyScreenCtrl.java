@@ -158,29 +158,29 @@ public class LobbyScreenCtrl implements SSESource {
         // Open the warning and wait for user action
         mainCtrl.openLobbyLeaveWarning(
            // If confirmed, exit the lobby
-           () -> {
-               mainCtrl.closeLobbyLeaveWarning();
-               this.communication.leaveLobby(response -> runLater(() -> {
-                   switch (response.getStatus()) {
-                       case 404:
-                           mainCtrl.showErrorSnackBar("Unable to leave the lobby.");
-                           break;
-                       case 409:
-                           mainCtrl.showErrorSnackBar("Something went wrong while leaving the lobby");
-                           break;
-                       case 200:
-                           mainCtrl.showInformationalSnackBar("Successfully left the lobby");
-                           mainCtrl.showLobbyListScreen();
-                           ClientState.game = null;
-                           ServerUtils.sseHandler.kill();
-                           break;
-                       default:
-                           mainCtrl.showErrorSnackBar("Unable to leave the lobby");
-                   }
-               }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Unable to leave the lobby")));
-           },
-           // Otherwise, simply close the warning
-           mainCtrl::closeLobbyLeaveWarning
+            () -> {
+                mainCtrl.closeLobbyLeaveWarning();
+                this.communication.leaveLobby(response -> runLater(() -> {
+                    switch (response.getStatus()) {
+                        case 404:
+                            mainCtrl.showErrorSnackBar("Unable to leave the lobby.");
+                            break;
+                        case 409:
+                            mainCtrl.showErrorSnackBar("Something went wrong while leaving the lobby");
+                            break;
+                        case 200:
+                            mainCtrl.showInformationalSnackBar("Successfully left the lobby");
+                            mainCtrl.showLobbyListScreen();
+                            ClientState.game = null;
+                            ServerUtils.sseHandler.kill();
+                            break;
+                        default:
+                            mainCtrl.showErrorSnackBar("Unable to leave the lobby");
+                    }
+                }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Unable to leave the lobby")));
+            },
+                // Otherwise, simply close the warning
+                mainCtrl::closeLobbyLeaveWarning
         );
     }
 
