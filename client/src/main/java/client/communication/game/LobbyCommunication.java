@@ -2,8 +2,10 @@ package client.communication.game;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import commons.entities.game.GameDTO;
+import commons.entities.game.configuration.GameConfigurationDTO;
 import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -194,6 +196,55 @@ public class LobbyCommunication {
                 log.error("Couldn't retrieve lobby: " + lobbyId);
                 handleFail.handle();
                 throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Handler for when the configuration is saved successfully.
+     */
+    public interface SaveConfigSuccessHandler {
+        void handle();
+    }
+
+    /**
+     * Handler for when the configuration couldn't be saved.
+     */
+    public interface SaveConfigurationFailHandler {
+        void handle();
+    }
+
+    /**
+     * Requests to update the game configuration.
+     *
+     * @param gameId the id of the game
+     * @param config the new configuration
+     * @param handleSuccess  the handler for when the request succeeds
+     * @param handleFail the handler for when the request fails
+     */
+    public void saveConfig(UUID gameId, GameConfigurationDTO config,
+                           SaveConfigSuccessHandler handleSuccess, SaveConfigurationFailHandler handleFail) {
+        Invocation request = ServerUtils.getRequestTarget()
+                .path("/api/lobby/" + gameId + "/config")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPost(Entity.entity(config, APPLICATION_JSON));
+
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    ClientState.game.setConfiguration(config);
+                    handleSuccess.handle();
+                } else {
+                    handleFail.handle();
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                throwable.printStackTrace();
+                handleFail.handle();
             }
         });
     }

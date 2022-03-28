@@ -201,11 +201,11 @@ public class MainCtrl {
             case Stretch:
             case ForcedScaled:
             case Letterbox:
-                var stac = new StackPane(parent);
-                topGroup.getChildren().set(0, new Group(stac));
+                var pane = new StackPane(parent);
+                topGroup.getChildren().set(0, new Group(pane));
 
                 primaryStage.show();
-                scaling(scene, stac, 1024, 576, strategy);
+                scaling(scene, pane, 1024, 576, strategy);
                 break;
             default:
                 break;
@@ -255,7 +255,7 @@ public class MainCtrl {
      * Shows the lobby screen.
      */
     public void showLobbyScreen() {
-        //ToDo: add `this.checkHost();` here when ClientState.user is updated on login.
+        this.lobbyScreenCtrl.reset();
         this.checkHost();
         lobbyScreenCtrl.bindHandler(ServerUtils.sseHandler);
         this.showScreenLetterBox(lobbyScene, StageScalingStrategy.Letterbox);
@@ -414,7 +414,6 @@ public class MainCtrl {
      *
      */
 
-    //ToDo: This will work only when ClientState.user is updated on login.
     public void checkHost() {
         //Request user's data
         Optional<GamePlayerDTO> gamePlayerData = ClientState.game.getPlayers()

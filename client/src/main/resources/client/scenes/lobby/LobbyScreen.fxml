@@ -4,20 +4,20 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576" prefWidth="1024" style="-fx-background-color: #FCFCFC;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.lobby.LobbyScreenCtrl">
+<AnchorPane fx:id="mainAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576" prefWidth="1024" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.lobby.LobbyScreenCtrl">
    <children>
       <VBox>
          <children>
             <HBox alignment="BOTTOM_RIGHT" prefHeight="47.0" prefWidth="1009.0" spacing="15.0">
                <children>
-                  <JFXButton fx:id="userButton" alignment="CENTER" buttonType="RAISED" contentDisplay="GRAPHIC_ONLY">
+                  <JFXButton fx:id="userButton" alignment="CENTER" buttonType="RAISED" contentDisplay="GRAPHIC_ONLY" text="Button" onAction="#showUserInfo">
                      <graphic>
                         <FontAwesomeIconView fill="#5e5e5e" glyphName="USER" size="20" text="" />
                      </graphic>
@@ -41,12 +41,12 @@
                      <children>
                         <HBox prefHeight="9.0" prefWidth="600.0">
                            <children>
-                              <Label prefHeight="17.0" prefWidth="78.0" text="STANDARD">
+                              <Label fx:id="gameType" prefHeight="17.0" prefWidth="78.0" text="STANDARD">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Label>
-                              <Label prefHeight="17.0" prefWidth="37.0" text="7/12">
+                              <Label fx:id="gameCapacity" prefHeight="17.0" prefWidth="37.0" text="7/12">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
@@ -60,7 +60,7 @@
                            <children>
                               <HBox alignment="CENTER_LEFT" prefHeight="101.0" prefWidth="496.0">
                                  <children>
-                                    <Label text="Ligma's game">
+                                    <Label fx:id="gameName" text="Ligma's game">
                                        <font>
                                           <Font size="36.0" />
                                        </font>
@@ -102,7 +102,7 @@
                                           </HBox>
                                           <HBox alignment="CENTER">
                                              <children>
-                                                <Label text="3wsZ4DlO89">
+                                                <Label fx:id="gameId" text="3wsZ4DlO89">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
@@ -120,7 +120,11 @@
                               </HBox>
                            </children>
                         </HBox>
-                        <ListView prefHeight="369.0" prefWidth="600.0" style="-fx-background-color: transparent;" />
+                        <ScrollPane hbarPolicy="NEVER" prefHeight="369.0" prefWidth="600.0">
+                           <content>
+                              <VBox fx:id="playerList" minWidth="-Infinity" prefHeight="87.0" prefWidth="598.0" spacing="5" />
+                           </content>
+                        </ScrollPane>
                      </children>
                   </VBox>
                </children>
