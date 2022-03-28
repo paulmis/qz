@@ -34,7 +34,7 @@
                   <FontAwesomeIconView glyphName="COG" size="36" />
                </graphic>
             </JFXButton>
-            <JFXButton fx:id="userButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="968.0" layoutY="3.0" onAction="#userButtonClick" prefHeight="40.0" prefWidth="40.0" text="User" textFill="WHITE">
+            <JFXButton fx:id="userButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="968.0" layoutY="3.0" onAction="#clickUserButton" prefHeight="40.0" prefWidth="40.0" text="User" textFill="WHITE">
                <graphic>
                   <FontAwesomeIconView glyphName="USER" size="36" />
                </graphic>

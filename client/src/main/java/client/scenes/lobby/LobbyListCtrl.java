@@ -6,6 +6,7 @@ import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.UserInfoPane;
 import client.utils.AlgorithmicUtils;
+import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;

@@ -3,11 +3,11 @@ package commons.entities.game;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.game.configuration.GameConfigurationDTO;
-import commons.entities.game.configuration.NormalGameConfigurationDTO;
-import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import commons.entities.questions.QuestionDTO;
 import commons.entities.utils.DTO;
+import commons.entities.utils.Views;
 import java.time.LocalDateTime;
 import java.util.*;
 import lombok.AllArgsConstructor;
@@ -27,6 +27,7 @@ import lombok.ToString;
 @JsonSubTypes({
     @JsonSubTypes.Type(value = DefiniteGameDTO.class, name = "DefiniteGameDTO")
 })
+@JsonView(Views.Public.class)
 public class GameDTO implements DTO {
     /**
      * The unique identifier of the game.
