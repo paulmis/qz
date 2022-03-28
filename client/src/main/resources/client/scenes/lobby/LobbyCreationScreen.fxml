@@ -26,7 +26,7 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <JFXButton layoutX="924.0" layoutY="7.0" onAction="#createLobbyButtonClick" prefHeight="35.0" prefWidth="85.0" style="-fx-background-color: green;" text="Create" textFill="WHITE">
+            <JFXButton fx:id="createLobbyGameButton" layoutX="924.0" layoutY="7.0" onAction="#createLobbyButtonClick" prefHeight="35.0" prefWidth="85.0" style="-fx-background-color: green;" text="Create" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
@@ -80,7 +80,7 @@
                   </FontAwesomeIconView>
                </graphic>
             </JFXButton>
-            <TextField fx:id="lobbyNameField" layoutX="216.0" layoutY="35.0" prefHeight="0.0" prefWidth="387.0" promptText="Give your lobby a name">
+            <TextField fx:id="lobbyNameField" layoutX="216.0" layoutY="35.0" prefHeight="0.0" prefWidth="387.0" promptText="Give your lobby a name" style="-fx-background-color: lightGray;">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
@@ -95,6 +95,21 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
+            <Label layoutX="294.0" layoutY="107.0" prefHeight="35.0" prefWidth="61.0" text="Type">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <JFXButton fx:id="singleplayerGameButton" layoutX="368.0" layoutY="107.0" onAction="#singleplayerGameButtonClick" prefHeight="35.0" prefWidth="110.0" style="-fx-background-color: green;" text="Singleplayer" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="multiplayerGameButton" buttonType="RAISED" layoutX="497.0" layoutY="107.0" onAction="#multiplayerGameButtonClick" prefHeight="35.0" prefWidth="110.0" style="-fx-background-color: red;" text="Multiplayer" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXButton>
          </children>
       </AnchorPane>
    </children>

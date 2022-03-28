@@ -1,6 +1,7 @@
 package client.scenes.lobby.configuration;
 
 import commons.entities.game.configuration.GameConfigurationDTO;
+import java.lang.reflect.Field;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -62,5 +63,13 @@ public class ConfigurationScreenPane extends StackPane {
 
     public void hideSaveButton() {
         this.controller.hideSaveButton();
+    }
+
+    public void setFieldReadOnly(Field field) {
+        controller.setFieldReadOnly(field);
+    }
+
+    public void setFieldEdit(Field field) {
+        controller.setFieldEdit(field);
     }
 }
