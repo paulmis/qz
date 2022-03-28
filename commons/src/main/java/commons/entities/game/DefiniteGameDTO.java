@@ -1,5 +1,6 @@
 package commons.entities.game;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +17,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = NormalGameDTO.class, name = "NormalGameDTO")
+})
 public class DefiniteGameDTO extends GameDTO {
     /**
      * The amount of questions in the game.

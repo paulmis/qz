@@ -3,24 +3,25 @@ package server.database.entities.answer;
 import static server.utils.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import javax.persistence.OrderColumn;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import lombok.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import server.database.entities.game.GamePlayer;
-import server.database.entities.question.Activity;
 import server.database.entities.utils.BaseEntity;
 
 /**
@@ -39,47 +40,52 @@ public class Answer extends BaseEntity<AnswerDTO> {
      */
     public Answer(AnswerDTO dto) {
         this.id = getUUID(0);
-        this.response = dto.getResponse().stream().map(Activity::new).collect(Collectors.toList());
+        this.response = dto.getResponse();
     }
 
     /**
-     * The list of activities from the Question given as an answer.
+     * The list of activity costs from the Question given as an answer.
      */
-    @ManyToMany
-    protected List<Activity> response = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "answer_responses", joinColumns = @JoinColumn(name = "answer_id"))
+    @OrderColumn(name = "response_idx")
+    protected List<Long> response = new ArrayList<>();
+
+    /**
+     * Timestamp of answer creation.
+     */
+    @Column(columnDefinition = "TIMESTAMP")
+    protected LocalDateTime answerDate;
+
+    /**
+     * Automatically sets the creation date to when the entity is first persisted.
+     */
+    @Generated
+    @PrePersist
+    @PreUpdate
+    protected void onUpdate() {
+        answerDate = LocalDateTime.now();
+    }
 
     /**
      * The player that gave the answer.
      */
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "player_id")
-    private GamePlayer player;
+    protected GamePlayer player;
 
     /**
      * The set of answers to the same question this one belongs to.
      */
     @JsonBackReference
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-    private AnswerCollection answerCollection;
-
-    /**
-     * Convert user choices to DTO.
-     *
-     * @return a list of ActivityDTOs
-     */
-    protected List<ActivityDTO> getResponseDTO() {
-        return this.response.stream().map(Activity::getDTO).collect(Collectors.toList());
-    }
+    @ToString.Exclude
+    protected AnswerCollection answerCollection;
 
     @Override
     public AnswerDTO getDTO() {
         ModelMapper modelMapper = new ModelMapper();
         TypeMap<Answer, AnswerDTO> propertyMapper = modelMapper.createTypeMap(Answer.class, AnswerDTO.class);
-
-        // Deep conversion of user choice
-        propertyMapper.addMappings(
-                mapper -> mapper.map(Answer::getResponseDTO, AnswerDTO::setResponse)
-        );
 
         // Retrieval of question
         propertyMapper.addMappings(

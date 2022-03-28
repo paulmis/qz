@@ -59,7 +59,7 @@ public class LobbyListItemCtrl implements Initializable {
         );
 
         this.topLevelAnchorPane.maxHeightProperty().bind(
-                Bindings.when(lobbyInfoPane.visibleProperty()).then(163).otherwise(63)
+                Bindings.when(lobbyInfoPane.visibleProperty()).then(283).otherwise(63)
         );
 
         this.topLevelAnchorPane.minHeightProperty().bind(this.topLevelAnchorPane.maxHeightProperty());
@@ -68,7 +68,6 @@ public class LobbyListItemCtrl implements Initializable {
         this.expandIcon.glyphNameProperty().bind(
                 Bindings.when(lobbyInfoPane.visibleProperty()).then("ANGLE_UP").otherwise("ANGLE_DOWN")
         );
-
         var extraInfoScreen = new ConfigurationScreenPane(game.getConfiguration());
         extraInfoScreen.makeTransparent();
         this.lobbyInfoPane.getChildren().add(extraInfoScreen);

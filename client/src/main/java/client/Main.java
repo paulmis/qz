@@ -18,12 +18,11 @@ package client;
 
 import static com.google.inject.Guice.createInjector;
 
-import client.scenes.GameScreenCtrl;
 import client.scenes.MainCtrl;
 import client.scenes.authentication.LogInScreenCtrl;
-import client.scenes.authentication.NicknameScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
+import client.scenes.game.GameScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
 import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
@@ -54,8 +53,6 @@ public class Main extends Application {
                 "client", "scenes", "authentication", "LogInScreen.fxml");
         var registerScreen = FXML.load(RegisterScreenCtrl.class,
                 "client", "scenes", "authentication", "RegisterScreen.fxml");
-        var nicknameScreen = FXML.load(NicknameScreenCtrl.class,
-                "client", "scenes", "authentication", "NicknameScreen.fxml");
         var lobbyScreen = FXML.load(LobbyScreenCtrl.class,
                 "client", "scenes", "lobby", "LobbyScreen.fxml");
         var gameScreen = FXML.load(GameScreenCtrl.class,
@@ -66,7 +63,7 @@ public class Main extends Application {
                 "client", "scenes", "lobby", "LobbyList.fxml");
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, serverConnectScreen, logInScreen, registerScreen, nicknameScreen,
+        mainCtrl.initialize(primaryStage, serverConnectScreen, logInScreen, registerScreen,
                 lobbyScreen, gameScreen, globalLeaderboardScreen, lobbyListScreen);
     }
 }

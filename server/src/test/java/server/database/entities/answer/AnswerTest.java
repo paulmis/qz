@@ -6,7 +6,6 @@ import static server.utils.TestHelpers.getUUID;
 import commons.entities.AnswerDTO;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import server.database.entities.question.Activity;
 
@@ -23,28 +22,28 @@ class AnswerTest {
     @Test
     void fromDTOConstructorTest() {
         AnswerDTO dto = new AnswerDTO();
-        List<Activity> choices = new ArrayList<>(List.of(
-                getActivity(1),
-                getActivity(2),
-                getActivity(3),
-                getActivity(4)
+        List<Long> choices = new ArrayList<>(List.of(
+                getActivity(1).getCost(),
+                getActivity(2).getCost(),
+                getActivity(3).getCost(),
+                getActivity(4).getCost()
         ));
-        dto.setResponse(choices.stream().map(Activity::getDTO).collect(Collectors.toList()));
+        dto.setResponse(choices);
         Answer toTest = new Answer(dto);
         assertEquals(choices, toTest.getResponse());
     }
 
     @Test
     void toDTOTest() {
-        List<Activity> choices = new ArrayList<>(List.of(
-                getActivity(1),
-                getActivity(2),
-                getActivity(3),
-                getActivity(4)
+        List<Long> choices = new ArrayList<>(List.of(
+                getActivity(1).getCost(),
+                getActivity(2).getCost(),
+                getActivity(3).getCost(),
+                getActivity(4).getCost()
         ));
         Answer toTest = new Answer();
         toTest.setResponse(choices);
         AnswerDTO dto = toTest.getDTO();
-        assertEquals(choices.stream().map(Activity::getDTO).collect(Collectors.toList()), dto.getResponse());
+        assertEquals(choices, dto.getResponse());
     }
 }

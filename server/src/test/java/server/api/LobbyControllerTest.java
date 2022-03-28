@@ -1,11 +1,7 @@
 package server.api;
 
 import static org.hamcrest.Matchers.equalToObject;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -13,7 +9,9 @@ import static server.utils.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import commons.entities.game.GameStatus;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -70,7 +68,7 @@ class LobbyControllerTest {
     @MockBean
     private LobbyService lobbyService;
 
-    private Game<?> mockLobby;
+    private NormalGame mockLobby;
     private GameConfiguration mockLobbyConfiguration;
     private NormalGameConfiguration normalGameConfiguration;
     private User john;
@@ -82,7 +80,7 @@ class LobbyControllerTest {
     @Autowired
     public LobbyControllerTest(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
-        this.objectMapper = new ObjectMapper().registerModule(new Jdk8Module());
+        this.objectMapper = new ObjectMapper().registerModules(new Jdk8Module(), new JavaTimeModule());
     }
 
     @BeforeEach
@@ -107,15 +105,19 @@ class LobbyControllerTest {
         mockLobby = new NormalGame();
         mockLobby.setId(getUUID(3));
         mockLobby.setStatus(GameStatus.CREATED);
-        mockLobbyConfiguration = new NormalGameConfiguration(10, 10, 2);
+        mockLobbyConfiguration = new NormalGameConfiguration(10, Duration.ofSeconds(10), 2, 2, 2f, 100, 0, 75);
         mockLobby.setConfiguration(mockLobbyConfiguration);
-        normalGameConfiguration = new NormalGameConfiguration(4, 8, 6);
+        normalGameConfiguration = new NormalGameConfiguration(4, Duration.ofSeconds(8), 6, 2, 2f, 100, 0, 75);
 
         // Add players
         johnPlayer = new GamePlayer(john);
-        susannePlayer = new GamePlayer(susanne);
         mockLobby.add(johnPlayer);
+        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(john.getId(), GameStatus.CREATED))
+                .thenReturn(Optional.of(mockLobby));
+        susannePlayer = new GamePlayer(susanne);
         mockLobby.add(susannePlayer);
+        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(susanne.getId(), GameStatus.CREATED))
+                .thenReturn(Optional.of(mockLobby));
 
         // Mock the lobby
         when(gameRepository.findById(mockLobby.getId())).thenReturn(Optional.of(mockLobby));
@@ -127,14 +129,12 @@ class LobbyControllerTest {
                         john.getEmail(),
                         john.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
-        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(john.getId(), GameStatus.CREATED))
-                .thenReturn(Optional.of(mockLobby));
     }
 
     @Test
     public void getAvailable() throws Exception {
         // Mock a list of lobbies
-        Game<?> otherLobby = new NormalGame();
+        NormalGame otherLobby = new NormalGame();
         otherLobby.setId(getUUID(1));
         otherLobby.setStatus(GameStatus.CREATED);
         otherLobby.setConfiguration(new NormalGameConfiguration());
@@ -143,10 +143,7 @@ class LobbyControllerTest {
 
         // Request
         this.mockMvc.perform(get("/api/lobby/available"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(equalToObject(
-                        objectMapper.writeValueAsString(List.of(mockLobby.getDTO(), otherLobby.getDTO()))
-                )));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -303,7 +300,6 @@ class LobbyControllerTest {
     @Test
     public void configPostLobbyNotCreatedTest() throws Exception {
         mockLobby.setStatus(GameStatus.ONGOING);
-        mockLobby.setHost(johnPlayer);
 
         // Request
         this.mockMvc
@@ -454,6 +450,75 @@ class LobbyControllerTest {
         // Request
         this.mockMvc
                 .perform(delete("/api/lobby/leave"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteOk() throws Exception {
+        // Mock the service
+        when(lobbyService.deleteLobby(mockLobby, john)).thenReturn(true);
+
+        // Request
+        this.mockMvc
+                .perform(delete("/api/lobby/delete"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteNotHost() throws Exception {
+        // Set the context user
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        susanne.getEmail(),
+                        susanne.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+
+        // Mock the service
+        when(lobbyService.deleteLobby(mockLobby, susanne)).thenReturn(false);
+
+        // Request
+        this.mockMvc
+                .perform(delete("/api/lobby/delete"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void deleteNoUser() throws Exception {
+        // Set non-existent user
+        User bobby = new User("Bobby", "bobby@solo.com", "stinkywhiskey");
+        bobby.setId(getUUID(3));
+        when(userRepository.findById(bobby.getId())).thenReturn(Optional.of(bobby));
+        when(userRepository.findByEmail(bobby.getEmail())).thenReturn(Optional.empty());
+
+        // Set the context user
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        bobby.getEmail(),
+                        bobby.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(bobby.getId(), GameStatus.CREATED))
+                .thenReturn(Optional.of(mockLobby));
+
+        // Request
+        this.mockMvc
+                .perform(delete("/api/lobby/delete"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteNoGame() throws Exception {
+        // Set the context user
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        sally.getEmail(),
+                        sally.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+        when(gameRepository.findByPlayers_User_IdEqualsAndStatus(sally.getId(), GameStatus.CREATED))
+                .thenReturn(Optional.empty());
+
+        // Request
+        this.mockMvc
+                .perform(delete("/api/lobby/delete"))
                 .andExpect(status().isNotFound());
     }
 }

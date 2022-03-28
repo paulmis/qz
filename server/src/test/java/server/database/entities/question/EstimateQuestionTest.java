@@ -1,10 +1,12 @@
 package server.database.entities.question;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static server.utils.TestHelpers.getUUID;
 
-import commons.entities.QuestionDTO;
+import commons.entities.questions.QuestionDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,10 +34,10 @@ class EstimateQuestionTest {
         q.setActivities(components);
     }
 
-    private Answer getAnswer(int estimate) {
+    private Answer getAnswer(long estimate) {
         Answer ans = new Answer();
-        List<Activity> answerActivities = new ArrayList<>();
-        answerActivities.add(getActivity(estimate));
+        List<Long> answerActivities = new ArrayList<>();
+        answerActivities.add(estimate);
         ans.setResponse(answerActivities);
         return ans;
     }
@@ -62,7 +64,7 @@ class EstimateQuestionTest {
         assertEquals(1, myQuestion.getRightAnswer().getResponse().size());
 
         // Correct activity has right cost
-        assertEquals(costTest, myQuestion.getRightAnswer().getResponse().get(0).getCost());
+        assertEquals(costTest, myQuestion.getRightAnswer().getResponse().get(0));
     }
 
     @Test
@@ -74,20 +76,14 @@ class EstimateQuestionTest {
                 getAnswer(0), // #5
                 getAnswer(75))); // #3
 
-        assertEquals(new ArrayList<>(Arrays.asList(0.75, 0.25, 1.0, 0.0, 0.5)), q.checkAnswer(userGuesses));
-    }
+        var desiredScores = Arrays.asList(0.92, 0.00, 0.96, 0.0, 0.53);
+        var actualScores = q.checkAnswer(userGuesses);
 
-    @Test
-    void checkAnswerSameRankTest() {
-        List<Answer> userGuesses = new ArrayList<>(Arrays.asList(
-                getAnswer(90), // #2
-                getAnswer(50), // #3
-                getAnswer(107), // #1
-                getAnswer(0), // #4
-                getAnswer(150), // #3
-                getAnswer(800))); // #5
+        assertEquals(desiredScores.size(), actualScores.size());
 
-        assertEquals(new ArrayList<>(Arrays.asList(0.75, 0.5, 1.0, 0.25, 0.5, 0.0)), q.checkAnswer(userGuesses));
+        for (int i = 0; i < desiredScores.size(); i++) {
+            assertThat(desiredScores.get(i), closeTo(actualScores.get(i), 1e-1));
+        }
     }
 
     @Test
@@ -98,26 +94,22 @@ class EstimateQuestionTest {
                 getAnswer(107), // #1
                 getAnswer(0))); // #4
 
-        List<Activity> answerAct = List.of(
-                getActivity(0),
-                getActivity(1),
-                getActivity(2),
-                getActivity(3)
+        List<Long> answerAct = List.of(
+                getActivity(0).getCost(),
+                getActivity(1).getCost(),
+                getActivity(2).getCost(),
+                getActivity(3).getCost()
         );
         Answer a = new Answer();
         a.setResponse(answerAct);
         userGuesses.add(a);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            q.checkAnswer(userGuesses);
-        });
+        assertThrows(IllegalArgumentException.class, () -> q.checkAnswer(userGuesses));
     }
 
     @Test
     void checkAnswerNullInput() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            q.checkAnswer(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> q.checkAnswer(null));
     }
 
     @Test

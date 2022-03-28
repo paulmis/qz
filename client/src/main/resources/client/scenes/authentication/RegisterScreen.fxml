@@ -17,9 +17,48 @@
       <Insets />
    </opaqueInsets>
    <children>
-      <BorderPane prefHeight="576.0" prefWidth="1024.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane fx:id="borderPane1" prefHeight="576.0" prefWidth="1024.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <right>
-            <Pane fx:id="pane" prefHeight="576.0" prefWidth="262.0" BorderPane.alignment="CENTER">
+            <Pane fx:id="pane1" prefHeight="576.0" prefWidth="278.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Label layoutX="46.0" layoutY="348.0" prefHeight="21.0" prefWidth="166.0" text="Username">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="usernameField" layoutX="47.0" layoutY="368.0" prefHeight="29.0" prefWidth="170.0">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </TextField>
+                  <JFXButton fx:id="usernameSetButton" alignment="CENTER" layoutX="44.0" layoutY="445.0" mnemonicParsing="false" onMouseClicked="#setUsername" prefHeight="22.0" prefWidth="170.0" text="Register" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </JFXButton>
+                  <ImageView fx:id="logo" fitHeight="135.0" fitWidth="139.0" layoutX="59.0" layoutY="30.0" pickOnBounds="true">
+                     <image>
+                        <Image url="@/client/images/logo.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="profilePicture" fitHeight="152.0" fitWidth="165.0" layoutX="46.0" layoutY="185.0" onMouseClicked="#uploadPicture" pickOnBounds="true">
+                     <image>
+                        <Image url="@/client/images/gray.jpg" />
+                     </image>
+                  </ImageView>
+                  <Label fx:id="uploadImage" layoutX="83.0" layoutY="252.0" onMouseClicked="#uploadPicture" text="Upload an Image" />
+                  <JFXButton fx:id="backButton" layoutX="25.0" layoutY="530.0" onMouseClicked="#reset" text="Back">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </JFXButton>
+               </children>
+            </Pane>
+         </right>
+      </BorderPane>
+      <BorderPane fx:id="borderPane2" prefHeight="576.0" prefWidth="1024.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <right>
+            <Pane fx:id="pane2" prefHeight="576.0" prefWidth="262.0" BorderPane.alignment="CENTER">
                <children>
                   <Label alignment="CENTER" layoutX="44.0" layoutY="187.0" prefHeight="21.0" prefWidth="168.0" text="Register">
                      <font>
@@ -31,7 +70,7 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="emailField" layoutX="47.0" layoutY="242.0" prefHeight="22.0" prefWidth="161.0">
+                  <TextField fx:id="emailField" layoutX="47.0" layoutY="242.0" onKeyTyped="#resetMessage" prefHeight="22.0" prefWidth="161.0">
                      <font>
                         <Font size="13.0" />
                      </font>
@@ -66,6 +105,16 @@
                         <Image url="@/client/images/logo.png" />
                      </image>
                   </ImageView>
+                  <Label fx:id="userExists" layoutX="66.0" layoutY="397.0" text="Credentials not valid !" textFill="RED">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="registerMessage" layoutX="65.0" layoutY="397.0" text="Registration Complete !" textFill="#1ed410">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
                </children>
             </Pane>
          </right>

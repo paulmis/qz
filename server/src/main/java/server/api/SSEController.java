@@ -1,5 +1,6 @@
 package server.api;
 
+import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
@@ -16,7 +17,7 @@ import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
-
+import server.services.SSEManager;
 
 /**
  * The SSE endpoint - opens new SSE connections.
@@ -32,6 +33,9 @@ public class SSEController {
     @Autowired
     private GameRepository gameRepository;
 
+    @Autowired
+    private SSEManager sseManager;
+
     /**
      * Open a new SSE connection.
      *
@@ -39,33 +43,33 @@ public class SSEController {
      */
     @GetMapping("/open")
     public ResponseEntity<SseEmitter> open() {
+        // TODO: add a cooldown per user
         // Create a new SSE emitter
-        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+        var emitter = new SseEmitter(Long.MAX_VALUE);
         try {
             // Get current user
             User user = userRepository.findByEmail(AuthContext.get())
                     .orElseThrow(() -> new NoSuchElementException("User not found"));
-
             // The user must currently be in a game
-            Game game = gameRepository.getPlayersGame(user.getId())
+            gameRepository.getPlayersLobbyOrGame(user.getId())
                     .orElseThrow(() -> new IllegalStateException("User not in a game"));
 
             // Register emitter callbacks.
-            emitter.onCompletion(() -> game.emitters.unregister(user.getId()));
+            emitter.onCompletion(() -> sseManager.unregister(user.getId(), emitter));
             emitter.onTimeout(() -> {
                 log.warn("SSE connection timed out");
-                game.emitters.unregister(user.getId());
+                sseManager.unregister(user.getId(), emitter);
             });
             emitter.onError(throwable -> {
                 log.error("Error in SSE connection", throwable);
-                game.emitters.unregister(user.getId());
+                sseManager.unregister(user.getId(), emitter);
             });
 
             // Register emitter to the SSE manager.
-            game.emitters.register(user.getId(), emitter);
+            sseManager.register(user.getId(), emitter);
 
             // The client will wait for a first event in order to start.
-            emitter.send(new SSEMessage(SSEMessageType.INIT));
+            sseManager.send(user.getId(), new SSEMessage(SSEMessageType.INIT));
 
             return ResponseEntity.ok(emitter);
         } catch (NoSuchElementException e) {
