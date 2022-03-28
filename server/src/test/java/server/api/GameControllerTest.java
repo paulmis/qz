@@ -80,17 +80,17 @@ public class GameControllerTest {
         john = new User("John", "john@upon.com", "stinkydonkey");
         john.setId(getUUID(0));
         when(userRepository.findById(john.getId())).thenReturn(Optional.of(john));
-        when(userRepository.findByEmail(john.getEmail())).thenReturn(Optional.of(john));
+        when(userRepository.findByEmailIgnoreCase(john.getEmail())).thenReturn(Optional.of(john));
 
         susanne = new User("Susanne", "susanne@louisiane.com", "stinkymonkey");
         susanne.setId(getUUID(1));
         when(userRepository.findById(susanne.getId())).thenReturn(Optional.of(susanne));
-        when(userRepository.findByEmail(susanne.getEmail())).thenReturn(Optional.of(susanne));
+        when(userRepository.findByEmailIgnoreCase(susanne.getEmail())).thenReturn(Optional.of(susanne));
 
         sally = new User("Sally", "sally@wally.com", "stinkybinky");
         sally.setId(getUUID(2));
         when(userRepository.findById(sally.getId())).thenReturn(Optional.of(sally));
-        when(userRepository.findByEmail(sally.getEmail())).thenReturn(Optional.of(sally));
+        when(userRepository.findByEmailIgnoreCase(sally.getEmail())).thenReturn(Optional.of(sally));
 
         // Setup mock question
         question = new MCQuestion();
