@@ -11,13 +11,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576" prefWidth="1024" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.lobby.LobbyScreenCtrl">
+<AnchorPane fx:id="mainAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576" prefWidth="1024" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.lobby.LobbyScreenCtrl">
    <children>
       <VBox>
          <children>
             <HBox alignment="BOTTOM_RIGHT" prefHeight="47.0" prefWidth="1009.0" spacing="15.0">
                <children>
-                  <JFXButton fx:id="userButton" alignment="CENTER" buttonType="RAISED" contentDisplay="GRAPHIC_ONLY" text="Button">
+                  <JFXButton fx:id="userButton" alignment="CENTER" buttonType="RAISED" contentDisplay="GRAPHIC_ONLY" text="Button" onAction="#showUserInfo">
                      <graphic>
                         <FontAwesomeIconView fill="#5e5e5e" glyphName="USER" size="20" text="" />
                      </graphic>

@@ -4,6 +4,7 @@ import static javafx.application.Platform.runLater;
 
 import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
+import client.scenes.UserInfoPane;
 import client.utils.ClientState;
 import client.utils.communication.SSEEventHandler;
 import client.utils.communication.SSEHandler;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import lombok.Generated;
 import lombok.Getter;
@@ -30,7 +32,10 @@ import lombok.Getter;
 public class LobbyScreenCtrl implements SSESource {
     private final LobbyCommunication communication;
     private final MainCtrl mainCtrl;
+    private final ServerUtils server;
 
+    @FXML
+    private AnchorPane mainAnchor;
     @FXML
     private Label gameName;
     @FXML
@@ -54,6 +59,8 @@ public class LobbyScreenCtrl implements SSESource {
     @FXML
     private JFXButton leaveButton;
 
+    private UserInfoPane userInfo = null;
+
     /**
      * Initialize a new controller using dependency injection.
      *
@@ -61,9 +68,10 @@ public class LobbyScreenCtrl implements SSESource {
      * @param mainCtrl      Reference to the main controller.
      */
     @Inject
-    public LobbyScreenCtrl(LobbyCommunication communication, MainCtrl mainCtrl) {
+    public LobbyScreenCtrl(LobbyCommunication communication, MainCtrl mainCtrl, ServerUtils server) {
         this.mainCtrl = mainCtrl;
         this.communication = communication;
+        this.server = server;
     }
 
     public void bindHandler(SSEHandler handler) {
@@ -99,6 +107,9 @@ public class LobbyScreenCtrl implements SSESource {
      * It handles all the required set-up that needs to be done for a lobby to be displayed.
      */
     public void reset() {
+        if (userInfo != null) {
+            userInfo.setVisible(false);
+        }
         updateView();
     }
 
@@ -172,8 +183,25 @@ public class LobbyScreenCtrl implements SSESource {
     }
 
     /**
+     * Fired when the user button is pressed
+     */
+    public void showUserInfo() {
+        if (userInfo == null) {
+            // Create userInfo
+            userInfo = new UserInfoPane(server, mainCtrl);
+            mainAnchor.getChildren().add(userInfo);
+            userInfo.setVisible(true);
+            runLater(() -> userInfo.setupPosition(userButton, mainAnchor));
+        } else {
+            // Toggle visibility
+            userInfo.setVisible(!userInfo.isVisible());
+        }
+    }
+
+    /**
      * Fired when the lobby settings button is clicked.
      */
+    @FXML
     public void lobbySettingsButtonClick() {
         mainCtrl.openLobbySettings(ClientState.game.getConfiguration(), (conf) -> {
             // Close pop-up
@@ -197,8 +225,8 @@ public class LobbyScreenCtrl implements SSESource {
      */
     public void updateView() {
         /* // For testing
-        GameDTO dto = new NormalGameDTO();
-        dto.setGameId("ABCD");
+        GameDTO gameDTO = new NormalGameDTO();
+        gameDTO.setGameId("ABCD");
         GameConfigurationDTO confDTO = new NormalGameConfigurationDTO(
                 null,
                 Duration.ofSeconds(60),
@@ -209,7 +237,7 @@ public class LobbyScreenCtrl implements SSESource {
                 100,
                 0,
                 75);
-        dto.setConfiguration(confDTO);
+        gameDTO.setConfiguration(confDTO);
         GamePlayerDTO sally = new GamePlayerDTO();
         sally.setId(UUID.randomUUID());
         sally.setNickname("Sally");
@@ -227,24 +255,29 @@ public class LobbyScreenCtrl implements SSESource {
             john.setJoinDate(LocalDateTime.now().minusMinutes(idx));
             players.add(john);
         }
-        dto.setPlayers(players);
-        dto.setHost(sally.getId());
+        gameDTO.setPlayers(players);
+        gameDTO.setHost(sally.getId());
         */
-        GameDTO dto = ClientState.game;
+        GameDTO gameDTO = ClientState.game;
 
         // ToDo: have a game name in gameDTO
-        String hostNickname = dto.getPlayers().stream()
-                .filter(player -> player.getId() == dto.getHost())
+        String hostNickname = gameDTO.getPlayers().stream()
+                .filter(player -> player.getId() == gameDTO.getHost())
                 .findFirst()
                 .map(GamePlayerDTO::getNickname)
                 .orElse("Ligma");
         gameName.setText(hostNickname + "'s game");
-        gameId.setText(dto.getGameId());
-        gameType.setText(dto.getClass().getName()
+        gameId.setText(gameDTO.getGameId());
+        gameType.setText(gameDTO.getClass().getName()
                 .replaceAll(".*\\.", "")
                 .replaceAll("GameDTO", ""));
-        gameCapacity.setText(dto.getPlayers().size() + "/" + dto.getConfiguration().getCapacity());
-        updatePlayerList(dto);
+        gameCapacity.setText(gameDTO.getPlayers().size() + "/" + gameDTO.getConfiguration().getCapacity());
+        boolean isHost = gameDTO.getPlayers().stream()
+                .filter(dto -> ClientState.user.getId().equals(dto.getUserId()))
+                .anyMatch(dto -> gameDTO.getHost().equals(dto.getId()));
+        lobbySettingsButton.setDisable(!isHost);
+        startButton.setDisable(!isHost);
+        updatePlayerList(gameDTO, isHost);
     }
 
     /**
@@ -252,15 +285,12 @@ public class LobbyScreenCtrl implements SSESource {
      *
      * @param gameDTO structure containing the game information
      */
-    private void updatePlayerList(GameDTO gameDTO) {
+    private void updatePlayerList(GameDTO gameDTO, boolean isHost) {
         playerList.getChildren().clear();
         int highestScore = gameDTO.getPlayers().stream()
                 .mapToInt(GamePlayerDTO::getScore)
                 .max()
                 .orElse(Integer.MIN_VALUE);
-        boolean isHost = gameDTO.getPlayers().stream()
-                .filter(dto -> ClientState.user.getId().equals(dto.getUserId()))
-                .anyMatch(dto -> gameDTO.getHost().equals(dto.getId()));
         List<LobbyPlayerPane> playerElements = gameDTO.getPlayers().stream()
                 .sorted((p1, p2) ->
                         // Sort by join date, host always first
