@@ -7,12 +7,14 @@ import client.communication.game.LobbyCommunication;
 import client.communication.game.LobbyListCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
-import client.utils.communication.ReflectionUtils;
+import client.utils.communication.*;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
+import commons.entities.game.GameStatus;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
+import commons.entities.messages.SSEMessageType;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -29,7 +31,7 @@ import jdk.jfr.Description;
 /**
  * The lobby creation screen controller. Controls the lobby creation screen.
  */
-public class LobbyCreationScreenCtrl implements Initializable {
+public class LobbyCreationScreenCtrl implements Initializable, SSESource {
     private final MainCtrl mainCtrl;
     private final LobbyListCommunication server;
     private final LobbyCommunication serverLobby;
@@ -93,6 +95,15 @@ public class LobbyCreationScreenCtrl implements Initializable {
         isMultiplayer.setValue(true);
     }
 
+    public void bindHandler(SSEHandler sseHandler) {
+        sseHandler.initialize(this);
+    }
+
+    @SSEEventHandler(SSEMessageType.GAME_START)
+    public void startGame() {
+        mainCtrl.showGameScreen(null);
+    }
+
     /**
      * This function resets the controller to a predefined default state.
      */
@@ -153,35 +164,24 @@ public class LobbyCreationScreenCtrl implements Initializable {
 
     @FXML
     private void createLobbyButtonClick() {
-        server.createLobby(config,
-                game -> runLater(() -> {
-                    if (isMultiplayer.get()) {
-                        mainCtrl.showLobbyScreen();
-                    } else {
-                        LobbyCommunication.startGame(game.getId(), (response) -> runLater(() -> {
-                            switch (response.getStatus()) {
-                                case 403:
-                                    mainCtrl.showErrorSnackBar("Starting the game failed! You are not the host.");
-                                    break;
-                                case 409:
-                                    mainCtrl.showErrorSnackBar("Something went wrong while starting the game.");
-                                    break;
-                                case 425:
-                                    mainCtrl.showErrorSnackBar("Try again after a second.");
-                                    break;
-                                case 200:
-                                    mainCtrl.showInformationalSnackBar("Game started!");
-                                    mainCtrl.showGameScreen(null);
-                                    break;
-                                default:
-                                    mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");
-                                    break;
-                            }
-                        }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to start game.")));
-                    }
-                }),
-                () -> runLater(() ->
-                        mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
+        // Start SSE
+        ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
+        bindHandler(ServerUtils.sseHandler);
+
+        // Create lobby
+        server.createLobby(
+            config,
+            // Success
+            game -> runLater(() -> {
+                if (game.getStatus() == GameStatus.CREATED) {
+                    mainCtrl.showLobbyScreen();
+                }
+            }),
+            // Failure
+            (error) -> runLater(() -> {
+                ServerUtils.sseHandler.kill();
+                mainCtrl.showErrorSnackBar(error == null ? "Failed to create the lobby" : error.getDescription());
+            }));
     }
 
     @FXML

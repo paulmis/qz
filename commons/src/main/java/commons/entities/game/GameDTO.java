@@ -79,6 +79,15 @@ public class GameDTO implements DTO {
     protected UUID host;
 
     /**
+     * Checks if the game is singleplayer or multiplayer.
+     *
+     * @return whether the game is singleplayer or multiplayer
+     */
+    public boolean isSingleplayer() {
+        return this.configuration.getCapacity() == 1;
+    }
+
+    /**
      * Copy constructor.
      *
      * @param gameDTO the game DTO to copy

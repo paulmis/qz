@@ -80,7 +80,7 @@ class FSMManagerTest {
         assertFalse(fsm.isRunning());
 
         // Start the FSM
-        assertTrue(fsmManager.startFSM(game));
+        assertTrue(fsmManager.startFSM(game.getId()));
         await().atMost(250, TimeUnit.MILLISECONDS).until(fsm::isRunning);
         // Verify that it's running
         assertTrue(fsm.isRunning());
@@ -123,19 +123,19 @@ class FSMManagerTest {
         // Add a new FSM
         fsmManager.addFSM(game, fsm);
         // Start the FSM
-        assertTrue(fsmManager.startFSM(game));
+        assertTrue(fsmManager.startFSM(game.getId()));
         await().atMost(250, TimeUnit.MILLISECONDS).until(fsm::isRunning);
         // Verify that it's running
         assertTrue(fsm.isRunning());
         // Try to start it again
-        assertFalse(fsmManager.startFSM(game));
+        assertFalse(fsmManager.startFSM(game.getId()));
         // Verify that it's still running
         assertTrue(fsm.isRunning());
     }
 
     @Test
     void startFSMNotFound() {
-        assertFalse(fsmManager.startFSM(game));
+        assertFalse(fsmManager.startFSM(game.getId()));
     }
 
     @Test

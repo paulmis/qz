@@ -2,6 +2,8 @@ package server.api;
 
 import commons.entities.utils.ApiError;
 import java.util.List;
+import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolationException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import server.api.exceptions.SSEFailedException;
 
 /**
  * Provides global API exception handling.
@@ -43,9 +46,19 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ApiError handleBadArgumentException(IllegalArgumentException ex) {
+    @ExceptionHandler({
+        IllegalArgumentException.class,
+        ConstraintViolationException.class,
+        PersistenceException.class })
+    public ApiError handleBadArgumentException(Exception ex) {
         return new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.TOO_EARLY)
+    @ResponseBody
+    @ExceptionHandler(SSEFailedException.class)
+    public ApiError handleSSEException(SSEFailedException ex) {
+        return new ApiError(HttpStatus.TOO_EARLY.value(), ex.getMessage());
     }
 
     /**

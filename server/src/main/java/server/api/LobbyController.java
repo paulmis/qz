@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import server.api.exceptions.SSEFailedException;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
@@ -66,11 +67,11 @@ public class LobbyController {
      * Endpoint for the creation of new lobbies.
      *
      * @param gameDTO the DTO of the game to create.
-     * @return 400 if the game constraints were violated, 404 if the user doesn't exist, 409 if the founder is
-     *      already in a lobby or a game, 201 and the game otherwise
+     * @return 400 if the validation failed, 404 if the user doesn't exist, 409 if the founder is
+     *      already in a lobby or a game, 425 if the SSE fails, 201 and the game otherwise
      */
     @PostMapping
-    ResponseEntity create(@RequestBody NormalGameDTO gameDTO) {
+    ResponseEntity create(@RequestBody NormalGameDTO gameDTO) throws SSEFailedException {
         // If the user doesn't exist, return 404
         Optional<User> founder = userRepository.findByEmail(AuthContext.get());
         if (founder.isEmpty()) {
@@ -83,30 +84,23 @@ public class LobbyController {
         }
 
         // Create the game
-        NormalGame game;
-        try {
-            game = new NormalGame(gameDTO);
-            game.setGameId(RandomStringUtils.random(6, true, true));
-            game.setStatus(GameStatus.CREATED);
-            game.setAcceptingAnswers(false);
+        NormalGame lobby = new NormalGame(gameDTO);
+        lobby.setGameId(RandomStringUtils.random(6, true, true));
+        lobby.setStatus(GameStatus.CREATED);
+        lobby.add(new GamePlayer(founder.get()));
 
-            // Save the configuration
-            NormalGameConfiguration config =
-                    gameConfigurationRepository.save((NormalGameConfiguration) game.getConfiguration());
-            game.setConfiguration(config);
-
-            // Create the player
-            GamePlayer player = new GamePlayer(founder.get());
-            game.add(player);
-
-            // Save the game with the added host and player
-            game = gameRepository.save(game);
-        } catch (ConstraintViolationException | PersistenceException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        // Save the game with the added host and player
+        // If the game is singleplayer, start it
+        if (lobby.isSingleplayer()) {
+            lobby = (NormalGame) gameService.start(lobby);
+        } else {
+            lobby = gameRepository.save(lobby);
         }
 
         // Return 201
-        return ResponseEntity.created(URI.create("/api/lobby/" + game.getId())).body(game.getDTO());
+        return ResponseEntity
+            .created(URI.create("/api/lobby/" + lobby.getId()))
+            .body(lobby.getDTO());
     }
 
     /**
@@ -232,7 +226,7 @@ public class LobbyController {
         // If the game doesn't start successfully, return 409
         // If the SSE events are not yet set-up return 425
         try {
-            gameService.startGame(lobby.get());
+            gameService.start(lobby.get());
         } catch (IOException ex) {
             return ResponseEntity.status(HttpStatus.TOO_EARLY).body(ex.getMessage());
         }
