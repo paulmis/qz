@@ -43,7 +43,7 @@ public abstract class GameConfigurationDTO implements DTO {
     @DecimalMin(value = "3")
     @DecimalMax(value = "120")
     @Description("Seconds per question")
-    protected Integer answerTime = 30;
+    protected Integer answerTime = 20;
 
 
     /**
@@ -52,7 +52,7 @@ public abstract class GameConfigurationDTO implements DTO {
     @DecimalMin(value = "1")
     @DecimalMax(value = "8")
     @Description("Capacity of lobby")
-    protected Integer capacity = 1;
+    protected Integer capacity = 5;
 
     /**
      * The streak size required for a streak to be applied.

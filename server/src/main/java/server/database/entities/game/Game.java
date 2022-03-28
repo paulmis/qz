@@ -126,6 +126,15 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
+     * Checks if the game is singleplayer, i.e. the capacity is 1.
+     *
+     * @return true if the game is singleplayer, false otherwise
+     */
+    public boolean isSingleplayer() {
+        return getConfiguration().getCapacity() == 1;
+    }
+
+    /**
      * Creates a new game from a DTO.
      * Only an empty lobby (no players or questions) can be initialized.
      *

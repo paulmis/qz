@@ -8,11 +8,13 @@ import commons.entities.auth.UserDTO;
 import commons.entities.game.GameDTO;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
+import commons.entities.utils.ApiError;
 import java.util.List;
 import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.core.Response;
 
 /**
  * Handles the communication that is done inside the lobby list screen
@@ -30,7 +32,7 @@ public class LobbyListCommunication {
      * Handler for when the create lobby fails.
      */
     public interface CreateLobbyHandlerFail {
-        void handle();
+        void handle(ApiError error);
     }
 
     /**
@@ -42,7 +44,6 @@ public class LobbyListCommunication {
     public void createLobby(GameConfigurationDTO config, CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
                             CreateLobbyHandlerFail createLobbyHandlerFail) {
         var game = new NormalGameDTO();
-        game.setId(UUID.randomUUID());
         game.setConfiguration(config);
 
         Invocation invocation = ServerUtils.getRequestTarget()
@@ -51,20 +52,25 @@ public class LobbyListCommunication {
                 .accept(APPLICATION_JSON)
                 .buildPost(Entity.entity(game, APPLICATION_JSON));
 
-        invocation.submit(new InvocationCallback<GameDTO>() {
+        invocation.submit(new InvocationCallback<Response>() {
 
             @Override
-            public void completed(GameDTO game) {
-                System.out.println(game);
-                ClientState.game = game;
-                ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
-                createLobbyHandlerSuccess.handle(game);
+            public void completed(Response response) {
+                if (response.getStatus() == 201) {
+                    ClientState.game = response.readEntity(GameDTO.class);
+                    createLobbyHandlerSuccess.handle(ClientState.game);
+                } else {
+                    ServerUtils.sseHandler.kill();
+                    ApiError error = response.readEntity(ApiError.class);
+                    createLobbyHandlerFail.handle(error);
+                }
             }
 
             @Override
             public void failed(Throwable throwable) {
-                createLobbyHandlerFail.handle();
                 throwable.printStackTrace();
+                ServerUtils.sseHandler.kill();
+                createLobbyHandlerFail.handle(null);
             }
         });
     }
