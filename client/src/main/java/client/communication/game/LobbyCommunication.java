@@ -99,7 +99,7 @@ public class LobbyCommunication {
     /**
      * Handler for when the configuration is saved successfully.
      */
-    public interface SaveConfigHandler {
+    public interface SaveConfigSuccessHandler {
         void handle();
     }
 
@@ -115,11 +115,11 @@ public class LobbyCommunication {
      *
      * @param gameId the id of the game
      * @param config the new configuration
-     * @param handlerSuccess  the handler for when the request succeeds
-     * @param handlerFail the handler for when the request fails
+     * @param handleSuccess  the handler for when the request succeeds
+     * @param handleFail the handler for when the request fails
      */
     public void saveConfig(UUID gameId, GameConfigurationDTO config,
-                           SaveConfigHandler handlerSuccess, SaveConfigurationFailHandler handlerFail) {
+                           SaveConfigSuccessHandler handleSuccess, SaveConfigurationFailHandler handleFail) {
         Invocation request = ServerUtils.getRequestTarget()
                 .path("/api/lobby/" + gameId + "/config")
                 .request(APPLICATION_JSON)
@@ -131,16 +131,16 @@ public class LobbyCommunication {
             public void completed(Response response) {
                 if (response.getStatus() == 200) {
                     ClientState.game.setConfiguration(config);
-                    handlerSuccess.handle();
+                    handleSuccess.handle();
                 } else {
-                    handlerFail.handle();
+                    handleFail.handle();
                 }
             }
 
             @Override
             public void failed(Throwable throwable) {
                 throwable.printStackTrace();
-                handlerFail.handle();
+                handleFail.handle();
             }
         });
     }

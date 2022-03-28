@@ -225,40 +225,6 @@ public class LobbyScreenCtrl implements SSESource {
      * Set up the screen elements according to the stored GameDTO.
      */
     public void updateView() {
-        /* // For testing
-        GameDTO gameDTO = new NormalGameDTO();
-        gameDTO.setGameId("ABCD");
-        GameConfigurationDTO confDTO = new NormalGameConfigurationDTO(
-                null,
-                Duration.ofSeconds(60),
-                2,
-                20,
-                3,
-                2f,
-                100,
-                0,
-                75);
-        gameDTO.setConfiguration(confDTO);
-        GamePlayerDTO sally = new GamePlayerDTO();
-        sally.setId(UUID.randomUUID());
-        sally.setNickname("Sally");
-        sally.setScore(12);
-        sally.setUserId(ClientState.user.getId());
-        sally.setJoinDate(LocalDateTime.now());
-        Set<GamePlayerDTO> players = new HashSet<>();
-        players.add(sally);
-        for (int idx = 0; idx < 40; idx++) {
-            GamePlayerDTO john = new GamePlayerDTO();
-            john.setId(UUID.randomUUID());
-            john.setNickname("John" + idx);
-            john.setScore(30 + idx);
-            john.setUserId(UUID.randomUUID());
-            john.setJoinDate(LocalDateTime.now().minusMinutes(idx));
-            players.add(john);
-        }
-        gameDTO.setPlayers(players);
-        gameDTO.setHost(sally.getId());
-        */
         GameDTO gameDTO = ClientState.game;
 
         // ToDo: have a game name in gameDTO
