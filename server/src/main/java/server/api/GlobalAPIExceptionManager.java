@@ -12,13 +12,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import server.api.exceptions.PlayerAlreadyInLobbyOrGame;
 
 /**
  * Provides global API exception handling.
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalAPIExceptionManager {
     /**
      * Handles validation errors for API fields annotated with @Valid.
      *
@@ -46,6 +47,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ApiError handleBadArgumentException(IllegalArgumentException ex) {
         return new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    @ExceptionHandler(PlayerAlreadyInLobbyOrGame.class)
+    public ApiError handlePlayerAlreadyInLobbyOrGameException(PlayerAlreadyInLobbyOrGame ex) {
+        return new ApiError(HttpStatus.CONFLICT.value(), ex.getMessage());
     }
 
     /**

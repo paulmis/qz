@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import server.api.exceptions.PlayerAlreadyInLobbyOrGame;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
@@ -58,9 +59,6 @@ public class LobbyController {
 
     @Autowired
     private GameConfigurationRepository gameConfigurationRepository;
-
-    @Autowired
-    private SSEManager sseManager;
 
     /**
      * Endpoint for the creation of new lobbies.
@@ -195,6 +193,11 @@ public class LobbyController {
         }
         Game lobby = lobbyOptional.get();
 
+        // Check that the player is not already in a lobby or a game
+        if (gameRepository.getPlayersLobbyOrGame(user.get().getId()).isPresent()) {
+            throw new PlayerAlreadyInLobbyOrGame();
+        }
+
         // Create the player
         GamePlayer player = new GamePlayer(user.get());
 
@@ -295,7 +298,7 @@ public class LobbyController {
 
         // Check that the user is in a lobby and remove them
         Optional<Game> lobby =
-                gameRepository.findByPlayers_User_IdEqualsAndStatus(user.get().getId(), GameStatus.CREATED);
+                gameRepository.getPlayersLobby(user.get().getId());
         if (lobby.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not in a lobby");
         }
@@ -319,7 +322,7 @@ public class LobbyController {
 
         // Find the user's lobby
         Optional<Game> lobby =
-                gameRepository.findByPlayers_User_IdEqualsAndStatus(user.get().getId(), GameStatus.CREATED);
+                gameRepository.getPlayersLobby(user.get().getId());
         if (lobby.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
