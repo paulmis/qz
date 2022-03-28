@@ -16,7 +16,6 @@ import commons.entities.game.GameDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.messages.SSEMessageType;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -34,7 +33,7 @@ public class LobbyScreenCtrl implements SSESource {
     private final LobbyCommunication communication;
     private final MainCtrl mainCtrl;
     private final ServerUtils server;
-
+    
     @FXML
     private AnchorPane mainAnchor;
     @FXML
@@ -48,6 +47,8 @@ public class LobbyScreenCtrl implements SSESource {
     @FXML
     private VBox playerList;
     @FXML
+    private JFXButton disbandButton;
+    @FXML
     private JFXButton settingsButton;
     @FXML
     private JFXButton userButton;
@@ -59,7 +60,7 @@ public class LobbyScreenCtrl implements SSESource {
     private JFXButton lobbySettingsButton;
     @FXML
     private JFXButton leaveButton;
-
+    
     private UserInfoPane userInfo = null;
 
     /**
@@ -86,6 +87,9 @@ public class LobbyScreenCtrl implements SSESource {
     public void playerJoined() {
         updateView();
     }
+
+
+
 
     /**
      * Reacts to a player leaving the lobby.
@@ -120,31 +124,31 @@ public class LobbyScreenCtrl implements SSESource {
     @FXML
     public void startButtonClick() {
         LobbyCommunication.startGame(
-                ClientState.game.getId(),
-                // Success
-                (response) -> runLater(() -> {
-                    switch (response.getStatus()) {
-                        case 403:
-                            mainCtrl.showErrorSnackBar("Starting the game failed! You are not the host.");
-                            break;
-                        case 409:
-                            mainCtrl.showErrorSnackBar("Something went wrong while starting the game.");
-                            break;
-                        case 425:
-                            mainCtrl.showErrorSnackBar("Try again after a second.");
-                            break;
-                        case 200:
-                            mainCtrl.showInformationalSnackBar("Game started!");
-                            break;
-                        default:
-                            mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");
-                            break;
-                    }
-                }),
-                // Failure
-                () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to start game.")));
+            ClientState.game.getId(),
+            // Success
+            (response) -> runLater(() -> {
+                switch (response.getStatus()) {
+                    case 403:
+                        mainCtrl.showErrorSnackBar("Starting the game failed! You are not the host.");
+                        break;
+                    case 409:
+                        mainCtrl.showErrorSnackBar("Something went wrong while starting the game.");
+                        break;
+                    case 425:
+                        mainCtrl.showErrorSnackBar("Try again after a second.");
+                        break;
+                    case 200:
+                        mainCtrl.showInformationalSnackBar("Game started!");
+                        break;
+                    default:
+                        mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");
+                        break;
+                }
+            }),
+            // Failure
+            () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to start game.")));
     }
-
+    
     /**
      * Handles the click of the quit button.
      * This is handled by the server function call.
@@ -153,36 +157,61 @@ public class LobbyScreenCtrl implements SSESource {
     private void leaveButtonClick() {
         // Open the warning and wait for user action
         mainCtrl.openLobbyLeaveWarning(
-                // If confirmed, exit the lobby
-                () -> {
-                    mainCtrl.closeLobbyLeaveWarning();
-                    this.communication.leaveLobby(
-                            (response) -> runLater(() -> {
-                                switch (response.getStatus()) {
-                                    case 200:
-                                        System.out.println("User successfully removed from lobby");
-                                        mainCtrl.showLobbyListScreen();
-                                        ClientState.game = null;
-                                        ServerUtils.sseHandler.kill();
-                                        break;
-                                    case 404:
-                                        mainCtrl.showErrorSnackBar("Unable to quit the lobby: "
-                                                + "user or lobby doesn't exist");
-                                        break;
-                                    case 409:
-                                        mainCtrl.showErrorSnackBar("Unable to quit the lobby: "
-                                                + "there was a conflict while removing the player");
-                                        break;
-                                    default:
-                                        mainCtrl.showErrorSnackBar("Unable to quit the lobby: server error");
-                                }
-                            }));
-                },
+            // If confirmed, exit the lobby
+            () -> {
+                mainCtrl.closeLobbyLeaveWarning();
+                this.communication.leaveLobby(response -> runLater(() -> {
+                    switch (response.getStatus()) {
+                        case 404:
+                            mainCtrl.showErrorSnackBar("Unable to leave the lobby.");
+                            break;
+                        case 409:
+                            mainCtrl.showErrorSnackBar("Something went wrong while leaving the lobby");
+                            break;
+                        case 200:
+                            mainCtrl.showInformationalSnackBar("Successfully left the lobby");
+                            mainCtrl.showLobbyListScreen();
+                            ClientState.game = null;
+                            ServerUtils.sseHandler.kill();
+                            break;
+                        default:
+                            mainCtrl.showErrorSnackBar("Unable to leave the lobby");
+                    }
+                }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Unable to leave the lobby")));
+            },
                 // Otherwise, simply close the warning
                 mainCtrl::closeLobbyLeaveWarning
         );
     }
 
+    /**
+     * Fired when the disband button is clicked.
+     */
+    public void disbandButtonClick() {
+        mainCtrl.openLobbyDisbandWarning(() -> {
+            mainCtrl.closeLobbyDisbandWarning();
+            this.communication.disbandLobby(response -> runLater(() -> {
+                switch (response.getStatus()) {
+                    case 401:
+                        mainCtrl.showErrorSnackBar("Failed to disband lobby. You are not the host");
+                        break;
+                    case 404:
+                        mainCtrl.showErrorSnackBar("Failed to disband lobby. Information couldn't be retrieved");
+                        break;
+                    case 200:
+                        mainCtrl.showInformationalSnackBar("Successfully disbanded the lobby");
+                        mainCtrl.showLobbyListScreen();
+                        ClientState.game = null;
+                        ServerUtils.sseHandler.kill();
+                        break;
+                    default:
+                        mainCtrl.showErrorSnackBar("Failed to disband lobby");
+                        break;
+                }
+            }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to disband lobby")));
+        }, () -> runLater(mainCtrl::closeLobbyDisbandWarning));
+    }
+    
     /**
      * Fired when the user button is pressed.
      */

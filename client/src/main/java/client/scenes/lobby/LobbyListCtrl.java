@@ -2,27 +2,21 @@ package client.scenes.lobby;
 
 import static javafx.application.Platform.runLater;
 
+import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.UserInfoPane;
 import client.utils.AlgorithmicUtils;
-import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameDTO;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
-import java.util.Comparator;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import lombok.Generated;
 
@@ -54,7 +48,7 @@ public class LobbyListCtrl implements Initializable {
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public LobbyListCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public LobbyListCtrl(ServerUtils server, MainCtrl mainCtrl, LobbyCommunication communication) {
         this.mainCtrl = mainCtrl;
         this.server = server;
     }
@@ -90,12 +84,13 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void createLobbyButtonClick() {
-        server.createLobby(
-            game -> {
-                ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
-                runLater(mainCtrl::showLobbyScreen);
-            },
-            () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
+        server.createLobby(game -> {
+            ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
+            runLater(() -> {
+                mainCtrl.showLobbyScreen();
+            });
+        }, () -> runLater(() ->
+                mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
     }
 
     @FXML
@@ -128,7 +123,9 @@ public class LobbyListCtrl implements Initializable {
                             sortedLobbies.map(gameDTO ->
                                     new LobbyListItemPane(gameDTO, (id) ->
                                             server.joinLobby(id,
-                                                    gameDTO1 -> runLater(mainCtrl::showLobbyScreen),
+                                                    gameDTO1 -> runLater(() -> {
+                                                        mainCtrl.showLobbyScreen();
+                                                    }),
                                                     () -> runLater(() ->
                                                             mainCtrl.showErrorSnackBar(
                                                                     "Something went wrong while joining the lobby."

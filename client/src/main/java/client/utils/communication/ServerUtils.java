@@ -28,6 +28,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import commons.entities.auth.LoginDTO;
 import commons.entities.auth.UserDTO;
 import commons.entities.game.GameDTO;
+import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.utils.ApiError;
@@ -344,7 +345,7 @@ public class ServerUtils {
     }
 
     /**
-     * Function that gets all the info about the currently logged in player.
+     * Function that gets all the info about the currently logged in user.
      *
      * @param getUserInfoHandlerSuccess The function that will be called if the request is successful.
      * @param getUserInfoHandlerFail The function that will be called if the request is unsuccessful.

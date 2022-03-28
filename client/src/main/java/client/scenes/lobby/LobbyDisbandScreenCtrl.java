@@ -9,11 +9,11 @@ import javafx.scene.layout.AnchorPane;
 import lombok.Generated;
 
 /**
- * The controller for the LobbyLeaveScreen.
- * It handles all the actions of the LobbyLeaveScreen.
+ * The controller for the LobbyDisbandScreen.
+ * It handles all the actions of the LobbyDisbandScreen.
  */
 @Generated
-public class LobbyLeaveScreenCtrl implements Initializable {
+public class LobbyDisbandScreenCtrl implements Initializable {
 
     /**
      * The cancel handler interface.
@@ -27,30 +27,30 @@ public class LobbyLeaveScreenCtrl implements Initializable {
     }
 
     /**
-     * The leave handler interface.
+     * The disband handler interface.
      * The purpose of this is to allow passing of a
      * function to this controller.
      * This function will be later applied by the user when clicking
-     * the leave button.
+     * the disband button.
      */
-    public interface LeaveHandler {
+    public interface DisbandHandler {
         void handle();
     }
 
-    @FXML private JFXButton cancelLeaveLobbyButton;
-    @FXML private JFXButton leaveLobbyButton;
+    @FXML private JFXButton cancelDisbandLobbyButton;
+    @FXML private JFXButton disbandLobbyButton;
     @FXML private AnchorPane rootPane;
-    private LeaveHandler leaveHandler;
     private CancelHandler cancelHandler;
+    private DisbandHandler disbandHandler;
 
     /**
-     * The constructor for the LobbyLeaveScreen controller.
+     * The constructor for the LobbyDisbandScreen controller.
      *
-     * @param leaveHandler the action that is to be performed when the user leaves the lobby.
-     * @param cancelHandler the action that is to be performed when the user cancels leaving the game.
+     * @param disbandHandler the action that is to be performed when the host disbands the lobby.
+     * @param cancelHandler the action that is to be performed when the host cancels disbanding the lobby.
      */
-    public LobbyLeaveScreenCtrl(LeaveHandler leaveHandler, CancelHandler cancelHandler) {
-        this.leaveHandler = leaveHandler;
+    public LobbyDisbandScreenCtrl(DisbandHandler disbandHandler, CancelHandler cancelHandler) {
+        this.disbandHandler = disbandHandler;
         this.cancelHandler = cancelHandler;
     }
 
@@ -58,16 +58,16 @@ public class LobbyLeaveScreenCtrl implements Initializable {
      * This function handles the cancel button click.
      */
     @FXML
-    private void cancelLeaveLobby() {
+    private void cancelDisbandLobby() {
         cancelHandler.handle();
     }
 
     /**
-     * This function handles the leave button click.
+     * This function handles the disband button click.
      */
     @FXML
-    private void leaveLobby() {
-        leaveHandler.handle();
+    private void disbandLobby() {
+        disbandHandler.handle();
     }
 
     @Override
