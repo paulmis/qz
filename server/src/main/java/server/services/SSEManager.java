@@ -41,10 +41,11 @@ public class SSEManager {
         if (emitters.containsKey(userId)) {
             emitters.get(userId).complete();
             unregister(userId);
-            log.debug("Removed existing SSE emitter for user {}", userId);
+            log.debug("Removed the previous SSE emitter for user [{}]", userId);
         }
 
         emitters.put(userId, emitter);
+        log.info("Registered SSE emitter for user [{}]", userId);
     }
 
     /**
@@ -66,7 +67,7 @@ public class SSEManager {
      * @return whether the SSE emitter was successfully removed or not
      */
     public boolean unregister(UUID userId, SseEmitter emitter) {
-        if (emitters.get(userId) != emitter) {
+        if (emitters.get(userId) == emitter) {
             emitters.remove(userId);
             return true;
         }
