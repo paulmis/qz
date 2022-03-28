@@ -53,6 +53,7 @@ public class GameCommunication {
                     handlerFailure.handle();
                 }
             }
+            
             @Override
             public void failed(Throwable throwable) {
                 log.error("Failed to update current answer", throwable);

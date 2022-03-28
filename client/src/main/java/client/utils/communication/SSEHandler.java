@@ -82,7 +82,8 @@ public class SSEHandler {
                 client.utils.communication.SSEEventHandler.class);
 
         // We get the names of all the event handlers
-        List<SSEMessageType> names = handlers.stream().map(ReflectionUtils::getSSEEventName).collect(Collectors.toList());
+        List<SSEMessageType> names = handlers.stream()
+                .map(ReflectionUtils::getSSEEventName).collect(Collectors.toList());
 
         // We generate the runnables for each event.
         List<SSEEventHandler> runnables = handlers.stream().map(method -> {
