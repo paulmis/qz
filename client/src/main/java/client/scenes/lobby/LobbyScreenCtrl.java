@@ -183,7 +183,7 @@ public class LobbyScreenCtrl implements SSESource {
     }
 
     /**
-     * Fired when the user button is pressed
+     * Fired when the user button is pressed.
      */
     public void showUserInfo() {
         if (userInfo == null) {

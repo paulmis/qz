@@ -4,15 +4,18 @@ import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.net.URL;
+import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import java.net.URL;
-import java.util.ResourceBundle;
 
+/**
+ * Control of the user info widget.
+ */
 public class UserInfoCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
@@ -63,7 +66,7 @@ public class UserInfoCtrl implements Initializable {
     }
 
     /**
-     * Sets current username in the widget
+     * Sets current username in the widget.
      */
     public void setupData() {
         usernameField.setText(ClientState.user.getNickname());
