@@ -39,7 +39,7 @@ public class JWTHandler {
         return JWT.create()
                 .withExpiresAt(new Date(System.currentTimeMillis() + JWT_TTL * 1000))
                 .withSubject("User")
-                .withClaim("email", email)
+                .withClaim("email", email.toLowerCase())
                 .withIssuedAt(new Date())
                 .sign(Algorithm.HMAC256(secret));
     }

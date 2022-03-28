@@ -50,7 +50,7 @@ public class AuthController {
     @PostMapping("register")
     public ResponseEntity<String> register(@Valid @RequestBody UserDTO userData) {
         // If a user with this email or username already exists, return 409
-        if (userRepository.existsByEmailOrUsername(userData.getEmail(), userData.getUsername())) {
+        if (userRepository.existsByEmailIgnoreCaseOrUsername(userData.getEmail(), userData.getUsername())) {
             return new ResponseEntity<>("User already exists", HttpStatus.CONFLICT);
         }
 
@@ -85,7 +85,7 @@ public class AuthController {
 
             // Find the user
             Optional<User> user = userRepository
-                    .findByEmail(userPrincipal.getUsername());
+                    .findByEmailIgnoreCase(userPrincipal.getUsername());
 
             // If the user doesn't exist, return 401
             if (user.isEmpty()) {

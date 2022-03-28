@@ -89,17 +89,17 @@ class LobbyControllerTest {
         john = new User("John", "john@upon.com", "stinkydonkey");
         john.setId(getUUID(0));
         when(userRepository.findById(john.getId())).thenReturn(Optional.of(john));
-        when(userRepository.findByEmail(john.getEmail())).thenReturn(Optional.of(john));
+        when(userRepository.findByEmailIgnoreCase(john.getEmail())).thenReturn(Optional.of(john));
 
         susanne = new User("Susanne", "susanne@louisiane.com", "stinkymonkey");
         susanne.setId(getUUID(1));
         when(userRepository.findById(susanne.getId())).thenReturn(Optional.of(susanne));
-        when(userRepository.findByEmail(susanne.getEmail())).thenReturn(Optional.of(susanne));
+        when(userRepository.findByEmailIgnoreCase(susanne.getEmail())).thenReturn(Optional.of(susanne));
 
         sally = new User("Sally", "sally@wally.com", "stinkybinky");
         sally.setId(getUUID(2));
         when(userRepository.findById(sally.getId())).thenReturn(Optional.of(sally));
-        when(userRepository.findByEmail(sally.getEmail())).thenReturn(Optional.of(sally));
+        when(userRepository.findByEmailIgnoreCase(sally.getEmail())).thenReturn(Optional.of(sally));
 
         // Create a lobby
         mockLobby = new NormalGame();
@@ -286,7 +286,7 @@ class LobbyControllerTest {
 
     @Test
     public void configPostUserNotFoundTest() throws Exception {
-        when(userRepository.findByEmail(john.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase(john.getEmail())).thenReturn(Optional.empty());
         mockLobby.setStatus(GameStatus.CREATED);
 
         // Request
@@ -342,7 +342,7 @@ class LobbyControllerTest {
     @Test
     void createUserNotFound() throws Exception {
         // Override the user repository response
-        when(userRepository.findByEmail(john.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase(john.getEmail())).thenReturn(Optional.empty());
 
         // Request
         this.mockMvc
@@ -488,7 +488,7 @@ class LobbyControllerTest {
         User bobby = new User("Bobby", "bobby@solo.com", "stinkywhiskey");
         bobby.setId(getUUID(3));
         when(userRepository.findById(bobby.getId())).thenReturn(Optional.of(bobby));
-        when(userRepository.findByEmail(bobby.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase(bobby.getEmail())).thenReturn(Optional.empty());
 
         // Set the context user
         SecurityContextHolder.getContext().setAuthentication(

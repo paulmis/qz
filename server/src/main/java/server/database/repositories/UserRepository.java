@@ -13,15 +13,7 @@ import server.database.entities.User;
  */
 @Repository
 public interface UserRepository extends PagingAndSortingRepository<User, UUID> {
-    Optional<User> findByEmail(String email);
-
-    /**
-     * Checks if a user with the provided email exists.
-     *
-     * @param email the user's email
-     * @return whether the user exists
-     */
-    boolean existsByEmail(String email);
+    Optional<User> findByEmailIgnoreCase(String email);
 
     /**
      * Checks if the provided email and username are unique.
@@ -30,7 +22,7 @@ public interface UserRepository extends PagingAndSortingRepository<User, UUID> {
      * @param username the username to check
      * @return whether the email or username already exists in the database
      */
-    boolean existsByEmailOrUsername(String email, String username);
+    boolean existsByEmailIgnoreCaseOrUsername(String email, String username);
 
     /**
      * Get the list of all users ordered by their score.

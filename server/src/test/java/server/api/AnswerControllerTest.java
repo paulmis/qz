@@ -125,7 +125,7 @@ class AnswerControllerTest {
                         joe.getEmail(),
                         joe.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
-        when(userRepository.findByEmail(joe.getEmail())).thenReturn(Optional.of(joe));
+        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
 
     }
 
@@ -204,7 +204,7 @@ class AnswerControllerTest {
                         susan.getEmail(),
                         susan.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
-        when(userRepository.findByEmail(susan.getEmail())).thenReturn(Optional.of(susan));
+        when(userRepository.findByEmailIgnoreCase(susan.getEmail())).thenReturn(Optional.of(susan));
 
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
@@ -285,7 +285,7 @@ class AnswerControllerTest {
                         susan.getEmail(),
                         susan.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
-        when(userRepository.findByEmail(susan.getEmail())).thenReturn(Optional.of(susan));
+        when(userRepository.findByEmailIgnoreCase(susan.getEmail())).thenReturn(Optional.of(susan));
 
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId())))
@@ -327,7 +327,7 @@ class AnswerControllerTest {
                         susan.getEmail(),
                         susan.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
-        when(userRepository.findByEmail(susan.getEmail())).thenReturn(Optional.of(susan));
+        when(userRepository.findByEmailIgnoreCase(susan.getEmail())).thenReturn(Optional.of(susan));
 
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(scoreEndpoint(mockLobby.getId())))

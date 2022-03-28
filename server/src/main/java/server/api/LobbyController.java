@@ -72,7 +72,7 @@ public class LobbyController {
     @PostMapping
     ResponseEntity create(@RequestBody NormalGameDTO gameDTO) {
         // If the user doesn't exist, return 404
-        Optional<User> founder = userRepository.findByEmail(AuthContext.get());
+        Optional<User> founder = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (founder.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -133,7 +133,7 @@ public class LobbyController {
     @GetMapping
     ResponseEntity<GameDTO> get() {
         // Get the user from the context
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (user.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -188,7 +188,7 @@ public class LobbyController {
     @PutMapping("/{lobbyId}/join")
     ResponseEntity join(@PathVariable UUID lobbyId) {
         // If the user or the game doesn't exist, return 404
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
         Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
         if (user.isEmpty() || lobbyOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or lobby not found");
@@ -218,7 +218,7 @@ public class LobbyController {
     @PutMapping("/{lobbyId}/start")
     ResponseEntity start(@PathVariable UUID lobbyId) {
         // If the user or the game don't exist, return 404
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
         Optional<Game> lobby = gameRepository.findById(lobbyId);
         if (user.isEmpty() || lobby.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or lobby not found");
@@ -252,7 +252,7 @@ public class LobbyController {
             @PathVariable UUID lobbyId,
             @RequestBody GameConfigurationDTO gameConfigurationData) {
         Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
-        Optional<User> userOptional = userRepository.findByEmail(AuthContext.get());
+        Optional<User> userOptional = userRepository.findByEmailIgnoreCase(AuthContext.get());
         // Check if the lobby exists and user exists.
         if (lobbyOptional.isEmpty() || userOptional.isEmpty()) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -288,7 +288,7 @@ public class LobbyController {
     @DeleteMapping("/leave")
     ResponseEntity leave() {
         // If the user or the game don't exist, return 404
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
@@ -312,7 +312,7 @@ public class LobbyController {
     @DeleteMapping("/delete")
     ResponseEntity deleteLobby() {
         // Retrieve the logged-in user
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (user.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
