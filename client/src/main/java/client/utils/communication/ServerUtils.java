@@ -212,7 +212,7 @@ public class ServerUtils {
      */
     public void createLobby(CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
                             CreateLobbyHandlerFail createLobbyHandlerFail) {
-        var config = new NormalGameConfigurationDTO(null, Duration.ofSeconds(10), 1, 10, 3, 2f, 100, 0, 75);
+        var config = new NormalGameConfigurationDTO(null, Duration.ofSeconds(5), 1, 3, 3, 2f, 100, 0, 75);
         var game = new NormalGameDTO();
         game.setId(UUID.randomUUID());
         game.setConfiguration(config);
@@ -318,7 +318,7 @@ public class ServerUtils {
             public void completed(GameDTO game) {
                 System.out.println(game);
                 ClientState.game = game;
-                subscribeToSSE(sseHandler);
+                sseHandler.subscribe();
                 joinLobbyHandlerSuccess.handle(game);
             }
 
@@ -376,32 +376,6 @@ public class ServerUtils {
     public String connect() {
         System.out.println("New connection!\n");
         return "200";
-    }
-
-    /**
-     * This function subscribes to the SSE event source.
-     * It calls the SSE open endpoint and handles the events.
-     *
-     * @param sseHandler The handler of sse events, exceptions and completion.
-     */
-    public static void subscribeToSSE(SSEHandler sseHandler) {
-        // This creates the WebTarget that the sse event source will use.
-        var target = getRequestTarget().path("/api/sse/open");
-
-        // Builds the event source with the target.
-        SseEventSource eventSource = SseEventSource.target(target).reconnectingEvery(0, MICROSECONDS).build();
-
-        // Registers the handling of events, exceptions and completion.
-        eventSource.register(
-                sseHandler::handleEvent,
-                sseHandler::handleException,
-                sseHandler::handleCompletion);
-
-        // Opens the sse listener.
-        eventSource.open();
-
-        // Sets the source of the events in the handler.
-        sseHandler.setSseEventSource(eventSource);
     }
 
     /**

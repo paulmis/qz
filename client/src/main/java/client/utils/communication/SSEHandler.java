@@ -1,5 +1,6 @@
 package client.utils.communication;
 
+import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static javafx.application.Platform.runLater;
 
 import commons.entities.messages.SSEMessageType;
@@ -58,6 +59,41 @@ public class SSEHandler {
         initialize(handlerSource);
     }
 
+    /**
+     * This function subscribes to the SSE event source.
+     * It calls the SSE open endpoint and handles the events.
+     */
+    public void subscribe() {
+        if (sseEventSource != null) {
+            log.warn("--[SSE]-- SSEHandler already subscribed!");
+        }
+
+        // Builds the event source with the target.
+        SseEventSource eventSource = SseEventSource
+            .target(
+                ServerUtils
+                    .getRequestTarget()
+                    .path("/api/sse/open"))
+            .reconnectingEvery(0, MICROSECONDS).build();
+
+        // Registers the handling of events, exceptions and completion.
+        eventSource.register(
+            this::handleEvent,
+            this::handleException,
+            this::handleCompletion);
+
+        // Opens the sse listener and sets the source of the events in the handler
+        eventSource.open();
+        setSseEventSource(eventSource);
+    }
+
+    /**
+     * Kills the current SSE connection.
+     */
+    public void kill() {
+        this.sseEventSource.close();
+        log.info("Killed the SSE connection");
+    }
 
     /**
      * This function initializes the sse handler object.
@@ -138,14 +174,7 @@ public class SSEHandler {
      */
     public void setSseEventSource(SseEventSource sseEventSource) {
         this.sseEventSource = sseEventSource;
-    }
-
-    /**
-     * Kills the current SSE connection.
-     */
-    public void kill() {
-        this.sseEventSource.close();
-        log.info("Killed the SSE connection");
+        log.info("Assigned SSE source");
     }
 
     /**
@@ -186,11 +215,12 @@ public class SSEHandler {
     }
 
     public void handleException(Throwable throwable) {
-
+        log.error("--[SSE]-- Exception encountered ");
+        throwable.printStackTrace();
     }
 
     public void handleCompletion() {
-
+        log.error("--[SSE]-- Completed");
     }
 }
 

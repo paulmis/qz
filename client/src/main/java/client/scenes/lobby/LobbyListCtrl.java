@@ -104,7 +104,7 @@ public class LobbyListCtrl implements Initializable {
     private void createLobbyButtonClick() {
         server.createLobby(
             game -> {
-                ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
+                ServerUtils.sseHandler.subscribe();
                 runLater(mainCtrl::showLobbyScreen);
             },
             () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
