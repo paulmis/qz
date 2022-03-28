@@ -40,9 +40,9 @@ public class ActivityController {
     ResponseEntity batchAddActivityWithImages(@RequestPart List<ActivityDTO> activities,
                                               @RequestPart(required = false) MultipartFile[] images) {
         // Map filenames to images
-        Map<String, MultipartFile> imageMap = images == null ?
-                Collections.emptyMap() :
-                Maps.uniqueIndex(Arrays.asList(images), MultipartFile::getOriginalFilename);
+        Map<String, MultipartFile> imageMap = images == null
+                ? Collections.emptyMap()
+                : Maps.uniqueIndex(Arrays.asList(images), MultipartFile::getOriginalFilename);
 
         // Convert DTOs to entities and save images
         List<Activity> activitiesToAdd = activities.stream().map(activityDTO -> {
@@ -90,7 +90,7 @@ public class ActivityController {
             List<ActivityDTO> activityDTOList = activityRepository.saveAll(activityList).stream()
                     .map(Activity::getDTO).collect(Collectors.toList());
             log.debug("Added {} activities", activityDTOList.size());
-            return new ResponseEntity<>(activityDTOList, HttpStatus.OK);
+            return new ResponseEntity<>(activityDTOList, HttpStatus.CREATED);
         } catch (Exception e) {
             // This can occur due to malformed data (for example, URL longer than 255 characters)
             log.warn("Failed to save activities: {}", e.getMessage());
