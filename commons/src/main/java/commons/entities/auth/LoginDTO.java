@@ -24,4 +24,10 @@ public class LoginDTO {
      */
     @JsonView(Views.Public.class)
     GameDTO game;
+
+    /**
+     * User data.
+     */
+    @JsonView(Views.Public.class)
+    UserDTO user;
 }

@@ -6,6 +6,7 @@ import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.UserInfoPane;
 import client.utils.AlgorithmicUtils;
+import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
@@ -85,10 +86,8 @@ public class LobbyListCtrl implements Initializable {
     @FXML
     private void createLobbyButtonClick() {
         server.createLobby(game -> {
-            ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
-            runLater(() -> {
-                mainCtrl.showLobbyScreen();
-            });
+            ServerUtils.sseHandler.subscribe();
+            runLater(mainCtrl::showLobbyScreen);
         }, () -> runLater(() ->
                 mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
     }
@@ -123,9 +122,7 @@ public class LobbyListCtrl implements Initializable {
                             sortedLobbies.map(gameDTO ->
                                     new LobbyListItemPane(gameDTO, (id) ->
                                             server.joinLobby(id,
-                                                    gameDTO1 -> runLater(() -> {
-                                                        mainCtrl.showLobbyScreen();
-                                                    }),
+                                                    gameDTO1 -> runLater(mainCtrl::showLobbyScreen),
                                                     () -> runLater(() ->
                                                             mainCtrl.showErrorSnackBar(
                                                                     "Something went wrong while joining the lobby."

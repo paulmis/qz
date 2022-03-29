@@ -1,6 +1,8 @@
 package commons.entities.questions;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonView;
+import commons.entities.utils.Views;
 import lombok.*;
 
 /**
@@ -12,6 +14,7 @@ import lombok.*;
 @Data
 @ToString(callSuper = true)
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
+@JsonView(Views.Public.class)
 public class MCQuestionDTO extends QuestionDTO {
 
     /**

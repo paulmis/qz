@@ -72,7 +72,7 @@ public class UserControllerTests {
     @Test
     void getOk() throws Exception {
         // Mock the repository
-        when(userRepository.findByEmail(joe.getEmail())).thenReturn(Optional.of(joe));
+        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
 
         // Perform the request
         MvcResult res = this.mvc
@@ -89,7 +89,7 @@ public class UserControllerTests {
     @Test
     void getNotFound() throws Exception {
         // Mock the repository
-        when(userRepository.findByEmail(joe.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.empty());
 
         // Perform the request
         MvcResult res = this.mvc
