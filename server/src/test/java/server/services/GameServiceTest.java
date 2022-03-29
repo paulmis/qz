@@ -34,6 +34,7 @@ import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Activity;
 import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
+import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.QuestionRepository;
 
@@ -50,6 +51,9 @@ public class GameServiceTest {
 
     @Mock
     private GameRepository gameRepository;
+
+    @Mock
+    private GamePlayerRepository gamePlayerRepository;
 
     @Mock
     private FSMManager fsmManager;

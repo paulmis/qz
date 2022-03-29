@@ -23,6 +23,7 @@ import server.database.entities.game.GamePlayer;
 import server.database.entities.game.exceptions.GameFinishedException;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
+import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.QuestionRepository;
 import server.services.answer.AnswerCollection;
@@ -46,6 +47,9 @@ public class GameService {
 
     @Autowired
     private GameRepository gameRepository;
+
+    @Autowired
+    private GamePlayerRepository gamePlayerRepository;
 
     @Autowired
     @Getter
@@ -335,6 +339,9 @@ public class GameService {
 
             int streakScore = game.computeStreakScore(player, score);
             player.setScore(player.getScore() + streakScore);
+
+            // Persist the score changes
+            gamePlayerRepository.save(player);
         });
     }
 }
