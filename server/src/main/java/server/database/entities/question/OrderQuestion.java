@@ -1,8 +1,10 @@
 package server.database.entities.question;
 
+import commons.entities.ActivityDTO;
+import commons.entities.AnswerDTO;
 import commons.entities.questions.QuestionDTO;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -12,18 +14,25 @@ import javax.persistence.InheritanceType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import server.database.entities.answer.Answer;
+import server.services.answer.AnswerCollection;
 
 /**
  * OrderQuestion data structure - describes a match question.
  */
+@Slf4j
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public class OrderQuestion extends Question {
+
+    /**
+     * A boolean indicating whether the answer should be in increasing order.
+     */
+    protected boolean increasing = true;
 
     /**
      * Construct a new entity from a DTO.
@@ -33,11 +42,6 @@ public class OrderQuestion extends Question {
     public OrderQuestion(QuestionDTO dto) {
         new ModelMapper().map(dto, this);
     }
-
-    /**
-     * A boolean indicating whether the answer should be in increasing order.
-     */
-    protected boolean increasing = true;
 
     /**
      * Constructor for the OrderQuestion class.
@@ -73,63 +77,90 @@ public class OrderQuestion extends Question {
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
      */
     @Override
-    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
+    public Map<UUID, Double> checkAnswer(AnswerCollection userAnswers) throws IllegalArgumentException {
         if (userAnswers == null) {
+            log.error("Attempting to check order question answers but collection is null");
             throw new IllegalArgumentException("NULL input");
         }
 
-        // Init
-        List<Double> points = new ArrayList<>();
+        final double pointStep = 1.0 / (getActivities().size() - 1);
 
-        for (Answer ans : userAnswers) {
-            if (ans.getResponse().size() != getActivities().size()) {
-                throw new IllegalArgumentException(
-                        "The number of activities in the answer must be the same as the question.");
-            }
+        return userAnswers.getAnswers().stream().collect(
+                Collectors.toMap(
+                        Map.Entry::getKey,
+                        answerEntry -> {
+                            // Get the answer of the user
+                            AnswerDTO answer = answerEntry.getValue();
+                            // Verify that the number of activities in the answer
+                            // matches the number of activities in the question
+                            if (answer.getResponse().size() != getActivities().size()) {
+                                // We don't want to throw here as this allows rogue users to DoS the server.
+                                log.error("The number of activities in answer doesn't match the number of activities"
+                                                + " in question for user {} (expected {}, got {})",
+                                        answerEntry.getKey(),
+                                        getActivities().size(),
+                                        answer.getResponse().size());
+                                return 0.0;
+                            }
 
-            // Check if the order of answers' costs is correct
-            // Give partial points for partially sorted lists
-            double currentPoints = 0;
-            double pointStep = 1.0 / (getActivities().size() - 1);
-            Function<List<Long>, Double> comparator = new Function<>() {
-                @Override
-                public Double apply(List<Long> values) {
-                    // Assign a partial point for adjacent answers in the correct order
-                    if (values.get(1) == values.get(0)) {
-                        return pointStep;
-                    } else if (values.get(1) > values.get(0)) {
-                        return increasing ? pointStep : 0;
-                    } else {
-                        return increasing ? 0 : pointStep;
-                    }
-                }
-            };
-            for (int idx = 1; idx < getActivities().size(); idx++) {
-                currentPoints += comparator.apply(ans.getResponse().subList(idx - 1, idx + 1));
-            }
+                            double currentPoints = 0;
+                            // Create the function to score the answer
+                            Function<List<ActivityDTO>, Double> comparator = values -> {
+                                // Verify that both parameters are present
+                                if (values.size() < 2 || values.get(0) == null || values.get(1) == null) {
+                                    log.error("Attempting to check order question answers but one"
+                                            + " of the activities is null or missing");
+                                    return 0.0;
+                                }
 
-            // Fix possible rounding errors
-            if (currentPoints + pointStep > 1) {
-                // This is to avoid rounding errors like 3*(1/3) != 1
-                currentPoints = 1;
-            }
+                                // Compare the first two activities
+                                if (values.get(0).getCost() == values.get(1).getCost()) {
+                                    return pointStep;
+                                } else if (values.get(1).getCost() > values.get(0).getCost()) {
+                                    return increasing ? pointStep : 0;
+                                } else {
+                                    return increasing ? 0 : pointStep;
+                                }
+                            };
 
-            // Add player's score
-            points.add(currentPoints);
-        }
-        return points;
+                            // Score the answer using the constructed function
+                            for (int idx = 1; idx < getActivities().size(); ++idx) {
+                                currentPoints += comparator.apply(answer.getResponse().subList(idx - 1, idx + 1));
+                            }
+
+                            // Fix possible rounding errors
+                            if (currentPoints + pointStep > 1) {
+                                // This is to avoid rounding errors like 3*(1/3) != 1
+                                currentPoints = 1;
+                            }
+                            return currentPoints;
+                        }
+                )
+        );
     }
 
+    /**
+     * getRightAnswer, returns the correct answer for the question.
+     *
+     * @return the right answer
+     */
     @Override
-    public Answer getRightAnswer() {
-        Answer rightAnswer = new Answer();
+    public AnswerDTO getRightAnswer() {
+        AnswerDTO rightAnswer = new AnswerDTO();
         rightAnswer.setResponse(getActivities().stream()
-                .map(Activity::getCost)
-                .sorted((o1, o2) -> increasing ? o1.compareTo(o2) : o2.compareTo(o1))
+                .map(Activity::getDTO)
+                .sorted((o1, o2) -> increasing
+                        ? o1.getCost().compareTo(o2.getCost())
+                        : o2.getCost().compareTo(o1.getCost()))
                 .collect(Collectors.toList()));
         return rightAnswer;
     }
-    
+
+    /**
+     * Converts the game superclass to a DTO.
+     *
+     * @return the game superclass DTO
+     */
     @Override
     public QuestionDTO getDTO() {
         return new ModelMapper().map(this, QuestionDTO.class);

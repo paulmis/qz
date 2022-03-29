@@ -1,6 +1,8 @@
 package commons.entities.game;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.utils.DTO;
+import commons.entities.utils.Views;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Data;
@@ -11,6 +13,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
+@JsonView(Views.Public.class)
 public class GamePlayerDTO implements DTO {
     /**
      * UUID of game player.

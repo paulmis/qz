@@ -20,7 +20,6 @@ import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 import lombok.Generated;
 
-
 /**
  * Log in Screen controller class.
  */
@@ -73,9 +72,10 @@ public class LogInScreenCtrl implements Initializable {
                 // If the user is in a lobby/game, put them in the apposite screen
                 if (s.getGame() != null) {
                     ClientState.game = s.getGame();
-                    ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
+                    ServerUtils.sseHandler.subscribe();
                     if (s.getGame().getStatus() == GameStatus.CREATED) {
                         mainCtrl.showLobbyScreen();
+                        //ToDo: add `mainCtrl.checkHost();` when ClientState.user is updated on login.
                     } else {
                         mainCtrl.showGameScreen(s.getGame().getCurrentQuestion());
                     }

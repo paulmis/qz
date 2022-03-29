@@ -1,21 +1,24 @@
 package server.database.entities.question;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import commons.entities.AnswerDTO;
 import commons.entities.questions.MCQuestionDTO;
-import commons.entities.questions.QuestionDTO;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import server.database.entities.answer.Answer;
+import server.services.answer.AnswerCollection;
 
 /**
  * MCQuestion data structure - describes a multiple choice question.
  */
+@Slf4j
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -82,7 +85,7 @@ public class MCQuestion extends Question {
      *
      * @param activities the list of activities that compose the question.
      * @param text       the description of the question.
-     * @param answer    the Activity that corresponds to the correct answer.
+     * @param answer     the Activity that corresponds to the correct answer.
      */
     public MCQuestion(List<Activity> activities, String text, Activity answer) {
         super(activities, text);
@@ -92,38 +95,58 @@ public class MCQuestion extends Question {
     /**
      * checkAnswer, checks if the answer of a multiple choice question is correct.
      *
-     * @param userAnswers list of answers provided by each user.
-     *                    Each user should have a single activity as answer.
+     * @param userAnswers Answer collection of all users to check the answer for.
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
+     *         mapped to GamePlayer ids.
      */
     @Override
-    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
+    public Map<UUID, Double> checkAnswer(AnswerCollection userAnswers) throws IllegalArgumentException {
+        log.trace("MCQuestion checkAnswer: checking answer for question {}", this.getId());
+
+        // Verify that the answer is not null.
         if (userAnswers == null) {
+            log.error("MCQuestion checkAnswer: userAnswers is null");
             throw new IllegalArgumentException("NULL input");
         }
-        List<Double> points = new ArrayList<>();
-        for (Answer ans : userAnswers) {
-            // There should be a single activity per answer
-            if (ans.getResponse().size() != 1) {
-                throw new IllegalArgumentException("There should be a single activity per answer.");
-            }
-            // Only the cost is compared because different activities might have the same cost unbeknown to the user
-            if (answer.getCost() == ans.getResponse().get(0)) {
-                points.add(1.0);
-            } else {
-                points.add(0.0);
-            }
-        }
-        return points;
+
+        return userAnswers.getAnswers().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, answerEntry -> {
+                    AnswerDTO answerDTO = answerEntry.getValue();
+                    if (answer == null || answerDTO.getResponse().size() == 0) {
+                        log.trace("User {} answered with no answer", answerEntry.getKey());
+                        return 0.0;
+                    }
+                    // We don't want to throw here, as this allows rogue users to DoS the server.
+                    if (answerDTO.getResponse().size() > 1) {
+                        log.warn("User {} answered with more than one answer", answerEntry.getKey());
+                        return 0.0;
+                    }
+
+                    if (answerDTO.getResponse().get(0).getCost() == answer.getCost()) {
+                        log.trace("User {} answered correctly", answerEntry.getKey());
+                        return 1.0;
+                    } else {
+                        log.trace("User {} answered incorrectly", answerEntry.getKey());
+                        return 0.0;
+                    }
+                }));
     }
 
+    /**
+     * getRightAnswer, returns the correct answer for the question.
+     *
+     * @return the right answer
+     */
     @Override
-    public Answer getRightAnswer() {
-        Answer rightAnswer = new Answer();
-        rightAnswer.setResponse(List.of(getAnswer().getCost()));
-        return rightAnswer;
+    public AnswerDTO getRightAnswer() {
+        return new AnswerDTO(this.getId(), List.of(getAnswer().getDTO()));
     }
-    
+
+    /**
+     * Converts the game superclass to a DTO.
+     *
+     * @return the game superclass DTO
+     */
     @Override
     public MCQuestionDTO getDTO() {
         return new MCQuestionDTO(super.toDTO(), guessConsumption);

@@ -47,7 +47,8 @@ public class DefiniteGameFSM extends GameFSM {
         if (getState() == FSMState.IDLE) {
             log.debug("[{}] FSM is in PREPARING state.", getGame().getId());
             setState(FSMState.PREPARING);
-            scheduleTask(this::run, Duration.ofSeconds(5));
+            scheduleTask(this::run,
+                    Duration.ofMillis(getContext().getQuizConfiguration().getTiming().getPreparationTime()));
             return;
         }
 
@@ -81,7 +82,8 @@ public class DefiniteGameFSM extends GameFSM {
         // If the game is finished, run the cleanup function and return immediately.
         try {
             // Move onto the next question.
-            log.debug("[{}] FSM runnable: advancing onto the next question.", getGame().getId());
+            log.debug("[{}] FSM runnable: advancing onto question {}.",
+                getGame().getId(), getGame().getCurrentQuestionNumber());
             getContext().getGameService()
                 .nextQuestion(
                     getGame(),
@@ -110,9 +112,9 @@ public class DefiniteGameFSM extends GameFSM {
         setState(FSMState.ANSWER);
 
         // Delay before progressing to the next stage
-        long delay = 5000; // TODO: make this configurable?
+        long delay = getContext().getQuizConfiguration().getTiming().getAnswerTime();
         // Show the leaderboard every <leaderboardInterval> questions
-        int leaderboardInterval = 5; // TODO: make this configurable?
+        int leaderboardInterval = getContext().getQuizConfiguration().getLeaderboardInterval();
 
         // Stop accepting answers
         getContext().getGameService().showAnswer(getGame(), delay);
@@ -140,8 +142,8 @@ public class DefiniteGameFSM extends GameFSM {
         log.trace("[{}] FSM runLeaderboard called.", getGame().getId());
         setState(FSMState.LEADERBOARD);
 
-        // TODO: make this configurable?
-        int delay = 5000; // Delay before progressing to the next stage.
+        // Delay before progressing to the next stage.
+        int delay = getContext().getQuizConfiguration().getTiming().getLeaderboardTime();
 
         // Notify all players to show the leaderboard.
         getContext().getSseManager().send(getGame().getPlayerIds(),

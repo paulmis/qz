@@ -85,7 +85,8 @@ public class AuthControllerTests {
     @Test
     void registerOk() throws Exception {
         // Mock the repository
-        when(userRepository.existsByEmailOrUsername(joeDTO.getEmail(), joeDTO.getUsername())).thenReturn(false);
+        when(userRepository.existsByEmailIgnoreCaseOrUsername(joeDTO.getEmail(), joeDTO.getUsername()))
+            .thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(joe);
 
         // Perform the request
@@ -99,7 +100,8 @@ public class AuthControllerTests {
     @Test
     void registerConflict() throws Exception {
         // Mock the repository
-        when(userRepository.existsByEmailOrUsername(joeDTO.getEmail(), joeDTO.getUsername())).thenReturn(true);
+        when(userRepository.existsByEmailIgnoreCaseOrUsername(joeDTO.getEmail(), joeDTO.getUsername()))
+            .thenReturn(true);
 
         // Perform the request
         this.mvc
@@ -125,7 +127,7 @@ public class AuthControllerTests {
     @Test
     void loginOk() throws Exception {
         // Mock the repository
-        when(userRepository.findByEmail(joe.getEmail())).thenReturn(Optional.of(joe));
+        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
         when(gameRepository.getPlayersLobbyOrGame(joe.getId())).thenReturn(Optional.of(game));
 
         // Perform the request
@@ -144,7 +146,7 @@ public class AuthControllerTests {
     @Test
     void loginUnauthorized() throws Exception {
         // Mock the repository
-        when(userRepository.findByEmail(joe.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.empty());
 
         // Perform the request
         this.mvc

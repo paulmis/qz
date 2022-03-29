@@ -1,7 +1,9 @@
 package commons.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.utils.DTO;
+import commons.entities.utils.Views;
 import java.util.UUID;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +13,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
+@JsonView(Views.Public.class)
 public class ActivityDTO implements DTO {
     /**
      * The ID of the activity.
@@ -25,7 +28,7 @@ public class ActivityDTO implements DTO {
     /**
      * Energy consumption of the activity.
      */
-    protected long cost;
+    protected Long cost;
 
     /**
      * URL of the picture of the activity.

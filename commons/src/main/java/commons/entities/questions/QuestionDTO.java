@@ -2,8 +2,10 @@ package commons.entities.questions;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.ActivityDTO;
 import commons.entities.utils.DTO;
+import commons.entities.utils.Views;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +22,7 @@ import lombok.*;
 @JsonSubTypes({
     @JsonSubTypes.Type(value = MCQuestionDTO.class, name = "MCQuestionDTO")
 })
+@JsonView(Views.Public.class)
 public class QuestionDTO implements DTO {
     /**
      * UUID of the question.

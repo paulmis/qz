@@ -2,7 +2,10 @@ package client.communication.game;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
+import commons.entities.game.GameDTO;
+import commons.entities.game.configuration.GameConfigurationDTO;
 import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -67,29 +70,181 @@ public class LobbyCommunication {
     /**
      * Handler for when the leave lobby succeeds.
      */
-    public interface LeaveGameHandler {
+    public interface LeaveGameHandlerSuccess {
         void handle(Response response);
     }
 
     /**
-     * Function that causes the user to leave the lobby.
+     * Handler for when the leave lobby fails.
      */
-    public void leaveLobby(LeaveGameHandler leaveGameHandler) {
+    public interface LeaveGameHandlerFail {
+        void handle();
+    }
+
+    /**
+     * Function that causes the user to leave the lobby.
+     *
+     * @param handleSuccess handler for when request succeeds
+     * @param handleFail handler for when request fails
+     */
+    public void leaveLobby(LeaveGameHandlerSuccess handleSuccess,
+                           LeaveGameHandlerFail handleFail) {
+        // Build the query invocation
         Invocation request = ServerUtils.getRequestTarget()
             .path("/api/lobby/leave")
             .request(APPLICATION_JSON)
             .accept(APPLICATION_JSON)
             .buildDelete();
+        // Perform the query asynchronously
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                handleSuccess.handle(response);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                log.error("");
+                handleFail.handle();
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Handler for when a disband lobby succeeds.
+     */
+    public interface DisbandLobbyHandlerSuccess {
+        void handle(Response response);
+    }
+
+    /**
+     * Handler for when a disband lobby fails.
+     */
+    public interface DisbandLobbyHandlerFail {
+        void handle();
+    }
+
+    /**
+     * Function that causes the host to delete the lobby.
+     *
+     * @param handleSuccess handler for when request succeeds
+     * @param handleFail handler for when request fails
+     */
+    public void disbandLobby(DisbandLobbyHandlerSuccess handleSuccess,
+                             DisbandLobbyHandlerFail handleFail) {
+        // Build the query invocation
+        Invocation request = ServerUtils.getRequestTarget()
+                .path("/api/lobby/delete")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildDelete();
+        // Perform the query asynchronously
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                handleSuccess.handle(response);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                log.error("Disbanding lobby failed");
+                handleFail.handle();
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Handler for getting the lobby info succeeds.
+     */
+    public interface GetLobbyInfoHandlerSuccess {
+        void handle(GameDTO gameDTO);
+    }
+
+    /**
+     * Handler for getting the lobby info fails.
+     */
+    public interface GetLobbyInfoHandlerFail {
+        void handle();
+    }
+
+    /**
+     * Function that gets all the lobby info from the provided lobby id.
+     *
+     * @param handleSuccess The function that will be called if the request is successful.
+     * @param handleFail The function that will be called if the request is unsuccessful.
+     * @param lobbyId The lobby id of the lobby that needs to be found.
+     */
+    public void getLobbyInfo(GetLobbyInfoHandlerSuccess handleSuccess,
+                             GetLobbyInfoHandlerFail handleFail, UUID lobbyId) {
+        // Build the query invocation
+        Invocation request = ServerUtils.getRequestTarget()
+                .path("/api/lobby/" + lobbyId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildGet();
+        // Perform the query asynchronously
+        request.submit(new InvocationCallback<GameDTO>() {
+            @Override
+            public void completed(GameDTO o) {
+                handleSuccess.handle(o);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                log.error("Couldn't retrieve lobby: " + lobbyId);
+                handleFail.handle();
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Handler for when the configuration is saved successfully.
+     */
+    public interface SaveConfigSuccessHandler {
+        void handle();
+    }
+
+    /**
+     * Handler for when the configuration couldn't be saved.
+     */
+    public interface SaveConfigurationFailHandler {
+        void handle();
+    }
+
+    /**
+     * Requests to update the game configuration.
+     *
+     * @param gameId the id of the game
+     * @param config the new configuration
+     * @param handleSuccess  the handler for when the request succeeds
+     * @param handleFail the handler for when the request fails
+     */
+    public void saveConfig(UUID gameId, GameConfigurationDTO config,
+                           SaveConfigSuccessHandler handleSuccess, SaveConfigurationFailHandler handleFail) {
+        Invocation request = ServerUtils.getRequestTarget()
+                .path("/api/lobby/" + gameId + "/config")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPost(Entity.entity(config, APPLICATION_JSON));
 
         request.submit(new InvocationCallback<Response>() {
             @Override
             public void completed(Response response) {
-                leaveGameHandler.handle(response);
+                if (response.getStatus() == 200) {
+                    ClientState.game.setConfiguration(config);
+                    handleSuccess.handle();
+                } else {
+                    handleFail.handle();
+                }
             }
 
             @Override
             public void failed(Throwable throwable) {
                 throwable.printStackTrace();
+                handleFail.handle();
             }
         });
     }

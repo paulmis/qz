@@ -1,9 +1,12 @@
 package client.utils.communication;
 
+import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static javafx.application.Platform.runLater;
 
 import commons.entities.messages.SSEMessageType;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -58,6 +61,44 @@ public class SSEHandler {
         initialize(handlerSource);
     }
 
+    /**
+     * This function subscribes to the SSE event source.
+     * It calls the SSE open endpoint and handles the events.
+     */
+    public void subscribe() {
+        if (sseEventSource != null) {
+            log.warn("--[SSE]-- SSEHandler already subscribed!");
+        }
+
+        // Builds the event source with the target.
+        SseEventSource eventSource = SseEventSource
+            .target(
+                ServerUtils
+                    .getRequestTarget()
+                    .path("/api/sse/open"))
+            .reconnectingEvery(0, MICROSECONDS).build();
+
+        // Registers the handling of events, exceptions and completion.
+        eventSource.register(
+            this::handleEvent,
+            this::handleException,
+            this::handleCompletion);
+
+        // Opens the sse listener and sets the source of the events in the handler
+        eventSource.open();
+        setSseEventSource(eventSource);
+    }
+
+    /**
+     * Asynchronously kills the current SSE connection.
+     */
+    public void kill() {
+        new Thread(() -> {
+            log.info("--[SSE]-- Killing the SSE connection...");
+            this.sseEventSource.close();
+            log.info("--[SSE]-- Killed the SSE connection");
+        }).start();
+    }
 
     /**
      * This function initializes the sse handler object.
@@ -76,16 +117,17 @@ public class SSEHandler {
         }
 
         // Gets all the methods that have the Name decoration. These are the event handlers.
-        var handlers = ReflectionUtils.getAnnotatedMethods(handlerSource,
+        List<Method> handlers = ReflectionUtils.getAnnotatedMethods(handlerSource,
                 client.utils.communication.SSEEventHandler.class);
 
         // We get the names of all the event handlers
-        var names = handlers.stream().map(ReflectionUtils::getSSEEventName).collect(Collectors.toList());
+        List<SSEMessageType> names = handlers.stream()
+                .map(ReflectionUtils::getSSEEventName).collect(Collectors.toList());
 
         // We generate the runnables for each event.
-        var runnables = handlers.stream().map(method -> {
+        List<SSEEventHandler> runnables = handlers.stream().map(method -> {
             // This gets the types of the parameters of the method.
-            var types = method.getParameterTypes();
+            Class<?>[] types = method.getParameterTypes();
 
             // throws exception if the length is different from 1
             if (types.length > 1) {
@@ -107,7 +149,7 @@ public class SSEHandler {
                     });
                 } else {
                     // Reads the object with the extracted type.
-                    var obj = inboundSseEvent.readData(types[0]);
+                    Object obj = inboundSseEvent.readData(types[0]);
 
                     // This invokes the function with the object and the source inside a run later so
                     // javafx components can have their state changed.
@@ -138,14 +180,7 @@ public class SSEHandler {
      */
     public void setSseEventSource(SseEventSource sseEventSource) {
         this.sseEventSource = sseEventSource;
-    }
-
-    /**
-     * Kills the current SSE connection.
-     */
-    public void kill() {
-        this.sseEventSource.close();
-        log.info("Killed the SSE connection");
+        log.info("Assigned SSE source");
     }
 
     /**
@@ -186,11 +221,12 @@ public class SSEHandler {
     }
 
     public void handleException(Throwable throwable) {
-
+        log.error("--[SSE]-- Exception encountered ");
+        throwable.printStackTrace();
     }
 
     public void handleCompletion() {
-
+        log.error("--[SSE]-- Completed");
     }
 }
 

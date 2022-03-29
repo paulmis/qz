@@ -1,8 +1,11 @@
 package server.database.entities.question;
 
+import commons.entities.ActivityDTO;
+import commons.entities.AnswerDTO;
 import commons.entities.questions.QuestionDTO;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
@@ -11,12 +14,14 @@ import javax.persistence.InheritanceType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import server.database.entities.answer.Answer;
+import server.services.answer.AnswerCollection;
 
 /**
  * MatchQuestion data structure - describes a match question.
  */
+@Slf4j
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -57,47 +62,84 @@ public class MatchQuestion extends Question {
     /**
      * checkAnswer, checks if the answer of a match question is correct.
      *
-     * @param userAnswers list of answers provided by each user.
-     *                    Each user should have a list of activities as answer.
-     *                    The list is compared to the original question's list.
+     * @param userAnswers Answer collection of all users to check the answer for.
      * @return a value between 0 and 1 indicating the percentage of points each user should get.
+     *         mapped to GamePlayer ids.
      */
     @Override
-    public List<Double> checkAnswer(List<Answer> userAnswers) throws IllegalArgumentException {
+    public Map<UUID, Double> checkAnswer(AnswerCollection userAnswers) throws IllegalArgumentException {
+        log.trace("MatchQuestion checkAnswer: Checking answer for match question {}", this.getId());
+
+        // Verify that the collection is not null
         if (userAnswers == null) {
+            log.error("Attempting to check match question answers but collection is null");
             throw new IllegalArgumentException("NULL input");
         }
-        List<Double> points = new ArrayList<>();
-        for (Answer ans : userAnswers) {
-            if (ans.getResponse().size() != getActivities().size()) {
-                throw new IllegalArgumentException(
-                        "The number of activities in the answer must be the same as the question.");
-            }
-            // Check if the order of answers corresponds to the order of questions
-            double currentPoints = 0;
-            double pointStep = 1.0 / getActivities().size();
-            for (int idx = 0; idx < getActivities().size(); idx++) {
-                if (getActivities().get(idx).getCost() == ans.getResponse().get(idx)) {
-                    currentPoints += pointStep;
-                }
-            }
-            if (currentPoints + pointStep > 1) {
-                // This is to avoid rounding errors like 3*(1/3) != 1
-                currentPoints = 1;
-            }
-            points.add(currentPoints);
-        }
-        return points;
+
+        final double pointStep = 1.0 / getActivities().size();
+
+        return userAnswers.getAnswers().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        answerEntry -> {
+                            if (answerEntry.getValue().getQuestionId() == null
+                                    || !answerEntry.getValue().getQuestionId().equals(getId())) {
+                                log.warn("MQ: checkAnswer: answer question ID does not match question ID (player {})",
+                                        answerEntry.getKey());
+                                return 0.0;
+                            }
+
+                            double currentPoints = 0;
+
+                            for (ActivityDTO answer : answerEntry.getValue().getResponse()) {
+                                // For mapping received answers to activities, we use original activity UUIDs
+                                // These UUIDs are sent together with the question DTO, and can be used to
+                                // retrieve the original activity from the question.
+                                Activity originalActivity = getActivities().stream().filter(
+                                        activity -> Objects.equals(activity.getId(), answer.getId())
+                                ).findFirst().orElse(null);
+                                // Check if we found a matching activity
+                                if (originalActivity == null) {
+                                    log.warn("MQ: checkAnswer: answer activity ID does not match"
+                                            + " any question activity ID (player {})",
+                                            answerEntry.getKey());
+                                    return 0.0;
+                                }
+
+                                // Check if the answer is correct
+                                if (originalActivity.getCost() == answer.getCost()) {
+                                    currentPoints += pointStep;
+                                }
+                            }
+
+                            if (currentPoints + pointStep > 1) {
+                                // This is to avoid rounding errors like 3*(1/3) != 1
+                                currentPoints = 1;
+                            }
+
+                            return currentPoints;
+                        }
+                ));
     }
 
+    /**
+     * getRightAnswer, returns the correct answer for the question.
+     *
+     * @return the right answer
+     */
     @Override
-    public Answer getRightAnswer() {
-        Answer rightAnswer = new Answer();
+    public AnswerDTO getRightAnswer() {
+        AnswerDTO rightAnswer = new AnswerDTO();
         rightAnswer.setResponse(getActivities().stream()
-                .map(Activity::getCost).collect(Collectors.toList()));
+                .map(Activity::getDTO).collect(Collectors.toList()));
         return rightAnswer;
     }
-    
+
+    /**
+     * Converts the game superclass to a DTO.
+     *
+     * @return the game superclass DTO
+     */
     @Override
     public QuestionDTO getDTO() {
         return new ModelMapper().map(this, QuestionDTO.class);

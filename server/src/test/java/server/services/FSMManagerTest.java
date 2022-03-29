@@ -16,6 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import server.configuration.quiz.QuizConfiguration;
+import server.configuration.quiz.QuizTimingConfiguration;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.services.fsm.DefiniteGameFSM;
@@ -31,11 +33,12 @@ class FSMManagerTest {
     @Mock
     private SSEManager sseManager;
     @Mock
-    private GameService gameService;
-    @Mock
     private ThreadPoolTaskScheduler taskScheduler;
-
+    @Mock
+    private QuizConfiguration quizConfiguration;
     @InjectMocks
+    private GameService gameService;
+
     private FSMContext context;
 
     @BeforeEach
@@ -50,7 +53,11 @@ class FSMManagerTest {
         game.setConfiguration(config);
         game.setCurrentQuestionNumber(0);
 
+        context = new FSMContext(gameService);
+
         lenient().when(taskScheduler.schedule(any(), any(Date.class))).thenReturn(new FSMHelpers.MockFuture<>());
+        lenient().when(quizConfiguration.getTiming()).thenReturn(
+                new QuizTimingConfiguration(5000, 5000, 5000));
     }
 
     @Test
@@ -117,7 +124,7 @@ class FSMManagerTest {
     }
 
     @Test
-    void startFSMAlreadyStarted() throws InterruptedException {
+    void startFSMAlreadyStarted() {
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
 
         // Add a new FSM

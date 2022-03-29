@@ -1,6 +1,8 @@
 package commons.entities.game.configuration;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonView;
+import commons.entities.utils.Views;
 import java.time.Duration;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @AllArgsConstructor
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
+@JsonView(Views.Public.class)
 public class MockGameConfigurationDTO extends GameConfigurationDTO {
     /**
      * Normal game config constructor.
