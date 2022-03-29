@@ -3,6 +3,7 @@ package client.scenes.lobby;
 import static javafx.application.Platform.runLater;
 
 import client.communication.game.LobbyCommunication;
+import client.communication.game.LobbyListCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.UserInfoPane;
 import client.utils.AlgorithmicUtils;
@@ -26,6 +27,7 @@ import lombok.Generated;
  */
 @Generated
 public class LobbyListCtrl implements Initializable {
+    private final LobbyListCommunication communication;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
@@ -45,12 +47,13 @@ public class LobbyListCtrl implements Initializable {
     /**
      * Initialize a new controller using dependency injection.
      *
-     * @param server Reference to communication utilities object.
+     * @param communication Reference to communication utilities object.
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public LobbyListCtrl(ServerUtils server, MainCtrl mainCtrl, LobbyCommunication communication) {
+    public LobbyListCtrl(LobbyListCommunication communication, MainCtrl mainCtrl, ServerUtils server) {
         this.mainCtrl = mainCtrl;
+        this.communication = communication;
         this.server = server;
     }
 
@@ -85,11 +88,13 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void createLobbyButtonClick() {
-        server.createLobby(game -> {
-            ServerUtils.sseHandler.subscribe();
-            runLater(mainCtrl::showLobbyScreen);
-        }, () -> runLater(() ->
-                mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
+        mainCtrl.showLobbyCreationScreen();
+    }
+
+    @FXML
+    private void signOutButtonClick() {
+        ClientState.user = null;
+        mainCtrl.showServerConnectScreen();
     }
 
     @FXML
@@ -109,7 +114,7 @@ public class LobbyListCtrl implements Initializable {
     }
 
     private void updateLobbyList(String filter) {
-        server.getLobbies(
+        communication.getLobbies(
                 games -> runLater(() -> {
                     lobbyListVbox.getChildren().clear();
 
@@ -121,7 +126,7 @@ public class LobbyListCtrl implements Initializable {
                     var generatedLobbies =
                             sortedLobbies.map(gameDTO ->
                                     new LobbyListItemPane(gameDTO, (id) ->
-                                            server.joinLobby(id,
+                                            communication.joinLobby(id,
                                                     gameDTO1 -> runLater(mainCtrl::showLobbyScreen),
                                                     () -> runLater(() ->
                                                             mainCtrl.showErrorSnackBar(

@@ -21,6 +21,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javax.ws.rs.core.Response;
 import lombok.Generated;
 import lombok.Getter;
 
@@ -185,7 +189,7 @@ public class LobbyScreenCtrl implements SSESource {
     }
 
     /**
-     * Fired when the disband button is clicked.
+     * Fired when the leave button is clicked.
      */
     public void disbandButtonClick() {
         mainCtrl.openLobbyDisbandWarning(() -> {
@@ -227,6 +231,7 @@ public class LobbyScreenCtrl implements SSESource {
             userInfo.setVisible(!userInfo.isVisible());
         }
     }
+
 
     /**
      * Fired when the lobby settings button is clicked.

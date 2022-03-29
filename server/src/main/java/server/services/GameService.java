@@ -29,6 +29,7 @@ import server.database.repositories.question.QuestionRepository;
 import server.services.answer.AnswerCollection;
 import server.services.fsm.DefiniteGameFSM;
 import server.services.fsm.FSMContext;
+import server.services.fsm.GameFSM;
 
 /**
  * Get the questions for a specific game.
@@ -102,13 +103,14 @@ public class GameService {
      * Starts a new game, by verifying the starting conditions and creating a questions set.
      *
      * @param game the game to start
+     * @return the started game
      * @throws NotImplementedException if a game other than a definite game is started
      * @throws IllegalStateException   if the game is already started or there aren't enough questions
      * @throws IOException             if sending the GAME_START message fails
      */
     @Transactional
-    public void startGame(Game game)
-            throws NotImplementedException, IllegalStateException, IOException {
+    public Game start(Game game)
+            throws NotImplementedException, IllegalStateException, SSEFailedException {
         // Make sure that the lobby is full and not started
         if (game.getStatus() != GameStatus.CREATED || !game.isFull()) {
             throw new IllegalStateException();
@@ -122,8 +124,10 @@ public class GameService {
 
         // Initialize the questions
         if (game instanceof DefiniteGame) {
+            // Initialize the questions
             DefiniteGame definiteGame = (DefiniteGame) game;
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
+            definiteGame = gameRepository.save(definiteGame);
 
             // Distribute the start event to all players
             sseManager.send(definiteGame.getUserIds(), new SSEMessage(SSEMessageType.GAME_START));
@@ -136,8 +140,6 @@ public class GameService {
         } else {
             throw new NotImplementedException("Starting games other than definite games is not yet supported.");
         }
-
-        gameRepository.save(game);
     }
 
     /**

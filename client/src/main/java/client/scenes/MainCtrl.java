@@ -79,6 +79,9 @@ public class MainCtrl {
     private LobbyListCtrl lobbyListCtrl;
     private Parent lobbyListScreen;
 
+    private LobbyCreationScreenCtrl lobbyCreationScreenCtrl;
+    private Parent lobbyCreationScreen;
+
     private Popup lobbySettingsPopUp;
     private Popup lobbyLeavePopUp;
     private Popup gameLeavePopUp;
@@ -98,7 +101,8 @@ public class MainCtrl {
                            Pair<LobbyScreenCtrl, Parent> lobbyScreen,
                            Pair<GameScreenCtrl, Parent> gameScreen,
                            Pair<GlobalLeaderboardCtrl, Parent> globalLeaderboardScreen,
-                           Pair<LobbyListCtrl, Parent> lobbyListScreen) {
+                           Pair<LobbyListCtrl, Parent> lobbyListScreen,
+                           Pair<LobbyCreationScreenCtrl, Parent> lobbyCreationScreen) {
         this.primaryStage = primaryStage;
 
         this.serverConnectScreen = serverConnectScreen.getValue();
@@ -121,6 +125,9 @@ public class MainCtrl {
 
         this.lobbyListScreen = lobbyListScreen.getValue();
         this.lobbyListCtrl = lobbyListScreen.getKey();
+
+        this.lobbyCreationScreen = lobbyCreationScreen.getValue();
+        this.lobbyCreationScreenCtrl = lobbyCreationScreen.getKey();
 
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
@@ -271,6 +278,14 @@ public class MainCtrl {
     }
 
     /**
+     * This function displays the lobby creation screen.
+     */
+    public void showLobbyCreationScreen() {
+        this.showScreenLetterBox(lobbyCreationScreen, StageScalingStrategy.Letterbox);
+        lobbyCreationScreenCtrl.reset();
+    }
+
+    /**
      * This function returns the primary stage.
      *
      * @return stage that is shown
@@ -328,17 +343,17 @@ public class MainCtrl {
         lobbyLeavePopUp.setOnShown(e -> {
             lobbyLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - lobbyLeavePopUp.getWidth() / 2);
-            
+
             lobbyLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
                     - lobbyLeavePopUp.getHeight() / 2);
         });
-        
+
         var lobbyLeavePane = new PopupPane(new LobbyLeaveScreenCtrl(leaveHandler, cancelHandler),
                 "/lobby/LobbyLeaveScreen");
         lobbyLeavePopUp.getContent().add(lobbyLeavePane);
         lobbyLeavePopUp.show(primaryStage);
     }
-    
+
     /**
      * This function closes the lobby leave popUp.
      */
@@ -346,7 +361,8 @@ public class MainCtrl {
         lobbyLeavePopUp.hide();
         lobbyLeavePopUp.getContent().clear();
     }
-    
+
+
     /**
      * This function opens a popup with
      * a leave warning for leaving the game.
@@ -359,17 +375,17 @@ public class MainCtrl {
         gameLeavePopUp.setOnShown(e -> {
             gameLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - gameLeavePopUp.getWidth() / 2);
-            
+
             gameLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
                     - gameLeavePopUp.getHeight() / 2);
         });
-        
+
         var gameLeavePane = new PopupPane(new GameLeaveScreenCtrl(leaveHandler, cancelHandler),
                 "GameLeaveScreen");
         gameLeavePopUp.getContent().add(gameLeavePane);
         gameLeavePopUp.show(primaryStage);
     }
-    
+
     /**
      * This function closes the game leave popUp.
      */
@@ -377,6 +393,7 @@ public class MainCtrl {
         gameLeavePopUp.hide();
         gameLeavePopUp.getContent().clear();
     }
+
 
     /**
      * This function opens a popup with

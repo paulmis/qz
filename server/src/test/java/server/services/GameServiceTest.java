@@ -23,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import server.database.entities.User;
-import server.database.entities.game.Game;
+import server.database.entities.game.DefiniteGame;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.MockGame;
 import server.database.entities.game.NormalGame;
@@ -175,13 +175,11 @@ public class GameServiceTest {
 
     @Test
     void startNormal() throws IOException {
-        // ToDo: fix QuestionRepository::findByIdNotIn
         // Mock the repository
-        //when(questionRepository.findByIdNotIn(new ArrayList<>()))
-        //        .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
+        when(gameRepository.save(any(DefiniteGame.class))).thenReturn(game);
 
         // Start the game
-        gameService.startGame(game);
+        gameService.start(game);
 
         // Check that the questions have been generated and the status was changed
         assertEquals(3, game.getQuestions().size());
@@ -203,7 +201,7 @@ public class GameServiceTest {
         game.setStatus(GameStatus.ONGOING);
 
         // Start the game
-        assertThrows(IllegalStateException.class, () -> gameService.startGame(game));
+        assertThrows(IllegalStateException.class, () -> gameService.start(game));
 
         // Verify interactions
         verifyNoMoreInteractions(questionRepository);
@@ -215,7 +213,7 @@ public class GameServiceTest {
         game.remove(susanne.getId());
 
         // Start the game
-        assertThrows(IllegalStateException.class, () -> gameService.startGame(game));
+        assertThrows(IllegalStateException.class, () -> gameService.start(game));
 
         // Verify interactions
         verifyNoMoreInteractions(questionRepository);
@@ -232,7 +230,7 @@ public class GameServiceTest {
         mockGame.add(joePlayer);
 
         // Call the service function
-        assertThrows(NotImplementedException.class, () -> gameService.startGame(mockGame));
+        assertThrows(NotImplementedException.class, () -> gameService.start(mockGame));
 
         // Verify that the game hasn't been started
         assertEquals(GameStatus.CREATED, game.getStatus());

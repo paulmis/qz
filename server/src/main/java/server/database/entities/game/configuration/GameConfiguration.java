@@ -2,6 +2,8 @@ package server.database.entities.game.configuration;
 
 import commons.entities.game.configuration.GameConfigurationDTO;
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -28,13 +30,13 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
      * TODO: in order to support half-time power-up, we need to modify the getter of this field
      */
     @Column(nullable = false)
-    protected Duration answerTime = Duration.ofSeconds(10);
+    protected Duration answerTime = Duration.ofSeconds(60);
 
     /**
      * Capacity of the lobby.
      */
     @Column(nullable = false)
-    protected int capacity = 6;
+    protected Integer capacity = 6;
 
     @Column(nullable = false)
     protected Integer streakSize = 3;
@@ -57,7 +59,7 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
      * @param dto source DTO
      */
     public GameConfiguration(GameConfigurationDTO dto) {
-        this.answerTime = dto.getAnswerTime();
+        this.answerTime = Duration.ofSeconds(dto.getAnswerTime());
         this.capacity = dto.getCapacity();
         this.streakSize = dto.getStreakSize();
         this.streakMultiplier = dto.getStreakMultiplier();

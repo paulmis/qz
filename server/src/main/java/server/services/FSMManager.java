@@ -1,8 +1,11 @@
 package server.services;
 
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.entities.game.Game;
 import server.services.fsm.GameFSM;
@@ -13,6 +16,9 @@ import server.services.fsm.GameFSM;
 @Slf4j
 @Service
 public class FSMManager {
+    @Autowired
+    private SSEManager sseManager;
+
     private final ConcurrentHashMap<UUID, GameFSM> fsmMap = new ConcurrentHashMap<>();
 
     /**
@@ -37,28 +43,28 @@ public class FSMManager {
     /**
      * Start the finite state machine for the given game.
      *
-     * @param game the game to get the finite state machine for.
+     * @param gameId the id of the game to start
      * @return whether the finite state machine was started.
      * @throws IllegalStateException if the finite state machine is already running.
      */
-    public boolean startFSM(Game game) {
+    public boolean startFSM(UUID gameId) {
         // Check if the game contains a finite state machine
-        if (fsmMap.containsKey(game.getId())) {
-            GameFSM fsm = fsmMap.get(game.getId());
+        if (fsmMap.containsKey(gameId)) {
+            GameFSM fsm = fsmMap.get(gameId);
             // Check if the finite state machine is already running
             if (!fsm.isRunning() && fsm.isStartable()) {
 
-                log.debug("Starting FSM for game {}", game.getId());
+                log.debug("Starting FSM for game {}", gameId);
                 // Start the finite state machine (in a new thread, to avoid blocking the main thread)
                 new Thread(fsm::run).start();
                 return true;
 
             } else {
-                log.warn("FSM for game {} is already running or not startable", game.getId());
+                log.warn("FSM for game {} is already running or not startable", gameId);
                 return false;
             }
         }
-        log.warn("FSM for game {} not found", game.getId());
+        log.warn("FSM for game {} not found", gameId);
         return false;
     }
 
