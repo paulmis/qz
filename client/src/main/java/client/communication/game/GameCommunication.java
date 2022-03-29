@@ -37,16 +37,16 @@ public class GameCommunication {
 
         // Build the query invocation
         Invocation invocation = ServerUtils.getRequestTarget()
-                .path("/api/answer/" + gameId + "/answer")
+                .path("/api/game/" + gameId + "/answer")
                 .request(APPLICATION_JSON)
                 .buildGet();
 
         // Perform the query asynchronously
         invocation.submit(new InvocationCallback<Response>() {
-
             @Override
             public void completed(Response response) {
                 if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                    log.info("Answer request completed successfully");
                     handlerSuccess.handle(response.readEntity(AnswerDTO.class));
                 } else {
                     log.error("Failed to update current answer: {}", response.getStatus());

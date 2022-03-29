@@ -21,7 +21,7 @@ public class SSEManager {
      * The Map which maps user IDs to SSE emitters.
      * As this class can be called from different threads, we need to use a concurrent map.
      */
-    private Map<UUID, SseEmitter> emitters = new ConcurrentHashMap<>();
+    private final Map<UUID, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     /**
      * Get the number of registered SSE emitters.
@@ -44,6 +44,7 @@ public class SSEManager {
             log.debug("Removed existing SSE emitter for user {}", userId);
         }
 
+        log.debug("Registered SSE emitter for user {}", userId);
         emitters.put(userId, emitter);
     }
 
@@ -54,6 +55,7 @@ public class SSEManager {
      * @return Whether the SSE emitter was successfully removed or not.
      */
     public boolean unregister(UUID userId) {
+        log.debug("Unregistering SSE emitter for user {}", userId);
         return emitters.remove(userId) != null;
     }
 
@@ -68,9 +70,11 @@ public class SSEManager {
     public boolean unregister(UUID userId, SseEmitter emitter) {
         if (emitters.get(userId) != emitter) {
             emitters.remove(userId);
+            log.debug("Unregistered SSE emitter for user {}", userId);
             return true;
         }
 
+        log.debug("Cannot unregister emitter: user {} has no registered emitter", userId);
         return false;
     }
 
@@ -81,6 +85,7 @@ public class SSEManager {
      * @return SSE emitter.
      */
     public SseEmitter get(UUID userId) {
+        log.trace("Getting SSE emitter for user {}", userId);
         return emitters.get(userId);
     }
 
@@ -109,6 +114,7 @@ public class SSEManager {
             return false;
         }
         emitters.get(userId).send(message);
+        log.trace("Sent message to user {}", userId);
         return true;
     }
 
@@ -121,6 +127,7 @@ public class SSEManager {
      * @throws IOException If the message could not be sent.
      */
     public boolean send(UUID userId, SSEMessage message) throws IOException {
+        log.trace("Sending message of type {} to user {}", message.getType(), userId);
         return send(userId, SSE.createEvent(message));
     }
 
@@ -171,6 +178,7 @@ public class SSEManager {
      * @throws IOException If the message could not be sent.
      */
     public void sendAll(SSEMessage message) throws IOException {
+        log.trace("Sending message of type {} to all users", message.getType());
         sendAll(SSE.createEvent(message));
     }
 
@@ -183,11 +191,13 @@ public class SSEManager {
     public boolean disconnect(UUID userId) {
         // If the user has no registered SSE emitter, we can't disconnect it.
         if (!isRegistered(userId)) {
+            log.debug("Cannot disconnect user {}: no registered emitter", userId);
             return false;
         }
 
         // Completes the emitter lifecycle and unregisters it.
         emitters.get(userId).complete();
+        log.trace("Disconnected emitter for user {}", userId);
         return unregister(userId);
     }
 
@@ -213,5 +223,7 @@ public class SSEManager {
             emitter.complete();
         }
         emitters.clear();
+
+        log.trace("Disconnected all emitters");
     }
 }

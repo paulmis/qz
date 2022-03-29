@@ -73,21 +73,26 @@ public class AnswerController {
         // Find GamePlayer
         GamePlayer gamePlayer = (GamePlayer) game.getPlayers().get(user.getId());
         if (gamePlayer == null) {
+            log.warn("GamePlayer not found for user {}", user.getId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         // Check if the game is accepting answers.
         if (!game.isAcceptingAnswers()) {
+            log.warn("Game {} is not accepting answers", game.getId());
             throw new IllegalStateException("Game is not accepting answers.");
         }
 
         // Check if question is correct
         Optional<Question> currentQuestion = game.getQuestion();
         if (currentQuestion.isEmpty()) {
+            log.warn("No question found for game {}", game.getId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         if (!currentQuestion.get().getId().equals(answerData.getQuestionId())) {
             // Trying to answer the wrong question
+            log.warn("Trying to answer question {} with answer for question {}",
+                    currentQuestion.get().getId(), answerData.getQuestionId());
             throw new IllegalArgumentException("Trying to answer the wrong question.");
         }
 
@@ -124,11 +129,13 @@ public class AnswerController {
 
         // Check if game exists
         if (game.isEmpty() || user.isEmpty()) {
+            log.debug("Game or user not found.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         // Check that the user is playing in the game
         if (!gamePlayerRepository.existsByUserIdAndGameId(user.get().getId(), game.get().getId())) {
+            log.info("User {} is not playing in game {}", user.get().getId(), game.get().getId());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -139,6 +146,8 @@ public class AnswerController {
         if (questionIdx.isPresent() && questionIdx.get() >= 0 && questionIdx.get() < game.get().getQuestions().size()) {
             toAnswer = Optional.of((Question) game.get().getQuestions().get(questionIdx.get()));
         }
+
+        log.trace("[{}] Sending correct answer for question {}.", gameId, toAnswer.get().getId());
 
         // Check if game is active
         return toAnswer
@@ -159,11 +168,13 @@ public class AnswerController {
 
         // Check if game exists
         if (game.isEmpty() || user.isEmpty()) {
+            log.debug("Game or user not found.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         // Check that the user is playing in the game
         if (!gamePlayerRepository.existsByUserIdAndGameId(user.get().getId(), game.get().getId())) {
+            log.info("User {} is not playing in game {}", user.get().getId(), game.get().getId());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 

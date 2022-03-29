@@ -143,6 +143,15 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
+     * Get UUIDs of all players in the game.
+     *
+     * @return set of UUIDs of all players in the game.
+     */
+    public Set<UUID> getUserIds() {
+        return players.keySet();
+    }
+
+    /**
      * Add a player to the game. Returns false if the lobby is already full or the player is already in this game.
      *
      * @param player the player to add

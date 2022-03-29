@@ -8,12 +8,14 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import server.configuration.quiz.QuizConfiguration;
 import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
 import server.database.entities.game.Game;
@@ -36,18 +38,24 @@ public class GameService {
     Map<UUID, Map<UUID, AnswerCollection>> allGameAnswers = new ConcurrentHashMap<>();
 
     @Autowired
+    @Getter
+    private QuizConfiguration quizConfiguration;
+
+    @Autowired
     private QuestionRepository questionRepository;
 
     @Autowired
     private GameRepository gameRepository;
 
     @Autowired
+    @Getter
     private SSEManager sseManager;
 
     @Autowired
     private FSMManager fsmManager;
 
     @Autowired
+    @Getter
     private ThreadPoolTaskScheduler taskScheduler;
 
     /**
@@ -114,12 +122,12 @@ public class GameService {
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
 
             // Distribute the start event to all players
-            sseManager.send(definiteGame.getPlayerIds(), new SSEMessage(SSEMessageType.GAME_START));
+            sseManager.send(definiteGame.getUserIds(), new SSEMessage(SSEMessageType.GAME_START));
 
             // Create and start a finite state machine for the game.
             fsmManager.addFSM(definiteGame,
                     new DefiniteGameFSM(definiteGame,
-                            new FSMContext(sseManager, this, taskScheduler)));
+                            new FSMContext(this)));
             fsmManager.startFSM(definiteGame);
         } else {
             throw new NotImplementedException("Starting games other than definite games is not yet supported.");
@@ -151,7 +159,7 @@ public class GameService {
         // Disconnect the player and update clients
         sseManager.unregister(user.getId());
         try {
-            sseManager.send(game.getPlayerIds(), new SSEMessage(SSEMessageType.PLAYER_LEFT, user.getId()));
+            sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.PLAYER_LEFT, user.getId()));
         } catch (IOException ex) {
             // Log failure to update clients
             log.error("Unable to send removePlayer message to all players", ex);
@@ -179,7 +187,7 @@ public class GameService {
 
         // Distribute the event to all players
         log.trace("[{}] FSM runnable: accepting answers enabled.", game.getId());
-        sseManager.send(game.getPlayerIds(), new SSEMessage(SSEMessageType.START_QUESTION, delay));
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.START_QUESTION, delay));
     }
 
     /**
@@ -196,7 +204,7 @@ public class GameService {
 
         // Distribute the event to all players
         log.trace("[{}] FSM runnable: accepting answers disabled.", game.getId());
-        sseManager.send(game.getPlayerIds(), new SSEMessage(SSEMessageType.STOP_QUESTION, delay));
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.STOP_QUESTION, delay));
     }
 
     /**
@@ -213,7 +221,7 @@ public class GameService {
 
         // Distribute the event to all players
         log.debug("[{}] Game is finished.", game.getId());
-        sseManager.send(game.getPlayerIds(), new SSEMessage(SSEMessageType.GAME_END));
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.GAME_END));
     }
 
     /**

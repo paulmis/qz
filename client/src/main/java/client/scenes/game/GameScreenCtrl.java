@@ -58,25 +58,44 @@ public class GameScreenCtrl implements Initializable, SSESource {
     private final GameCommunication communication;
     private final MainCtrl mainCtrl;
 
-    @FXML private BorderPane mainBorderPane;
-    @FXML private HBox avatarHBox;
-    @FXML private HBox emojiHBox;
-    @FXML private HBox powerUpHBox;
-    @FXML private JFXButton quitButton;
-    @FXML private JFXButton settingsButton;
-    @FXML private Label timerLabel;
-    @FXML private Label questionNumberLabel;
-    @FXML private Button emojiBarButton;
-    @FXML private Button powerUpBarButton;
-    @FXML private ImageView emojiBarIcon;
-    @FXML private ImageView powerUpBarIcon;
-    @FXML private ScrollPane emojiScrollPane;
-    @FXML private ScrollPane powerUpScrollPane;
-    @FXML private AnchorPane settingsPanel;
-    @FXML private JFXButton volumeButton;
-    @FXML private JFXSlider volumeSlider;
-    @FXML private JFXToggleButton muteEveryoneToggleButton;
-    @FXML private FontAwesomeIconView volumeIconView;
+    @FXML
+    private BorderPane mainBorderPane;
+    @FXML
+    private HBox avatarHBox;
+    @FXML
+    private HBox emojiHBox;
+    @FXML
+    private HBox powerUpHBox;
+    @FXML
+    private JFXButton quitButton;
+    @FXML
+    private JFXButton settingsButton;
+    @FXML
+    private Label timerLabel;
+    @FXML
+    private Label questionNumberLabel;
+    @FXML
+    private Button emojiBarButton;
+    @FXML
+    private Button powerUpBarButton;
+    @FXML
+    private ImageView emojiBarIcon;
+    @FXML
+    private ImageView powerUpBarIcon;
+    @FXML
+    private ScrollPane emojiScrollPane;
+    @FXML
+    private ScrollPane powerUpScrollPane;
+    @FXML
+    private AnchorPane settingsPanel;
+    @FXML
+    private JFXButton volumeButton;
+    @FXML
+    private JFXSlider volumeSlider;
+    @FXML
+    private JFXToggleButton muteEveryoneToggleButton;
+    @FXML
+    private FontAwesomeIconView volumeIconView;
 
     private StackPane centerPane;
 
@@ -91,7 +110,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      * Initialize a new controller using dependency injection.
      *
      * @param communication Reference to communication utilities object.
-     * @param mainCtrl Reference to the main controller.
+     * @param mainCtrl      Reference to the main controller.
      */
     @Inject
     public GameScreenCtrl(GameCommunication communication, MainCtrl mainCtrl) {
@@ -108,7 +127,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      * is not null.
      * We use this in order to directly reference the controls in the view.
      *
-     * @param location These location parameter.
+     * @param location  These location parameter.
      * @param resources The resource bundle.
      */
     @Override
@@ -134,12 +153,12 @@ public class GameScreenCtrl implements Initializable, SSESource {
         log.debug("Question stage handler triggered.");
         // Set the current question
         GameCommunication.updateCurrentQuestion(
-            ClientState.game.getId(),
-            // Success
-            (question) -> runLater(() -> setQuestion(question)),
-            // Failure
-            () -> runLater(
-                () -> mainCtrl.showErrorSnackBar("Unable to retrieve the current question")));
+                ClientState.game.getId(),
+                // Success
+                (question) -> runLater(() -> setQuestion(question)),
+                // Failure
+                () -> runLater(
+                        () -> mainCtrl.showErrorSnackBar("Unable to retrieve the current question")));
 
         // TODO: timer
     }
@@ -154,11 +173,17 @@ public class GameScreenCtrl implements Initializable, SSESource {
         GameCommunication.updateCurrentAnswer(
                 ClientState.game.getId(),
                 // Success
-                (answer) -> runLater(() -> setAnswer(answer)),
+                (answer) -> runLater(() -> {
+                    log.debug("Received answer for question {}", answer.getQuestionId());
+                    setAnswer(answer);
+                }),
                 // Failure
-                () -> runLater(
-                        () -> mainCtrl.showErrorSnackBar("Unable to retrieve the current answer")
-                )
+                () -> {
+                    log.error("Unable to retrieve the current answer.");
+                    runLater(
+                            () -> mainCtrl.showErrorSnackBar("Unable to retrieve the current answer")
+                    );
+                }
         );
 
         // TODO: timer
@@ -180,7 +205,8 @@ public class GameScreenCtrl implements Initializable, SSESource {
             return;
         }
 
-
+        log.debug("setAnswer: setting answer");
+        ((QuestionPane) this.centerPane).showAnswer(answer);
     }
 
     /**
@@ -413,32 +439,33 @@ public class GameScreenCtrl implements Initializable, SSESource {
     private void quitButtonClick(ActionEvent actionEvent) {
         // Open the warning and wait for user action
         mainCtrl.openGameLeaveWarning(
-            // If confirmed, exit the game
-            () -> {
-                mainCtrl.closeGameLeaveWarning();
-                this.communication.quitGame(
-                    (response) -> runLater(() -> {
-                        switch (response.getStatus()) {
-                            case 200:
-                                System.out.println("User successfully removed from game");
-                                mainCtrl.showLobbyListScreen();
-                                ClientState.game = null;
-                                ServerUtils.sseHandler.kill();
-                                break;
-                            case 404:
-                                mainCtrl.showErrorSnackBar("Unable to quit the game: user or game doesn't exist");
-                                break;
-                            case 409:
-                                mainCtrl.showErrorSnackBar("Unable to quit the game: "
-                                    + "there was a conflict while removing the player");
-                                break;
-                            default:
-                                mainCtrl.showErrorSnackBar("Unable to quit the game: server error");
-                        }
-                    }));
-            },
-            // Otherwise, simply close the warning
-            mainCtrl::closeGameLeaveWarning
+                // If confirmed, exit the game
+                () -> {
+                    mainCtrl.closeGameLeaveWarning();
+                    this.communication.quitGame(
+                            (response) -> runLater(() -> {
+                                switch (response.getStatus()) {
+                                    case 200:
+                                        System.out.println("User successfully removed from game");
+                                        mainCtrl.showLobbyListScreen();
+                                        ClientState.game = null;
+                                        ServerUtils.sseHandler.kill();
+                                        break;
+                                    case 404:
+                                        mainCtrl.showErrorSnackBar("Unable to quit the game: "
+                                                + "user or game doesn't exist");
+                                        break;
+                                    case 409:
+                                        mainCtrl.showErrorSnackBar("Unable to quit the game: "
+                                                + "there was a conflict while removing the player");
+                                        break;
+                                    default:
+                                        mainCtrl.showErrorSnackBar("Unable to quit the game: server error");
+                                }
+                            }));
+                },
+                // Otherwise, simply close the warning
+                mainCtrl::closeGameLeaveWarning
         );
     }
 

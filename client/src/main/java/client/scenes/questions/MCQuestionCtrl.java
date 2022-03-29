@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -94,13 +95,24 @@ public abstract class MCQuestionCtrl implements Initializable {
      * @param answer the correct answer.
      */
     protected void showAnswer(AnswerDTO answer) {
-        if (this.question.getId() != answer.getQuestionId()) {
+        if (!this.question.getId().equals(answer.getQuestionId())) {
             log.warn("Received answer for a different question: expected {} but got {}",
                 this.question.getId(), answer.getQuestionId());
             return;
         }
-        // Get the correct answer
-        // TODO
+
+        log.debug("Showing answer: {}", answer);
+        UUID answerActivity = answer.getResponse().get(0).getId();
+        for (int i = 0; i < getButtons().size(); ++i) {
+            JFXButton button = getButtons().get(i);
+            button.setMouseTransparent(true);
+
+            if (question.getActivities().get(i).getId().equals(answerActivity)) {
+                button.getStyleClass().add("correct-answer");
+            } else if (this.chosenAnswer == this.getButtons().get(i)) {
+                button.getStyleClass().add("incorrect-answer");
+            }
+        }
     }
 
     /**
