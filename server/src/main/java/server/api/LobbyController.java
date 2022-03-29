@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.api.exceptions.PlayerAlreadyInLobbyOrGame;
+import server.api.exceptions.PlayerAlreadyInLobbyOrGameException;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
@@ -31,7 +31,6 @@ import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
 import server.services.LobbyService;
-import server.services.SSEManager;
 
 
 /**
@@ -195,7 +194,7 @@ public class LobbyController {
 
         // Check that the player is not already in a lobby or a game
         if (gameRepository.getPlayersLobbyOrGame(user.get().getId()).isPresent()) {
-            throw new PlayerAlreadyInLobbyOrGame();
+            throw new PlayerAlreadyInLobbyOrGameException();
         }
 
         // Create the player

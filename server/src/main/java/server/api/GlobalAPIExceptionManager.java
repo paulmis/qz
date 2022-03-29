@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import server.api.exceptions.PlayerAlreadyInLobbyOrGame;
+import server.api.exceptions.PlayerAlreadyInLobbyOrGameException;
 import server.api.exceptions.UserAlreadyExistsException;
 
 /**
@@ -46,7 +46,7 @@ public class GlobalAPIExceptionManager {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
     @ExceptionHandler({
-        PlayerAlreadyInLobbyOrGame.class,
+        PlayerAlreadyInLobbyOrGameException.class,
         UserAlreadyExistsException.class,
         IllegalStateException.class })
     public ApiError handlePlayerAlreadyInLobbyOrGameException(Exception ex) {

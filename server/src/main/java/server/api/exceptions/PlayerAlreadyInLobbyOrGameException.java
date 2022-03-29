@@ -3,11 +3,11 @@ package server.api.exceptions;
 /**
  * Thrown when a player is already in a lobby a game, but shouldn't be.
  */
-public class PlayerAlreadyInLobbyOrGame extends IllegalStateException {
+public class PlayerAlreadyInLobbyOrGameException extends IllegalStateException {
     /**
      * No-args constructor.
      */
-    public PlayerAlreadyInLobbyOrGame() {
+    public PlayerAlreadyInLobbyOrGameException() {
         super("Already in a lobby or game");
     }
 
@@ -16,7 +16,7 @@ public class PlayerAlreadyInLobbyOrGame extends IllegalStateException {
      *
      * @param message the exception message
      */
-    public PlayerAlreadyInLobbyOrGame(String message) {
+    public PlayerAlreadyInLobbyOrGameException(String message) {
         super(message);
     }
 }
