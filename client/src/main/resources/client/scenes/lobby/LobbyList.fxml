@@ -133,7 +133,7 @@
       </GridPane>
       <JFXButton fx:id="joinRandomLobbyButton" contentDisplay="GRAPHIC_ONLY" layoutX="840.0" layoutY="90.0" onMouseClicked="#joinRandomLobby" prefHeight="40.0" prefWidth="40.0">
          <graphic>
-            <FontAwesomeIconView glyphName="PLUS" size="40" />
+            <FontAwesomeIconView glyphName="RANDOM" size="40" />
          </graphic>
       </JFXButton>
    </children>
