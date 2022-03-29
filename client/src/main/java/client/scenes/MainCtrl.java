@@ -303,7 +303,6 @@ public class MainCtrl {
         configPane.setPrefHeight(primaryStage.getHeight() / 2);
 
         lobbySettingsPopUp.getContent().add(configPane);
-
         lobbySettingsPopUp.show(primaryStage);
     }
 
