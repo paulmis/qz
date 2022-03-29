@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static server.utils.TestHelpers.getUUID;
 
+import commons.entities.ActivityDTO;
+import commons.entities.AnswerDTO;
 import commons.entities.questions.QuestionDTO;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import server.database.entities.answer.Answer;
+import server.services.answer.AnswerCollection;
 
 class OrderQuestionTest {
     static Question q;
@@ -18,7 +18,7 @@ class OrderQuestionTest {
     private static Activity getActivity(int id) {
         Activity a = new Activity();
         a.setDescription("Activity" + (id + 1));
-        a.setCost(2 + id * 4);
+        a.setCost(2 + id * 4L);
         return a;
     }
 
@@ -46,132 +46,154 @@ class OrderQuestionTest {
 
     @Test
     void getRightAnswerTest() {
-        List<Long> expectedRightChoice = new ArrayList<>();
+        List<ActivityDTO> expectedRightChoice = new ArrayList<>();
         for (int idx = 0; idx < q.getActivities().size(); idx++) {
-            expectedRightChoice.add(getActivity(idx).getCost());
+            expectedRightChoice.add(getActivity(idx).getDTO());
         }
-        Answer expectedRightAnswer = new Answer();
+        AnswerDTO expectedRightAnswer = new AnswerDTO();
         expectedRightAnswer.setResponse(expectedRightChoice);
         assertEquals(expectedRightAnswer, q.getRightAnswer());
     }
 
     @Test
     void checkAnswerTest() {
+        Map<UUID, AnswerDTO> userAnswers = new HashMap<>();
+
         // first user is right
-        List<Long> answerAct = List.of(
-                getActivity(0).getCost(),
-                getActivity(1).getCost(),
-                getActivity(2).getCost(),
-                getActivity(3).getCost()
+        List<ActivityDTO> answerAct = List.of(
+                getActivity(0).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(3).getDTO()
         );
-        Answer a = new Answer();
+        AnswerDTO a = new AnswerDTO();
         a.setResponse(answerAct);
-        List<Answer> userAnswers = new ArrayList<>();
-        userAnswers.add(a);
+        userAnswers.put(getUUID(1), a);
 
         // second user is decreasing
         answerAct = List.of(
-                getActivity(3).getCost(),
-                getActivity(2).getCost(),
-                getActivity(1).getCost(),
-                getActivity(0).getCost()
+                getActivity(3).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(0).getDTO()
         );
-        a = new Answer();
+        a = new AnswerDTO();
         a.setResponse(answerAct);
-        userAnswers.add(a);
+        userAnswers.put(getUUID(2), a);
 
         // third user has two inverted (2/3 of points)
         answerAct = List.of(
-                getActivity(0).getCost(),
-                getActivity(2).getCost(),
-                getActivity(1).getCost(),
-                getActivity(3).getCost()
+                getActivity(0).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(3).getDTO()
         );
-        a = new Answer();
+        a = new AnswerDTO();
         a.setResponse(answerAct);
-        userAnswers.add(a);
+        userAnswers.put(getUUID(3), a);
 
-        assertEquals(new ArrayList<>(Arrays.asList(1.0, 0.0, 2.0 / 3)), q.checkAnswer(userAnswers));
+        Map<UUID, Double> expectedAnswers = new HashMap<>();
+        expectedAnswers.put(getUUID(1), 0.0);
+        expectedAnswers.put(getUUID(2), 1.0);
+        expectedAnswers.put(getUUID(3), 2.0 / 3);
+
+        AnswerCollection answerCollection = new AnswerCollection(userAnswers);
+        assertEquals(expectedAnswers, q.checkAnswer(answerCollection));
     }
 
     @Test
     void checkAnswerDecreasing() {
+        Map<UUID, AnswerDTO> userAnswers = new HashMap<>();
+
         // first user is increasing
-        List<Long> answerAct = List.of(
-                getActivity(0).getCost(),
-                getActivity(1).getCost(),
-                getActivity(2).getCost(),
-                getActivity(3).getCost()
+        List<ActivityDTO> answerAct = List.of(
+                getActivity(0).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(3).getDTO()
         );
-        Answer a = new Answer();
+        AnswerDTO a = new AnswerDTO();
         a.setResponse(answerAct);
-        List<Answer> userAnswers = new ArrayList<>();
-        userAnswers.add(a);
+        userAnswers.put(getUUID(1), a);
 
         // second user is decreasing
         answerAct = List.of(
-                getActivity(30).getCost(),
-                getActivity(2).getCost(),
-                getActivity(1).getCost(),
-                getActivity(0).getCost()
+                getActivity(30).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(0).getDTO()
         );
-        a = new Answer();
+        a = new AnswerDTO();
         a.setResponse(answerAct);
-        userAnswers.add(a);
+        userAnswers.put(getUUID(2), a);
 
         // third user has two inverted (1/3 of points)
         answerAct = List.of(
-                getActivity(0).getCost(),
-                getActivity(2).getCost(),
-                getActivity(1).getCost(),
-                getActivity(3).getCost()
+                getActivity(0).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(3).getDTO()
         );
-        a = new Answer();
+        a = new AnswerDTO();
         a.setResponse(answerAct);
-        userAnswers.add(a);
+        userAnswers.put(getUUID(3), a);
 
         ((OrderQuestion) q).setIncreasing(false);
-        assertEquals(new ArrayList<>(Arrays.asList(0.0, 1.0, 1.0 / 3)), q.checkAnswer(userAnswers));
+
+        Map<UUID, Double> expectedAnswers = new HashMap<>();
+        expectedAnswers.put(getUUID(1), 0.0);
+        expectedAnswers.put(getUUID(2), 1.0);
+        expectedAnswers.put(getUUID(3), 1.0 / 3);
+
+        AnswerCollection answerCollection = new AnswerCollection(userAnswers);
+        assertEquals(expectedAnswers, q.checkAnswer(answerCollection));
     }
 
     @Test
     void checkAnswerMismatchingSize() {
+        Map<UUID, AnswerDTO> userAnswers = new HashMap<>();
+
         // first user has 4 activities
-        List<Long> answerAct = List.of(
-                getActivity(0).getCost(),
-                getActivity(1).getCost(),
-                getActivity(2).getCost(),
-                getActivity(3).getCost()
+        List<ActivityDTO> answerAct = List.of(
+                getActivity(0).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(3).getDTO()
         );
-        Answer a = new Answer();
+        AnswerDTO a = new AnswerDTO();
         a.setResponse(answerAct);
-        List<Answer> userAnswers = new ArrayList<>();
-        userAnswers.add(a);
+        userAnswers.put(getUUID(1), a);
 
         // second user has 5 activities
         answerAct = List.of(
-                getActivity(3).getCost(),
-                getActivity(2).getCost(),
-                getActivity(1).getCost(),
-                getActivity(0).getCost(),
-                getActivity(12).getCost()
+                getActivity(3).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(0).getDTO(),
+                getActivity(12).getDTO()
         );
-        a = new Answer();
+        a = new AnswerDTO();
         a.setResponse(answerAct);
-        userAnswers.add(a);
+        userAnswers.put(getUUID(2), a);
 
         // third user has 4 activities
         answerAct = List.of(
-                getActivity(0).getCost(),
-                getActivity(2).getCost(),
-                getActivity(1).getCost(),
-                getActivity(3).getCost()
+                getActivity(0).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(3).getDTO()
         );
-        a = new Answer();
+        a = new AnswerDTO();
         a.setResponse(answerAct);
-        userAnswers.add(a);
+        userAnswers.put(getUUID(3), a);
 
-        assertThrows(IllegalArgumentException.class, () -> q.checkAnswer(userAnswers));
+        Map<UUID, Double> expectedAnswers = new HashMap<>();
+        expectedAnswers.put(getUUID(1), 0.0);
+        expectedAnswers.put(getUUID(2), 0.0);
+        expectedAnswers.put(getUUID(3), 1.0 / 3);
+
+        AnswerCollection answerCollection = new AnswerCollection(userAnswers);
+        assertEquals(expectedAnswers, q.checkAnswer(answerCollection));
     }
 
     @Test

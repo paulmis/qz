@@ -158,7 +158,7 @@ class AnswerControllerTest {
     public void userAnswerOkTest() throws Exception {
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
-        userAnswer.setResponse(List.of(mockQuestion.getActivities().get(0).getCost()));
+        userAnswer.setResponse(List.of(mockQuestion.getActivities().get(0).getDTO()));
         userAnswer.setQuestionId(mockQuestion.getId());
         this.mockMvc
                 .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))
@@ -220,7 +220,7 @@ class AnswerControllerTest {
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId())))
                 .andExpect(content().string(equalToObject(
-                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer().getDTO()))));
+                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer()))));
     }
 
     @Test
@@ -239,7 +239,7 @@ class AnswerControllerTest {
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId(), Optional.of(1))))
                 .andExpect(content().string(equalToObject(
-                        objectMapper.writeValueAsString(secondQuestion.getRightAnswer().getDTO()))));
+                        objectMapper.writeValueAsString(secondQuestion.getRightAnswer()))));
     }
 
     @Test
@@ -247,7 +247,7 @@ class AnswerControllerTest {
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId(), Optional.of(1))))
                 .andExpect(content().string(equalToObject(
-                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer().getDTO()))));
+                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer()))));
     }
 
     @Test
@@ -255,7 +255,7 @@ class AnswerControllerTest {
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId(), Optional.of(-1))))
                 .andExpect(content().string(equalToObject(
-                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer().getDTO()))));
+                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer()))));
     }
 
     @Test

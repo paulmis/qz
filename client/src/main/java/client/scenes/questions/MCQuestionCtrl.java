@@ -74,9 +74,8 @@ public abstract class MCQuestionCtrl implements Initializable {
                         // Send the answer
                         GameCommunication.putAnswer(
                             ClientState.game.getId(),
-                            new AnswerDTO(
-                                List.of(question.getActivities().get(finalI).getCost()),
-                                question.getId()),
+                            new AnswerDTO(question.getId(),
+                                    List.of(question.getActivities().get(finalI))),
                             // Success
                             () -> runLater(() -> setCurrentAnswer(button)),
                             // Failure
@@ -100,10 +99,9 @@ public abstract class MCQuestionCtrl implements Initializable {
                 this.question.getId(), answer.getQuestionId());
             return;
         }
-
         // Get the correct answer
         // TODO
-    };
+    }
 
     /**
      * Sets the current answer.

@@ -15,14 +15,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.User;
-import server.database.entities.answer.Answer;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
+import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.ActivityRepository;
+import server.services.GameService;
 
 /**
  * AnswerController, controller for all api endpoints of question answers.
@@ -40,6 +41,9 @@ public class AnswerController {
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
+
+    @Autowired
+    private GameService gameService;
 
     @Autowired
     private ActivityRepository activityRepository;
@@ -67,7 +71,8 @@ public class AnswerController {
         User user = userOpt.get();
 
         // Find GamePlayer
-        if (!game.getPlayers().containsKey(user.getId())) {
+        GamePlayer gamePlayer = (GamePlayer) game.getPlayers().get(user.getId());
+        if (gamePlayer == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
@@ -87,11 +92,9 @@ public class AnswerController {
         }
 
         // Update the answer
-        Answer userAnswer = new Answer(answerData);
-        if (game.addAnswer(userAnswer, user.getId())) {
-            // Save updated game
-            game = gameRepository.save(game);
-
+        // XXX: There might be a race condition here?
+        if (gameService.addAnswer(game, gamePlayer, answerData)) {
+            log.trace("[{}] Answer added to game (question {}).", gameId, currentQuestion.get().getId());
             // Answer has been received successfully.
             return ResponseEntity.ok().build();
         } else {
@@ -139,7 +142,7 @@ public class AnswerController {
 
         // Check if game is active
         return toAnswer
-                .map(question -> ResponseEntity.ok(question.getRightAnswer().getDTO()))
+                .map(question -> ResponseEntity.ok(question.getRightAnswer()))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
     }
 

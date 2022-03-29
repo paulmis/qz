@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static server.utils.TestHelpers.getUUID;
 
+import commons.entities.ActivityDTO;
+import commons.entities.AnswerDTO;
 import commons.entities.questions.QuestionDTO;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import server.database.entities.answer.Answer;
+import server.services.answer.AnswerCollection;
 
 class MatchQuestionTest {
     static Question q;
@@ -43,94 +43,106 @@ class MatchQuestionTest {
 
     @Test
     void getRightAnswerTest() {
-        List<Long> expectedRightChoice = new ArrayList<>();
+        List<ActivityDTO> expectedRightChoice = new ArrayList<>();
         for (int idx = 0; idx < q.getActivities().size(); idx++) {
-            expectedRightChoice.add(getActivity(idx).getCost());
+            expectedRightChoice.add(getActivity(idx).getDTO());
         }
-        Answer expectedRightAnswer = new Answer();
+        AnswerDTO expectedRightAnswer = new AnswerDTO();
         expectedRightAnswer.setResponse(expectedRightChoice);
         assertEquals(expectedRightAnswer, q.getRightAnswer());
     }
 
     @Test
     void checkAnswerTest() {
+        Map<UUID, AnswerDTO> userAnswers = new HashMap<>();
+
         // first user has all correct
-        List<Long> answerAct = List.of(
-                getActivity(0).getCost(),
-                getActivity(1).getCost(),
-                getActivity(2).getCost(),
-                getActivity(3).getCost()
+        List<ActivityDTO> answerAct = List.of(
+                getActivity(0).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(3).getDTO()
         );
-        Answer a = new Answer();
+        AnswerDTO a = new AnswerDTO();
         a.setResponse(answerAct);
-        List<Answer> userAnswers = new ArrayList<>();
-        userAnswers.add(a);
+        userAnswers.put(getUUID(1), a);
 
         // second user has all wrong
         answerAct = List.of(
-                getActivity(3).getCost(),
-                getActivity(2).getCost(),
-                getActivity(1).getCost(),
-                getActivity(0).getCost()
+                getActivity(3).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(0).getDTO()
         );
-        a = new Answer();
+        a = new AnswerDTO();
         a.setResponse(answerAct);
-        userAnswers.add(a);
+        userAnswers.put(getUUID(2), a);
 
         // third user has two switched (2/4 of points)
         answerAct = List.of(
-                getActivity(0).getCost(),
-                getActivity(2).getCost(),
-                getActivity(1).getCost(),
-                getActivity(3).getCost()
+                getActivity(0).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(3).getDTO()
         );
-        a = new Answer();
+        a = new AnswerDTO();
         a.setResponse(answerAct);
-        userAnswers.add(a);
+        userAnswers.put(getUUID(3), a);
 
-        assertEquals(new ArrayList<>(Arrays.asList(1.0, 0.0, 2.0 / 4)), q.checkAnswer(userAnswers));
+        Map<UUID, Double> expectedScores = new HashMap<>();
+        expectedScores.put(getUUID(1), 1.0);
+        expectedScores.put(getUUID(2), 0.0);
+        expectedScores.put(getUUID(3), 0.5);
+
+        AnswerCollection answerCollection = new AnswerCollection(userAnswers);
+        assertEquals(expectedScores, q.checkAnswer(answerCollection));
     }
 
     @Test
     void checkAnswerMismatchingSize() {
+        Map<UUID, AnswerDTO> userAnswers = new HashMap<>();
+
         // first user has 4 activities
-        List<Long> answerAct = List.of(
-                getActivity(0).getCost(),
-                getActivity(1).getCost(),
-                getActivity(2).getCost(),
-                getActivity(3).getCost()
+        List<ActivityDTO> answerAct = List.of(
+                getActivity(0).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(3).getDTO()
         );
-        Answer a = new Answer();
+        AnswerDTO a = new AnswerDTO();
         a.setResponse(answerAct);
-        List<Answer> userAnswers = new ArrayList<>();
-        userAnswers.add(a);
+        userAnswers.put(getUUID(1), a);
 
         // second user has 5 activities
         answerAct = List.of(
-                getActivity(3).getCost(),
-                getActivity(2).getCost(),
-                getActivity(1).getCost(),
-                getActivity(0).getCost(),
-                getActivity(12).getCost()
+                getActivity(0).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(3).getDTO(),
+                getActivity(4).getDTO()
         );
-        a = new Answer();
+        a = new AnswerDTO();
         a.setResponse(answerAct);
-        userAnswers.add(a);
+        userAnswers.put(getUUID(2), a);
 
         // third user has 4 activities
         answerAct = List.of(
-                getActivity(0).getCost(),
-                getActivity(2).getCost(),
-                getActivity(1).getCost(),
-                getActivity(3).getCost()
+                getActivity(0).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(3).getDTO()
         );
-        a = new Answer();
+        a = new AnswerDTO();
         a.setResponse(answerAct);
-        userAnswers.add(a);
+        userAnswers.put(getUUID(3), a);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            q.checkAnswer(userAnswers);
-        });
+        Map<UUID, Double> expectedScores = new HashMap<>();
+        expectedScores.put(getUUID(1), 1.0);
+        expectedScores.put(getUUID(2), 0.0);
+        expectedScores.put(getUUID(3), 0.5);
+
+        AnswerCollection answerCollection = new AnswerCollection(userAnswers);
+        assertEquals(expectedScores, q.checkAnswer(answerCollection));
     }
 
     @Test

@@ -5,15 +5,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static server.utils.TestHelpers.getUUID;
 
+import commons.entities.ActivityDTO;
+import commons.entities.AnswerDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import server.database.entities.User;
+import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.MockGame;
 import server.database.entities.game.NormalGame;
@@ -330,5 +331,76 @@ public class GameServiceTest {
             any(Iterable.class),
             eq(new SSEMessage(SSEMessageType.GAME_END)));
         verifyNoMoreInteractions(gameRepository, sseManager);
+    }
+
+    @Test
+    void updateScoresCorrect() {
+        AnswerDTO answerA = new AnswerDTO();
+        answerA.setResponse(List.of(questionA.getAnswer().getDTO()));
+        gameService.addAnswer(game, joePlayer, answerA);
+
+        AnswerDTO answerB = new AnswerDTO();
+        answerB.setResponse(List.of(questionB.getAnswer().getDTO()));
+        gameService.addAnswer(game, susannePlayer, answerB);
+
+        gameService.updateScores(game);
+
+        assertEquals(100, joePlayer.getScore());
+        assertEquals(1, joePlayer.getStreak());
+        assertEquals(1, joePlayer.getPowerUpPoints());
+
+        assertEquals(100, susannePlayer.getScore());
+        assertEquals(1, susannePlayer.getStreak());
+        assertEquals(1, susannePlayer.getPowerUpPoints());
+
+    }
+
+    @Test
+    void updateScoresHalf() {
+        AnswerDTO answerA = new AnswerDTO();
+        answerA.setResponse(List.of(questionA.getAnswer().getDTO()));
+        gameService.addAnswer(game, joePlayer, answerA);
+
+        AnswerDTO answerB = new AnswerDTO();
+        ActivityDTO answerBActivity = new ActivityDTO();
+        answerBActivity.setCost(300L);
+        answerB.setResponse(List.of(answerBActivity));
+        gameService.addAnswer(game, susannePlayer, answerB);
+
+        gameService.updateScores(game);
+        assertEquals(100, joePlayer.getScore());
+        assertEquals(1, joePlayer.getStreak());
+        assertEquals(1, joePlayer.getPowerUpPoints());
+
+        assertEquals(-10, susannePlayer.getScore());
+        assertEquals(0, susannePlayer.getStreak());
+        assertEquals(0, susannePlayer.getPowerUpPoints());
+    }
+
+    @Test
+    void updateScoresWrong() {
+        joePlayer.setStreak(12);
+
+        AnswerDTO answerA = new AnswerDTO();
+        ActivityDTO answerAActivity = new ActivityDTO();
+        answerAActivity.setCost(300L);
+        answerA.setResponse(List.of(answerAActivity));
+        gameService.addAnswer(game, joePlayer, answerA);
+
+        AnswerDTO answerB = new AnswerDTO();
+        ActivityDTO answerBActivity = new ActivityDTO();
+        answerBActivity.setCost(300L);
+        answerB.setResponse(List.of(answerBActivity));
+        gameService.addAnswer(game, susannePlayer, answerB);
+
+        gameService.updateScores(game);
+
+        assertEquals(-10, joePlayer.getScore());
+        assertEquals(0, joePlayer.getStreak());
+        assertEquals(0, joePlayer.getPowerUpPoints());
+
+        assertEquals(-10, susannePlayer.getScore());
+        assertEquals(0, susannePlayer.getStreak());
+        assertEquals(0, susannePlayer.getPowerUpPoints());
     }
 }
