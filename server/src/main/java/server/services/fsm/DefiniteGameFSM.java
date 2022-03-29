@@ -111,6 +111,9 @@ public class DefiniteGameFSM extends GameFSM {
         log.trace("[{}] FSM runAnswer called.", getGame().getId());
         setState(FSMState.ANSWER);
 
+        // Update the scores
+        getContext().getGameService().updateScores(getGame());
+
         // Delay before progressing to the next stage
         long delay = getContext().getQuizConfiguration().getTiming().getAnswerTime();
         // Show the leaderboard every <leaderboardInterval> questions
