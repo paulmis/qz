@@ -1,26 +1,32 @@
 package server.services;
 
+import commons.entities.AnswerDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import server.api.exceptions.SSEFailedException;
+import server.configuration.quiz.QuizConfiguration;
 import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
 import server.database.entities.game.Game;
+import server.database.entities.game.GamePlayer;
 import server.database.entities.game.exceptions.GameFinishedException;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
+import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.QuestionRepository;
+import server.services.answer.AnswerCollection;
 import server.services.fsm.DefiniteGameFSM;
 import server.services.fsm.FSMContext;
 import server.services.fsm.GameFSM;
@@ -31,6 +37,12 @@ import server.services.fsm.GameFSM;
 @Service
 @Slf4j
 public class GameService {
+    Map<UUID, Map<UUID, AnswerCollection>> allGameAnswers = new ConcurrentHashMap<>();
+
+    @Autowired
+    @Getter
+    private QuizConfiguration quizConfiguration;
+
     @Autowired
     private QuestionRepository questionRepository;
 
@@ -38,12 +50,17 @@ public class GameService {
     private GameRepository gameRepository;
 
     @Autowired
+    private GamePlayerRepository gamePlayerRepository;
+
+    @Autowired
+    @Getter
     private SSEManager sseManager;
 
     @Autowired
     private FSMManager fsmManager;
 
     @Autowired
+    @Getter
     private ThreadPoolTaskScheduler taskScheduler;
 
     /**
@@ -102,7 +119,10 @@ public class GameService {
         // Launch the game
         game.setStatus(GameStatus.ONGOING);
 
-        // Initialize the game
+        // Initialize the answers collection
+        allGameAnswers.put(game.getId(), new ConcurrentHashMap<>());
+
+        // Initialize the questions
         if (game instanceof DefiniteGame) {
             // Initialize the questions
             DefiniteGame definiteGame = (DefiniteGame) game;
@@ -110,17 +130,13 @@ public class GameService {
             definiteGame = gameRepository.save(definiteGame);
 
             // Distribute the start event to all players
-            sseManager.send(definiteGame.getPlayerIds(), new SSEMessage(SSEMessageType.GAME_START));
+            sseManager.send(definiteGame.getUserIds(), new SSEMessage(SSEMessageType.GAME_START));
 
-            // Create and start the FSM
+            // Create and start a finite state machine for the game.
             fsmManager.addFSM(definiteGame,
-                new DefiniteGameFSM(
-                    definiteGame,
-                    new FSMContext(sseManager, this, taskScheduler)));
-            fsmManager.startFSM(definiteGame.getId());
-
-            // Return the started game
-            return definiteGame;
+                    new DefiniteGameFSM(definiteGame,
+                            new FSMContext(this)));
+            fsmManager.startFSM(definiteGame);
         } else {
             throw new NotImplementedException("Starting games other than definite games is not yet supported.");
         }
@@ -149,7 +165,7 @@ public class GameService {
         // Disconnect the player and update clients
         sseManager.unregister(user.getId());
         try {
-            sseManager.send(game.getPlayerIds(), new SSEMessage(SSEMessageType.PLAYER_LEFT, user.getId()));
+            sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.PLAYER_LEFT, user.getId()));
         } catch (IOException ex) {
             // Log failure to update clients
             log.error("Unable to send removePlayer message to all players", ex);
@@ -164,7 +180,7 @@ public class GameService {
      */
     @Transactional
     public void nextQuestion(Game<?> game, Long delay)
-        throws IOException, GameFinishedException {
+            throws IOException, GameFinishedException {
         // Check if the game should finish
         if (game.shouldFinish()) {
             throw new GameFinishedException();
@@ -177,7 +193,7 @@ public class GameService {
 
         // Distribute the event to all players
         log.trace("[{}] FSM runnable: accepting answers enabled.", game.getId());
-        sseManager.send(game.getPlayerIds(), new SSEMessage(SSEMessageType.START_QUESTION, delay));
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.START_QUESTION, delay));
     }
 
     /**
@@ -186,15 +202,15 @@ public class GameService {
      * @param game the game to transition
      * @throws IOException if an SSE connection send failed.
      */
-    public void showAnswer(Game<?> game, Long delay)
-        throws IOException {
+    public boolean showAnswer(Game<?> game, Long delay)
+            throws IOException {
         // Disable answering
         game.setAcceptingAnswers(false);
         game = gameRepository.save(game);
 
         // Distribute the event to all players
         log.trace("[{}] FSM runnable: accepting answers disabled.", game.getId());
-        sseManager.send(game.getPlayerIds(), new SSEMessage(SSEMessageType.STOP_QUESTION, delay));
+        return sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.STOP_QUESTION, delay));
     }
 
     /**
@@ -204,13 +220,130 @@ public class GameService {
      * @throws IOException if an SSE connection send failed.
      */
     public void finish(Game<?> game)
-        throws IOException {
+            throws IOException {
         // Mark the game as finished
         game.setStatus(GameStatus.FINISHED);
         game = gameRepository.save(game);
 
         // Distribute the event to all players
         log.debug("[{}] Game is finished.", game.getId());
-        sseManager.send(game.getPlayerIds(), new SSEMessage(SSEMessageType.GAME_END));
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.GAME_END));
+    }
+
+    /**
+     * Add an answer to a game.
+     *
+     * @param game the game to add the answer to.
+     * @param gamePlayer the player who submitted the answer.
+     * @param answer the answer to add.
+     * @return whether the answer was added properly.
+     */
+    public boolean addAnswer(Game game, GamePlayer gamePlayer, AnswerDTO answer) {
+        if (!game.getPlayerIds().contains(gamePlayer.getId())) {
+            log.warn("[{}] Player {} tried to submit an answer, but is not in the game.",
+                    game.getId(),
+                    gamePlayer.getId());
+            return false;
+        }
+        Question question = (Question) game.getQuestion().orElse(null);
+        if (question == null) {
+            log.warn("[{}] Player {} tried to submit an answer, but there is no question.",
+                    game.getId(),
+                    gamePlayer.getId());
+            return false;
+        }
+
+        Map<UUID, AnswerCollection> gameAnswerCollections = allGameAnswers.get(game.getId());
+        if (gameAnswerCollections == null) {
+            log.warn("[{}] Player {} tried to submit an answer, but the game map is not present.",
+                    game.getId(),
+                    gamePlayer.getId());
+            gameAnswerCollections = new ConcurrentHashMap<>();
+            allGameAnswers.put(game.getId(), gameAnswerCollections);
+        }
+
+        AnswerCollection answerCollection = gameAnswerCollections.get(question.getId());
+        if (answerCollection == null) {
+            log.trace("[{}] Creating answer collection for question {}.", game.getId(), question.getId());
+            answerCollection = new AnswerCollection();
+            allGameAnswers.get(game.getId()).put(question.getId(), answerCollection);
+        }
+
+        answerCollection.addAnswer(gamePlayer.getId(), answer);
+        return true;
+    }
+
+    /**
+     * Get answers for a specific game's current question.
+     *
+     * @param game the game to get the answers for.
+     * @return the answers for the game (current question).
+     */
+    public AnswerCollection getAnswers(Game game) {
+        Question currentQuestion = (Question) game.getQuestion().orElse(null);
+        if (currentQuestion == null) {
+            return null;
+        }
+        return getAnswers(game, currentQuestion);
+    }
+
+    /**
+     * Get answers for a specific question of a specific game.
+     *
+     * @param game Game to get the answers for.
+     * @param question Question to get the answers for.
+     * @return The answers for the given game and question.
+     */
+    public AnswerCollection getAnswers(Game game, Question question) {
+        Map<UUID, AnswerCollection> gameAnswerCollections = allGameAnswers.get(game.getId());
+        if (gameAnswerCollections == null || question == null) {
+            return null;
+        }
+        return gameAnswerCollections.get(question.getId());
+    }
+
+    /**
+     * Update the game score.
+     *
+     * @param game the game to update the score for.
+     */
+    public void updateScores(Game game) {
+        updateScores(game, (Question) game.getQuestion().get());
+    }
+
+    /**
+     * Update the game score to account for a specific question.
+     *
+     * @param game game to update the scores for.
+     * @param question question to update the scores for.
+     */
+    public void updateScores(Game game, Question question) {
+        AnswerCollection answerCollection = getAnswers(game, question);
+        if (answerCollection == null) {
+            log.error("[{}] No answer collection for question {}.", game.getId(), question.getId());
+            throw new IllegalArgumentException("No answer collection for question " + question.getId());
+        }
+
+        Map<UUID, Integer> scores = question.checkAnswer(answerCollection).entrySet().stream().collect(
+                Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> game.computeBaseScore(e.getValue())
+                ));
+
+        game.getPlayers().values().forEach(p -> {
+            GamePlayer player = (GamePlayer) p;
+
+            int score = Optional.ofNullable(scores.get(player.getId())).orElse(0);
+            boolean isCorrect = score > game.getConfiguration().getCorrectAnswerThreshold();
+
+            game.updateStreak(player, isCorrect);
+            game.updatePowerUpPoints(player, isCorrect);
+
+            int streakScore = game.computeStreakScore(player, score);
+            player.setScore(player.getScore() + streakScore);
+
+            // Persist the score changes
+            gamePlayerRepository.save(player);
+        });
     }
 }

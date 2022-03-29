@@ -6,9 +6,7 @@ import commons.entities.utils.Views;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 /**
@@ -20,12 +18,12 @@ import lombok.NoArgsConstructor;
 @JsonView(Views.Public.class)
 public class AnswerDTO implements DTO {
     /**
-     * The list of activities from the Question given as an answer.
-     */
-    protected List<Long> response = new ArrayList<>();
-
-    /**
      * The id of the question being answered.
      */
     protected UUID questionId;
+
+    /**
+     * The list of activities from the Question given as an answer.
+     */
+    @NonNull protected List<ActivityDTO> response = new ArrayList<>();
 }

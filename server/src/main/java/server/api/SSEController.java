@@ -52,7 +52,10 @@ public class SSEController {
                     .orElseThrow(() -> new NoSuchElementException("User not found"));
 
             // Register emitter callbacks.
-            emitter.onCompletion(() -> sseManager.unregister(user.getId(), emitter));
+            emitter.onCompletion(() -> {
+                log.trace("SSE connection closed");
+                sseManager.unregister(user.getId(), emitter);
+            });
             emitter.onTimeout(() -> {
                 log.warn("SSE connection timed out");
                 sseManager.unregister(user.getId(), emitter);
@@ -64,6 +67,7 @@ public class SSEController {
 
             // Register emitter to the SSE manager.
             sseManager.register(user.getId(), emitter);
+            log.trace("SSE connection opened");
 
             // The client will wait for a first event in order to start.
             sseManager.send(user.getId(), new SSEMessage(SSEMessageType.INIT));

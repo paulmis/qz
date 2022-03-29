@@ -4,7 +4,6 @@ import static server.utils.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.google.common.collect.Streams;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
@@ -19,8 +18,6 @@ import java.util.stream.Collectors;
 import javax.persistence.*;
 import lombok.*;
 import org.modelmapper.ModelMapper;
-import server.database.entities.answer.Answer;
-import server.database.entities.answer.AnswerCollection;
 import server.database.entities.game.configuration.GameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
@@ -84,46 +81,27 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * Whether the players are allowed to submit an answer or not.
      */
     protected boolean acceptingAnswers = false;
-
-    /**
-     * PRNG.
-     */
-    @Transient
-    private SaveableRandom random = new SaveableRandom(this.seed);
-
     /**
      * List of players currently in the game mapped by their user IDs.
      */
     @JsonManagedReference
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     protected Map<UUID, GamePlayer> players = new HashMap<>();
-
     /**
      * The head of the lobby - person in charge with special privileges.
      */
     @OneToOne(fetch = FetchType.LAZY)
     protected GamePlayer host;
-
     /**
      * Questions assigned to this game.
      */
     @ManyToMany
     protected List<Question> questions = new ArrayList<>();
-
     /**
-     * Answers given by each player for each question.
+     * PRNG.
      */
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
-    protected Map<Question, AnswerCollection> answers = new HashMap<>();
-
-    /**
-     * Automatically sets the creation date to when the entity is first persisted.
-     */
-    @Generated
-    @PrePersist
-    void onCreate() {
-        createDate = LocalDateTime.now();
-    }
+    @Transient
+    private SaveableRandom random = new SaveableRandom(this.seed);
 
     /**
      * Checks if the game is singleplayer, i.e. the capacity is 1.
@@ -164,11 +142,29 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
+     * Automatically sets the creation date to when the entity is first persisted.
+     */
+    @Generated
+    @PrePersist
+    void onCreate() {
+        createDate = LocalDateTime.now();
+    }
+
+    /**
      * Get UUIDs of GamePlayers.
      *
      * @return UUIDs of all GamePlayers in the current game.
      */
     public Set<UUID> getPlayerIds() {
+        return players.values().stream().map(GamePlayer::getId).collect(Collectors.toSet());
+    }
+
+    /**
+     * Get UUIDs of all players in the game.
+     *
+     * @return set of UUIDs of all players in the game.
+     */
+    public Set<UUID> getUserIds() {
         return players.keySet();
     }
 
@@ -271,12 +267,13 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
-     * Increments the current question number.
+     * Increments the current question number and returns the question ID.
      */
-    public void incrementQuestion() {
+    public Optional<UUID> incrementQuestion() {
         this.currentQuestionNumber = this.currentQuestionNumber == null
-            ? 0
-            : this.currentQuestionNumber + 1;
+                ? 0
+                : this.currentQuestionNumber + 1;
+        return this.getQuestion().map(Question::getId);
     }
 
     /**
@@ -294,99 +291,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     public abstract boolean shouldFinish();
 
     /**
-     * Sets the answer of a player to the current question.
-     *
-     * @param answer the answer to set
-     * @param userId the id of the user giving the answer
-     * @return true if the answer was correctly added
-     */
-    public boolean addAnswer(Answer answer, UUID userId) {
-        // Get the player
-        if (!players.containsKey(userId)) {
-            return false;
-        }
-        GamePlayer player = players.get(userId);
-
-        // Set answer's player
-        answer.setPlayer(player);
-
-        // Get current question
-        Optional<Question> question = getQuestion();
-        if (question.isEmpty()) {
-            return false;
-        }
-
-        // Get answers to current question
-        AnswerCollection currentAnswers = answers.get(question.get());
-        if (currentAnswers == null) {
-            // Init tree if question is answered for the first time
-            currentAnswers = new AnswerCollection();
-            currentAnswers.setId(new AnswerCollection.Pk(getId(), question.get().getId()));
-        }
-
-        currentAnswers.addAnswer(answer);
-
-        // Update answers to question
-        answers.put(question.get(), currentAnswers);
-        return true;
-    }
-
-    /**
-     * Returns the list of answers given by each player to the current question.
-     *
-     * @return answers given by each player to the current question, sorted by player id
-     */
-    public List<Answer> getCurrentAnswers() {
-        // Retrieve current question
-        Optional<Question> questionOpt = getQuestion();
-        if (questionOpt.isEmpty()) {
-            return new ArrayList<>();
-        }
-        Question question = questionOpt.get();
-
-        // Fill list and sort it by player id
-        if (!answers.containsKey(question)) {
-            // No answer given
-            return new ArrayList<>();
-        }
-        List<Answer> currentAnswersList = answers.get(question).getAnswerList();
-        return currentAnswersList;
-    }
-
-    /**
-     * Updates the scores of the users based on the given question
-     * and their answers.
-     *
-     * @param question the question that the answers are for.
-     * @param answers the answers to the question.
-     */
-    public void updateScores(@NonNull Question question, @NonNull List<Answer> answers) {
-        // Zips the game player with the base score of their answer(percentage of correctness).
-        Map<GamePlayer, Double> scores =
-                Streams.zip(
-                        answers.stream().map(Answer::getPlayer),
-                        question.checkAnswer(answers).stream(),
-                        AbstractMap.SimpleEntry::new)
-                        .collect(
-                                Collectors.toMap(e -> e.getKey(),
-                                e  -> computeBaseScore(e.getValue())
-                                ));
-
-        // Iterates over the players and updates their streak, computes their streak
-        // score and sets their new score accordingly.
-        players.values().forEach(gamePlayer -> {
-            double score = Optional.ofNullable(scores.get(gamePlayer)).orElse(0.0);
-            var isCorrect =  score >= configuration.getCorrectAnswerThreshold();
-
-            updateStreak(gamePlayer, isCorrect);
-            updatePowerUpPoints(gamePlayer, isCorrect);
-
-            var streakScore = computeStreakScore(gamePlayer, score);
-            gamePlayer.setScore(gamePlayer.getScore() + (int) Math.round(streakScore));
-        });
-    }
-
-    /**
      * Computes the base score given a correctness percentage.
      * A base score means a score without streaks or multipliers applied.
      *
@@ -394,26 +298,26 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * @return the computed base score.
      * @throws IllegalArgumentException if the percentage is not in the range [0, 1]
      */
-    protected Double computeBaseScore(double percentage) throws IllegalArgumentException {
+    public int computeBaseScore(double percentage) throws IllegalArgumentException {
         if (percentage < 0.0 - 1e-9 || percentage > 1.0 + 1e-9) {
             throw new IllegalArgumentException("Percentage needs to be between 0 and 1.0.");
         }
-        return percentage
+        return (int) Math.round(percentage
                 * (configuration.getPointsCorrect() - configuration.getPointsWrong())
-                + configuration.getPointsWrong();
+                + configuration.getPointsWrong());
     }
 
     /**
      * Computes the streak score given a base score.
      *
      * @param gamePlayer the game player that has the streak.
-     * @param baseScore the base score.
+     * @param baseScore  the base score.
      * @return the new streak score.
      */
-    protected Double computeStreakScore(GamePlayer gamePlayer, double baseScore) {
-        return (gamePlayer.getStreak() >= configuration.getStreakSize())
+    public int computeStreakScore(GamePlayer gamePlayer, double baseScore) {
+        return (int) Math.round((gamePlayer.getStreak() >= configuration.getStreakSize())
                 ? baseScore * configuration.getStreakMultiplier()
-                : baseScore;
+                : baseScore);
     }
 
     /**
@@ -421,9 +325,9 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * Resets the streak if an answer was wrong and adds 1 if the answer was right.
      *
      * @param gamePlayer the game player.
-     * @param isCorrect the boolean depicting if the answer was correct.
+     * @param isCorrect  the boolean depicting if the answer was correct.
      */
-    protected void updateStreak(GamePlayer gamePlayer, boolean isCorrect) {
+    public void updateStreak(GamePlayer gamePlayer, boolean isCorrect) {
         gamePlayer.setStreak(isCorrect ? gamePlayer.getStreak() + 1 : 0);
     }
 
@@ -431,9 +335,9 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * Updates the power-up points of the player based on if his answer is correct.
      *
      * @param gamePlayer the game player that added the answer.
-     * @param isCorrect if the answer is correct.
+     * @param isCorrect  if the answer is correct.
      */
-    protected void updatePowerUpPoints(GamePlayer gamePlayer, boolean isCorrect) {
+    public void updatePowerUpPoints(GamePlayer gamePlayer, boolean isCorrect) {
         if (isCorrect) {
             gamePlayer.setPowerUpPoints(gamePlayer.getPowerUpPoints() + 1);
         }

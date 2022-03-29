@@ -68,14 +68,14 @@ public class LobbyService {
 
         // Update players of the deletion
         try {
-            sseManager.send(lobby.getPlayerIds(), new SSEMessage(SSEMessageType.LOBBY_DELETED));
+            sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_DELETED));
         } catch (IOException e) {
             // Couldn't notify other players, nothing to do
             log.error("[{}] Couldn't notify other players of lobby deletion", lobby.getGameId(), e);
         }
 
         // Close connection to the players
-        sseManager.disconnect(lobby.getPlayerIds());
+        sseManager.disconnect(lobby.getUserIds());
         return true;
     }
 }
