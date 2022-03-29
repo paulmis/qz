@@ -17,8 +17,6 @@ import javax.ws.rs.core.Response;
 import lombok.Generated;
 import lombok.Getter;
 
-import java.util.concurrent.ExecutionException;
-import javax.ws.rs.core.Response;
 /**
  * Lobby controller.
  */

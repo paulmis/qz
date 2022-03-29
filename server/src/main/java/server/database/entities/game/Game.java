@@ -239,7 +239,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public void changeAcceptingAnswers(boolean acceptingAnswers) throws IOException {
         this.acceptingAnswers = acceptingAnswers;
-
+    }
 
     /**
      * Adds questions to the game.

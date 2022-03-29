@@ -5,6 +5,7 @@ import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
