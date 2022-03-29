@@ -7,6 +7,7 @@ package commons.entities.messages;
 public enum SSEMessageType {
     INIT,
     PLAYER_LEFT,
+    PLAYER_JOINED,
     GAME_START,
     GAME_END,
     START_QUESTION,

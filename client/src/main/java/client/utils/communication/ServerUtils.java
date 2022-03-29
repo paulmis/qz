@@ -124,7 +124,7 @@ public class ServerUtils {
             public void completed(Response o) {
                 if (o.getStatus() == 201) {
                     client = client.register(new Authenticator(o.readEntity(String.class)));
-                    ClientState.user = user;
+                    getMyInfo((dto) -> {}, () -> {});
                     registerHandler.handle(o, new ApiError());
                 } else if (o.getStatus() == 400) {
                     registerHandler.handle(o, o.readEntity(ApiError.class));
@@ -178,7 +178,7 @@ public class ServerUtils {
             public void completed(LoginDTO loginDTO) {
                 System.out.println(loginDTO);
                 client = client.register(new Authenticator(loginDTO.getToken()));
-                ClientState.user = user;
+                getMyInfo((dto) -> {}, () -> {});
                 logInHandlerSuccess.handle(loginDTO);
             }
 
@@ -212,16 +212,15 @@ public class ServerUtils {
      */
     public void createLobby(CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
                             CreateLobbyHandlerFail createLobbyHandlerFail) {
-        var config = new NormalGameConfigurationDTO(null, Duration.ofSeconds(10), 1, 10, 3, 2f, 100, 0, 75);
-        var game = new NormalGameDTO();
-        game.setId(UUID.randomUUID());
-        game.setConfiguration(config);
+        var defaultConfig = new NormalGameConfigurationDTO(null, Duration.ofSeconds(10), 1, 5, 3, 2f, 100, 0, 75);
+        var defaultGame = new NormalGameDTO();
+        defaultGame.setConfiguration(defaultConfig);
 
         Invocation invocation = client
                 .target(SERVER).path("/api/lobby")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .buildPost(Entity.entity(game, APPLICATION_JSON));
+                .buildPost(Entity.entity(defaultGame, APPLICATION_JSON));
 
         invocation.submit(new InvocationCallback<GameDTO>() {
 
@@ -362,6 +361,7 @@ public class ServerUtils {
 
             @Override
             public void completed(UserDTO o) {
+                ClientState.user = o;
                 getUserInfoHandlerSuccess.handle(o);
             }
 
