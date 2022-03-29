@@ -79,7 +79,15 @@
                                     <JFXButton fx:id="leaveButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#leaveButtonClick" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #FF6969;" text="LEAVE" textFill="WHITE" />
                                  </children>
                               </HBox>
-                              <HBox alignment="TOP_RIGHT" prefHeight="37.0" prefWidth="347.0">
+                              <HBox alignment="TOP_CENTER" prefHeight="42.0" prefWidth="150.0">
+                                 <children>
+                                    <JFXButton fx:id="disbandButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#disbandButtonClick" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #FF0000#FF0000;" text="DISBAND" textFill="WHITE">
+                                       <HBox.margin>
+                                          <Insets />
+                                       </HBox.margin></JFXButton>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="TOP_RIGHT" prefHeight="42.0" prefWidth="159.0">
                                  <children>
                                     <VBox alignment="BOTTOM_LEFT">
                                        <children>

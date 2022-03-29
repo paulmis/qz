@@ -21,18 +21,17 @@ import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
 import client.scenes.game.GameScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
-import client.scenes.lobby.LobbyLeaveScreenCtrl;
-import client.scenes.lobby.LobbyLeaveScreenPane;
-import client.scenes.lobby.LobbyListCtrl;
-import client.scenes.lobby.LobbyScreenCtrl;
+import client.scenes.lobby.*;
 import client.scenes.lobby.configuration.ConfigurationScreenCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbarLayout;
+import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.questions.QuestionDTO;
+import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -83,6 +82,7 @@ public class MainCtrl {
     private Popup lobbySettingsPopUp;
     private Popup lobbyLeavePopUp;
     private Popup gameLeavePopUp;
+    private Popup lobbyDisbandPopUp;
 
     private Parent activeScreen;
 
@@ -127,6 +127,7 @@ public class MainCtrl {
         lobbySettingsPopUp = new Popup();
         lobbyLeavePopUp = new Popup();
         gameLeavePopUp = new Popup();
+        lobbyDisbandPopUp = new Popup();
         showServerConnectScreen();
 
         // This makes sure to close every thread when the app is closed.
@@ -255,6 +256,7 @@ public class MainCtrl {
      */
     public void showLobbyScreen() {
         this.lobbyScreenCtrl.reset();
+        this.checkHost();
         lobbyScreenCtrl.bindHandler(ServerUtils.sseHandler);
         this.showScreenLetterBox(lobbyScene, StageScalingStrategy.Letterbox);
     }
@@ -304,7 +306,6 @@ public class MainCtrl {
         configPane.setPrefHeight(primaryStage.getHeight() / 2);
 
         lobbySettingsPopUp.getContent().add(configPane);
-
         lobbySettingsPopUp.show(primaryStage);
     }
 
@@ -327,17 +328,17 @@ public class MainCtrl {
         lobbyLeavePopUp.setOnShown(e -> {
             lobbyLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - lobbyLeavePopUp.getWidth() / 2);
-
+            
             lobbyLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
                     - lobbyLeavePopUp.getHeight() / 2);
         });
-
-        var disbandPane = new LobbyLeaveScreenPane(leaveHandler, cancelHandler);
-        lobbyLeavePopUp.getContent().add(disbandPane);
-
+        
+        var lobbyLeavePane = new PopupPane(new LobbyLeaveScreenCtrl(leaveHandler, cancelHandler),
+                "/lobby/LobbyLeaveScreen");
+        lobbyLeavePopUp.getContent().add(lobbyLeavePane);
         lobbyLeavePopUp.show(primaryStage);
     }
-
+    
     /**
      * This function closes the lobby leave popUp.
      */
@@ -345,7 +346,7 @@ public class MainCtrl {
         lobbyLeavePopUp.hide();
         lobbyLeavePopUp.getContent().clear();
     }
-
+    
     /**
      * This function opens a popup with
      * a leave warning for leaving the game.
@@ -358,23 +359,89 @@ public class MainCtrl {
         gameLeavePopUp.setOnShown(e -> {
             gameLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - gameLeavePopUp.getWidth() / 2);
-
+            
             gameLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
                     - gameLeavePopUp.getHeight() / 2);
         });
-
-        var disbandPane = new GameLeaveScreenPane(leaveHandler, cancelHandler);
-        gameLeavePopUp.getContent().add(disbandPane);
-
+        
+        var gameLeavePane = new PopupPane(new GameLeaveScreenCtrl(leaveHandler, cancelHandler),
+                "GameLeaveScreen");
+        gameLeavePopUp.getContent().add(gameLeavePane);
         gameLeavePopUp.show(primaryStage);
     }
-
+    
     /**
      * This function closes the game leave popUp.
      */
     public void closeGameLeaveWarning() {
         gameLeavePopUp.hide();
         gameLeavePopUp.getContent().clear();
+    }
+
+    /**
+     * This function opens a popup with
+     * a disband warning for disbanding the lobby.
+     *
+     * @param disbandHandler the action that is to be performed when the host disbands the lobby.
+     * @param cancelHandler the action that is to be performed when the host cancels disbanding the lobby.
+     */
+    public void openLobbyDisbandWarning(LobbyDisbandScreenCtrl.DisbandHandler disbandHandler,
+                                        LobbyDisbandScreenCtrl.CancelHandler cancelHandler) {
+        lobbyDisbandPopUp.setOnShown(e -> {
+            lobbyDisbandPopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - lobbyDisbandPopUp.getWidth() / 2);
+
+            lobbyDisbandPopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - lobbyDisbandPopUp.getHeight() / 2);
+        });
+
+        var lobbyDisbandPane = new PopupPane(new LobbyDisbandScreenCtrl(disbandHandler, cancelHandler),
+                "/lobby/LobbyDisbandScreen");
+        lobbyDisbandPopUp.getContent().add(lobbyDisbandPane);
+        lobbyDisbandPopUp.show(primaryStage);
+    }
+
+    /**
+     * This function closes the lobby disband popUp.
+     */
+    public void closeLobbyDisbandWarning() {
+        lobbyDisbandPopUp.hide();
+        lobbyDisbandPopUp.getContent().clear();
+    }
+
+    /**
+     * This function checks if the player is the host of the lobby.
+     *
+     */
+
+    public void checkHost() {
+        //Request user's data
+        Optional<GamePlayerDTO> gamePlayerData = ClientState.game.getPlayers()
+                .stream()
+                .filter(gp -> ClientState.user.getId().equals(gp.getUserId()))
+                .findAny();
+        //Check if game player data is empty
+        if (!gamePlayerData.isEmpty()) {
+            // Compare gamePlayer id with lobby host id to check if player is host
+            if (gamePlayerData.get().getId().equals(ClientState.game.getHost())) {
+                System.out.println("Player is host");
+                this.showDisbandButton();
+            } else {
+                System.out.println("Player is not host");
+                this.hideDisbandButton();
+            }
+        } else {
+            System.out.println("Couldn't retrieve game player/User is not a game player");
+            this.hideDisbandButton();
+        }
+    }
+
+    public void showDisbandButton() {
+        lobbyScreenCtrl.getDisbandButton().setVisible(true);
+    }
+
+    public void hideDisbandButton() {
+        lobbyScreenCtrl.getDisbandButton().setVisible(false);
     }
 
     /**
