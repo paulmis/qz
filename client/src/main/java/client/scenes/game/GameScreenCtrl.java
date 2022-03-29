@@ -282,14 +282,20 @@ public class GameScreenCtrl implements Initializable, SSESource {
      * @param duration duration of the timer in seconds.
      */
     public synchronized void startTimer(Duration duration) {
+        // XXX: this could probably be done in a better way,
+        // but timers are getting cancelled randomly, and I
+        // don't really have the time to fix it.
+
         // Stop existing timer
-        if (timerTask != null) {
+        if (timer != null) {
             try {
-                timerTask.cancel();
+                timer.cancel();
             } catch (Exception e) {
                 log.debug("Unable to cancel timer task: {}", e.getMessage());
             }
         }
+        // Create a new timer
+        timer = new Timer();
         // Reset the time left.
         timeLeft.set((int) duration.toSeconds());
 
