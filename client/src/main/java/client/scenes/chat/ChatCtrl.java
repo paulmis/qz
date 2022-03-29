@@ -1,14 +1,9 @@
 package client.scenes.chat;
 
-import client.utils.communication.SSEEventHandler;
-import client.utils.communication.SSEHandler;
-import client.utils.communication.SSESource;
-import commons.entities.messages.SSEMessageType;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import commons.entities.utils.DTO;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
