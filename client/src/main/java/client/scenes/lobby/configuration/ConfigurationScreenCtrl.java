@@ -70,7 +70,7 @@ public class ConfigurationScreenCtrl implements Initializable {
     private Node generateElementFromField(@NonNull Field field) {
         try {
 
-            // This sets the field as accessible so we can set and get the field.
+            // This sets the field as accessible, so we can set and get the field.
             field.setAccessible(true);
 
             // This calls the constructor of the element with the extracted annotations and data.
