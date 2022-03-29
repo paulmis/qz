@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="topLevelAdminPanelAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#adminPanelKeyPressed" prefHeight="576" prefWidth="1024" style="-fx-background-color: green;" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.admin.ActivityListScreenCtrl">
+   <children>
+      <AnchorPane prefHeight="50.0" prefWidth="1024.0" style="-fx-background-color: white;">
+         <children>
+            <JFXButton fx:id="activitiesGoBackButton" contentDisplay="GRAPHIC_ONLY" onAction="#goBackToAuth" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="0.0">
+               <graphic>
+                  <FontAwesomeIconView glyphName="ARROW_LEFT" size="36" />
+               </graphic>
+            </JFXButton>
+            <Label alignment="CENTER" layoutX="440.0" layoutY="7.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Admin panel">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="126.0" layoutY="42.0" prefHeight="536.0" prefWidth="769.0" style="-fx-background-color: white;">
+         <children>
+            <TableView fx:id="activityTable" layoutX="5.0" layoutY="25.0" prefHeight="426.0" prefWidth="759.0" style="-fx-background-color: white;" tableMenuButtonVisible="true">
+              <columns>
+                <TableColumn fx:id="pictureTableColumn" prefWidth="75.0" text="Picture" />
+                <TableColumn fx:id="descriptionTableColumn" prefWidth="75.0" text="Description" />
+                  <TableColumn fx:id="costTableColumn" prefWidth="75.0" text="Cost" />
+                  <TableColumn fx:id="sourceTableColumn" prefWidth="75.0" text="Source" />
+              </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+            <JFXButton fx:id="deleteActivityButton" disable="true" layoutX="553.0" layoutY="474.0" onAction="#deleteActivityButtonClick" prefHeight="48.0" prefWidth="201.0" ripplerFill="RED" style="-fx-background-color: RED; -fx-background-radius: 20;" text="Delete activity" textFill="WHITE">
+               <graphic>
+                  <FontAwesomeIconView fx:id="deleteActivityIcon" fill="WHITE" glyphName="REMOVE" size="36" />
+               </graphic>
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="editActivityButton" disable="true" layoutX="296.0" layoutY="474.0" onAction="#editActivityButtonClick" prefHeight="48.0" prefWidth="178.0" ripplerFill="#3baa80" style="-fx-background-color: orange; -fx-background-radius: 20;" text="Edit activity" textFill="WHITE">
+               <graphic>
+                  <FontAwesomeIconView fx:id="editActivityIcon" fill="WHITE" glyphName="EDIT" size="36" />
+               </graphic>
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="addActivityButton" layoutX="14.0" layoutY="474.0" onAction="#addActivityButtonClick" prefHeight="48.0" prefWidth="178.0" ripplerFill="#3baa80" style="-fx-background-color: green; -fx-background-radius: 20;" text="Add activity" textFill="WHITE">
+               <graphic>
+                  <FontAwesomeIconView fx:id="addActivityIcon" fill="WHITE" glyphName="PLUS" size="36" />
+               </graphic>
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </JFXButton>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

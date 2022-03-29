@@ -49,7 +49,7 @@ public class LobbyListCtrl implements Initializable {
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public LobbyListCtrl(ServerUtils server, MainCtrl mainCtrl, LobbyCommunication communication) {
+    public LobbyListCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
     }

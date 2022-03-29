@@ -19,6 +19,7 @@ package client;
 import static com.google.inject.Guice.createInjector;
 
 import client.scenes.MainCtrl;
+import client.scenes.admin.ActivityListScreenCtrl;
 import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
@@ -61,9 +62,10 @@ public class Main extends Application {
                 "client", "scenes", "leaderboard", "GlobalLeaderboard.fxml");
         var lobbyListScreen = FXML.load(LobbyListCtrl.class,
                 "client", "scenes", "lobby", "LobbyList.fxml");
-
+        var activityListScreen = FXML.load(ActivityListScreenCtrl.class,
+                "client", "scenes", "admin", "ActivityListScreen.fxml");
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, serverConnectScreen, logInScreen, registerScreen,
-                lobbyScreen, gameScreen, globalLeaderboardScreen, lobbyListScreen);
+                lobbyScreen, gameScreen, globalLeaderboardScreen, lobbyListScreen, activityListScreen);
     }
 }

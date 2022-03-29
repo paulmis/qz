@@ -132,4 +132,9 @@ public class LogInScreenCtrl implements Initializable {
         panelTranslate.setOnFinished(e -> mainCtrl.showRegisterScreen());
         panelTranslate.play();
     }
+
+    @FXML
+    private void adminPanelButtonClick() {
+        mainCtrl.showActivityListScreen();
+    }
 }

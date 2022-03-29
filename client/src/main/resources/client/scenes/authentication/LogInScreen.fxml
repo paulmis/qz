@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
@@ -75,5 +76,10 @@
             </Pane>
          </left>
       </BorderPane>
+      <JFXButton fx:id="adminPanelButton" contentDisplay="GRAPHIC_ONLY" onAction="#adminPanelButtonClick" style="-fx-background-color: white; -fx-background-radius: 20;" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="20.0">
+         <graphic>
+            <FontAwesomeIconView glyphName="COG" size="24" />
+         </graphic>
+      </JFXButton>
    </children>
 </AnchorPane>
