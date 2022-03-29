@@ -165,8 +165,8 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
     @FXML
     private void createLobbyButtonClick() {
         // Start SSE
-        ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
         bindHandler(ServerUtils.sseHandler);
+
 
         // Create lobby
         server.createLobby(

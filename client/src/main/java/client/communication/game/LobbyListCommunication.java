@@ -153,7 +153,6 @@ public class LobbyListCommunication {
             public void completed(GameDTO game) {
                 System.out.println(game);
                 ClientState.game = game;
-                ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
                 joinLobbyHandlerSuccess.handle(game);
             }
 
