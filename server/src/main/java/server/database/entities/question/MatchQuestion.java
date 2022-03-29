@@ -5,6 +5,7 @@ import commons.entities.AnswerDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
@@ -81,7 +82,8 @@ public class MatchQuestion extends Question {
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         answerEntry -> {
-                            if (!answerEntry.getValue().getQuestionId().equals(getId())) {
+                            if (answerEntry.getValue().getQuestionId() == null
+                                    || !answerEntry.getValue().getQuestionId().equals(getId())) {
                                 log.warn("MQ: checkAnswer: answer question ID does not match question ID (player {})",
                                         answerEntry.getKey());
                                 return 0.0;
@@ -94,7 +96,7 @@ public class MatchQuestion extends Question {
                                 // These UUIDs are sent together with the question DTO, and can be used to
                                 // retrieve the original activity from the question.
                                 Activity originalActivity = getActivities().stream().filter(
-                                        activity -> activity.getId().equals(answer.getId())
+                                        activity -> Objects.equals(activity.getId(), answer.getId())
                                 ).findFirst().orElse(null);
                                 // Check if we found a matching activity
                                 if (originalActivity == null) {
@@ -105,7 +107,7 @@ public class MatchQuestion extends Question {
                                 }
 
                                 // Check if the answer is correct
-                                if (originalActivity.getId().equals(answer.getId())) {
+                                if (originalActivity.getCost() == answer.getCost()) {
                                     currentPoints += pointStep;
                                 }
                             }

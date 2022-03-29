@@ -1,10 +1,10 @@
 package server.services.answer;
 
 import commons.entities.AnswerDTO;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AnswerCollection {
-    private Map<UUID, AnswerDTO> answers = new HashMap<>();
+    private Map<UUID, AnswerDTO> answers = new ConcurrentHashMap<>();
 
     /**
      * Check whether a player has answered the question.

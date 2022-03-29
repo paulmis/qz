@@ -139,7 +139,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * @return UUIDs of all GamePlayers in the current game.
      */
     public Set<UUID> getPlayerIds() {
-        return players.keySet();
+        return players.values().stream().map(GamePlayer::getId).collect(Collectors.toSet());
     }
 
     /**

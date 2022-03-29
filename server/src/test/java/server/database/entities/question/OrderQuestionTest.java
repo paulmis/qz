@@ -8,12 +8,12 @@ import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.*;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.services.answer.AnswerCollection;
 
 class OrderQuestionTest {
-    static Question q;
+    private Question defaultQuestion;
 
     private static Activity getActivity(int id) {
         Activity a = new Activity();
@@ -22,17 +22,17 @@ class OrderQuestionTest {
         return a;
     }
 
-    @BeforeAll
-    static void defaultQuestion() {
+    @BeforeEach
+    void setUp() {
         List<Activity> components = new ArrayList<>();
         Activity a;
         for (int idx = 0; idx < 4; idx++) {
             a = getActivity(idx);
             components.add(a);
         }
-        q = new OrderQuestion();
-        q.setActivities(components);
-        ((OrderQuestion) q).setIncreasing(true);
+        defaultQuestion = new OrderQuestion();
+        defaultQuestion.setActivities(components);
+        ((OrderQuestion) defaultQuestion).setIncreasing(true);
     }
 
     @Test
@@ -47,12 +47,14 @@ class OrderQuestionTest {
     @Test
     void getRightAnswerTest() {
         List<ActivityDTO> expectedRightChoice = new ArrayList<>();
-        for (int idx = 0; idx < q.getActivities().size(); idx++) {
+        for (int idx = 0; idx < defaultQuestion.getActivities().size(); idx++) {
             expectedRightChoice.add(getActivity(idx).getDTO());
         }
         AnswerDTO expectedRightAnswer = new AnswerDTO();
         expectedRightAnswer.setResponse(expectedRightChoice);
-        assertEquals(expectedRightAnswer, q.getRightAnswer());
+
+        AnswerDTO obtainedRightAnswer = defaultQuestion.getRightAnswer();
+        assertEquals(expectedRightAnswer, obtainedRightAnswer);
     }
 
     @Test
@@ -93,12 +95,12 @@ class OrderQuestionTest {
         userAnswers.put(getUUID(3), a);
 
         Map<UUID, Double> expectedAnswers = new HashMap<>();
-        expectedAnswers.put(getUUID(1), 0.0);
-        expectedAnswers.put(getUUID(2), 1.0);
+        expectedAnswers.put(getUUID(1), 1.0);
+        expectedAnswers.put(getUUID(2), 0.0);
         expectedAnswers.put(getUUID(3), 2.0 / 3);
 
         AnswerCollection answerCollection = new AnswerCollection(userAnswers);
-        assertEquals(expectedAnswers, q.checkAnswer(answerCollection));
+        assertEquals(expectedAnswers, defaultQuestion.checkAnswer(answerCollection));
     }
 
     @Test
@@ -138,7 +140,7 @@ class OrderQuestionTest {
         a.setResponse(answerAct);
         userAnswers.put(getUUID(3), a);
 
-        ((OrderQuestion) q).setIncreasing(false);
+        ((OrderQuestion) defaultQuestion).setIncreasing(false);
 
         Map<UUID, Double> expectedAnswers = new HashMap<>();
         expectedAnswers.put(getUUID(1), 0.0);
@@ -146,12 +148,14 @@ class OrderQuestionTest {
         expectedAnswers.put(getUUID(3), 1.0 / 3);
 
         AnswerCollection answerCollection = new AnswerCollection(userAnswers);
-        assertEquals(expectedAnswers, q.checkAnswer(answerCollection));
+        assertEquals(expectedAnswers, defaultQuestion.checkAnswer(answerCollection));
     }
 
     @Test
     void checkAnswerMismatchingSize() {
         Map<UUID, AnswerDTO> userAnswers = new HashMap<>();
+
+        ((OrderQuestion) defaultQuestion).setIncreasing(false);
 
         // first user has 4 activities
         List<ActivityDTO> answerAct = List.of(
@@ -193,12 +197,12 @@ class OrderQuestionTest {
         expectedAnswers.put(getUUID(3), 1.0 / 3);
 
         AnswerCollection answerCollection = new AnswerCollection(userAnswers);
-        assertEquals(expectedAnswers, q.checkAnswer(answerCollection));
+        assertEquals(expectedAnswers, defaultQuestion.checkAnswer(answerCollection));
     }
 
     @Test
     void checkAnswerNullInput() {
-        assertThrows(IllegalArgumentException.class, () -> q.checkAnswer(null));
+        assertThrows(IllegalArgumentException.class, () -> defaultQuestion.checkAnswer(null));
     }
 
     @Test

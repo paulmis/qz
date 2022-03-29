@@ -33,7 +33,7 @@ import server.services.fsm.FSMContext;
 @Service
 @Slf4j
 public class GameService {
-    Map<UUID, Map<UUID, AnswerCollection>> allGameAnswers = new HashMap<>();
+    Map<UUID, Map<UUID, AnswerCollection>> allGameAnswers = new ConcurrentHashMap<>();
 
     @Autowired
     private QuestionRepository questionRepository;
@@ -244,7 +244,8 @@ public class GameService {
             log.warn("[{}] Player {} tried to submit an answer, but the game map is not present.",
                     game.getId(),
                     gamePlayer.getId());
-            allGameAnswers.put(game.getId(), new ConcurrentHashMap<>());
+            gameAnswerCollections = new ConcurrentHashMap<>();
+            allGameAnswers.put(game.getId(), gameAnswerCollections);
         }
 
         AnswerCollection answerCollection = gameAnswerCollections.get(question.getId());

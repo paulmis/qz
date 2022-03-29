@@ -68,7 +68,7 @@ class EstimateQuestionTest {
         assertEquals(1, myQuestion.getRightAnswer().getResponse().size());
 
         // Correct activity has right cost
-        assertEquals(costTest, myQuestion.getRightAnswer().getResponse().get(0));
+        assertEquals(costTest, myQuestion.getRightAnswer().getResponse().get(0).getCost());
     }
 
     @Test
@@ -92,8 +92,8 @@ class EstimateQuestionTest {
         Map<UUID, Double> actualScores = q.checkAnswer(answers);
 
         assertEquals(desiredScores.size(), actualScores.size());
-        for (int i = 0; i < desiredScores.size(); i++) {
-            assertThat(desiredScores.get(i), closeTo(actualScores.get(i), 1e-1));
+        for (UUID idx : desiredScores.keySet()) {
+            assertThat(desiredScores.get(idx), closeTo(actualScores.get(idx), 1e-1));
         }
     }
 
@@ -123,8 +123,8 @@ class EstimateQuestionTest {
 
         // Verify that the mismatched activity results in score 0
         assertEquals(desiredScores.size(), actualScores.size());
-        for (int i = 0; i < desiredScores.size(); i++) {
-            assertThat(desiredScores.get(i), closeTo(actualScores.get(i), 1e-1));
+        for (UUID idx : desiredScores.keySet()) {
+            assertThat(desiredScores.get(idx), closeTo(actualScores.get(idx), 1e-1));
         }
     }
 
@@ -137,8 +137,7 @@ class EstimateQuestionTest {
     void allArgsConstructorTest() {
         // Test setup
         String questionText = "aQuestion";
-        List<Activity> activities = new ArrayList<>(List.of(
-                getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
+        List<Activity> activities = new ArrayList<>(List.of(getActivity(0)));
         Question estimateNoArgs = new EstimateQuestion();
         estimateNoArgs.setId(getUUID(0));
         estimateNoArgs.setActivities(List.copyOf(activities));
@@ -155,8 +154,7 @@ class EstimateQuestionTest {
     void copyConstructorTest() {
         // Test setup
         String questionText = "aQuestion";
-        List<Activity> activities = new ArrayList<>(List.of(
-                getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
+        List<Activity> activities = new ArrayList<>(List.of(getActivity(0)));
         Question estimateAllArgs = new EstimateQuestion(getUUID(0), activities, questionText);
         Question estimateCopy = new EstimateQuestion(estimateAllArgs);
 
@@ -164,5 +162,11 @@ class EstimateQuestionTest {
         assertEquals(estimateAllArgs.getId(), estimateCopy.getId());
         assertEquals(estimateAllArgs.getActivities(), estimateCopy.getActivities());
         assertEquals(estimateAllArgs.getText(), estimateCopy.getText());
+    }
+
+    @Test
+    void constructorTestMultipleActivities() {
+        List<Activity> activities = new ArrayList<>(List.of(getActivity(0), getActivity(1)));
+        assertThrows(IllegalArgumentException.class, () -> new EstimateQuestion(getUUID(0), activities, ""));
     }
 }

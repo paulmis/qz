@@ -31,6 +31,7 @@ import server.database.entities.game.configuration.MockGameConfiguration;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.GameFinishedException;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
+import server.database.entities.question.Activity;
 import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
 import server.database.repositories.game.GameRepository;
@@ -70,6 +71,10 @@ public class GameServiceTest {
     MCQuestion questionB;
     MCQuestion questionC;
     MCQuestion questionD;
+    Activity answerActivityA;
+    Activity answerActivityB;
+    Activity answerActivityC;
+    Activity answerActivityD;
     List<UUID> usedQuestionIds;
 
     @BeforeEach
@@ -78,16 +83,19 @@ public class GameServiceTest {
         joe = new User("joe", "joe@doe.com", "stinkywinky");
         joe.setId(getUUID(0));
         joePlayer = new GamePlayer(joe);
+        joePlayer.setId(getUUID(100));
         joePlayer.setJoinDate(LocalDateTime.parse("2020-03-04T00:00:00"));
 
         susanne = new User("Susanne", "susanne@louisiane.com", "stinkymonkey");
         susanne.setId(getUUID(1));
         susannePlayer = new GamePlayer(susanne);
+        susannePlayer.setId(getUUID(101));
         susannePlayer.setJoinDate(LocalDateTime.parse("2022-03-03T00:00:00"));
 
         james = new User("James", "james@blames.com", "stinkydonkey");
         james.setId(getUUID(2));
         jamesPlayer = new GamePlayer(james);
+        jamesPlayer.setId(getUUID(102));
         jamesPlayer.setJoinDate(LocalDateTime.parse("2022-03-02T00:00:00"));
 
         // Create questions
@@ -101,10 +109,26 @@ public class GameServiceTest {
         questionD.setId(getUUID(8));
         usedQuestionIds = Arrays.asList(questionB.getId(), questionA.getId());
 
+        // Create answers
+        answerActivityA = new Activity();
+        answerActivityA.setId(getUUID(9));
+        answerActivityB = new Activity();
+        answerActivityB.setId(getUUID(10));
+        answerActivityC = new Activity();
+        answerActivityC.setId(getUUID(11));
+        answerActivityD = new Activity();
+        answerActivityD.setId(getUUID(12));
+
+        // Assign answers to questions
+        questionA.setAnswer(answerActivityA);
+        questionB.setAnswer(answerActivityB);
+        questionC.setAnswer(answerActivityC);
+        questionD.setAnswer(answerActivityD);
+
         // Create the game
         game = new NormalGame();
         game.setId(getUUID(3));
-        game.setConfiguration(new NormalGameConfiguration(3, Duration.ofSeconds(13), 2, 2, 2f, 100, 0, 75));
+        game.setConfiguration(new NormalGameConfiguration(3, Duration.ofSeconds(13), 2, 2, 2f, 100, -10, 75));
         game.add(joePlayer);
         game.add(susannePlayer);
 
@@ -335,12 +359,17 @@ public class GameServiceTest {
 
     @Test
     void updateScoresCorrect() {
+        game.addQuestions(List.of(questionA, questionB));
+        game.setCurrentQuestionNumber(0);
+
         AnswerDTO answerA = new AnswerDTO();
         answerA.setResponse(List.of(questionA.getAnswer().getDTO()));
+        answerA.setQuestionId(questionA.getId());
         gameService.addAnswer(game, joePlayer, answerA);
 
         AnswerDTO answerB = new AnswerDTO();
-        answerB.setResponse(List.of(questionB.getAnswer().getDTO()));
+        answerB.setResponse(List.of(questionA.getAnswer().getDTO()));
+        answerB.setQuestionId(questionA.getId());
         gameService.addAnswer(game, susannePlayer, answerB);
 
         gameService.updateScores(game);
@@ -357,15 +386,18 @@ public class GameServiceTest {
 
     @Test
     void updateScoresHalf() {
-        AnswerDTO answerA = new AnswerDTO();
-        answerA.setResponse(List.of(questionA.getAnswer().getDTO()));
-        gameService.addAnswer(game, joePlayer, answerA);
+        game.addQuestions(List.of(questionA, questionB));
+        game.setCurrentQuestionNumber(0);
 
-        AnswerDTO answerB = new AnswerDTO();
+        AnswerDTO answerJoe = new AnswerDTO();
+        answerJoe.setResponse(List.of(questionA.getAnswer().getDTO()));
+        gameService.addAnswer(game, joePlayer, answerJoe);
+
+        AnswerDTO answerSusanne = new AnswerDTO();
         ActivityDTO answerBActivity = new ActivityDTO();
         answerBActivity.setCost(300L);
-        answerB.setResponse(List.of(answerBActivity));
-        gameService.addAnswer(game, susannePlayer, answerB);
+        answerSusanne.setResponse(List.of(answerBActivity));
+        gameService.addAnswer(game, susannePlayer, answerSusanne);
 
         gameService.updateScores(game);
         assertEquals(100, joePlayer.getScore());
@@ -379,6 +411,9 @@ public class GameServiceTest {
 
     @Test
     void updateScoresWrong() {
+        game.addQuestions(List.of(questionA, questionB));
+        game.setCurrentQuestionNumber(0);
+
         joePlayer.setStreak(12);
 
         AnswerDTO answerA = new AnswerDTO();

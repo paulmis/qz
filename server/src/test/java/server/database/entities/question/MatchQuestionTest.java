@@ -15,10 +15,19 @@ import server.services.answer.AnswerCollection;
 class MatchQuestionTest {
     static Question q;
 
+    private static int deriveCost(int id) {
+        return 2 + id * 4;
+    }
+
     private static Activity getActivity(int id) {
+        return getActivity(id, deriveCost(id));
+    }
+
+    private static Activity getActivity(int id, int cost) {
         Activity a = new Activity();
         a.setDescription("Activity" + (id + 1));
-        a.setCost(2 + id * 4);
+        a.setCost(cost);
+        a.setId(getUUID(id));
         return a;
     }
 
@@ -29,6 +38,7 @@ class MatchQuestionTest {
             components.add(getActivity(idx));
         }
         q = new MatchQuestion();
+        q.setId(getUUID(10));
         q.setActivities(components);
     }
 
@@ -53,7 +63,7 @@ class MatchQuestionTest {
     }
 
     @Test
-    void checkAnswerTest() {
+    void  checkAnswerTest() {
         Map<UUID, AnswerDTO> userAnswers = new HashMap<>();
 
         // first user has all correct
@@ -65,28 +75,31 @@ class MatchQuestionTest {
         );
         AnswerDTO a = new AnswerDTO();
         a.setResponse(answerAct);
+        a.setQuestionId(getUUID(10));
         userAnswers.put(getUUID(1), a);
 
         // second user has all wrong
         answerAct = List.of(
-                getActivity(3).getDTO(),
-                getActivity(2).getDTO(),
-                getActivity(1).getDTO(),
-                getActivity(0).getDTO()
+                getActivity(3, deriveCost(0)).getDTO(),
+                getActivity(2, deriveCost(1)).getDTO(),
+                getActivity(1, deriveCost(2)).getDTO(),
+                getActivity(0, deriveCost(3)).getDTO()
         );
         a = new AnswerDTO();
         a.setResponse(answerAct);
+        a.setQuestionId(getUUID(10));
         userAnswers.put(getUUID(2), a);
 
         // third user has two switched (2/4 of points)
         answerAct = List.of(
                 getActivity(0).getDTO(),
-                getActivity(2).getDTO(),
-                getActivity(1).getDTO(),
+                getActivity(2, deriveCost(1)).getDTO(),
+                getActivity(1, deriveCost(2)).getDTO(),
                 getActivity(3).getDTO()
         );
         a = new AnswerDTO();
         a.setResponse(answerAct);
+        a.setQuestionId(getUUID(10));
         userAnswers.put(getUUID(3), a);
 
         Map<UUID, Double> expectedScores = new HashMap<>();
@@ -95,6 +108,7 @@ class MatchQuestionTest {
         expectedScores.put(getUUID(3), 0.5);
 
         AnswerCollection answerCollection = new AnswerCollection(userAnswers);
+        q.setId(getUUID(10));
         assertEquals(expectedScores, q.checkAnswer(answerCollection));
     }
 
@@ -111,6 +125,7 @@ class MatchQuestionTest {
         );
         AnswerDTO a = new AnswerDTO();
         a.setResponse(answerAct);
+        a.setQuestionId(getUUID(10));
         userAnswers.put(getUUID(1), a);
 
         // second user has 5 activities
@@ -123,23 +138,77 @@ class MatchQuestionTest {
         );
         a = new AnswerDTO();
         a.setResponse(answerAct);
+        a.setQuestionId(getUUID(10));
         userAnswers.put(getUUID(2), a);
 
         // third user has 4 activities
         answerAct = List.of(
                 getActivity(0).getDTO(),
-                getActivity(2).getDTO(),
-                getActivity(1).getDTO(),
+                getActivity(2, deriveCost(1)).getDTO(),
+                getActivity(1, deriveCost(2)).getDTO(),
                 getActivity(3).getDTO()
         );
         a = new AnswerDTO();
         a.setResponse(answerAct);
+        a.setQuestionId(getUUID(10));
         userAnswers.put(getUUID(3), a);
 
         Map<UUID, Double> expectedScores = new HashMap<>();
         expectedScores.put(getUUID(1), 1.0);
         expectedScores.put(getUUID(2), 0.0);
         expectedScores.put(getUUID(3), 0.5);
+
+        AnswerCollection answerCollection = new AnswerCollection(userAnswers);
+        assertEquals(expectedScores, q.checkAnswer(answerCollection));
+    }
+
+    @Test
+    void checkAnswerWrongQuestion() {
+        Map<UUID, AnswerDTO> userAnswers = new HashMap<>();
+
+        // first user has 4 activities
+        List<ActivityDTO> answerAct = List.of(
+                getActivity(0).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(3).getDTO()
+        );
+        AnswerDTO a = new AnswerDTO();
+        a.setResponse(answerAct);
+        a.setQuestionId(getUUID(11));
+        userAnswers.put(getUUID(1), a);
+
+        // second user has 5 activities
+        answerAct = List.of(
+                getActivity(0).getDTO(),
+                getActivity(1).getDTO(),
+                getActivity(2).getDTO(),
+                getActivity(3).getDTO(),
+                getActivity(4).getDTO()
+        );
+        a = new AnswerDTO();
+        a.setResponse(answerAct);
+        a.setQuestionId(getUUID(10));
+        userAnswers.put(getUUID(2), a);
+
+        // third user has 4 activities
+        answerAct = List.of(
+                getActivity(0).getDTO(),
+                getActivity(2, deriveCost(1)).getDTO(),
+                getActivity(1, deriveCost(2)).getDTO(),
+                getActivity(3).getDTO()
+        );
+        a = new AnswerDTO();
+        a.setResponse(answerAct);
+        a.setQuestionId(getUUID(10));
+        userAnswers.put(getUUID(3), a);
+
+        Map<UUID, Double> expectedScores = new HashMap<>();
+        expectedScores.put(getUUID(1), 0.0);
+        expectedScores.put(getUUID(2), 0.0);
+        expectedScores.put(getUUID(3), 0.5);
+
+        q.setId(getUUID(10));
 
         AnswerCollection answerCollection = new AnswerCollection(userAnswers);
         assertEquals(expectedScores, q.checkAnswer(answerCollection));
