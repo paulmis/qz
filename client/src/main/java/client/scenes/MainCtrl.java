@@ -394,6 +394,7 @@ public class MainCtrl {
         gameLeavePopUp.getContent().clear();
     }
 
+
     /**
      * This function opens a popup with
      * a disband warning for disbanding the lobby.
