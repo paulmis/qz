@@ -2,9 +2,6 @@ package server.database.entities.game;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static server.utils.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,31 +9,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
-import commons.entities.messages.SSEMessage;
-import commons.entities.messages.SSEMessageType;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import server.database.entities.User;
-import server.database.entities.answer.Answer;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Activity;
 import server.database.entities.question.MCQuestion;
-import server.database.repositories.question.QuestionRepository;
-import server.services.GameService;
-import server.services.SSEManager;
 
 /**
  * Tests for NormalGame class.
@@ -291,69 +280,6 @@ public class NormalGameTest {
 
         game.updateStreak(joePlayer, false);
         assertEquals(0, joePlayer.getStreak());
-    }
-
-    @Test
-    void updateScoresCorrect() {
-        var answerA = new Answer();
-        answerA.setPlayer(joePlayer);
-        answerA.setResponse(List.of(questionA.getAnswer().getCost()));
-
-        var answerB = new Answer();
-        answerB.setPlayer(susannePlayer);
-        answerB.setResponse(List.of(questionA.getAnswer().getCost()));
-
-        game.updateScores(questionA, List.of(answerA, answerB));
-        assertEquals(100, joePlayer.getScore());
-        assertEquals(1, joePlayer.getStreak());
-        assertEquals(1, joePlayer.getPowerUpPoints());
-
-        assertEquals(100, susannePlayer.getScore());
-        assertEquals(1, susannePlayer.getStreak());
-        assertEquals(1, susannePlayer.getPowerUpPoints());
-
-    }
-
-    @Test
-    void updateScoresHalf() {
-        var answerA = new Answer();
-        answerA.setPlayer(joePlayer);
-        answerA.setResponse(List.of(questionA.getAnswer().getCost()));
-
-        var answerB = new Answer();
-        answerB.setPlayer(susannePlayer);
-        answerB.setResponse(List.of(300L));
-
-        game.updateScores(questionA, List.of(answerA, answerB));
-        assertEquals(100, joePlayer.getScore());
-        assertEquals(1, joePlayer.getStreak());
-        assertEquals(1, joePlayer.getPowerUpPoints());
-
-        assertEquals(-10, susannePlayer.getScore());
-        assertEquals(0, susannePlayer.getStreak());
-        assertEquals(0, susannePlayer.getPowerUpPoints());
-    }
-
-    @Test
-    void updateScoresWrong() {
-        joePlayer.setStreak(12);
-
-        var answerA = new Answer();
-        answerA.setPlayer(joePlayer);
-        answerA.setResponse(List.of(300L));
-
-        var answerB = new Answer();
-        answerB.setPlayer(susannePlayer);
-        answerB.setResponse(List.of(300L));
-
-        game.updateScores(questionB, List.of(answerA, answerB));
-        assertEquals(-10, joePlayer.getScore());
-        assertEquals(0, joePlayer.getStreak());
-        assertEquals(0, joePlayer.getPowerUpPoints());
-
-        assertEquals(-10, susannePlayer.getScore());
-        assertEquals(0, susannePlayer.getStreak());
-        assertEquals(0, susannePlayer.getPowerUpPoints());
     }
 
     @Test

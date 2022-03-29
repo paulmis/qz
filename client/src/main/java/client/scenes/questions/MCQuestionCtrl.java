@@ -12,16 +12,19 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * MCQuestion controller.
  */
 @Generated
+@Slf4j
 public abstract class MCQuestionCtrl implements Initializable {
     private final MainCtrl mainCtrl;
     private final GameCommunication communication;
@@ -72,9 +75,8 @@ public abstract class MCQuestionCtrl implements Initializable {
                         // Send the answer
                         GameCommunication.putAnswer(
                             ClientState.game.getId(),
-                            new AnswerDTO(
-                                List.of(question.getActivities().get(finalI).getCost()),
-                                question.getId()),
+                            new AnswerDTO(question.getId(),
+                                    List.of(question.getActivities().get(finalI))),
                             // Success
                             () -> runLater(() -> setCurrentAnswer(button)),
                             // Failure
@@ -84,6 +86,32 @@ public abstract class MCQuestionCtrl implements Initializable {
                         );
                     }
                 });
+        }
+    }
+
+    /**
+     * Shows the correct answer in the UI.
+     *
+     * @param answer the correct answer.
+     */
+    protected void showAnswer(AnswerDTO answer) {
+        if (!this.question.getId().equals(answer.getQuestionId())) {
+            log.warn("Received answer for a different question: expected {} but got {}",
+                this.question.getId(), answer.getQuestionId());
+            return;
+        }
+
+        log.debug("Showing answer: {}", answer);
+        UUID answerActivity = answer.getResponse().get(0).getId();
+        for (int i = 0; i < getButtons().size(); ++i) {
+            JFXButton button = getButtons().get(i);
+            button.setMouseTransparent(true);
+
+            if (question.getActivities().get(i).getId().equals(answerActivity)) {
+                button.getStyleClass().add("correct-answer");
+            } else if (this.chosenAnswer == this.getButtons().get(i)) {
+                button.getStyleClass().add("incorrect-answer");
+            }
         }
     }
 

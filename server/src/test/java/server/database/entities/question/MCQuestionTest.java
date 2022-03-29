@@ -4,14 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static server.utils.TestHelpers.getUUID;
 
+import commons.entities.ActivityDTO;
+import commons.entities.AnswerDTO;
 import commons.entities.questions.MCQuestionDTO;
-import commons.entities.questions.QuestionDTO;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import server.database.entities.answer.Answer;
+import server.services.answer.AnswerCollection;
 
 class MCQuestionTest {
 
@@ -50,47 +49,60 @@ class MCQuestionTest {
     void getRightAnswerTest() {
         int rightAnswerIdx = 2;
         ((MCQuestion) q).setAnswer(q.getActivities().get(rightAnswerIdx));
-        Answer rightAnswer = new Answer();
-        rightAnswer.setResponse(new ArrayList<>(List.of(q.getActivities().get(rightAnswerIdx).getCost())));
+        AnswerDTO rightAnswer = new AnswerDTO();
+        rightAnswer.setResponse(new ArrayList<>(List.of(q.getActivities().get(rightAnswerIdx).getDTO())));
         assertEquals(rightAnswer, q.getRightAnswer());
     }
 
     @Test
     void checkAnswerTest() {
-        List<Answer> userAnswers = new ArrayList<>();
+        AnswerCollection userAnswers = new AnswerCollection();
         for (int idx = 0; idx < 6; idx++) {
-            List<Long> answerActivities = new ArrayList<>();
+            List<ActivityDTO> answerActivities = new ArrayList<>();
             int choice = idx % 4;
-            long c = getActivity(choice).getCost();
-            answerActivities.add(c);
-            Answer ans = new Answer();
+            answerActivities.add(getActivity(choice).getDTO());
+            AnswerDTO ans = new AnswerDTO();
             ans.setResponse(answerActivities);
-            userAnswers.add(ans);
+            userAnswers.addAnswer(getUUID(idx), ans);
         }
 
-        assertEquals(new ArrayList<>(Arrays.asList(0.0, 1.0, 0.0, 0.0, 0.0, 1.0)), q.checkAnswer(userAnswers));
+        Map<UUID, Double> expectedScores = new HashMap<>();
+        expectedScores.put(getUUID(0), 0.0);
+        expectedScores.put(getUUID(1), 1.0);
+        expectedScores.put(getUUID(2), 0.0);
+        expectedScores.put(getUUID(3), 0.0);
+        expectedScores.put(getUUID(4), 0.0);
+        expectedScores.put(getUUID(5), 1.0);
+
+        assertEquals(expectedScores, q.checkAnswer(userAnswers));
     }
 
     @Test
     void checkAnswerMultipleAnswers() {
-        List<Answer> userAnswers = new ArrayList<>();
+        AnswerCollection userAnswers = new AnswerCollection();
         for (int idx = 0; idx < 6; idx++) {
-            List<Long> answerActivities = new ArrayList<>();
+            List<ActivityDTO> answerActivities = new ArrayList<>();
             int choice = idx % 4;
-            long a = getActivity(choice).getCost();
+            ActivityDTO a = getActivity(choice).getDTO();
             answerActivities.add(a);
-            if (idx == 2) {
-                a = getActivity(12).getCost();
+            if (idx == 1) {
+                a = getActivity(12).getDTO();
                 answerActivities.add(a);
             }
-            Answer ans = new Answer();
+            AnswerDTO ans = new AnswerDTO();
             ans.setResponse(answerActivities);
-            userAnswers.add(ans);
+            userAnswers.addAnswer(getUUID(idx), ans);
         }
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            q.checkAnswer(userAnswers);
-        });
+        Map<UUID, Double> expectedScores = new HashMap<>();
+        expectedScores.put(getUUID(0), 0.0);
+        expectedScores.put(getUUID(1), 0.0);
+        expectedScores.put(getUUID(2), 0.0);
+        expectedScores.put(getUUID(3), 0.0);
+        expectedScores.put(getUUID(4), 0.0);
+        expectedScores.put(getUUID(5), 1.0);
+
+        assertEquals(expectedScores, q.checkAnswer(userAnswers));
     }
 
     @Test
