@@ -23,6 +23,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.io.IOException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
@@ -104,6 +105,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
 
     private SimpleIntegerProperty timeLeft;
     private Timer timer;
+    private TimerTask timerTask;
 
 
     /**
@@ -149,33 +151,38 @@ public class GameScreenCtrl implements Initializable, SSESource {
      * Transits the client to the question stage.
      */
     @SSEEventHandler(SSEMessageType.START_QUESTION)
-    public void toQuestionStage() {
-        log.debug("Question stage handler triggered.");
+    public void toQuestionStage(Integer delay) {
+        log.debug("Question stage handler triggered. Delay: {}", delay);
         // Set the current question
         GameCommunication.updateCurrentQuestion(
                 ClientState.game.getId(),
                 // Success
-                (question) -> runLater(() -> setQuestion(question)),
+                (question) -> runLater(() -> {
+                    log.debug("Received a question: {}", question.getId());
+                    setQuestion(question);
+                    // Start the timer
+                    startTimer(Duration.ofMillis(delay));
+                }),
                 // Failure
                 () -> runLater(
                         () -> mainCtrl.showErrorSnackBar("Unable to retrieve the current question")));
-
-        // TODO: timer
     }
 
     /**
      * Transits the client to the answer stage.
      */
     @SSEEventHandler(SSEMessageType.STOP_QUESTION)
-    public void toAnswerStage() {
+    public void toAnswerStage(Integer delay) {
         // TODO: implement
-        log.debug("The answer stage has been reached.");
+        log.debug("The answer stage has been reached. Delay: {}", delay);
         GameCommunication.updateCurrentAnswer(
                 ClientState.game.getId(),
                 // Success
                 (answer) -> runLater(() -> {
                     log.debug("Received answer for question {}", answer.getQuestionId());
                     setAnswer(answer);
+                    // Start the timer
+                    startTimer(Duration.ofMillis(delay));
                 }),
                 // Failure
                 () -> {
@@ -185,8 +192,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
                     );
                 }
         );
-
-        // TODO: timer
     }
 
     /**
@@ -234,26 +239,65 @@ public class GameScreenCtrl implements Initializable, SSESource {
         mainBorderPane.setCenter(this.centerPane);
     }
 
+    /**
+     * Generate a new timer task.
+     *
+     * @return the generated timer task.
+     */
+    private TimerTask getTimerTask() {
+        log.debug("Generating a new timer task");
+        return new TimerTask() {
+            @Override
+            public void run() {
+                // We need to use this because we need to update the UI thread.
+                Platform.runLater(() -> {
+                    log.debug("Timer ticked");
+                    // Decrement the time left.
+                    timeLeft.set(timeLeft.get() - 1);
+                    // If the time left is 0, stop the timer.
+                    if (timeLeft.get() == 0) {
+                        timer.cancel();
+                    }
+                });
+            }
+        };
+    }
+
+    /**
+     * Initializes the timer.
+     */
     private void setUpTimer() {
         // Keeps track of the time left.
         timeLeft = new SimpleIntegerProperty(10);
         // Connect the time left to the label.
         timerLabel.textProperty().bind(timeLeft.asString());
 
-        // Create a new Java timer.
-        timer = new Timer();
         // Create a new timer task.
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                // Decrement the time left.
-                timeLeft.set(timeLeft.get() - 1);
-                // If the time left is 0, stop the timer.
-                if (timeLeft.get() == 0) {
-                    timer.cancel();
-                }
+        this.timer = new Timer();
+    }
+
+    /**
+     * Start a timer with a specified duration.
+     *
+     * @param duration duration of the timer in seconds.
+     */
+    public synchronized void startTimer(Duration duration) {
+        // Stop existing timer
+        if (timerTask != null) {
+            try {
+                timerTask.cancel();
+            } catch (Exception e) {
+                log.debug("Unable to cancel timer task: {}", e.getMessage());
             }
-        };
+        }
+        // Reset the time left.
+        timeLeft.set((int) duration.toSeconds());
+
+        log.debug("Starting timer with duration {}", duration);
+
+        // Schedule the task
+        timerTask = getTimerTask();
+        timer.scheduleAtFixedRate(timerTask, 1000, 1000);
     }
 
     /**
