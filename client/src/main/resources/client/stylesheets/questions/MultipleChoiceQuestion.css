@@ -38,3 +38,20 @@
     -fx-font-size: 20px;
     -fx-font-weight: bold;
 }
+
+.button-disabled {
+    -fx-background-color: disabledButtonColor !important;
+}
+
+.correct-answer {
+    -fx-background-color: correctAnswerColor !important;
+}
+
+.correct-answer > .label {
+    -fx-font-size: 20px !important;
+    -fx-font-weight: bold !important;
+}
+
+.incorrect-answer {
+    -fx-background-color: incorrectAnswerColor !important;
+}

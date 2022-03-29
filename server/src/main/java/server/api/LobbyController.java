@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,7 @@ import server.services.LobbyService;
  * LobbyController, expose endpoints for lobbies.
  * Lobbies are games that haven't started yet.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/lobby")
 public class LobbyController {
@@ -71,11 +73,13 @@ public class LobbyController {
         // If the user doesn't exist, return 404
         Optional<User> founder = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (founder.isEmpty()) {
+            log.debug("Founder doesn't exist");
             return ResponseEntity.notFound().build();
         }
 
         // Check that the user isn't in another game
         if (gamePlayerRepository.existsByUserIdAndGameStatusNot(founder.get().getId(), GameStatus.FINISHED)) {
+            log.error("The user is already in a game");
             throw new IllegalStateException("User is already in a game");
         }
 
@@ -99,9 +103,11 @@ public class LobbyController {
             // Save the game with the added host and player
             game = gameRepository.save(game);
         } catch (ConstraintViolationException | PersistenceException e) {
+            log.error("Game constraints violated - could not save the game to the database");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
+        log.debug("Created a new game with id {}", game.getGameId());
         // Return 201
         return ResponseEntity.created(URI.create("/api/lobby/" + game.getId())).body(game.getDTO());
     }
@@ -188,6 +194,7 @@ public class LobbyController {
         Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
         Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
         if (user.isEmpty() || lobbyOptional.isEmpty()) {
+            log.error("User or lobby not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or lobby not found");
         }
         Game lobby = lobbyOptional.get();
@@ -203,10 +210,12 @@ public class LobbyController {
         // Check that the game hasn't started yet and add the player
         if (lobby.getStatus() != GameStatus.CREATED
                 || !lobby.add(player)) {
+            log.debug("User {} attempted to join a game that has already started", user.get().getId());
             throw new IllegalStateException("Game is already started.");
         }
 
         lobby = gameRepository.save(lobby);
+        log.debug("User {} joined game {}", user.get().getId(), lobby.getId());
         return ResponseEntity.ok(lobby.getDTO());
     }
 
@@ -223,11 +232,13 @@ public class LobbyController {
         Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
         Optional<Game> lobby = gameRepository.findById(lobbyId);
         if (user.isEmpty() || lobby.isEmpty()) {
+            log.error("User or lobby not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or lobby not found");
         }
 
         // If the user isn't the lobby host, return 403
         if (lobby.get().getHost().getUser().getId() != user.get().getId()) {
+            log.error("User is not the lobby host");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the lobby host");
         }
 
@@ -236,9 +247,11 @@ public class LobbyController {
         try {
             gameService.startGame(lobby.get());
         } catch (IOException ex) {
+            log.error("Could not start game", ex);
             return ResponseEntity.status(HttpStatus.TOO_EARLY).body(ex.getMessage());
         }
         // Otherwise, return 200
+        log.debug("Started game {}", lobby.get().getId());
         return ResponseEntity.ok().build();
     }
 
@@ -292,6 +305,7 @@ public class LobbyController {
         // If the user or the game don't exist, return 404
         Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (user.isEmpty()) {
+            log.error("User not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
@@ -299,10 +313,12 @@ public class LobbyController {
         Optional<Game> lobby =
                 gameRepository.getPlayersLobby(user.get().getId());
         if (lobby.isEmpty()) {
+            log.debug("User {} is not in a lobby", user.get().getId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not in a lobby");
         }
 
         lobbyService.removePlayer(lobby.get(), user.get());
+        log.debug("Removed user {} from lobby {}", user.get().getId(), lobby.get().getId());
         return ResponseEntity.ok().build();
     }
 
@@ -316,6 +332,7 @@ public class LobbyController {
         // Retrieve the logged-in user
         Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (user.isEmpty()) {
+            log.error("User not found");
             return ResponseEntity.notFound().build();
         }
 
@@ -323,13 +340,16 @@ public class LobbyController {
         Optional<Game> lobby =
                 gameRepository.getPlayersLobby(user.get().getId());
         if (lobby.isEmpty()) {
+            log.debug("User {} is not in a lobby", user.get().getId());
             return ResponseEntity.notFound().build();
         }
 
         if (!lobbyService.deleteLobby(lobby.get(), user.get())) {
+            log.debug("User {} is not the lobby host", user.get().getId());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        log.debug("Deleted lobby {}", lobby.get().getId());
         return ResponseEntity.ok().build();
     }
 }
