@@ -46,4 +46,11 @@ public class ChatPane extends StackPane {
         this.maxWidthProperty().bind(top.maxWidthProperty());
         this.maxHeightProperty().bind(top.maxHeightProperty());
     }
+
+    /**
+     * Expose the updateMessages method from the controller.
+     */
+    public void updateMessages() {
+        controller.updateMessages();
+    }
 }

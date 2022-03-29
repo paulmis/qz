@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import commons.entities.utils.DTO;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
@@ -18,7 +19,7 @@ import lombok.Generated;
  * Chat controller.
  */
 @Generated
-public class ChatCtrl implements Initializable, SSESource {
+public class ChatCtrl implements Initializable {
 
     @FXML private VBox messageList;
     @FXML private TextField userMessage;
@@ -27,11 +28,6 @@ public class ChatCtrl implements Initializable, SSESource {
      * Constructor of a chat widget.
      */
     public ChatCtrl() {
-    }
-
-    @Override
-    public void bindHandler(SSEHandler handler) {
-        handler.initialize(this);
     }
 
     @Override
@@ -52,9 +48,8 @@ public class ChatCtrl implements Initializable, SSESource {
     }
 
     /**
-     * Update message list when a new message event is received.
+     * Retrieve chat messages and update message list.
      */
-    @SSEEventHandler(SSEMessageType.CHAT_MESSAGE)
     public void updateMessages() {
         // ToDo: update list of messages
         messageList.getChildren().clear();
