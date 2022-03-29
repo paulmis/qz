@@ -81,7 +81,8 @@ public class DefiniteGameFSM extends GameFSM {
         // If the game is finished, run the cleanup function and return immediately.
         try {
             // Move onto the next question.
-            log.debug("[{}] FSM runnable: advancing onto the next question.", getGame().getId());
+            log.debug("[{}] FSM runnable: advancing onto question {}.",
+                getGame().getId(), getGame().getCurrentQuestionNumber());
             getContext().getGameService()
                 .nextQuestion(
                     getGame(),

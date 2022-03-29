@@ -30,7 +30,7 @@ public class UserController {
     @GetMapping
     @JsonView(value = Views.Private.class)
     public ResponseEntity<UserDTO> get() {
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (user.isEmpty()) {
             return ResponseEntity.notFound().build();
         }

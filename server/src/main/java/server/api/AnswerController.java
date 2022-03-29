@@ -57,7 +57,7 @@ public class AnswerController {
             @PathVariable UUID gameId) {
         // Retrieve game and user
         Optional<Game> gameOpt = gameRepository.findById(gameId);
-        Optional<User> userOpt = userRepository.findByEmail(AuthContext.get());
+        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(AuthContext.get());
 
         // Check if game exists.
         if (gameOpt.isEmpty() || userOpt.isEmpty()) {
@@ -117,7 +117,7 @@ public class AnswerController {
             @RequestParam(name = "idx") Optional<Integer> questionIdx) {
 
         Optional<Game> game = gameRepository.findById(gameId);
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
 
         // Check if game exists
         if (game.isEmpty() || user.isEmpty()) {
@@ -152,7 +152,7 @@ public class AnswerController {
     @GetMapping("/{gameId}/score")
     ResponseEntity<Integer> getScore(@PathVariable UUID gameId) {
         Optional<Game> game = gameRepository.findById(gameId);
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
 
         // Check if game exists
         if (game.isEmpty() || user.isEmpty()) {

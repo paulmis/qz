@@ -48,7 +48,7 @@ public class SSEController {
         var emitter = new SseEmitter(Long.MAX_VALUE);
         try {
             // Get current user
-            User user = userRepository.findByEmail(AuthContext.get())
+            User user = userRepository.findByEmailIgnoreCase(AuthContext.get())
                     .orElseThrow(() -> new NoSuchElementException("User not found"));
             // The user must currently be in a game
             gameRepository.getPlayersLobbyOrGame(user.getId())

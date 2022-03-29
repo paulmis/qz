@@ -32,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email)
         throws UsernameNotFoundException {
         // Fetch the user from the database
-        Optional<User> user = userRepository.findByEmail(email);
+        Optional<User> user = userRepository.findByEmailIgnoreCase(email);
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("User with email " + email + " doesn't exist");
         }
