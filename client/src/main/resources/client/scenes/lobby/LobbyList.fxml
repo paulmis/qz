@@ -5,9 +5,9 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -131,10 +131,10 @@
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
       </GridPane>
-      <JFXButton fx:id="joinRandomLobbyButton" layoutX="828.0" layoutY="160.0" onMouseClicked="#joinRandomLobby" prefHeight="40.0" prefWidth="140.0" text="Join Random Lobby">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
+      <JFXButton fx:id="joinRandomLobbyButton" contentDisplay="GRAPHIC_ONLY" layoutX="840.0" layoutY="90.0" onMouseClicked="#joinRandomLobby" prefHeight="40.0" prefWidth="40.0">
+         <graphic>
+            <FontAwesomeIconView glyphName="PLUS" size="40" />
+         </graphic>
       </JFXButton>
    </children>
 </AnchorPane>
