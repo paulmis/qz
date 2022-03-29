@@ -2,7 +2,9 @@ package commons.entities.game.configuration;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.utils.DTO;
+import commons.entities.utils.Views;
 import java.time.Duration;
 import java.util.UUID;
 import javax.persistence.MappedSuperclass;
@@ -28,6 +30,7 @@ import org.hibernate.validator.constraints.time.DurationMin;
     @JsonSubTypes.Type(value = SurvivalGameConfigurationDTO.class, name = "SurvivalGameConfigurationDTO"),
     @JsonSubTypes.Type(value = MockGameConfigurationDTO.class, name = "MockGameConfigurationDTO")
 })
+@JsonView(Views.Public.class)
 public abstract class GameConfigurationDTO implements DTO {
     /**
      * The id of the game configuration.

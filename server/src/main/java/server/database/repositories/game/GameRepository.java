@@ -19,10 +19,12 @@ public interface GameRepository extends JpaRepository<Game, UUID> {
      * Finds player's active lobby. This function should not be used for ongoing games.
      *
      * @param id user's id
-     * @param status game status, should be set to CREATED
      * @return empty if there is no active lobby for the player, otherwise the lobby
      */
-    Optional<Game> findByPlayers_User_IdEqualsAndStatus(@NonNull UUID id, @NonNull GameStatus status);
+    @Query("SELECT g FROM Game g "
+        + "LEFT JOIN GamePlayer gp ON g.id = gp.game "
+        + "WHERE gp.user.id = ?1 AND g.status = commons.entities.game.GameStatus.CREATED")
+    Optional<Game> getPlayersLobby(@NonNull UUID id);
 
     /**
      * Finds player's active game.

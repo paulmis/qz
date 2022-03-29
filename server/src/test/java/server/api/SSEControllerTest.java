@@ -70,7 +70,7 @@ class SSEControllerTest {
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
                 user.getEmail(), user.getPassword(), Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
         ));
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmailIgnoreCase(user.getEmail())).thenReturn(Optional.of(user));
     }
 
     @Test
