@@ -147,12 +147,16 @@ public class AnswerController {
             toAnswer = Optional.of((Question) game.get().getQuestions().get(questionIdx.get()));
         }
 
-        log.trace("[{}] Sending correct answer for question {}.", gameId, toAnswer.get().getId());
-
         // Check if game is active
         return toAnswer
-                .map(question -> ResponseEntity.ok(question.getRightAnswer()))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+                .map(question -> {
+                    log.trace("[{}] Sending correct answer for question {}.", gameId, question.getId());
+                    return ResponseEntity.ok(question.getRightAnswer());
+                })
+                .orElseGet(() -> {
+                    log.debug("[{}] No question found.", gameId);
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                });
     }
 
     /**

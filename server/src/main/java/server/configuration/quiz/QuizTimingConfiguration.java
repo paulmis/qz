@@ -1,11 +1,15 @@
 package server.configuration.quiz;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Timing related configuration for the game.
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class QuizTimingConfiguration {
     /**
      * Length of the preparation phase.

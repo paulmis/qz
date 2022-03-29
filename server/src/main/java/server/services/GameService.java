@@ -196,7 +196,7 @@ public class GameService {
      * @param game the game to transition
      * @throws IOException if an SSE connection send failed.
      */
-    public void showAnswer(Game<?> game, Long delay)
+    public boolean showAnswer(Game<?> game, Long delay)
             throws IOException {
         // Disable answering
         game.setAcceptingAnswers(false);
@@ -204,7 +204,7 @@ public class GameService {
 
         // Distribute the event to all players
         log.trace("[{}] FSM runnable: accepting answers disabled.", game.getId());
-        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.STOP_QUESTION, delay));
+        return sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.STOP_QUESTION, delay));
     }
 
     /**
