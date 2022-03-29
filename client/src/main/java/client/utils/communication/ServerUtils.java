@@ -54,6 +54,10 @@ public class ServerUtils {
     public static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
             .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
 
+    public static String getImagePathFromId(String id) {
+        return "file:///C:/Users/rd211/Downloads/Broadway_tower_edit.jpg";
+        //return SERVER + "resource/" + id.toString();
+    }
     /**
      * Provides a request target for the server that can be used to build and invoke a query.
      *
