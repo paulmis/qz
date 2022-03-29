@@ -1,6 +1,7 @@
 package server.api;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyIterable;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -66,9 +67,9 @@ class QuestionControllerTest {
     @Test
     void testMcCreate() throws Exception {
         this.mockMvc.perform(
-                put("/api/question/mc")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        verify(questionRepository, times(1)).save(any(Question.class));
+            put("/api/question/mc")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+        verify(questionRepository, times(1)).saveAll(anyIterable());
     }
 }

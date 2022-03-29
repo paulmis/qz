@@ -43,7 +43,7 @@ public class GameController {
     @PostMapping("/leave")
     ResponseEntity leave() {
         // If the user or the game don't exist, return 404
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (user.isEmpty()) {
             return ResponseEntity.notFound().build();
         }

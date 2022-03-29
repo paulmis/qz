@@ -37,8 +37,8 @@ public class GameLeaveScreenCtrl implements Initializable {
         void handle();
     }
 
-    @FXML private JFXButton cancelButton;
-    @FXML private JFXButton leaveButton;
+    @FXML private JFXButton cancelLeaveGameButton;
+    @FXML private JFXButton leaveGameButton;
     @FXML private AnchorPane rootPane;
     private CancelHandler cancelHandler;
     private LeaveHandler leaveHandler;
@@ -59,7 +59,7 @@ public class GameLeaveScreenCtrl implements Initializable {
      * This function handles the cancel button click.
      */
     @FXML
-    private void cancel() {
+    private void cancelLeaveGame() {
         cancelHandler.handle();
     }
 
@@ -67,7 +67,7 @@ public class GameLeaveScreenCtrl implements Initializable {
      * This function handles the leave button click.
      */
     @FXML
-    private void leave() {
+    private void leaveGame() {
         leaveHandler.handle();
     }
 

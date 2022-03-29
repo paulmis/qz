@@ -2,24 +2,22 @@ package client.scenes.lobby;
 
 import static javafx.application.Platform.runLater;
 
+import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
+import client.scenes.UserInfoPane;
 import client.utils.AlgorithmicUtils;
+import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameDTO;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
-import java.util.Comparator;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import lombok.Generated;
 
@@ -31,20 +29,18 @@ public class LobbyListCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
+    @FXML private AnchorPane lobbyListAnchorPane;
     @FXML private JFXButton leaderboardButton;
     @FXML private JFXButton settingsButton;
     @FXML private JFXButton userButton;
     @FXML private JFXButton searchButton;
     @FXML private JFXButton fetchButton;
-    @FXML private GridPane userPanelGrid;
     @FXML private JFXButton createLobbyButton;
     @FXML private TextField searchField;
     @FXML private VBox lobbyListVbox;
     @FXML private JFXButton signOutButton;
     @FXML private JFXButton editButton;
-    @FXML private TextField usernameField;
-    @FXML private ImageView playerImageView;
-    @FXML private FontAwesomeIconView editIcon;
+    private UserInfoPane userInfo;
 
     /**
      * Initialize a new controller using dependency injection.
@@ -53,7 +49,7 @@ public class LobbyListCtrl implements Initializable {
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public LobbyListCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public LobbyListCtrl(ServerUtils server, MainCtrl mainCtrl, LobbyCommunication communication) {
         this.mainCtrl = mainCtrl;
         this.server = server;
     }
@@ -61,19 +57,6 @@ public class LobbyListCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        this.usernameField.textProperty().addListener((observable, oldValue, newValue) -> {
-            // TODO: Replace this with a server call to change the username when it becomes available.
-            System.out.println(newValue);
-        });
-
-
-        // This changes the icon of the edit username button depending on if the username field is editable.
-        this.editIcon.glyphNameProperty().bind(
-                Bindings.when(usernameField.editableProperty()).then(
-                        "PAPER_PLANE"
-                ).otherwise("EDIT")
-        );
     }
 
     @FXML
@@ -88,37 +71,25 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void userButtonClick() {
-        if (!userPanelGrid.isVisible()) {
-            server.getMyInfo(userDTO -> runLater(() -> {
-                this.usernameField.setText(userDTO.getUsername());
-                userPanelGrid.setVisible(true);
-                playerImageView.setImage(new Image("https://upload.wikimedia.org/wikipedia/commons/e/e3/Klaus_Iohannis_din_interviul_cu_Dan_Tapalag%C4%83_cropped.jpg"));
-            }), () -> runLater(() ->
-                            mainCtrl.showErrorSnackBar("Something went wrong while fetching your user data.")));
+        if (userInfo == null) {
+            // Create userInfo
+            userInfo = new UserInfoPane(server, mainCtrl);
+            lobbyListAnchorPane.getChildren().add(userInfo);
+            userInfo.setVisible(true);
+            runLater(() -> userInfo.setupPosition(userButton, lobbyListAnchorPane));
         } else {
-            userPanelGrid.setVisible(false);
+            // Toggle visibility
+            userInfo.setVisible(!userInfo.isVisible());
         }
     }
 
     @FXML
     private void createLobbyButtonClick() {
-        server.createLobby(
-            game -> {
-                ServerUtils.subscribeToSSE(ServerUtils.sseHandler);
-                runLater(mainCtrl::showLobbyScreen);
-            },
-            () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
-    }
-
-    @FXML
-    private void signOutButtonClick() {
-        server.signOut();
-        mainCtrl.showServerConnectScreen();
-    }
-
-    @FXML
-    private void editButtonClick() {
-        this.usernameField.setEditable(!this.usernameField.isEditable());
+        server.createLobby(game -> {
+            ServerUtils.sseHandler.subscribe();
+            runLater(mainCtrl::showLobbyScreen);
+        }, () -> runLater(() ->
+                mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
     }
 
     @FXML
@@ -131,7 +102,9 @@ public class LobbyListCtrl implements Initializable {
      */
     public void reset() {
         updateLobbyList("");
-        userPanelGrid.setVisible(false);
+        if (userInfo != null) {
+            userInfo.setVisible(false);
+        }
         this.searchField.setText("");
     }
 

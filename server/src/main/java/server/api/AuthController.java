@@ -1,7 +1,10 @@
 package server.api;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.auth.LoginDTO;
 import commons.entities.auth.UserDTO;
+import commons.entities.utils.Views;
+import java.net.URI;
 import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import server.api.exceptions.UserAlreadyExistsException;
 import server.database.entities.User;
 import server.database.entities.auth.config.JWTHandler;
 import server.database.entities.game.Game;
@@ -48,22 +52,29 @@ public class AuthController {
      *      201 and the auth token otherwise
      */
     @PostMapping("register")
-    public ResponseEntity<String> register(@Valid @RequestBody UserDTO userData) {
+    @JsonView(Views.Private.class)
+    public ResponseEntity<LoginDTO> register(@Valid @RequestBody UserDTO userData) {
         // If a user with this email or username already exists, return 409
-        if (userRepository.existsByEmailOrUsername(userData.getEmail(), userData.getUsername())) {
-            return new ResponseEntity<>("User already exists", HttpStatus.CONFLICT);
+        if (userRepository.existsByEmailIgnoreCaseOrUsername(userData.getEmail(), userData.getUsername())) {
+            throw new UserAlreadyExistsException();
         }
 
         // Salt the password
         try {
             userData.setPassword(passwordEncoder.encode(userData.getPassword()));
         } catch (IllegalArgumentException ex) {
-            return new ResponseEntity<>("Password cannot be salted: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        // Persist the user and return 201
+        // Persist the user and return 201 with the user data
         User user = userRepository.save(new User(userData));
-        return new ResponseEntity<>(handler.generateToken(user.getEmail()), HttpStatus.CREATED);
+        return ResponseEntity
+            .created(URI.create("/api/user/" + user.getId()))
+            .body(
+                new LoginDTO(
+                    handler.generateToken(user.getEmail()),
+                    null,
+                    user.getDTO()));
     }
 
     /**
@@ -74,6 +85,7 @@ public class AuthController {
      *     200 and the auth token otherwise
      */
     @PostMapping("login")
+    @JsonView(Views.Private.class)
     public ResponseEntity<LoginDTO> login(@RequestBody UserDTO userData) {
         try {
             // TODO: allow authentication with both mail and username
@@ -85,7 +97,7 @@ public class AuthController {
 
             // Find the user
             Optional<User> user = userRepository
-                    .findByEmail(userPrincipal.getUsername());
+                    .findByEmailIgnoreCase(userPrincipal.getUsername());
 
             // If the user doesn't exist, return 401
             if (user.isEmpty()) {
@@ -95,11 +107,12 @@ public class AuthController {
             // Find the current lobby or game
             Optional<Game> game = gameRepository.getPlayersLobbyOrGame(user.get().getId());
 
-            // Return 200, the token and the lobby or game
+            // Return 200 and the user data
             return ResponseEntity.ok(
                 new LoginDTO(
                     handler.generateToken(user.get().getEmail()),
-                    game.isEmpty() ? null : game.get().getDTO()));
+                    game.isEmpty() ? null : game.get().getDTO(),
+                    user.get().getDTO()));
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

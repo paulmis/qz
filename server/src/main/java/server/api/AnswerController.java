@@ -15,14 +15,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import server.database.entities.User;
-import server.database.entities.answer.Answer;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
+import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.ActivityRepository;
+import server.services.GameService;
 
 /**
  * AnswerController, controller for all api endpoints of question answers.
@@ -42,6 +43,9 @@ public class AnswerController {
     private GamePlayerRepository gamePlayerRepository;
 
     @Autowired
+    private GameService gameService;
+
+    @Autowired
     private ActivityRepository activityRepository;
 
     /**
@@ -57,7 +61,7 @@ public class AnswerController {
             @PathVariable UUID gameId) {
         // Retrieve game and user
         Optional<Game> gameOpt = gameRepository.findById(gameId);
-        Optional<User> userOpt = userRepository.findByEmail(AuthContext.get());
+        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(AuthContext.get());
 
         // Check if game exists.
         if (gameOpt.isEmpty() || userOpt.isEmpty()) {
@@ -67,31 +71,35 @@ public class AnswerController {
         User user = userOpt.get();
 
         // Find GamePlayer
-        if (!game.getPlayers().containsKey(user.getId())) {
+        GamePlayer gamePlayer = (GamePlayer) game.getPlayers().get(user.getId());
+        if (gamePlayer == null) {
+            log.warn("GamePlayer not found for user {}", user.getId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         // Check if the game is accepting answers.
         if (!game.isAcceptingAnswers()) {
+            log.warn("Game {} is not accepting answers", game.getId());
             throw new IllegalStateException("Game is not accepting answers.");
         }
 
         // Check if question is correct
         Optional<Question> currentQuestion = game.getQuestion();
         if (currentQuestion.isEmpty()) {
+            log.warn("No question found for game {}", game.getId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         if (!currentQuestion.get().getId().equals(answerData.getQuestionId())) {
             // Trying to answer the wrong question
+            log.warn("Trying to answer question {} with answer for question {}",
+                    currentQuestion.get().getId(), answerData.getQuestionId());
             throw new IllegalArgumentException("Trying to answer the wrong question.");
         }
 
         // Update the answer
-        Answer userAnswer = new Answer(answerData);
-        if (game.addAnswer(userAnswer, user.getId())) {
-            // Save updated game
-            game = gameRepository.save(game);
-
+        // XXX: There might be a race condition here?
+        if (gameService.addAnswer(game, gamePlayer, answerData)) {
+            log.trace("[{}] Answer added to game (question {}).", gameId, currentQuestion.get().getId());
             // Answer has been received successfully.
             return ResponseEntity.ok().build();
         } else {
@@ -117,15 +125,17 @@ public class AnswerController {
             @RequestParam(name = "idx") Optional<Integer> questionIdx) {
 
         Optional<Game> game = gameRepository.findById(gameId);
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
 
         // Check if game exists
         if (game.isEmpty() || user.isEmpty()) {
+            log.debug("Game or user not found.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         // Check that the user is playing in the game
         if (!gamePlayerRepository.existsByUserIdAndGameId(user.get().getId(), game.get().getId())) {
+            log.info("User {} is not playing in game {}", user.get().getId(), game.get().getId());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -139,8 +149,14 @@ public class AnswerController {
 
         // Check if game is active
         return toAnswer
-                .map(question -> ResponseEntity.ok(question.getRightAnswer().getDTO()))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+                .map(question -> {
+                    log.trace("[{}] Sending correct answer for question {}.", gameId, question.getId());
+                    return ResponseEntity.ok(question.getRightAnswer());
+                })
+                .orElseGet(() -> {
+                    log.debug("[{}] No question found.", gameId);
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                });
     }
 
     /**
@@ -152,15 +168,17 @@ public class AnswerController {
     @GetMapping("/{gameId}/score")
     ResponseEntity<Integer> getScore(@PathVariable UUID gameId) {
         Optional<Game> game = gameRepository.findById(gameId);
-        Optional<User> user = userRepository.findByEmail(AuthContext.get());
+        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
 
         // Check if game exists
         if (game.isEmpty() || user.isEmpty()) {
+            log.debug("Game or user not found.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         // Check that the user is playing in the game
         if (!gamePlayerRepository.existsByUserIdAndGameId(user.get().getId(), game.get().getId())) {
+            log.info("User {} is not playing in game {}", user.get().getId(), game.get().getId());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 

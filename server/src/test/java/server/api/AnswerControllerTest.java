@@ -125,7 +125,7 @@ class AnswerControllerTest {
                         joe.getEmail(),
                         joe.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
-        when(userRepository.findByEmail(joe.getEmail())).thenReturn(Optional.of(joe));
+        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
 
     }
 
@@ -158,7 +158,7 @@ class AnswerControllerTest {
     public void userAnswerOkTest() throws Exception {
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
-        userAnswer.setResponse(List.of(mockQuestion.getActivities().get(0).getCost()));
+        userAnswer.setResponse(List.of(mockQuestion.getActivities().get(0).getDTO()));
         userAnswer.setQuestionId(mockQuestion.getId());
         this.mockMvc
                 .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))
@@ -204,7 +204,7 @@ class AnswerControllerTest {
                         susan.getEmail(),
                         susan.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
-        when(userRepository.findByEmail(susan.getEmail())).thenReturn(Optional.of(susan));
+        when(userRepository.findByEmailIgnoreCase(susan.getEmail())).thenReturn(Optional.of(susan));
 
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
@@ -220,7 +220,7 @@ class AnswerControllerTest {
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId())))
                 .andExpect(content().string(equalToObject(
-                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer().getDTO()))));
+                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer()))));
     }
 
     @Test
@@ -239,7 +239,7 @@ class AnswerControllerTest {
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId(), Optional.of(1))))
                 .andExpect(content().string(equalToObject(
-                        objectMapper.writeValueAsString(secondQuestion.getRightAnswer().getDTO()))));
+                        objectMapper.writeValueAsString(secondQuestion.getRightAnswer()))));
     }
 
     @Test
@@ -247,7 +247,7 @@ class AnswerControllerTest {
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId(), Optional.of(1))))
                 .andExpect(content().string(equalToObject(
-                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer().getDTO()))));
+                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer()))));
     }
 
     @Test
@@ -255,7 +255,7 @@ class AnswerControllerTest {
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId(), Optional.of(-1))))
                 .andExpect(content().string(equalToObject(
-                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer().getDTO()))));
+                        objectMapper.writeValueAsString(mockQuestion.getRightAnswer()))));
     }
 
     @Test
@@ -285,7 +285,7 @@ class AnswerControllerTest {
                         susan.getEmail(),
                         susan.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
-        when(userRepository.findByEmail(susan.getEmail())).thenReturn(Optional.of(susan));
+        when(userRepository.findByEmailIgnoreCase(susan.getEmail())).thenReturn(Optional.of(susan));
 
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(answerEndpoint(mockLobby.getId())))
@@ -327,7 +327,7 @@ class AnswerControllerTest {
                         susan.getEmail(),
                         susan.getPassword(),
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
-        when(userRepository.findByEmail(susan.getEmail())).thenReturn(Optional.of(susan));
+        when(userRepository.findByEmailIgnoreCase(susan.getEmail())).thenReturn(Optional.of(susan));
 
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(scoreEndpoint(mockLobby.getId())))

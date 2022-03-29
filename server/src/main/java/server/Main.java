@@ -20,8 +20,10 @@ import lombok.Generated;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+import server.configuration.quiz.QuizConfiguration;
 
 /**
  * Main Spring Boot application class.
@@ -29,6 +31,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 @SpringBootApplication
 @EntityScan(basePackages = { "commons", "server" })
 @Generated
+@EnableConfigurationProperties({QuizConfiguration.class})
 public class Main {
 
     public static void main(String[] args) {

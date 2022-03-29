@@ -1,6 +1,8 @@
 package server.database.entities.game;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.game.DefiniteGameDTO;
+import commons.entities.utils.Views;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -20,6 +22,7 @@ import server.database.entities.game.configuration.NormalGameConfiguration;
 @ToString(callSuper = true)
 @Data
 public abstract class DefiniteGame<T extends DefiniteGameDTO> extends Game<T> {
+    @JsonView(Views.Public.class)
     protected int dummyField;
 
     /**
