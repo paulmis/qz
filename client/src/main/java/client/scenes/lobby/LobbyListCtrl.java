@@ -133,6 +133,38 @@ public class LobbyListCtrl implements Initializable {
                 () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while fetching the lobbies.")));
     }
 
+    /**
+     * Function that lets the user join a random lobby.
+     */
+    @FXML
+    private void joinRandomLobby() {
+        server.getLobbies(
+                games -> {
+                    // Gets a random available lobby and joins it
+                    games.removeIf(game -> (game.getConfiguration().getCapacity() <= game.getPlayers().size()));
+                    if (games.isEmpty())
+                        this.createLobbyButtonClick();
+                    else {
+                        var game = games.get(new Random().nextInt(games.size()));
+                        server.joinLobby(game.getId(), gameDTO -> {
+                            runLater(mainCtrl::showLobbyScreen);
+                        }, () -> {
+                            runLater(() -> {
+                                mainCtrl.showErrorSnackBar("Couldn't join random game.");
+                            });
+                        });
+                    }
+                },
+                () -> {
+                    // If there are no available games, the user creates a new lobby
+                    runLater(() -> {
+                        this.createLobbyButtonClick();
+                    });
+                });
+    }
+
+
+
     private String createSearchableString(GameDTO game) {
         return game.getPlayers().stream().filter(gamePlayerDTO -> gamePlayerDTO.getId().equals(game.getHost()))
                 .findFirst().get().getNickname();
