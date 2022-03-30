@@ -31,17 +31,29 @@ public class LobbyService {
      * @param user  the user to be removed
      * @return true if the user was removed, false otherwise
      */
-    @Transactional
-    public boolean removePlayer(Game lobby, User user) {
+    public boolean removePlayer(Game<?> lobby, User user) {
         // Remove the player from the lobby
         // If this was the last player, delete the lobby
         try {
+            // Remove the user
             if (!lobby.remove(user.getId())) {
                 return false;
             }
-            gameRepository.save(lobby);
+
+            // Save the lobby
+            lobby = gameRepository.save(lobby);
+            log.info("[{}] Removed player {}", lobby.getGameId(), user.getId());
+
+            // Distribute the notifications to all players in the lobby
+            try {
+                sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
+            } catch (IOException ex) {
+                log.error("Failed to notify players about the new configuration", ex);
+            }
+
         } catch (LastPlayerRemovedException ex) {
             gameRepository.delete(lobby);
+            log.info("[{}] Last player removed, deleting lobby", lobby.getGameId());
         }
         return true;
     }
@@ -54,7 +66,7 @@ public class LobbyService {
      * @return true if the lobby was successfully deleted, false otherwise
      */
     @Transactional(noRollbackFor = IOException.class)
-    public boolean deleteLobby(Game lobby, User user) {
+    public boolean deleteLobby(Game<?> lobby, User user) {
         // Check if the host is set. If host is null, let anyone delete the lobby
         if (lobby.getHost() != null) {
             // Check that the user is the lobby host
@@ -70,7 +82,6 @@ public class LobbyService {
         try {
             sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_DELETED));
         } catch (IOException e) {
-            // Couldn't notify other players, nothing to do
             log.error("[{}] Couldn't notify other players of lobby deletion", lobby.getGameId(), e);
         }
 
