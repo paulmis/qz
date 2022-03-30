@@ -45,7 +45,7 @@ public class SurvivalGameConfiguration extends GameConfiguration {
     public SurvivalGameConfigurationDTO getDTO() {
         ModelMapper mapper = new ModelMapper();
         mapper.addConverter(
-                context -> (int) context.getSource().toSeconds(),
+                context -> (int) context.getSource().toMillis(),
                 Duration.class, Integer.class);
 
         return mapper.map(this, SurvivalGameConfigurationDTO.class);

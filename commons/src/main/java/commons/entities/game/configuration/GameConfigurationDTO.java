@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.utils.DTO;
+import commons.entities.utils.Multiplier;
 import commons.entities.utils.Views;
 import java.time.Duration;
 import java.util.UUID;
@@ -40,10 +41,11 @@ public abstract class GameConfigurationDTO implements DTO {
     /**
      * Available time to answer.
      */
-    @DecimalMin(value = "3")
-    @DecimalMax(value = "120")
+    @DecimalMin(value = "3000")
+    @DecimalMax(value = "120000")
     @Description("Seconds per question")
-    protected Integer answerTime = 20;
+    @Multiplier(value = 1000)
+    protected Integer answerTime = 20000;
 
 
     /**

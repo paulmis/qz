@@ -28,7 +28,7 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
      * TODO: in order to support half-time power-up, we need to modify the getter of this field
      */
     @Column(nullable = false)
-    protected Duration answerTime = Duration.ofSeconds(10);
+    protected Duration answerTime = Duration.ofSeconds(20);
 
     /**
      * Capacity of the lobby.
@@ -57,7 +57,8 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
      * @param dto source DTO
      */
     public GameConfiguration(GameConfigurationDTO dto) {
-        this.answerTime = Duration.ofSeconds(dto.getAnswerTime());
+        this.answerTime = Duration.ofMillis(dto.getAnswerTime());
+        System.out.println(dto.getAnswerTime());
         this.capacity = dto.getCapacity();
         this.streakSize = dto.getStreakSize();
         this.streakMultiplier = dto.getStreakMultiplier();

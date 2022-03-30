@@ -80,9 +80,9 @@ public class ConfigurationScreenCtrl implements Initializable {
 
             // This calls the constructor of the element with the extracted annotations and data.
             var ele = new ConfigurationElementPane(ReflectionUtils.getTextDescription(field),
-                    Float.parseFloat(field.get(gameConfig).toString()),
-                    ReflectionUtils.getMinValue(field),
-                    ReflectionUtils.getMaxValue(field),
+                    Float.parseFloat(field.get(gameConfig).toString()) / (ReflectionUtils.getMultiplierValue(field)),
+                    ReflectionUtils.getMinValue(field) / (ReflectionUtils.getMultiplierValue(field)),
+                    ReflectionUtils.getMaxValue(field) / (ReflectionUtils.getMultiplierValue(field)),
                     isEditableFieldMap.containsKey(field)
                             ? isEditableFieldMap.get(field)
                             : editable,
@@ -94,9 +94,9 @@ public class ConfigurationScreenCtrl implements Initializable {
             ele.valueProperty().addListener((observable, oldValue, newValue) -> {
                 try {
                     if (field.getType().equals(Float.class)) {
-                        field.set(gameConfig, newValue.floatValue());
+                        field.set(gameConfig, newValue.floatValue() * (ReflectionUtils.getMultiplierValue(field)));
                     } else if (field.getType().equals(Integer.class)) {
-                        field.set(gameConfig, newValue.intValue());
+                        field.set(gameConfig, newValue.intValue() * (ReflectionUtils.getMultiplierValue(field)));
                     }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();

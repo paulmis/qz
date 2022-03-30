@@ -109,7 +109,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     public Game(GameDTO dto) {
         ModelMapper mapper = new ModelMapper();
         mapper.addConverter(
-                context -> Duration.ofSeconds(context.getSource()),
+                context -> Duration.ofMillis(context.getSource()),
                 Integer.class, Duration.class);
         mapper.getConfiguration().setSkipNullEnabled(true);
         if (dto.getId() == null) {
