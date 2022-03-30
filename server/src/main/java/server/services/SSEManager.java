@@ -156,7 +156,8 @@ public class SSEManager {
      * @return Whether the message was sent to all specified users or not.
      * @throws SSEFailedException If the message could not be sent.
      */
-    public boolean send(Iterable<UUID> users, SseEmitter.SseEventBuilder message) throws SSEFailedException {        boolean success = true;
+    public boolean send(Iterable<UUID> users, SseEmitter.SseEventBuilder message) throws SSEFailedException {
+        boolean success = true;
         for (UUID userId : users) {
             try {
                 success &= send(userId, message);

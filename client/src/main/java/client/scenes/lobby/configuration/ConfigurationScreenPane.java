@@ -1,16 +1,12 @@
 package client.scenes.lobby.configuration;
 
-import client.scenes.questions.EstimateQuestionCtrl;
 import commons.entities.game.configuration.GameConfigurationDTO;
+import java.lang.reflect.Field;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
-
-import java.lang.reflect.Field;
 
 /**
  * The class that encompasses the ConfigurationScreen.

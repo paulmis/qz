@@ -70,7 +70,8 @@ public class LobbyController {
      *      already in a lobby or a game, 201 and the game otherwise
      */
     @PostMapping
-    ResponseEntity create(@RequestBody NormalGameDTO gameDTO) throws SSEFailedException {        // If the user doesn't exist, return 404
+    ResponseEntity create(@RequestBody NormalGameDTO gameDTO) throws SSEFailedException {
+        // If the user doesn't exist, return 404
         Optional<User> founder = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (founder.isEmpty()) {
             log.debug("Founder doesn't exist");
@@ -88,12 +89,11 @@ public class LobbyController {
         lobby.setStatus(GameStatus.CREATED);
         lobby.add(new GamePlayer(founder.get()));
 
+        lobby = gameRepository.save(lobby);
         // Save the game with the added host and player
         // If the game is singleplayer, start it
         if (lobby.isSingleplayer()) {
             lobby = (NormalGame) gameService.start(lobby);
-        } else {
-            lobby = gameRepository.save(lobby);
         }
 
 

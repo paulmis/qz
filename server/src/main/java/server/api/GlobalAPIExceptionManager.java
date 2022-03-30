@@ -2,6 +2,8 @@ package server.api;
 
 import commons.entities.utils.ApiError;
 import java.util.List;
+import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolationException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -17,8 +19,6 @@ import server.api.exceptions.SSEFailedException;
 import server.api.exceptions.UserAlreadyExistsException;
 import server.exceptions.ResourceNotFoundException;
 
-import javax.persistence.PersistenceException;
-import javax.validation.ConstraintViolationException;
 
 /**
  * Provides global API exception handling.
@@ -49,10 +49,7 @@ public class GlobalAPIExceptionManager {
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    @ExceptionHandler({
-            IllegalArgumentException.class,
-            ConstraintViolationException.class,
-            PersistenceException.class })
+    @ExceptionHandler({IllegalArgumentException.class, ConstraintViolationException.class, PersistenceException.class })
     public ApiError handleBadArgumentException(Exception ex) {
         return new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }

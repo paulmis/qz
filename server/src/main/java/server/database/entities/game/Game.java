@@ -8,7 +8,6 @@ import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;

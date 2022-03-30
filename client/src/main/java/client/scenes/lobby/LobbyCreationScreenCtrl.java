@@ -136,6 +136,7 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
                 .filter(field -> field.getName().equals("capacity")).findFirst().get();
 
         if (isMultiplayer.get()) {
+            config.setCapacity(5);
             setUpConfigScreen();
             configPane.setFieldEdit(capacityField);
             singleplayerGameButton.setButtonType(JFXButton.ButtonType.FLAT);

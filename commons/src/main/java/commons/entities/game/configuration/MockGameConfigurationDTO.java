@@ -31,7 +31,8 @@ public class MockGameConfigurationDTO extends GameConfigurationDTO {
      * @param pointsWrong the number of points per incorrect answer.
      * @param correctAnswerThreshold the correct answer threshold.
      */
-    public MockGameConfigurationDTO(UUID id, Integer answerTime, Integer capacity, Float speedModifier,                                    Integer streakSize,
+    public MockGameConfigurationDTO(UUID id, Integer answerTime, Integer capacity, Float speedModifier,
+                                    Integer streakSize,
                                     Float streakMultiplier,
                                     Integer pointsCorrect,
                                     Integer pointsWrong,
