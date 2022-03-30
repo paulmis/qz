@@ -49,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ServerUtils {
 
-    private static final String SERVER = "http://localhost:8080/";
+    private static String SERVER = "http://localhost:8080/";
     public static SSEHandler sseHandler = new SSEHandler();
     public static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
             .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
@@ -374,8 +374,9 @@ public class ServerUtils {
         });
     }
 
-    public String connect() {
-        System.out.println("New connection!\n");
+    public String connect(String serverPath) {
+        this.SERVER = serverPath;
+        System.out.println("Connecting to " + SERVER + "\n");
         return "200";
     }
 
