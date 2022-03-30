@@ -374,6 +374,12 @@ public class ServerUtils {
         });
     }
 
+    /**
+     * Function to connect to the server and sets the server path.
+     *
+     * @param serverPath the server path to connect to
+     * @return returns a 200 ok status
+     */
     public String connect(String serverPath) {
         this.SERVER = serverPath;
         System.out.println("Connecting to " + SERVER + "\n");

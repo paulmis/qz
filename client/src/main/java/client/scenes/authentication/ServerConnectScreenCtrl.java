@@ -53,7 +53,7 @@ public class ServerConnectScreenCtrl implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Create a local file in documents to store server path
-        this.localFile = new File(System.getProperty("user.home")+"/Documents/quizzzServerPath.txt");
+        this.localFile = new File(System.getProperty("user.home") + "/Documents/quizzzServerPath.txt");
         // Check if local file has a saved server path
         this.retrievePath();
         // Set default server path in url field
@@ -80,10 +80,15 @@ public class ServerConnectScreenCtrl implements Initializable {
         mainCtrl.showLogInScreen();
     }
 
-    public void savePath(String serverPath){
+    /**
+     * Saves the server path to a local file.
+     *
+     * @param serverPath the server path
+     */
+    public void savePath(String serverPath) {
         try {
             // Create a local file if it doesn't exist
-            if(!localFile.exists()) {
+            if (!localFile.exists()) {
                 localFile.createNewFile();
             }
             // Update file with new server path
@@ -95,10 +100,13 @@ public class ServerConnectScreenCtrl implements Initializable {
         }
     }
 
-    public void retrievePath(){
+    /**
+     * Retrieves the server path from the local file.
+     */
+    public void retrievePath() {
         try {
             // Check if local file exists
-            if (localFile.exists()){
+            if (localFile.exists()) {
                 Scanner scanner = new Scanner(localFile);
                 // If server path exists then set the sever path in client and set checkbox to checked
                 if (scanner.hasNextLine()) {
@@ -112,6 +120,5 @@ public class ServerConnectScreenCtrl implements Initializable {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
     }
 }
