@@ -58,6 +58,7 @@ public class ServerUtils {
         return "file:///C:/Users/rd211/Downloads/Broadway_tower_edit.jpg";
         //return SERVER + "resource/" + id.toString();
     }
+
     /**
      * Provides a request target for the server that can be used to build and invoke a query.
      *
