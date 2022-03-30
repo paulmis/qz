@@ -30,11 +30,6 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     protected User user;
 
     /**
-     * The player's nickname within the game.
-     */
-    protected String nickname;
-
-    /**
      * Indicates whether the player abandoned the game before it ended.
      */
     protected boolean abandoned = false;
@@ -76,14 +71,9 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
         joinDate = LocalDateTime.now();
     }
 
-    /**
-     * Returns player's nickname. If one isn't set, returns their username.
-     *
-     * @return player's nickname
-     */
-    public String getNickname() {
-        // the user != null is necessary
-        return nickname == null && user != null ? user.getUsername() : nickname;
+
+    public String getUsername() {
+        return user.getUsername();
     }
 
     /**
@@ -94,7 +84,6 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
      */
     public GamePlayer(GamePlayerDTO dto, User user) {
         this.user = user;
-        this.nickname = dto.getNickname();
         this.score = dto.getScore();
         this.streak = dto.getStreak();
     }

@@ -1,6 +1,7 @@
 package server.api;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -98,6 +99,46 @@ public class UserControllerTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(joeDTO)))
                 .andExpect(status().isNotFound())
+                .andReturn();
+    }
+
+    @Test
+    void changeUsernameOk() throws Exception {
+        // Mock the repository
+        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
+        when(userRepository.existsByUsername("joe")).thenReturn(true);
+
+        this.mvc.perform(post("/api/user/username")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("George Bush"))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    void changeUsernameSame() throws Exception {
+        // Mock the repository
+        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
+        when(userRepository.existsByUsername("joe")).thenReturn(true);
+
+        this.mvc.perform(post("/api/user/username")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("joe"))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    void changeUsernameUsed() throws Exception {
+        // Mock the repository
+        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
+        when(userRepository.existsByUsername("joe")).thenReturn(true);
+        when(userRepository.existsByUsername("Donald Trump")).thenReturn(true);
+
+        this.mvc.perform(post("/api/user/username")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("Donald Trump"))
+                .andExpect(status().is4xxClientError())
                 .andReturn();
     }
 }
