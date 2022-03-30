@@ -177,6 +177,8 @@ public class GameServiceTest {
     void startNormal() throws IOException {
         // ToDo: fix QuestionRepository::findByIdNotIn
         // Mock the repository
+
+        when(gameRepository.save(any(Game.class))).thenReturn(game);
         //when(questionRepository.findByIdNotIn(new ArrayList<>()))
         //        .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
 

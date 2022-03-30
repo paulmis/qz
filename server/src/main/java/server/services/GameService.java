@@ -125,7 +125,7 @@ public class GameService {
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
-            gameRepository.save(definiteGame);
+            definiteGame = gameRepository.save(definiteGame);
 
             // Distribute the start event to all players
             sseManager.send(definiteGame.getUserIds(), new SSEMessage(SSEMessageType.GAME_START));
@@ -137,7 +137,6 @@ public class GameService {
                             new FSMContext(this)));
             fsmManager.startFSM(definiteGame.getId());
 
-            gameRepository.save(game);
             // Return the started game
             return definiteGame;
         } else {
