@@ -1,6 +1,6 @@
 package server.api;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -12,6 +12,7 @@ import commons.entities.ActivityDTO;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,8 +25,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import server.database.entities.User;
 import server.database.entities.question.Activity;
 import server.database.repositories.question.ActivityRepository;
 import server.services.storage.StorageService;
@@ -140,12 +145,12 @@ class ActivityControllerTest {
         List<Activity> activities = new ArrayList<>();
         List<ActivityDTO> activitiesDTO = new ArrayList<>();
 
-        Activity activity1 = new Activity("activity1", 100, "activity1.png", "https://example.com/");
+        Activity activity1 = new Activity("activity1", 100, "activity1.png", "https://example.com/", false);
         activity1.setId(getUUID(1));
         activities.add(activity1);
         activitiesDTO.add(activity1.getDTO());
 
-        Activity activity2 = new Activity("activity2", 200, "activity2.png", "https://example.com/");
+        Activity activity2 = new Activity("activity2", 200, "activity2.png", "https://example.com/", false);
         activity2.setId(getUUID(2));
         activities.add(activity2);
         activitiesDTO.add(activity2.getDTO());

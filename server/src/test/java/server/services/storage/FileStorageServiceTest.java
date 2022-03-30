@@ -40,6 +40,7 @@ class FileStorageServiceTest {
         file.createNewFile();
         FileWriter writer = new FileWriter(file);
         writer.write(content);
+        writer.close();
     }
 
     private InputStream stringToInputStream(String text) {
