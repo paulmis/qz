@@ -89,12 +89,14 @@ public class LobbyController {
         lobby.setStatus(GameStatus.CREATED);
         lobby.add(new GamePlayer(founder.get()));
 
-        lobby = gameRepository.save(lobby);
         // Save the game with the added host and player
         // If the game is singleplayer, start it
         if (lobby.isSingleplayer()) {
             lobby = (NormalGame) gameService.start(lobby);
+        } else {
+            lobby = gameRepository.save(lobby);
         }
+
 
 
         log.debug("Created a new game with id {}", lobby.getGameId());
