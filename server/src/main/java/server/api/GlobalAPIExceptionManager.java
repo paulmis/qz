@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import server.api.exceptions.PlayerAlreadyInLobbyOrGameException;
 import server.api.exceptions.UserAlreadyExistsException;
+import server.exceptions.ResourceNotFoundException;
 
 /**
  * Provides global API exception handling.
@@ -36,6 +37,12 @@ public class GlobalAPIExceptionManager {
         return processFieldErrors(fieldErrors, ex);
     }
 
+    /**
+     * Handle invalid parameters exception.
+     *
+     * @param ex the exception.
+     * @return the API error.
+     */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     @ExceptionHandler(IllegalArgumentException.class)
@@ -51,6 +58,19 @@ public class GlobalAPIExceptionManager {
         IllegalStateException.class })
     public ApiError handlePlayerAlreadyInLobbyOrGameException(Exception ex) {
         return new ApiError(HttpStatus.CONFLICT.value(), ex.getMessage());
+    }
+
+    /**
+     * Handles "resource not found" exceptions.
+     *
+     * @param ex caught exception
+     * @return API error
+     */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ApiError handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return new ApiError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 
     /**

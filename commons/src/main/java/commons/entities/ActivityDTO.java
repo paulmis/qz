@@ -31,7 +31,7 @@ public class ActivityDTO implements DTO {
     protected Long cost;
 
     /**
-     * URL of the picture of the activity.
+     * URL or file path of the picture of the activity.
      */
     protected String icon;
 
