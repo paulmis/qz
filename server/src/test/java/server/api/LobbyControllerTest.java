@@ -237,7 +237,7 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void configPostLobbyConfigurationUpdateNotAcceptableTest() throws Exception {
+    public void configPostLobbyConfigurationBadRequest() throws Exception {
         mockLobby.setStatus(GameStatus.CREATED);
         mockLobby.setHost(johnPlayer);
         SurvivalGameConfiguration survivalGameConfiguration = new SurvivalGameConfiguration(1.25f);
@@ -247,11 +247,11 @@ class LobbyControllerTest {
                 .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(survivalGameConfiguration.getDTO())))
-                .andExpect(status().isNotAcceptable());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void configPostLobbyConfigurationUpdatedTest() throws Exception {
+    public void configPostLobbyConfigurationUpdated() throws Exception {
         mockLobby.setStatus(GameStatus.CREATED);
         mockLobby.setHost(johnPlayer);
 
@@ -306,7 +306,7 @@ class LobbyControllerTest {
                 .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(normalGameConfiguration.getDTO())))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict());
     }
 
     @Test

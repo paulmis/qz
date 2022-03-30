@@ -134,7 +134,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
-     * Get UUIDs of GamePlayers.
+     * Returns ids of all users in the game.
      *
      * @return UUIDs of all GamePlayers in the current game.
      */

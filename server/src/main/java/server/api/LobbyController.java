@@ -5,6 +5,8 @@ import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import server.api.exceptions.GameAlreadyStartedException;
 import server.api.exceptions.PlayerAlreadyInLobbyOrGameException;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
@@ -32,6 +35,7 @@ import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
 import server.services.LobbyService;
+import server.services.SSEManager;
 
 
 /**
@@ -60,6 +64,9 @@ public class LobbyController {
 
     @Autowired
     private GameConfigurationRepository gameConfigurationRepository;
+
+    @Autowired
+    private SSEManager sseManager;
 
     /**
      * Endpoint for the creation of new lobbies.
@@ -186,7 +193,8 @@ public class LobbyController {
      * Endpoint to allow a user to join a game.
      *
      * @param lobbyId UUID of the lobby to join.
-     * @return true if the join was successful, false otherwise.
+     * @return 404 if the lobby doesn't exist, 409 if the player is already in the lobby or the lobby has started,
+     *      200 and the lobby otherwise.
      */
     @PutMapping("/{lobbyId}/join")
     ResponseEntity join(@PathVariable UUID lobbyId) {
@@ -197,25 +205,31 @@ public class LobbyController {
             log.error("User or lobby not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or lobby not found");
         }
-        Game lobby = lobbyOptional.get();
+        Game<?> lobby = lobbyOptional.get();
 
         // Check that the player is not already in a lobby or a game
         if (gameRepository.getPlayersLobbyOrGame(user.get().getId()).isPresent()) {
             throw new PlayerAlreadyInLobbyOrGameException();
         }
 
-        // Create the player
-        GamePlayer player = new GamePlayer(user.get());
-
         // Check that the game hasn't started yet and add the player
-        if (lobby.getStatus() != GameStatus.CREATED
-                || !lobby.add(player)) {
-            log.debug("User {} attempted to join a game that has already started", user.get().getId());
-            throw new IllegalStateException("Game is already started.");
+        GamePlayer player = new GamePlayer(user.get());
+        if (lobby.getStatus() != GameStatus.CREATED || !lobby.add(player)) {
+            throw new GameAlreadyStartedException(user.get(), lobby);
         }
 
+        // Save the lobby
         lobby = gameRepository.save(lobby);
         log.debug("User {} joined game {}", user.get().getId(), lobby.getId());
+
+        // Distribute the notifications to all players in the lobby
+        try {
+            sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
+        } catch (IOException ex) {
+            log.error("Failed to notify players about the new player", ex);
+        }
+
+        // Return 200
         return ResponseEntity.ok(lobby.getDTO());
     }
 
@@ -260,38 +274,52 @@ public class LobbyController {
      *
      * @param lobbyId               UUID of the lobby to join.
      * @param gameConfigurationData The new configuration data.
-     * @return An ok status if successful.
+     * @return 400 if the provided configuration has an invalid type, 403 if the user isn't the lobby host,
+     *      404 if the lobby doesn't exist, 409 if the game has already started, 200 otherwise
      */
     @PostMapping("/{lobbyId}/config")
     ResponseEntity updateConfiguration(
             @PathVariable UUID lobbyId,
             @RequestBody GameConfigurationDTO gameConfigurationData) {
+        // Check if the lobby exists and user exists
         Optional<Game> lobbyOptional = gameRepository.findById(lobbyId);
         Optional<User> userOptional = userRepository.findByEmailIgnoreCase(AuthContext.get());
-        // Check if the lobby exists and user exists.
         if (lobbyOptional.isEmpty() || userOptional.isEmpty()) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        Game lobby = lobbyOptional.get();
+        Game<?> lobby = lobbyOptional.get();
         User user = userOptional.get();
-        // Check if the lobby is created.
-        if (lobby.getStatus() != GameStatus.CREATED) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        // Check if the user is host.
+
+        // Check if the user is the lobby host
         if (lobby.getHost().getUser().getId() != user.getId()) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        // Change and update lobby configuration based on configuration type.
+
+        // Check that the game hasn't started yet
+        if (lobby.getStatus() != GameStatus.CREATED) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        // Change and update lobby configuration based on configuration type
         if (gameConfigurationData instanceof NormalGameConfigurationDTO) {
             lobby.setConfiguration(new NormalGameConfiguration((NormalGameConfigurationDTO) gameConfigurationData));
         } else {
-            // Other configurations are not accepted as these are the only implemented game types as of now.
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            // Other configurations are not accepted as these are the only implemented game types as of now
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        // Update repository.
+
+        // Update the repository
         gameRepository.save(lobby);
-        // Return an ok status.
+        log.info("Updated lobby {} configuration", lobby.getId());
+
+        // Distribute the notifications to all players in the lobby
+        try {
+            sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
+        } catch (IOException ex) {
+            log.error("Failed to notify players about the new configuration", ex);
+        }
+
+        // Return 200
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -303,22 +331,23 @@ public class LobbyController {
     @DeleteMapping("/leave")
     ResponseEntity leave() {
         // If the user or the game don't exist, return 404
-        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
-        if (user.isEmpty()) {
+        Optional<User> userOptional = userRepository.findByEmailIgnoreCase(AuthContext.get());
+        if (userOptional.isEmpty()) {
             log.error("User not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
+        User user = userOptional.get();
 
         // Check that the user is in a lobby and remove them
-        Optional<Game> lobby =
-                gameRepository.getPlayersLobby(user.get().getId());
-        if (lobby.isEmpty()) {
-            log.debug("User {} is not in a lobby", user.get().getId());
+        Optional<Game> lobbyOptional = gameRepository.getPlayersLobby(user.getId());
+        if (lobbyOptional.isEmpty()) {
+            log.debug("User {} is not in a lobby", user.getId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not in a lobby");
         }
+        Game<?> lobby = lobbyOptional.get();
 
-        lobbyService.removePlayer(lobby.get(), user.get());
-        log.debug("Removed user {} from lobby {}", user.get().getId(), lobby.get().getId());
+        // Remove the player and return 200
+        lobbyService.removePlayer(lobby, user);
         return ResponseEntity.ok().build();
     }
 
