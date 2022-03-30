@@ -25,7 +25,7 @@ public class ActivityService {
         if (count < 0) {
             throw new IllegalArgumentException("Count must be greater than or equal to 0.");
         }
-        List<Activity> activities = activityRepository.findAll();
+        List<Activity> activities = activityRepository.findByAbandonedIsFalse();
         if (activities.size() < count) {
             throw new IllegalArgumentException("Requested count is greater than the number of available activities.");
         }
