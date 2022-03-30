@@ -130,7 +130,7 @@ public class SSEManager {
             log.debug("Sent message to user {}", userId);
             return true;
         } catch (IOException e) {
-            log.debug("Failed to send message to user {}", userId);
+            log.info("Failed to send message to user {}", userId);
             throw new SSEFailedException(e.getMessage());
         }
     }
@@ -159,11 +159,7 @@ public class SSEManager {
     public boolean send(Iterable<UUID> users, SseEmitter.SseEventBuilder message) throws SSEFailedException {
         boolean success = true;
         for (UUID userId : users) {
-            try {
-                success &= send(userId, message);
-            } catch (IOException e) {
-                throw new SSEFailedException(e.getMessage());
-            }
+            success &= send(userId, message);
         }
         return success;
     }

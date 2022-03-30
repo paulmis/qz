@@ -34,22 +34,22 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
      * Capacity of the lobby.
      */
     @Column(nullable = false)
-    protected Integer capacity = 6;
+    protected int capacity = 6;
 
     @Column(nullable = false)
-    protected Integer streakSize = 3;
+    protected int streakSize = 3;
 
     @Column(nullable = false)
-    protected Float streakMultiplier = 1.5f;
+    protected float streakMultiplier = 1.5f;
 
     @Column(nullable = false)
-    protected Integer pointsCorrect = 100;
+    protected int pointsCorrect = 100;
 
     @Column(nullable = false)
-    protected Integer pointsWrong = 0;
+    protected int pointsWrong = 0;
 
     @Column(nullable = false)
-    protected Integer correctAnswerThreshold = 75;
+    protected int correctAnswerThreshold = 75;
 
     /**
      * Creates a new game configuration from a DTO.

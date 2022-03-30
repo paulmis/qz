@@ -39,11 +39,11 @@ public class SurvivalGameConfiguration extends GameConfiguration {
      * The speed increase/decrease of the game.
      */
     @Column(nullable = false)
-    Float speedModifier = 1.0f;
+    float speedModifier = 1.0f;
 
     @Override
     public SurvivalGameConfigurationDTO getDTO() {
-        var mapper = new ModelMapper();
+        ModelMapper mapper = new ModelMapper();
         mapper.addConverter(
                 context -> (int) context.getSource().toSeconds(),
                 Duration.class, Integer.class);

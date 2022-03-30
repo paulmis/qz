@@ -57,7 +57,7 @@ public class NormalGameConfiguration extends GameConfiguration {
 
     @Override
     public NormalGameConfigurationDTO getDTO() {
-        var mapper = new ModelMapper();
+        ModelMapper mapper = new ModelMapper();
         mapper.addConverter(
                 context -> (int) context.getSource().toSeconds(),
                 Duration.class, Integer.class);
