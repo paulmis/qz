@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import server.api.exceptions.PlayerAlreadyInLobbyOrGameException;
+import server.api.exceptions.SSEFailedException;
 import server.api.exceptions.UserAlreadyExistsException;
 import server.exceptions.ResourceNotFoundException;
+
+import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolationException;
 
 /**
  * Provides global API exception handling.
@@ -45,10 +49,21 @@ public class GlobalAPIExceptionManager {
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ApiError handleBadArgumentException(IllegalArgumentException ex) {
+    @ExceptionHandler({
+            IllegalArgumentException.class,
+            ConstraintViolationException.class,
+            PersistenceException.class })
+    public ApiError handleBadArgumentException(Exception ex) {
         return new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
+
+    @ResponseStatus(HttpStatus.TOO_EARLY)
+    @ResponseBody
+    @ExceptionHandler(SSEFailedException.class)
+    public ApiError handleSSEException(SSEFailedException ex) {
+        return new ApiError(HttpStatus.TOO_EARLY.value(), ex.getMessage());
+    }
+
 
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody

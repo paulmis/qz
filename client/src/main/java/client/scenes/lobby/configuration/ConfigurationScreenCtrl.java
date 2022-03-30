@@ -5,6 +5,8 @@ import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
@@ -43,6 +45,9 @@ public class ConfigurationScreenCtrl implements Initializable {
     private boolean editable;
     private SaveHandler saveHandler;
 
+
+    private Map<Field, Boolean> isEditableFieldMap = new HashMap<Field, Boolean>();
+
     public ConfigurationScreenCtrl(GameConfigurationDTO gameConfig) {
         this.gameConfig = gameConfig;
         this.editable = false;
@@ -78,7 +83,9 @@ public class ConfigurationScreenCtrl implements Initializable {
                     Float.parseFloat(field.get(gameConfig).toString()),
                     ReflectionUtils.getMinValue(field),
                     ReflectionUtils.getMaxValue(field),
-                    editable,
+                    isEditableFieldMap.containsKey(field)
+                            ? isEditableFieldMap.get(field)
+                            : editable,
                     field.getType()
             );
 
@@ -137,4 +144,23 @@ public class ConfigurationScreenCtrl implements Initializable {
                 + "-fx-background-radius: 0; "
                 + "-fx-effect: none;");
     }
+
+
+    /**
+     * Hides the save button if you don't want to display it.
+     */
+    public void hideSaveButton() {
+        this.saveButton.setVisible(false);
+    }
+
+    public void setFieldReadOnly(Field field) {
+        isEditableFieldMap.put(field, false);
+        initializeChildren();
+    }
+
+    public void setFieldEdit(Field field) {
+        isEditableFieldMap.put(field, true);
+        initializeChildren();
+    }
+
 }

@@ -12,6 +12,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 
+import java.time.Duration;
+
 /**
  * Configuration for the survival game mode.
  * In this mode, the player has to survive as long as possible, while the
@@ -42,6 +44,11 @@ public class SurvivalGameConfiguration extends GameConfiguration {
 
     @Override
     public SurvivalGameConfigurationDTO getDTO() {
-        return new ModelMapper().map(this, SurvivalGameConfigurationDTO.class);
+        var mapper = new ModelMapper();
+        mapper.addConverter(
+                context -> (int) context.getSource().toSeconds(),
+                Duration.class, Integer.class);
+
+        return mapper.map(this, SurvivalGameConfigurationDTO.class);
     }
 }

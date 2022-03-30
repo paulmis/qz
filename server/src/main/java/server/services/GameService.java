@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import server.api.exceptions.SSEFailedException;
 import server.configuration.quiz.QuizConfiguration;
 import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
@@ -107,8 +108,8 @@ public class GameService {
      * @throws IOException             if sending the GAME_START message fails
      */
     @Transactional
-    public void startGame(Game game)
-            throws NotImplementedException, IllegalStateException, IOException {
+    public Game start(Game game)
+            throws NotImplementedException, IllegalStateException, SSEFailedException {
         // Make sure that the lobby is full and not started
         if (game.getStatus() != GameStatus.CREATED || !game.isFull()) {
             throw new IllegalStateException();
@@ -120,24 +121,28 @@ public class GameService {
         // Initialize the answers collection
         allGameAnswers.put(game.getId(), new ConcurrentHashMap<>());
 
-        // Initialize the questions
+        // Initialize the game
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
+            gameRepository.save(definiteGame);
 
             // Distribute the start event to all players
             sseManager.send(definiteGame.getUserIds(), new SSEMessage(SSEMessageType.GAME_START));
 
             // Create and start a finite state machine for the game.
             fsmManager.addFSM(definiteGame,
-                    new DefiniteGameFSM(definiteGame,
+                    new DefiniteGameFSM(
+                            definiteGame,
                             new FSMContext(this)));
-            fsmManager.startFSM(definiteGame);
+            fsmManager.startFSM(definiteGame.getId());
+
+            gameRepository.save(game);
+            // Return the started game
+            return definiteGame;
         } else {
             throw new NotImplementedException("Starting games other than definite games is not yet supported.");
         }
-
-        gameRepository.save(game);
     }
 
     /**

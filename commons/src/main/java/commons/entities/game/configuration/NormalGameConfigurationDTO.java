@@ -27,7 +27,7 @@ public class NormalGameConfigurationDTO extends GameConfigurationDTO {
     @DecimalMin(value = "10")
     @DecimalMax(value = "100")
     @Description("Number of questions")
-    protected Integer numQuestions;
+    protected Integer numQuestions = 20;
 
     /**
      * Normal game config constructor.
@@ -42,7 +42,7 @@ public class NormalGameConfigurationDTO extends GameConfigurationDTO {
      * @param pointsWrong the number of points per incorrect answer.
      * @param correctAnswerThreshold the correct answer threshold.
      */
-    public NormalGameConfigurationDTO(UUID id, Duration answerTime, Integer capacity, Integer numQuestions,
+    public NormalGameConfigurationDTO(UUID id, Integer answerTime, Integer capacity, Integer numQuestions,
                                       Integer streakSize,
                                       Float streakMultiplier,
                                       Integer pointsCorrect,

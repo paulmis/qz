@@ -181,7 +181,7 @@ public class GameServiceTest {
         //        .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
 
         // Start the game
-        gameService.startGame(game);
+        gameService.start(game);
 
         // Check that the questions have been generated and the status was changed
         assertEquals(3, game.getQuestions().size());
@@ -203,7 +203,7 @@ public class GameServiceTest {
         game.setStatus(GameStatus.ONGOING);
 
         // Start the game
-        assertThrows(IllegalStateException.class, () -> gameService.startGame(game));
+        assertThrows(IllegalStateException.class, () -> gameService.start(game));
 
         // Verify interactions
         verifyNoMoreInteractions(questionRepository);
@@ -215,7 +215,7 @@ public class GameServiceTest {
         game.remove(susanne.getId());
 
         // Start the game
-        assertThrows(IllegalStateException.class, () -> gameService.startGame(game));
+        assertThrows(IllegalStateException.class, () -> gameService.start(game));
 
         // Verify interactions
         verifyNoMoreInteractions(questionRepository);
@@ -232,7 +232,7 @@ public class GameServiceTest {
         mockGame.add(joePlayer);
 
         // Call the service function
-        assertThrows(NotImplementedException.class, () -> gameService.startGame(mockGame));
+        assertThrows(NotImplementedException.class, () -> gameService.start(mockGame));
 
         // Verify that the game hasn't been started
         assertEquals(GameStatus.CREATED, game.getStatus());

@@ -10,6 +10,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
 
+import java.lang.reflect.Field;
+
 /**
  * The class that encompasses the ConfigurationScreen.
  * The purpose of this class is to allow the
@@ -61,5 +63,18 @@ public class ConfigurationScreenPane extends StackPane {
 
     public void makeTransparent() {
         this.controller.makeTransparent();
+    }
+
+
+    public void hideSaveButton() {
+        this.controller.hideSaveButton();
+    }
+
+    public void setFieldReadOnly(Field field) {
+        controller.setFieldReadOnly(field);
+    }
+
+    public void setFieldEdit(Field field) {
+        controller.setFieldEdit(field);
     }
 }

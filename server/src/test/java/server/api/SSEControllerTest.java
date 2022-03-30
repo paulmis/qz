@@ -74,17 +74,6 @@ class SSEControllerTest {
     }
 
     @Test
-    void testOpenNotInGame() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get("/api/sse/open"))
-                .andExpect(request().asyncStarted())
-                .andDo(MockMvcResultHandlers.log())
-                .andReturn();
-
-        this.mockMvc.perform(asyncDispatch(mvcResult))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void testOpenInGame() throws Exception {
         // Create a game
         Game game = new NormalGame();

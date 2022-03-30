@@ -34,7 +34,7 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
      * Capacity of the lobby.
      */
     @Column(nullable = false)
-    protected int capacity = 6;
+    protected Integer capacity = 6;
 
     @Column(nullable = false)
     protected Integer streakSize = 3;
@@ -57,7 +57,7 @@ public abstract class GameConfiguration extends BaseEntity<GameConfigurationDTO>
      * @param dto source DTO
      */
     public GameConfiguration(GameConfigurationDTO dto) {
-        this.answerTime = dto.getAnswerTime();
+        this.answerTime = Duration.ofSeconds(dto.getAnswerTime());
         this.capacity = dto.getCapacity();
         this.streakSize = dto.getStreakSize();
         this.streakMultiplier = dto.getStreakMultiplier();
