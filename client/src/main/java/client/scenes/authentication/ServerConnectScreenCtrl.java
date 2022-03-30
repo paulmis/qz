@@ -67,11 +67,7 @@ public class ServerConnectScreenCtrl implements Initializable {
      */
     @FXML
     private void clickConnectButton() {
-        if (urlField.getText().isEmpty()) {
-            this.serverPath = "http://localhost:8080/";
-        } else {
-            this.serverPath = urlField.getText();
-        }
+        this.serverPath = urlField.getText().isEmpty() ? "http://localhost:8080/" : urlField.getText();
         if (rememberServer.isSelected()) {
             file.savePath(localFile, this.serverPath);
         } else {
