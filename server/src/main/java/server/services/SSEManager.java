@@ -56,8 +56,14 @@ public class SSEManager {
      * @return Whether the SSE emitter was successfully removed or not.
      */
     public boolean unregister(UUID userId) {
-        log.debug("Unregistering SSE emitter for user {}", userId);
-        return emitters.remove(userId) != null;
+        if (!emitters.containsKey(userId)) {
+            log.debug("Cannot unregister emitter: user {} has no registered emitter", userId);
+            return false;
+        } else {
+            emitters.remove(userId);
+            log.debug("Unregistered SSE emitter for user {}", userId);
+            return true;
+        }
     }
 
     /**
@@ -115,7 +121,7 @@ public class SSEManager {
             return false;
         }
         emitters.get(userId).send(message);
-        log.trace("Sent message to user {}", userId);
+        log.debug("Sent message to user {}", userId);
         return true;
     }
 
