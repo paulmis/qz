@@ -88,7 +88,14 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
         this.streak = dto.getStreak();
     }
 
+    /**
+     * Converts to game player dto.
+     *
+     * @return the gameplayer dto
+     */
     public GamePlayerDTO getDTO() {
-        return new ModelMapper().map(this, GamePlayerDTO.class);
+        var gamePlayerDTO = new ModelMapper().map(this, GamePlayerDTO.class);
+        gamePlayerDTO.setNickname(getUsername());
+        return gamePlayerDTO;
     }
 }

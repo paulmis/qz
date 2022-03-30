@@ -15,4 +15,5 @@ public enum SSEMessageType {
     SHOW_LEADERBOARD,
     LOBBY_DELETED,
     CHAT_MESSAGE,
+    USERNAME_CHANGED,
 }

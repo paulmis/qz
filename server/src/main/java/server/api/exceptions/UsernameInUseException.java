@@ -1,5 +1,9 @@
 package server.api.exceptions;
 
+/**
+ * An exception that is to be used when a
+ * username is already in use.
+ */
 public class UsernameInUseException extends IllegalStateException {
     /**
      * No-args constructor.
