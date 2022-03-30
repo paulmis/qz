@@ -1,24 +1,24 @@
 package client.scenes.admin;
 
-import client.utils.communication.ServerUtils;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextArea;
 import commons.entities.ActivityDTO;
-import commons.entities.game.configuration.GameConfigurationDTO;
+import java.io.File;
+import java.net.URL;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.UUID;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
-import javafx.stage.Window;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
+/**
+ * Edit activity screen controller.
+ * Controls the edit activity pop-up that is part of the admin panel.
+ */
 public class EditActivityScreenCtrl implements Initializable {
 
     private ActivityView activity;
@@ -58,11 +58,20 @@ public class EditActivityScreenCtrl implements Initializable {
         });
     }
 
+    /**
+     * Handles the save activity action.
+     */
     public interface SaveHandler {
         void handle(ActivityDTO activity);
     }
 
 
+    /**
+     * Edit activity screen controller constructor.
+     *
+     * @param activity the activity we want to edit(if=null a new activity will be created)
+     * @param saveHandler the save handler.
+     */
     public EditActivityScreenCtrl(ActivityView activity, SaveHandler saveHandler) {
         this.activity = Objects.requireNonNullElseGet(activity, () -> {
             var a = new ActivityDTO();
@@ -87,7 +96,8 @@ public class EditActivityScreenCtrl implements Initializable {
     @FXML
     private void changeImageClick() {
         var fileSelector = new FileChooser();
-        FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.jpeg", "*.png");
+        FileChooser.ExtensionFilter imageFilter =
+                new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.jpeg", "*.png");
         fileSelector.setTitle("Select your Profile Picture");
         fileSelector.getExtensionFilters().add(imageFilter);
 

@@ -2,12 +2,15 @@ package client.scenes.admin;
 
 import client.utils.communication.ServerUtils;
 import commons.entities.ActivityDTO;
+import java.util.UUID;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import lombok.Data;
 
-import java.util.UUID;
-
+/**
+ * A helper class for wrapping an image
+ * and displaying everything inside a row of a tableview.
+ */
 @Data
 public class ActivityView {
 
@@ -41,6 +44,12 @@ public class ActivityView {
      */
     private ImageView image;
 
+    /**
+     * Creates an activity view from an activity DTO.
+     * This also initialize the image to a recovered image from the server.
+     *
+     * @param activityDTO the activity dto.
+     */
     public ActivityView(ActivityDTO activityDTO) {
         this.id = activityDTO.getId();
         this.cost = activityDTO.getCost();
@@ -52,6 +61,11 @@ public class ActivityView {
         this.image.setFitWidth(50);
     }
 
+    /**
+     * Converts the activityView back to dto.
+     *
+     * @return the new dto.
+     */
     public ActivityDTO toDTO() {
         var activityDTO = new ActivityDTO();
         activityDTO.setSource(this.source);

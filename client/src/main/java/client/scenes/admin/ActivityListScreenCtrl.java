@@ -5,6 +5,10 @@ import client.scenes.MainCtrl;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.ActivityDTO;
+import java.net.URL;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,11 +23,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+/**
+ * This is the controller for the activity list screen.
+ * This screen is the main screen of the admin panel.
+ */
 public class ActivityListScreenCtrl implements Initializable {
 
     private final MainCtrl mainCtrl;
@@ -45,6 +48,12 @@ public class ActivityListScreenCtrl implements Initializable {
 
     private EditActivityScreenPane editActivityPane;
 
+    /**
+     * Gets the server and mainctrl by injection.
+     *
+     * @param server the communication point for the application.
+     * @param mainCtrl the main controller.
+     */
     @Inject
     public ActivityListScreenCtrl(AdminCommunication server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
@@ -54,13 +63,17 @@ public class ActivityListScreenCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // This piece of code enables the edit activity and delete activity
+        // buttons depending on if a row is selected in the table.
         activityTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             editActivityButton.setDisable(newValue == null);
             deleteActivityButton.setDisable(newValue == null);
         });
 
+        // This is part of the implementation of a pop-up
+        // This handles closing the pop-up when the user clicks outside it.
         topLevelAdminPanelAnchor.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            if(editActivityPane != null && event.getPickResult().getIntersectedNode() != addActivityButton
+            if (editActivityPane != null && event.getPickResult().getIntersectedNode() != addActivityButton
                     && event.getPickResult().getIntersectedNode() != editActivityButton) {
                 if (!inHierarchy(event.getPickResult().getIntersectedNode(), editActivityPane.getChildren().get(0))) {
                     this.closeEditActivity();
@@ -69,18 +82,27 @@ public class ActivityListScreenCtrl implements Initializable {
         });
     }
 
+    /**
+     * Resets the controller to a default state.
+     */
     public void reset() {
         activities.clear();
         createTableView();
         mockActivities();
     }
 
+    /**
+     * Gets all the activities from the server and adds them to the table.
+     */
     private void updateActivities() {
         server.getAllActivities(activities -> this.activities.setAll(
                 activities.stream().map(ActivityView::new).collect(Collectors.toList())
         ), () -> mainCtrl.showErrorSnackBar("Getting activities failed. Check server connection!"));
     }
 
+    /**
+     * A temporary mock function.
+     */
     private void mockActivities() {
         var activity = new ActivityDTO();
         activity.setCost(123L);
@@ -92,6 +114,9 @@ public class ActivityListScreenCtrl implements Initializable {
         this.activities.setAll(new ActivityView(activity));
     }
 
+    /**
+     * Creates the table view and binds the properties.
+     */
     private void createTableView() {
         pictureTableColumn.setCellValueFactory(
                 new PropertyValueFactory<>("image")
@@ -109,7 +134,11 @@ public class ActivityListScreenCtrl implements Initializable {
         activityTable.setItems(activities);
     }
 
-    public void addActivityButtonClick() {
+    /**
+     * Add activity button handler.
+     */
+    @FXML
+    private void addActivityButtonClick() {
         this.openEditActivity(null, activity -> {
             server.updateActivity(activity, response -> {
                 switch (response.getStatus()) {
@@ -134,8 +163,11 @@ public class ActivityListScreenCtrl implements Initializable {
         });
     }
 
-    public void editActivityButtonClick() {
-        System.out.println(activityTable.getSelectionModel().getSelectedItem());
+    /**
+     * Edit activity button handler.
+     */
+    @FXML
+    private void editActivityButtonClick() {
         this.openEditActivity(activityTable.getSelectionModel().getSelectedItem(), activity -> {
             server.updateActivity(activity, response -> {
                 switch (response.getStatus()) {
@@ -160,7 +192,11 @@ public class ActivityListScreenCtrl implements Initializable {
         });
     }
 
-    public void deleteActivityButtonClick() {
+    /**
+     * Delete activity button handler.
+     */
+    @FXML
+    private void deleteActivityButtonClick() {
         server.deleteActivity(activityTable.getSelectionModel().getSelectedItem().getId(), response -> {
             switch (response.getStatus()) {
                 case 200:
@@ -177,10 +213,20 @@ public class ActivityListScreenCtrl implements Initializable {
         }, () -> mainCtrl.showErrorSnackBar("Something went wrong. Check server connection."));
     }
 
-    public void goBackToAuth() {
+    /**
+     * Function that handles the back button click.
+     */
+    @FXML
+    private void goBackToAuth() {
         mainCtrl.showLogInScreen();
     }
 
+    /**
+     * Opens the edit activity pop-up.
+     *
+     * @param activity the activity to view/edit.
+     * @param saveHandler the handler for save.
+     */
     private void openEditActivity(ActivityView activity, EditActivityScreenCtrl.SaveHandler saveHandler) {
         editActivityPane = new EditActivityScreenPane(activity, saveHandler);
         this.topLevelAdminPanelAnchor.getChildren().add(editActivityPane);
@@ -190,11 +236,22 @@ public class ActivityListScreenCtrl implements Initializable {
         AnchorPane.setRightAnchor(editActivityPane, 0d);
     }
 
+    /**
+     * CLoses the edit activity pop-up.
+     */
     private void closeEditActivity() {
         this.topLevelAdminPanelAnchor.getChildren().remove(editActivityPane);
         editActivityPane = null;
     }
 
+    /**
+     * A function that checks if a node is part of
+     * the hierarchy of another node.
+     *
+     * @param node the parent node.
+     * @param potentialHierarchyElement the potential node.
+     * @return a boolean representing if the potential node is in the hierarchy.
+     */
     private boolean inHierarchy(Node node, Node potentialHierarchyElement) {
         if (potentialHierarchyElement == null) {
             return true;
@@ -208,6 +265,12 @@ public class ActivityListScreenCtrl implements Initializable {
         return false;
     }
 
+    /**
+     * Handles the admin panel key pressed event.
+     * This is used to close the edit activity panenl on ESCAPE key pressed.
+     *
+     * @param event the key event.
+     */
     @FXML
     private void adminPanelKeyPressed(KeyEvent event) {
         if (event.getCode() == KeyCode.ESCAPE && editActivityPane != null) {
