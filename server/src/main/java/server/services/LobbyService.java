@@ -45,15 +45,12 @@ public class LobbyService {
             log.info("[{}] Removed player {}", lobby.getGameId(), user.getId());
 
             // Distribute the notifications to all players in the lobby
-            try {
-                sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
-            } catch (IOException ex) {
-                log.error("Failed to notify players about the new configuration", ex);
-            }
-
+            sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
         } catch (LastPlayerRemovedException ex) {
             gameRepository.delete(lobby);
             log.info("[{}] Last player removed, deleting lobby", lobby.getGameId());
+        } catch (IOException ex) {
+            log.error("Failed to notify players about the new configuration", ex);
         }
         return true;
     }
