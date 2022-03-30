@@ -79,9 +79,9 @@ The Quizzz app consists of three components: the database, server, and client. E
 
 ### Populating the database
 
-In order to populate the database, a helper script is provided: `populate_db.py`. To run it, you will need the `activities.json` file (which is included in the repository).
+In order to populate the database, a helper script is provided: `populate_db.py`. To run it, you will need the activity bank (included in `./activities` directory).
 
-Then, run: `python populate_db.py activities.json -c 100 -r`. The script will create a new user, and use it to access the protected API endpoint. If you have already ran the script before and don't want to register the new user, run the script without the `-r` flag. Additionally, attempting to re-register an existing user will cause the script to fail with the `409` error code.
+Then, run: `python populate_db.py ./activities/ -c 100 -q -m 100`. The script will import all activities (images included) and generate 100 multiple choice questions. Uploading images requires the `requests` python library. If you don't want to install the library, you can use the script without uploading pictures, by specifying the `-i` command line switch.
 
 For more configuration options run `python populate_db.py --help`.
 
