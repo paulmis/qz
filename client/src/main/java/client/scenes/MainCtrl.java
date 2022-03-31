@@ -78,6 +78,9 @@ public class MainCtrl {
     private LobbyListCtrl lobbyListCtrl;
     private Parent lobbyListScreen;
 
+    private LobbyCreationScreenCtrl lobbyCreationScreenCtrl;
+    private Parent lobbyCreationScreen;
+
     private Popup lobbySettingsPopUp;
     private Popup lobbyLeavePopUp;
     private Popup gameLeavePopUp;
@@ -97,7 +100,8 @@ public class MainCtrl {
                            Pair<LobbyScreenCtrl, Parent> lobbyScreen,
                            Pair<GameScreenCtrl, Parent> gameScreen,
                            Pair<GlobalLeaderboardCtrl, Parent> globalLeaderboardScreen,
-                           Pair<LobbyListCtrl, Parent> lobbyListScreen) {
+                           Pair<LobbyListCtrl, Parent> lobbyListScreen,
+                           Pair<LobbyCreationScreenCtrl, Parent> lobbyCreationScreen) {
         this.primaryStage = primaryStage;
 
         this.serverConnectScreen = serverConnectScreen.getValue();
@@ -120,6 +124,9 @@ public class MainCtrl {
 
         this.lobbyListScreen = lobbyListScreen.getValue();
         this.lobbyListCtrl = lobbyListScreen.getKey();
+
+        this.lobbyCreationScreen = lobbyCreationScreen.getValue();
+        this.lobbyCreationScreenCtrl = lobbyCreationScreen.getKey();
 
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
@@ -228,6 +235,15 @@ public class MainCtrl {
         this.showScreenLetterBox(lobbyListScreen, StageScalingStrategy.Letterbox);
         lobbyListCtrl.reset();
     }
+
+    /**
+     * This function displays the lobby creation screen.
+     */
+    public void showLobbyCreationScreen() {
+        this.showScreenLetterBox(lobbyCreationScreen, StageScalingStrategy.Letterbox);
+        lobbyCreationScreenCtrl.reset();
+    }
+
 
     /**
      * This function displays the log in screen.
