@@ -146,7 +146,7 @@ public class DefiniteGameFSM extends GameFSM {
         int delay = getContext().getQuizConfiguration().getTiming().getLeaderboardTime();
 
         // Notify all players to show the leaderboard.
-        getContext().getSseManager().send(getGame().getPlayerIds(),
+        getContext().getSseManager().send(getGame().getUserIds(),
             new SSEMessage(SSEMessageType.SHOW_LEADERBOARD, delay));
         log.trace("[{}] Leaderboard shown.", getGame().getId());
 

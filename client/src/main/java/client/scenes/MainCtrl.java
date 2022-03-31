@@ -172,7 +172,6 @@ public class MainCtrl {
         Fixed,
     }
 
-
     private void showScreenLetterBox(Parent parent, StageScalingStrategy strategy) {
         if (primaryStage.getScene() == null) {
             primaryStage.setScene(new Scene(new Group(new StackPane(parent))));
@@ -214,14 +213,14 @@ public class MainCtrl {
     }
 
     /**
-     * This function displays the server connect screen.
+     * Displays the server connect screen.
      */
     public void showServerConnectScreen() {
         this.showScreenLetterBox(serverConnectScreen, StageScalingStrategy.Letterbox);
     }
 
     /**
-     * This function displays the global leaderboard screen.
+     * Displays the global leaderboard screen.
      */
     public void showGlobalLeaderboardScreen() {
         this.showScreenLetterBox(globalLeaderboardScreen, StageScalingStrategy.Letterbox);
@@ -229,9 +228,10 @@ public class MainCtrl {
     }
 
     /**
-     * This function displays the lobby list screen.
+     * Displays the lobby list screen.
      */
     public void showLobbyListScreen() {
+        ClientState.game = null;
         this.showScreenLetterBox(lobbyListScreen, StageScalingStrategy.Letterbox);
         lobbyListCtrl.reset();
     }
