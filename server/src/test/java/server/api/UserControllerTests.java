@@ -214,9 +214,10 @@ public class UserControllerTests {
         when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
         when(userRepository.existsByUsername("joe")).thenReturn(true);
 
-        this.mvc.perform(post("/api/user/username")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("G"))
+        this.mvc.perform(
+                post("/api/user/username")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("G"))
                 .andExpect(status().is4xxClientError())
                 .andReturn();
     }
@@ -227,9 +228,10 @@ public class UserControllerTests {
         when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
         when(userRepository.existsByUsername("joe")).thenReturn(true);
 
-        this.mvc.perform(post("/api/user/username")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("Gsssssssssssssssssssssssssssssssssssssssssssssssss"))
+        this.mvc.perform(
+                post("/api/user/username")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("Gsssssssssssssssssssssssssssssssssssssssssssssssss"))
                 .andExpect(status().is4xxClientError())
                 .andReturn();
     }
