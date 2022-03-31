@@ -1,6 +1,5 @@
 package client.scenes.questions;
 
-import client.communication.game.AnswerHandler;
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
 import commons.entities.questions.MCQuestionDTO;
@@ -9,7 +8,6 @@ import java.util.Arrays;
 import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 
 /**

@@ -1,9 +1,7 @@
 package client.scenes.questions;
 
-import client.communication.game.AnswerHandler;
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
-import commons.entities.AnswerDTO;
 import commons.entities.questions.MCQuestionDTO;
 import java.net.URL;
 import java.util.ResourceBundle;
