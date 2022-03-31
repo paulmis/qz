@@ -2,6 +2,7 @@ package server.database.entities.question;
 
 import static server.utils.TestHelpers.getUUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import commons.entities.ActivityDTO;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -63,6 +64,13 @@ public class Activity extends BaseEntity<ActivityDTO> {
     @Column(length = 2048)
     @URL
     private String source;
+
+    /**
+     * Marks the activity as abandoned (i.e. it will not be used to generate new questions).
+     */
+    @Column(nullable = false)
+    @JsonIgnore
+    private boolean abandoned = false;
 
     @Override
     public ActivityDTO getDTO() {
