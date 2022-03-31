@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -364,13 +365,9 @@ class ActivityControllerTest {
 
     @Test
     void updateMalformed() throws Exception {
-        // This test is kinda fake tbh
-        // Update an activity
-        String anURL = "a";
-        for (int idx = 0; idx < 12; idx++) {
-            anURL += anURL;
-        }
-        activityA.setSource(anURL);
+        // Update an activity with an invalid source (i.e. a URL longer than 2048 characters)
+        String filled = StringUtils.repeat("a", 2050);
+        activityA.setSource(filled);
         when(activityRepository.save(activityA)).thenThrow(IllegalArgumentException.class);
 
         // Send the request
