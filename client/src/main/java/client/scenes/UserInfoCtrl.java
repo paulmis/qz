@@ -5,6 +5,7 @@ import static javafx.application.Platform.runLater;
 import client.communication.user.UserCommunication;
 import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
+import commons.entities.game.GameStatus;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -45,8 +46,6 @@ public class UserInfoCtrl implements Initializable {
         this.userCommunication = userCommunication;
     }
 
-
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // This changes the icon of the edit username button depending on if the username field is editable.
@@ -61,25 +60,20 @@ public class UserInfoCtrl implements Initializable {
     private void editButtonClick() {
         usernameField.setEditable(!this.usernameField.isEditable());
         if (!usernameField.isEditable() && !ClientState.user.getUsername().equals(usernameField.getText())) {
-            // Just finished editing, sent update to server
-            userCommunication.changeUsername(this.usernameField.getText(),
-                    (response) -> runLater(() -> {
-                        switch (response.getStatus()) {
-                            case 200:
-                                mainCtrl.showInformationalSnackBar("Changed username!");
-                                ClientState.user.setUsername(this.usernameField.getText());
-                                break;
-                            case 409:
-                                mainCtrl.showErrorSnackBar("Username is in use try something else.");
-                                this.usernameField.setEditable(true);
-                                break;
-                            default:
-                                mainCtrl.showErrorSnackBar("An unknown error occurred.");
-                                this.usernameField.setEditable(true);
-                                break;
-                        }
-                    }),
-                    () -> runLater(() -> mainCtrl.showInformationalSnackBar("Something went wrong")));
+            // Send update to server
+            userCommunication.changeUsername(
+                    this.usernameField.getText(),
+                    // Success
+                    user -> runLater(() ->
+                            mainCtrl.showInformationalSnackBar("Changed username!")),
+                    // Failure
+                    (error) -> runLater(() -> {
+                        mainCtrl.showErrorSnackBar(error == null
+                                ? "Failed to change username"
+                                : error.getDescription());
+
+                        this.usernameField.setEditable(true);
+                    }));
         }
     }
 
@@ -88,8 +82,6 @@ public class UserInfoCtrl implements Initializable {
         server.signOut();
         mainCtrl.showServerConnectScreen();
     }
-
-
 
     /**
      * Sets current username in the widget.

@@ -151,9 +151,10 @@ public class UserControllerTests {
         when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
         when(userRepository.existsByUsername("joe")).thenReturn(true);
 
-        this.mvc.perform(post("/api/user/username")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("joe"))
+        this.mvc.perform(
+                post("/api/user/username")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("joe"))
                 .andExpect(status().isOk())
                 .andReturn();
     }
@@ -165,9 +166,10 @@ public class UserControllerTests {
         when(userRepository.existsByUsername("joe")).thenReturn(true);
         when(userRepository.existsByUsername("Donald Trump")).thenReturn(true);
 
-        this.mvc.perform(post("/api/user/username")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("Donald Trump"))
+        this.mvc.perform(
+                post("/api/user/username")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("Donald Trump"))
                 .andExpect(status().is4xxClientError())
                 .andReturn();
     }
@@ -178,9 +180,10 @@ public class UserControllerTests {
         when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
         when(userRepository.existsByUsername("joe")).thenReturn(true);
 
-        this.mvc.perform(post("/api/user/username")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("George Bush"))
+        this.mvc.perform(
+                post("/api/user/username")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("George Bush"))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -195,13 +198,39 @@ public class UserControllerTests {
         when(userRepository.existsByUsername("joe")).thenReturn(true);
         when(userRepository.existsByUsername("Donald Trump")).thenReturn(true);
 
-
-        this.mvc.perform(post("/api/user/username")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("Donald Trump"))
+        this.mvc.perform(
+                post("/api/user/username")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("Donald Trump"))
                 .andExpect(status().is4xxClientError())
                 .andReturn();
 
         verifyNoMoreInteractions(sseManager);
+    }
+
+    @Test
+    void changeUsernameShort() throws Exception {
+        // Mock the repository
+        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
+        when(userRepository.existsByUsername("joe")).thenReturn(true);
+
+        this.mvc.perform(post("/api/user/username")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("G"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+    }
+
+    @Test
+    void changeUsernameLong() throws Exception {
+        // Mock the repository
+        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
+        when(userRepository.existsByUsername("joe")).thenReturn(true);
+
+        this.mvc.perform(post("/api/user/username")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("Gsssssssssssssssssssssssssssssssssssssssssssssssss"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
     }
 }

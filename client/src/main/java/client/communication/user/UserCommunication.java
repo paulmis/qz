@@ -3,8 +3,10 @@ package client.communication.user;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import commons.entities.auth.UserDTO;
+import commons.entities.utils.ApiError;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
@@ -29,7 +31,7 @@ public class UserCommunication {
      * Handler for when getting the logged in user fails.
      */
     public interface GetUserInfoHandlerFail {
-        void handle();
+        void handle(ApiError error);
     }
 
     /**
@@ -46,17 +48,23 @@ public class UserCommunication {
                 .accept(APPLICATION_JSON)
                 .buildGet();
 
-        invocation.submit(new InvocationCallback<UserDTO>() {
+        invocation.submit(new InvocationCallback<Response>() {
 
             @Override
-            public void completed(UserDTO o) {
-                getUserInfoHandlerSuccess.handle(o);
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    ClientState.user = response.readEntity(UserDTO.class);
+                    getUserInfoHandlerSuccess.handle(ClientState.user);
+                } else {
+                    ApiError error = response.readEntity(ApiError.class);
+                    getUserInfoHandlerFail.handle(error);
+                }
             }
 
             @Override
             public void failed(Throwable throwable) {
-                getUserInfoHandlerFail.handle();
                 throwable.printStackTrace();
+                getUserInfoHandlerFail.handle(null);
             }
         });
     }
@@ -65,14 +73,14 @@ public class UserCommunication {
      * Handler for when changing the username succeeds.
      */
     public interface ChangeUsernameHandlerSuccess {
-        void handle(Response response);
+        void handle(UserDTO userDTO);
     }
 
     /**
      * Handler for when changing the username fails.
      */
     public interface ChangeUsernameHandlerFail {
-        void handle();
+        void handle(ApiError error);
     }
 
     /**
@@ -92,15 +100,20 @@ public class UserCommunication {
         invocation.submit(new InvocationCallback<Response>() {
 
             @Override
-            public void completed(Response o) {
-                changeUsernameHandlerSuccess.handle(o);
-                log.info("Changed username");
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    ClientState.user = response.readEntity(UserDTO.class);
+                    changeUsernameHandlerSuccess.handle(ClientState.user);
+                } else {
+                    ApiError error = response.readEntity(ApiError.class);
+                    changeUsernameHandlerFail.handle(error);
+                }
             }
 
             @Override
             public void failed(Throwable throwable) {
-                changeUsernameHandlerFail.handle();
-                log.error("Failed to change username.");
+                throwable.printStackTrace();
+                changeUsernameHandlerFail.handle(null);
             }
         });
     }

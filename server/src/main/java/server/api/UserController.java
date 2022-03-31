@@ -6,12 +6,12 @@ import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import commons.entities.utils.Views;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import server.api.exceptions.UserNotFoundException;
 import server.api.exceptions.UsernameInUseException;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
@@ -61,7 +61,7 @@ public class UserController {
     public ResponseEntity<UserDTO> changeUsername(@RequestBody String newUsername) {
         Optional<User> userOptional = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (userOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new UserNotFoundException("User hasn't be found");
         }
 
         User user = userOptional.get();
@@ -71,9 +71,14 @@ public class UserController {
             return ResponseEntity.ok(user.getDTO());
         }
 
-        // If a user with this username already exists, return 409
+        // If a user with this username already exists, return username in use exception.
         if (userRepository.existsByUsername(newUsername)) {
-            throw new UsernameInUseException();
+            throw new UsernameInUseException("Username is already in use.");
+        }
+
+        // Throw this error when the username has wrong length
+        if (newUsername.length() < 3 || newUsername.length() > 20) {
+            throw new IllegalArgumentException("Username must be between 3 - 20 characters long.");
         }
 
         // Set the new username

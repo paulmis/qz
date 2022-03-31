@@ -83,18 +83,12 @@ public class LobbyScreenCtrl implements SSESource {
         handler.initialize(this);
     }
 
-
-
     /**
      * Reacts to a username change event.
      */
     @SSEEventHandler(SSEMessageType.USERNAME_CHANGED)
     public void usernameChanged() {
-        communication.getLobbyInfo(gameDTO -> runLater(() -> {
-            ClientState.game = gameDTO;
-            updateView();
-        }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while updating server info.")),
-                ClientState.game.getId());
+        lobbyModified();
     }
 
     /**
@@ -119,7 +113,6 @@ public class LobbyScreenCtrl implements SSESource {
             })
         );
     }
-
 
     /**
      * Reacts to the lobby being disbanded.
