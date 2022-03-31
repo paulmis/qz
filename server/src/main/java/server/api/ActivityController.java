@@ -75,14 +75,13 @@ public class ActivityController {
     }
 
     /**
-     * Get all activities.
+     * Add a batch of activities.
      *
      * @param activities List of activities to add.
      * @return DTOs of all added activities.
      */
     @PostMapping("/batch")
     ResponseEntity<List<ActivityDTO>> batchAddActivity(@RequestBody List<ActivityDTO> activities) {
-        // ToDo: Add images
         // Convert DTOs to entities
         List<Activity> activityList = activities.stream().map(Activity::new).collect(Collectors.toList());
 
@@ -131,21 +130,19 @@ public class ActivityController {
     }
 
     /**
-     * Creates or updates an activity.
+     * Creates or updates an activity and its image.
      *
      * @param activityDTO DTO of the activity to store
-     * @return 400 if the activity is malformed,
-     *         410 if the activity is marked as abandoned,
-     *         200 if the activity is updated and
+     * @param image       The activity image to upload
+     * @return 400 if the activity was malformed,
+     *         410 if the activity was marked as abandoned,
+     *         200 if the activity was updated and
      *         201 if a new activity was created
      */
-    @PostMapping("/save")
-    ResponseEntity saveActivity(@RequestBody ActivityDTO activityDTO) {
-        // ToDo: Add images
-
-        // Convert DTO to entity
-        Activity toSave = new Activity(activityDTO);
-
+    @PostMapping("/save/image")
+    ResponseEntity saveActivityImage(
+            @RequestPart ActivityDTO activityDTO,
+            @RequestPart(required = false) MultipartFile image) {
         boolean createdActivity = true;
         if (activityDTO.getId() != null) {
             // Retrieve previously existing activity, if present
@@ -157,6 +154,24 @@ public class ActivityController {
                 createdActivity = false;
             }
         }
+
+        // Store the image, if present
+        if (image != null) {
+            try {
+                // Save the image to the storage
+                UUID imageId = storageService.store(image.getInputStream());
+                log.trace("Stored image '{}' for activity '{}'", imageId, activityDTO.getId());
+
+                // Set the image resource ID
+                activityDTO.setIcon(imageId.toString());
+
+            } catch (IOException e) {
+                log.error("Failed to store the image for activity '{}'", activityDTO.getId(), e);
+            }
+        }
+
+        // Convert DTO to entity
+        Activity toSave = new Activity(activityDTO);
 
         // Save the entity (if the UUID in the DTO is already existing, the entity will be updated instead)
         try {
@@ -175,6 +190,20 @@ public class ActivityController {
     }
 
     /**
+     * Creates or updates an activity.
+     *
+     * @param activityDTO DTO of the activity to store
+     * @return 400 if the activity was malformed,
+     *         410 if the activity was marked as abandoned,
+     *         200 if the activity was updated and
+     *         201 if a new activity was created
+     */
+    @PostMapping("/save")
+    ResponseEntity saveActivity(@RequestBody ActivityDTO activityDTO) {
+        return saveActivityImage(activityDTO, null);
+    }
+
+    /**
      * Marks an activity as abandoned (i.e. it will not be used to generate new questions).
      *
      * @param activityId the id of the activity
@@ -182,8 +211,6 @@ public class ActivityController {
      */
     @PostMapping("/{activityId}/delete")
     ResponseEntity deleteActivity(@PathVariable UUID activityId) {
-        // ToDo: handle images
-
         Optional<Activity> toDelete = activityRepository.findByIdAndAbandonedIsFalse(activityId);
         if (toDelete.isEmpty()) {
             // Activity not found
