@@ -14,11 +14,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import server.api.exceptions.PlayerAlreadyInLobbyOrGameException;
-import server.api.exceptions.SSEFailedException;
-import server.api.exceptions.UserAlreadyExistsException;
+import server.api.exceptions.*;
 import server.exceptions.ResourceNotFoundException;
-
 
 /**
  * Provides global API exception handling.
@@ -66,9 +63,10 @@ public class GlobalAPIExceptionManager {
     @ResponseBody
     @ExceptionHandler({
         PlayerAlreadyInLobbyOrGameException.class,
+        PlayerNotInLobbyException.class,
         UserAlreadyExistsException.class,
         IllegalStateException.class })
-    public ApiError handlePlayerAlreadyInLobbyOrGameException(Exception ex) {
+    public ApiError handleConflictException(Exception ex) {
         return new ApiError(HttpStatus.CONFLICT.value(), ex.getMessage());
     }
 
@@ -82,6 +80,15 @@ public class GlobalAPIExceptionManager {
     @ResponseBody
     @ExceptionHandler(ResourceNotFoundException.class)
     public ApiError handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return new ApiError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    @ExceptionHandler({
+        UserNotFoundException.class,
+        LobbyNotFoundException.class })
+    public ApiError handleNotFoundException(Exception ex) {
         return new ApiError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 

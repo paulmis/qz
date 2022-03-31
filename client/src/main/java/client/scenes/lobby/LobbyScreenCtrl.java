@@ -24,12 +24,14 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import lombok.Generated;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Lobby controller.
  */
 @Getter
 @Generated
+@Slf4j
 public class LobbyScreenCtrl implements SSESource {
     private final LobbyCommunication communication;
     private final MainCtrl mainCtrl;
@@ -81,17 +83,7 @@ public class LobbyScreenCtrl implements SSESource {
         handler.initialize(this);
     }
 
-    /**
-     * Reacts to a player joining the lobby.
-     */
-    @SSEEventHandler(SSEMessageType.PLAYER_JOINED)
-    public void playerJoined() {
-        communication.getLobbyInfo(gameDTO -> runLater(() -> {
-            ClientState.game = gameDTO;
-            updateView();
-        }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while updating server info.")),
-                ClientState.game.getId());
-    }
+
 
     /**
      * Reacts to a username change event.
@@ -105,17 +97,37 @@ public class LobbyScreenCtrl implements SSESource {
                 ClientState.game.getId());
     }
 
+    /**
+     * Reacts to the lobby being modified.
+     */
+    @SSEEventHandler(SSEMessageType.LOBBY_MODIFIED)
+    public void lobbyModified() {
+        log.info("Lobby modified");
+        // Ask for the new lobby
+        communication.getLobbyInfo(
+            ClientState.game.getId(),
+            (game) -> runLater(() -> {
+                log.info("Lobby info with {} players received", game.getPlayers().size());
+                ClientState.game = game;
+                updateView();
+            }),
+            (error) -> runLater(() -> {
+                mainCtrl.showErrorSnackBar(
+                    error == null
+                        ? "Unable to update the lobby"
+                        : error.getDescription());
+            })
+        );
+    }
+
 
     /**
-     * Reacts to a player leaving the lobby.
+     * Reacts to the lobby being disbanded.
      */
-    @SSEEventHandler(SSEMessageType.PLAYER_LEFT)
-    public void playerLeft() {
-        communication.getLobbyInfo(gameDTO -> runLater(() -> {
-            ClientState.game = gameDTO;
-            updateView();
-        }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while updating server info.")),
-                ClientState.game.getId());
+    @SSEEventHandler(SSEMessageType.LOBBY_DELETED)
+    public void lobbyDisbanded() {
+        mainCtrl.showErrorSnackBar("Lobby has been disbanded");
+        mainCtrl.showLobbyListScreen();
     }
 
     /**

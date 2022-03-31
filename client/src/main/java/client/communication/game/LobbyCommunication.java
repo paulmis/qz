@@ -6,6 +6,7 @@ import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import commons.entities.game.GameDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
+import commons.entities.utils.ApiError;
 import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -166,35 +167,39 @@ public class LobbyCommunication {
      * Handler for getting the lobby info fails.
      */
     public interface GetLobbyInfoHandlerFail {
-        void handle();
+        void handle(ApiError error);
     }
 
     /**
      * Function that gets all the lobby info from the provided lobby id.
      *
+     * @param lobbyId The lobby id of the lobby that needs to be found.
      * @param handleSuccess The function that will be called if the request is successful.
      * @param handleFail The function that will be called if the request is unsuccessful.
-     * @param lobbyId The lobby id of the lobby that needs to be found.
      */
-    public void getLobbyInfo(GetLobbyInfoHandlerSuccess handleSuccess,
-                             GetLobbyInfoHandlerFail handleFail, UUID lobbyId) {
+    public void getLobbyInfo(UUID lobbyId,
+                             GetLobbyInfoHandlerSuccess handleSuccess, GetLobbyInfoHandlerFail handleFail) {
         // Build the query invocation
         Invocation request = ServerUtils.getRequestTarget()
                 .path("/api/lobby/" + lobbyId)
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .buildGet();
+
         // Perform the query asynchronously
-        request.submit(new InvocationCallback<GameDTO>() {
+        request.submit(new InvocationCallback<Response>() {
             @Override
-            public void completed(GameDTO o) {
-                handleSuccess.handle(o);
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    handleSuccess.handle(response.readEntity(GameDTO.class));
+                } else {
+                    handleFail.handle(response.readEntity(ApiError.class));
+                }
             }
 
             @Override
             public void failed(Throwable throwable) {
-                log.error("Couldn't retrieve lobby: " + lobbyId);
-                handleFail.handle();
+                handleFail.handle(null);
                 throwable.printStackTrace();
             }
         });
