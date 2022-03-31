@@ -36,7 +36,7 @@
                         <Font size="13.0" />
                      </font>
                   </TextField>
-                  <CheckBox layoutX="46.0" layoutY="277.0" mnemonicParsing="false" text="Remember the server">
+                  <CheckBox fx:id="rememberServer" layoutX="46.0" layoutY="277.0" mnemonicParsing="false" text="Remember the server">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>

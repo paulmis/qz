@@ -28,7 +28,11 @@ import client.scenes.lobby.LobbyCreationScreenCtrl;
 import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import com.google.inject.Injector;
+import java.util.Optional;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import lombok.Generated;
 
@@ -69,5 +73,25 @@ public class Main extends Application {
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, serverConnectScreen, logInScreen, registerScreen,
                 lobbyScreen, gameScreen, globalLeaderboardScreen, lobbyListScreen, lobbyCreationScreen);
+
+        primaryStage.setOnCloseRequest(e -> {
+            e.consume();
+            exitButtonClicked();
+        });
+    }
+
+    /**
+     * Function that fires when exiting the application. Shows a alert to confirm leaving.
+     */
+    public void exitButtonClicked() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                        "Are you sure you want to exit Quizzz?",
+                        ButtonType.YES,
+                        ButtonType.NO);
+        Optional<ButtonType> confirmExit = alert.showAndWait();
+        if (confirmExit.isPresent() && confirmExit.get() == ButtonType.YES) {
+            Platform.exit();
+            System.exit(0);
+        }
     }
 }

@@ -32,7 +32,6 @@ import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.Optional;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
@@ -136,12 +135,6 @@ public class MainCtrl {
         gameLeavePopUp = new Popup();
         lobbyDisbandPopUp = new Popup();
         showServerConnectScreen();
-
-        // This makes sure to close every thread when the app is closed.
-        primaryStage.setOnCloseRequest(e -> {
-            Platform.exit();
-            System.exit(0);
-        });
     }
 
     enum StageScalingStrategy {
@@ -427,9 +420,7 @@ public class MainCtrl {
 
     /**
      * This function checks if the player is the host of the lobby.
-     *
      */
-
     public void checkHost() {
         //Request user's data
         Optional<GamePlayerDTO> gamePlayerData = ClientState.game.getPlayers()
