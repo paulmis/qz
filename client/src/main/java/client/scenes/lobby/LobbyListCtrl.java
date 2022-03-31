@@ -135,7 +135,7 @@ public class LobbyListCtrl implements Initializable {
      */
     @FXML
     private void joinRandomLobby() {
-        server.getLobbies(
+        communication.getLobbies(
                 games -> {
                     // Gets a random available lobby and joins it
                     games.removeIf(game -> (game.getConfiguration().getCapacity() <= game.getPlayers().size()));
@@ -143,7 +143,7 @@ public class LobbyListCtrl implements Initializable {
                         this.createLobbyButtonClick();
                     } else {
                         var game = games.get(new Random().nextInt(games.size()));
-                        server.joinLobby(game.getId(), gameDTO -> {
+                        communication.joinLobby(game.getId(), gameDTO -> {
                             runLater(mainCtrl::showLobbyScreen);
                         }, () -> {
                             runLater(() -> {
