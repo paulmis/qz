@@ -3,8 +3,9 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.TextField?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -46,11 +47,17 @@
                <graphic>
                   <FontAwesomeIconView glyphName="SEARCH" size="36" />
                </graphic>
+               <tooltip>
+                  <Tooltip text="Search" />
+               </tooltip>
             </JFXButton>
             <JFXButton fx:id="createLobbyButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="467.0" layoutY="24.0" onAction="#createLobbyButtonClick" prefHeight="40.0" prefWidth="40.0" text="Create" textFill="WHITE">
                <graphic>
                   <FontAwesomeIconView glyphName="PLUS" size="40" />
                </graphic>
+               <tooltip>
+                  <Tooltip text="Create a new Lobby" />
+               </tooltip>
             </JFXButton>
             <ScrollPane hbarPolicy="NEVER" layoutX="5.0" layoutY="77.0" pannable="true" prefHeight="423.0" prefWidth="595.0" vbarPolicy="NEVER">
                <content>
@@ -61,11 +68,17 @@
                <graphic>
                   <FontAwesomeIconView glyphName="REFRESH" size="36" />
                </graphic>
+               <tooltip>
+                  <Tooltip text="Refresh Lobby List" />
+               </tooltip>
             </JFXButton>
             <JFXButton fx:id="joinRandomLobbyButton" contentDisplay="GRAPHIC_ONLY" layoutX="539.0" layoutY="24.0" onMouseClicked="#joinRandomLobby" prefHeight="40.0" prefWidth="40.0">
                <graphic>
                   <FontAwesomeIconView glyphName="RANDOM" size="40" />
                </graphic>
+               <tooltip>
+                  <Tooltip text="Join a Random Lobby" />
+               </tooltip>
             </JFXButton>
          </children>
       </AnchorPane>
