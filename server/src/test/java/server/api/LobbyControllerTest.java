@@ -237,7 +237,7 @@ class LobbyControllerTest {
     }
 
     @Test
-    public void configPostLobbyConfigurationUpdateNotAcceptableTest() throws Exception {
+    public void configPostLobbyConfigurationBadRequest() throws Exception {
         mockLobby.setStatus(GameStatus.CREATED);
         mockLobby.setHost(johnPlayer);
         SurvivalGameConfiguration survivalGameConfiguration = new SurvivalGameConfiguration(1.25f);
@@ -247,11 +247,11 @@ class LobbyControllerTest {
                 .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(survivalGameConfiguration.getDTO())))
-                .andExpect(status().isNotAcceptable());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void configPostLobbyConfigurationUpdatedTest() throws Exception {
+    public void configPostLobbyConfigurationUpdated() throws Exception {
         mockLobby.setStatus(GameStatus.CREATED);
         mockLobby.setHost(johnPlayer);
 
@@ -306,7 +306,7 @@ class LobbyControllerTest {
                 .perform(post("/api/lobby/" + mockLobby.getId() + "/config")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(normalGameConfiguration.getDTO())))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict());
     }
 
     @Test
@@ -420,7 +420,7 @@ class LobbyControllerTest {
     }
 
     @Test
-    void leaveNotFound() throws Exception {
+    void leaveConflict() throws Exception {
         // Mock the service
         when(lobbyService.removePlayer(mockLobby, john)).thenReturn(false);
 
@@ -434,7 +434,7 @@ class LobbyControllerTest {
         // Request
         this.mockMvc
                 .perform(delete("/api/lobby/leave"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isConflict());
     }
 
     @Test
@@ -463,7 +463,7 @@ class LobbyControllerTest {
         // Request
         this.mockMvc
                 .perform(delete("/api/lobby/delete"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -490,7 +490,7 @@ class LobbyControllerTest {
     }
 
     @Test
-    void deleteNoGame() throws Exception {
+    void deleteUserNotInLobby() throws Exception {
         // Set the context user
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(
@@ -503,6 +503,6 @@ class LobbyControllerTest {
         // Request
         this.mockMvc
                 .perform(delete("/api/lobby/delete"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isConflict());
     }
 }
