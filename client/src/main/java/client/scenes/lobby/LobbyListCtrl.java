@@ -141,11 +141,17 @@ public class LobbyListCtrl implements Initializable {
         server.getLobbies(
                 games -> {
                     // Gets a random available lobby and joins it
+
                     games.removeIf(game -> (game.getConfiguration().getCapacity() <= game.getPlayers().size()));
-                    if (games.isEmpty()) {
+                    Comparator<GameDTO> comparator = Comparator.comparing(gameDTO ->
+                            (gameDTO.getConfiguration().getCapacity() - gameDTO.getPlayers().size()));
+
+                    var sortedLobbies = games.stream().sorted(comparator).collect(Collectors.toList());
+
+                    if (sortedLobbies.isEmpty()) {
                         this.createLobbyButtonClick();
                     } else {
-                        var game = games.get(new Random().nextInt(games.size()));
+                        var game = sortedLobbies.get(new Random().nextInt(games.size()));
                         server.joinLobby(game.getId(), gameDTO -> {
                             runLater(mainCtrl::showLobbyScreen);
                         }, () -> {
