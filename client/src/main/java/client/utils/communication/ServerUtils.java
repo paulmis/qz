@@ -191,14 +191,6 @@ public class ServerUtils {
         });
     }
 
-
-
-
-    public String connect() {
-        System.out.println("New connection!\n");
-        return "200";
-    }
-
     /**
      * Function to connect to the server and sets the server path.
      *

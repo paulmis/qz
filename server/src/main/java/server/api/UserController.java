@@ -59,12 +59,9 @@ public class UserController {
      */
     @PostMapping("/username")
     public ResponseEntity<UserDTO> changeUsername(@RequestBody String newUsername) {
-        Optional<User> userOptional = userRepository.findByEmailIgnoreCase(AuthContext.get());
-        if (userOptional.isEmpty()) {
-            throw new UserNotFoundException("User hasn't be found");
-        }
-
-        User user = userOptional.get();
+        User user = userRepository
+                .findByEmailIgnoreCase(AuthContext.get())
+                .orElseThrow(UserNotFoundException::new);
 
         // Send 200 if new username is the same as the old one.
         if (user.getUsername().equals(newUsername)) {
@@ -84,9 +81,9 @@ public class UserController {
         // Set the new username
         user.setUsername(newUsername);
 
-        // Persist the username and return 200
+        // Persist the username
         userRepository.save(user);
-        System.out.println(user.getId());
+
         Optional<Game> gameOptional = gameRepository.getPlayersLobbyOrGame(user.getId());
         if (gameOptional.isPresent()) {
             try {
@@ -95,6 +92,7 @@ public class UserController {
                 log.error("Error occurred while sending USERNAME_CHANGED event: " + exception);
             }
         }
+
         return ResponseEntity.ok(user.getDTO());
     }
 }
