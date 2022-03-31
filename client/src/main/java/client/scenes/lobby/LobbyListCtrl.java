@@ -2,6 +2,7 @@ package client.scenes.lobby;
 
 import static javafx.application.Platform.runLater;
 
+import client.communication.LobbyListCommunication;
 import client.communication.game.LobbyCommunication;
 import client.communication.user.UserCommunication;
 import client.scenes.MainCtrl;
@@ -27,8 +28,8 @@ import lombok.Generated;
  */
 @Generated
 public class LobbyListCtrl implements Initializable {
-    private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private final LobbyListCommunication communication;
 
     @FXML private AnchorPane lobbyListAnchorPane;
     @FXML private JFXButton leaderboardButton;
@@ -46,13 +47,13 @@ public class LobbyListCtrl implements Initializable {
     /**
      * Initialize a new controller using dependency injection.
      *
-     * @param server Reference to communication utilities object.
+     * @param communication Reference to communication utilities object.
      * @param mainCtrl Reference to the main controller.
      */
     @Inject
-    public LobbyListCtrl(ServerUtils server, MainCtrl mainCtrl, LobbyCommunication communication) {
+    public LobbyListCtrl(MainCtrl mainCtrl, LobbyListCommunication communication) {
         this.mainCtrl = mainCtrl;
-        this.server = server;
+        this.communication = communication;
     }
 
 
@@ -74,7 +75,7 @@ public class LobbyListCtrl implements Initializable {
     private void userButtonClick() {
         if (userInfo == null) {
             // Create userInfo
-            userInfo = new UserInfoPane(server, new UserCommunication(), mainCtrl);
+            userInfo = new UserInfoPane(new ServerUtils(), new UserCommunication(), mainCtrl);
             lobbyListAnchorPane.getChildren().add(userInfo);
             userInfo.setVisible(true);
             runLater(() -> userInfo.setupPosition(userButton, lobbyListAnchorPane));
@@ -86,11 +87,7 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void createLobbyButtonClick() {
-        server.createLobby(game -> {
-            ServerUtils.sseHandler.subscribe();
-            runLater(mainCtrl::showLobbyScreen);
-        }, () -> runLater(() ->
-                mainCtrl.showErrorSnackBar("Something went wrong while creating the new lobby.")));
+        mainCtrl.showLobbyCreationScreen();
     }
 
     @FXML
@@ -110,7 +107,7 @@ public class LobbyListCtrl implements Initializable {
     }
 
     private void updateLobbyList(String filter) {
-        server.getLobbies(
+        communication.getLobbies(
                 games -> runLater(() -> {
                     lobbyListVbox.getChildren().clear();
 
@@ -122,7 +119,7 @@ public class LobbyListCtrl implements Initializable {
                     var generatedLobbies =
                             sortedLobbies.map(gameDTO ->
                                     new LobbyListItemPane(gameDTO, (id) ->
-                                            server.joinLobby(id,
+                                            communication.joinLobby(id,
                                                     gameDTO1 -> runLater(mainCtrl::showLobbyScreen),
                                                     () -> runLater(() ->
                                                             mainCtrl.showErrorSnackBar(
@@ -134,6 +131,38 @@ public class LobbyListCtrl implements Initializable {
                 () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while fetching the lobbies.")));
     }
 
+    /**
+     * Function that lets the user join a random lobby.
+     */
+    @FXML
+    private void joinRandomLobby() {
+        server.getLobbies(
+                games -> {
+                    // Gets a random available lobby and joins it
+                    games.removeIf(game -> (game.getConfiguration().getCapacity() <= game.getPlayers().size()));
+                    if (games.isEmpty()) {
+                        this.createLobbyButtonClick();
+                    } else {
+                        var game = games.get(new Random().nextInt(games.size()));
+                        server.joinLobby(game.getId(), gameDTO -> {
+                            runLater(mainCtrl::showLobbyScreen);
+                        }, () -> {
+                            runLater(() -> {
+                                mainCtrl.showErrorSnackBar("Couldn't join random game.");
+                            });
+                        });
+                    }
+                },
+                () -> {
+                    // If there are no available games, the user creates a new lobby
+                    runLater(() -> {
+                        this.createLobbyButtonClick();
+                    });
+                });
+    }
+
+
+
     private String createSearchableString(GameDTO game) {
         return game.getPlayers().stream().filter(gamePlayerDTO -> gamePlayerDTO.getId().equals(game.getHost()))
                 .findFirst().get().getNickname();
@@ -143,4 +172,6 @@ public class LobbyListCtrl implements Initializable {
     private void fetchButtonClick() {
         updateLobbyList(searchField.getText());
     }
+
+    //TODO: RE ADD SIGN OUT
 }

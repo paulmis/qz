@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="lobbyCreationScreenPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576" prefWidth="1024" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.lobby.LobbyCreationScreenCtrl">
+   <children>
+      <AnchorPane prefHeight="50.0" prefWidth="1024.0" style="-fx-background-color: white;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <JFXButton contentDisplay="GRAPHIC_ONLY" onAction="#goBackToLobbies" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="0.0">
+               <graphic>
+                  <FontAwesomeIconView glyphName="ARROW_LEFT" size="36" />
+               </graphic>
+            </JFXButton>
+            <Label alignment="CENTER" layoutX="404.0" layoutY="7.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Create a new lobby">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <JFXButton fx:id="createLobbyGameButton" layoutX="924.0" layoutY="7.0" onAction="#createLobbyButtonClick" prefHeight="35.0" prefWidth="85.0" style="-fx-background-color: green;" text="Create" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+               <graphic>
+                  <FontAwesomeIconView fill="WHITE" glyphName="PLAY" />
+               </graphic>
+            </JFXButton>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="182.0" layoutY="72.0" prefHeight="504.0" prefWidth="657.0" style="-fx-background-color: white; -fx-background-radius: 20 20 0 0;">
+         <children>
+            <ScrollPane hbarPolicy="NEVER" layoutX="49.0" layoutY="221.0" prefHeight="275.0" prefWidth="559.0" vbarPolicy="NEVER">
+               <content>
+                  <VBox fx:id="configurationPanelVbox" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="273.0" prefWidth="555.0" />
+               </content>
+            </ScrollPane>
+            <Label layoutX="68.0" layoutY="174.0" prefHeight="35.0" prefWidth="137.0" text="Game mode">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <JFXButton fx:id="standardGameConfigurationButton" buttonType="RAISED" layoutX="217.0" layoutY="174.0" onAction="#standardGameConfigurationButtonClick" prefHeight="35.0" prefWidth="85.0" style="-fx-background-color: green;" text="Standard" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="survivalGameConfigurationButton" layoutX="325.0" layoutY="174.0" onAction="#survivalGameConfigurationButtonClick" prefHeight="35.0" prefWidth="85.0" style="-fx-background-color: red;" text="Survival" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXButton>
+            <JFXButton contentDisplay="GRAPHIC_ONLY" layoutX="217.0" layoutY="97.0" onAction="#lockButtonClick">
+               <graphic>
+                  <FontAwesomeIconView fx:id="lockButtonIconView" glyphName="UNLOCK" size="48">
+                     <fill>
+                        <LinearGradient endX="1.0" endY="1.0">
+                           <stops>
+                              <Stop>
+                                 <color>
+                                    <Color red="0.3515990376472473" green="1.0" blue="0.03999999910593033" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="1.0">
+                                 <color>
+                                    <Color red="0.06765756756067276" green="0.44736841320991516" blue="0.23852744698524475" />
+                                 </color>
+                              </Stop>
+                           </stops>
+                        </LinearGradient>
+                     </fill>
+                  </FontAwesomeIconView>
+               </graphic>
+            </JFXButton>
+            <TextField fx:id="lobbyNameField" layoutX="216.0" layoutY="35.0" prefHeight="0.0" prefWidth="387.0" promptText="Give your lobby a name" style="-fx-background-color: lightGray;">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </TextField>
+            <Label layoutX="68.0" layoutY="37.0" text="Name">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="publicPrivateLabel" layoutX="67.0" layoutY="107.0" text="Public">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="294.0" layoutY="107.0" prefHeight="35.0" prefWidth="61.0" text="Type">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <JFXButton fx:id="singleplayerGameButton" layoutX="368.0" layoutY="107.0" onAction="#singleplayerGameButtonClick" prefHeight="35.0" prefWidth="110.0" style="-fx-background-color: green;" text="Singleplayer" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="multiplayerGameButton" buttonType="RAISED" layoutX="497.0" layoutY="107.0" onAction="#multiplayerGameButtonClick" prefHeight="35.0" prefWidth="110.0" style="-fx-background-color: red;" text="Multiplayer" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXButton>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

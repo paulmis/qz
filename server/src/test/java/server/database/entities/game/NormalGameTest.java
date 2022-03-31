@@ -316,4 +316,16 @@ public class NormalGameTest {
         game.setCurrentQuestionNumber(2);
         assertFalse(game.isLastQuestion());
     }
+
+    @Test
+    void isSingleplayerTrue() {
+        config.setCapacity(1);
+        assertTrue(game.isSingleplayer());
+    }
+
+    @Test
+    void isSingleplayerFalse() {
+        config.setCapacity(2);
+        assertFalse(game.isSingleplayer());
+    }
 }

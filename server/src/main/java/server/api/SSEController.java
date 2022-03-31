@@ -50,9 +50,6 @@ public class SSEController {
             // Get current user
             User user = userRepository.findByEmailIgnoreCase(AuthContext.get())
                     .orElseThrow(() -> new NoSuchElementException("User not found"));
-            // The user must currently be in a game
-            gameRepository.getPlayersLobbyOrGame(user.getId())
-                    .orElseThrow(() -> new IllegalStateException("User not in a game"));
 
             // Register emitter callbacks.
             emitter.onCompletion(() -> {

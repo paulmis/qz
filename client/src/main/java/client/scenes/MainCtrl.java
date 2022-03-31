@@ -32,7 +32,6 @@ import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.Optional;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
@@ -79,6 +78,9 @@ public class MainCtrl {
     private LobbyListCtrl lobbyListCtrl;
     private Parent lobbyListScreen;
 
+    private LobbyCreationScreenCtrl lobbyCreationScreenCtrl;
+    private Parent lobbyCreationScreen;
+
     private Popup lobbySettingsPopUp;
     private Popup lobbyLeavePopUp;
     private Popup gameLeavePopUp;
@@ -98,7 +100,8 @@ public class MainCtrl {
                            Pair<LobbyScreenCtrl, Parent> lobbyScreen,
                            Pair<GameScreenCtrl, Parent> gameScreen,
                            Pair<GlobalLeaderboardCtrl, Parent> globalLeaderboardScreen,
-                           Pair<LobbyListCtrl, Parent> lobbyListScreen) {
+                           Pair<LobbyListCtrl, Parent> lobbyListScreen,
+                           Pair<LobbyCreationScreenCtrl, Parent> lobbyCreationScreen) {
         this.primaryStage = primaryStage;
 
         this.serverConnectScreen = serverConnectScreen.getValue();
@@ -122,6 +125,9 @@ public class MainCtrl {
         this.lobbyListScreen = lobbyListScreen.getValue();
         this.lobbyListCtrl = lobbyListScreen.getKey();
 
+        this.lobbyCreationScreen = lobbyCreationScreen.getValue();
+        this.lobbyCreationScreenCtrl = lobbyCreationScreen.getKey();
+
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
         lobbySettingsPopUp = new Popup();
@@ -129,12 +135,6 @@ public class MainCtrl {
         gameLeavePopUp = new Popup();
         lobbyDisbandPopUp = new Popup();
         showServerConnectScreen();
-
-        // This makes sure to close every thread when the app is closed.
-        primaryStage.setOnCloseRequest(e -> {
-            Platform.exit();
-            System.exit(0);
-        });
     }
 
     enum StageScalingStrategy {
@@ -235,6 +235,15 @@ public class MainCtrl {
         this.showScreenLetterBox(lobbyListScreen, StageScalingStrategy.Letterbox);
         lobbyListCtrl.reset();
     }
+
+    /**
+     * This function displays the lobby creation screen.
+     */
+    public void showLobbyCreationScreen() {
+        this.showScreenLetterBox(lobbyCreationScreen, StageScalingStrategy.Letterbox);
+        lobbyCreationScreenCtrl.reset();
+    }
+
 
     /**
      * This function displays the log in screen.
@@ -411,9 +420,7 @@ public class MainCtrl {
 
     /**
      * This function checks if the player is the host of the lobby.
-     *
      */
-
     public void checkHost() {
         //Request user's data
         Optional<GamePlayerDTO> gamePlayerData = ClientState.game.getPlayers()
