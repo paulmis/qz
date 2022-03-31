@@ -58,7 +58,7 @@ public class UserController {
      * @return the response code.
      */
     @PostMapping("/username")
-    public ResponseEntity changeUsername(@RequestBody String newUsername) {
+    public ResponseEntity<UserDTO> changeUsername(@RequestBody String newUsername) {
         Optional<User> userOptional = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (userOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -68,7 +68,7 @@ public class UserController {
 
         // Send 200 if new username is the same as the old one.
         if (user.getUsername().equals(newUsername)) {
-            return ResponseEntity.ok(URI.create("/api/user/" + user.getId()));
+            return ResponseEntity.ok(user.getDTO());
         }
 
         // If a user with this username already exists, return 409
@@ -90,6 +90,6 @@ public class UserController {
                 log.error("Error occurred while sending USERNAME_CHANGED event: " + exception);
             }
         }
-        return ResponseEntity.ok(URI.create("/api/user/" + user.getId()));
+        return ResponseEntity.ok(user.getDTO());
     }
 }

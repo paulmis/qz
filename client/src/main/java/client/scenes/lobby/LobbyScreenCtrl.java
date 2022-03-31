@@ -3,6 +3,7 @@ package client.scenes.lobby;
 import static javafx.application.Platform.runLater;
 
 import client.communication.game.LobbyCommunication;
+import client.communication.user.UserCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.UserInfoPane;
 import client.utils.ClientState;
@@ -85,10 +86,24 @@ public class LobbyScreenCtrl implements SSESource {
      */
     @SSEEventHandler(SSEMessageType.PLAYER_JOINED)
     public void playerJoined() {
-        updateView();
+        communication.getLobbyInfo(gameDTO -> runLater(() -> {
+            ClientState.game = gameDTO;
+            updateView();
+        }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while updating server info.")),
+                ClientState.game.getId());
     }
 
-
+    /**
+     * Reacts to a username change event.
+     */
+    @SSEEventHandler(SSEMessageType.USERNAME_CHANGED)
+    public void usernameChanged() {
+        communication.getLobbyInfo(gameDTO -> runLater(() -> {
+            ClientState.game = gameDTO;
+            updateView();
+        }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while updating server info.")),
+                ClientState.game.getId());
+    }
 
 
     /**
@@ -96,7 +111,11 @@ public class LobbyScreenCtrl implements SSESource {
      */
     @SSEEventHandler(SSEMessageType.PLAYER_LEFT)
     public void playerLeft() {
-        updateView();
+        communication.getLobbyInfo(gameDTO -> runLater(() -> {
+            ClientState.game = gameDTO;
+            updateView();
+        }), () -> runLater(() -> mainCtrl.showErrorSnackBar("Something went wrong while updating server info.")),
+                ClientState.game.getId());
     }
 
     /**
@@ -218,7 +237,7 @@ public class LobbyScreenCtrl implements SSESource {
     public void showUserInfo() {
         if (userInfo == null) {
             // Create userInfo
-            userInfo = new UserInfoPane(server, mainCtrl);
+            userInfo = new UserInfoPane(server, new UserCommunication(), mainCtrl);
             mainAnchor.getChildren().add(userInfo);
             userInfo.setVisible(true);
             runLater(() -> userInfo.setupPosition(userButton, mainAnchor));
