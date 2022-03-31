@@ -84,14 +84,6 @@ public class LobbyScreenCtrl implements SSESource {
     }
 
     /**
-     * Reacts to a username change event.
-     */
-    @SSEEventHandler(SSEMessageType.USERNAME_CHANGED)
-    public void usernameChanged() {
-        lobbyModified();
-    }
-
-    /**
      * Reacts to the lobby being modified.
      */
     @SSEEventHandler(SSEMessageType.LOBBY_MODIFIED)

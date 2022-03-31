@@ -90,7 +90,7 @@ public class UserController {
         Optional<Game> gameOptional = gameRepository.getPlayersLobbyOrGame(user.getId());
         if (gameOptional.isPresent()) {
             try {
-                sseManager.send(gameOptional.get().getUserIds(), new SSEMessage(SSEMessageType.USERNAME_CHANGED));
+                sseManager.send(gameOptional.get().getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
             } catch (IOException exception) {
                 log.error("Error occurred while sending USERNAME_CHANGED event: " + exception);
             }

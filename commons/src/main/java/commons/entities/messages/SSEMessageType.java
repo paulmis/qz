@@ -49,5 +49,4 @@ public enum SSEMessageType {
      * Sent when a new message is sent in a lobby or game.
      */
     CHAT_MESSAGE,
-    USERNAME_CHANGED,
 }
