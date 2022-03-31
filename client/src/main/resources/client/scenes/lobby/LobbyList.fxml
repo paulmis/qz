@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -43,20 +38,26 @@
       </AnchorPane>
       <AnchorPane fx:id="lobbyListItemsAnchorPane" layoutX="212.0" layoutY="69.0" prefHeight="507.0" prefWidth="605.0">
          <children>
-            <TextField fx:id="searchField" layoutX="72.0" layoutY="21.0" prefHeight="45.0" prefWidth="376.0" promptText="Search by game name, type or username">
+            <TextField fx:id="searchField" layoutX="72.0" layoutY="21.0" prefHeight="46.0" prefWidth="298.0" promptText="Search by game name, type or username">
                <font>
                   <Font size="18.0" />
                </font>
             </TextField>
-            <JFXButton fx:id="searchButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="461.0" layoutY="20.0" onAction="#searchButtonClick" prefHeight="40.0" prefWidth="40.0" text="Create" textFill="WHITE">
+            <JFXButton fx:id="searchButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="396.0" layoutY="24.0" onAction="#searchButtonClick" prefHeight="40.0" prefWidth="40.0" text="Create" textFill="WHITE">
                <graphic>
                   <FontAwesomeIconView glyphName="SEARCH" size="36" />
                </graphic>
+               <tooltip>
+                  <Tooltip text="Search" />
+               </tooltip>
             </JFXButton>
-            <JFXButton fx:id="createLobbyButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="531.0" layoutY="22.0" onAction="#createLobbyButtonClick" prefHeight="40.0" prefWidth="40.0" text="Create" textFill="WHITE">
+            <JFXButton fx:id="createLobbyButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="467.0" layoutY="24.0" onAction="#createLobbyButtonClick" prefHeight="40.0" prefWidth="40.0" text="Create" textFill="WHITE">
                <graphic>
                   <FontAwesomeIconView glyphName="PLUS" size="40" />
                </graphic>
+               <tooltip>
+                  <Tooltip text="Create a new Lobby" />
+               </tooltip>
             </JFXButton>
             <ScrollPane hbarPolicy="NEVER" layoutX="5.0" layoutY="77.0" pannable="true" prefHeight="423.0" prefWidth="595.0" vbarPolicy="NEVER">
                <content>
@@ -67,6 +68,17 @@
                <graphic>
                   <FontAwesomeIconView glyphName="REFRESH" size="36" />
                </graphic>
+               <tooltip>
+                  <Tooltip text="Refresh Lobby List" />
+               </tooltip>
+            </JFXButton>
+            <JFXButton fx:id="joinRandomLobbyButton" contentDisplay="GRAPHIC_ONLY" layoutX="539.0" layoutY="24.0" onMouseClicked="#joinRandomLobby" prefHeight="40.0" prefWidth="40.0">
+               <graphic>
+                  <FontAwesomeIconView glyphName="RANDOM" size="40" />
+               </graphic>
+               <tooltip>
+                  <Tooltip text="Join a Random Lobby" />
+               </tooltip>
             </JFXButton>
          </children>
       </AnchorPane>

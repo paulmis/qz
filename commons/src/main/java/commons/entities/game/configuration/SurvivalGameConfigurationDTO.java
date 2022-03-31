@@ -30,7 +30,7 @@ public class SurvivalGameConfigurationDTO extends GameConfigurationDTO {
     @DecimalMin(value = "0.1")
     @DecimalMax(value = "10.0")
     @Description("Speed modifier")
-    protected Float speedModifier;
+    protected Float speedModifier = 1f;
 
     /**
      * Normal game config constructor.
@@ -45,7 +45,7 @@ public class SurvivalGameConfigurationDTO extends GameConfigurationDTO {
      * @param pointsWrong the number of points per incorrect answer.
      * @param correctAnswerThreshold the correct answer threshold.
      */
-    public SurvivalGameConfigurationDTO(UUID id, Duration answerTime, Integer capacity, Float speedModifier,
+    public SurvivalGameConfigurationDTO(UUID id, Integer answerTime, Integer capacity, Float speedModifier,
                                         Integer streakSize,
                                         Float streakMultiplier,
                                         Integer pointsCorrect,
