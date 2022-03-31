@@ -318,7 +318,7 @@ public class LobbyController {
         // Find the user's lobby
         Game<?> lobby = gameRepository.getPlayersLobby(user.getId()).orElseThrow(PlayerNotInLobbyException::new);
 
-        // Remove the user from the lobby
+        // Delete the lobby
         if (!lobbyService.deleteLobby(lobby, user)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
