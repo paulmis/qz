@@ -355,7 +355,7 @@ class ActivityControllerTest {
                 .perform(post("/api/activity/save")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(activityB.getDTO())))
-                .andExpect(status().isGone());
+                .andExpect(status().isNotFound());
 
         verify(activityRepository, times(1)).findById(activityB.getId());
         verify(activityRepository, times(0)).save(activityB);

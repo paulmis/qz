@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import server.database.entities.question.Activity;
 import server.database.repositories.question.ActivityRepository;
+import server.exceptions.ResourceNotFoundException;
 import server.services.storage.StorageService;
 
 /**
@@ -94,7 +95,7 @@ public class ActivityController {
         } catch (Exception e) {
             // This can occur due to malformed data (for example, URL longer than 255 characters)
             log.warn("Failed to save activities: {}", e.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw e;
         }
     }
 
@@ -112,7 +113,7 @@ public class ActivityController {
             HttpHeaders headers = new HttpHeaders();
             headers.setLocation(storageService.getURI(UUID.fromString(icon)));
             return new ResponseEntity<>(headers, HttpStatus.FOUND);
-        }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Activity not found"));
+        }).orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
     }
     
     /**
@@ -135,7 +136,7 @@ public class ActivityController {
      * @param activityDTO DTO of the activity to store
      * @param image       The activity image to upload
      * @return 400 if the activity was malformed,
-     *         410 if the activity was marked as abandoned,
+     *         404 if the activity was marked as abandoned,
      *         200 if the activity was updated and
      *         201 if a new activity was created
      */
@@ -143,15 +144,18 @@ public class ActivityController {
     ResponseEntity saveActivityImage(
             @RequestPart ActivityDTO activityDTO,
             @RequestPart(required = false) MultipartFile image) {
+
         boolean createdActivity = true;
         if (activityDTO.getId() != null) {
             // Retrieve previously existing activity, if present
-            Optional<Activity> previous = activityRepository.findById(activityDTO.getId());
-            if (previous.isPresent() && previous.get().isAbandoned()) {
-                // Trying to update an abandoned activity
-                return ResponseEntity.status(HttpStatus.GONE).build();
-            } else if (previous.isPresent()) {
-                createdActivity = false;
+            Activity previous = activityRepository.findById(activityDTO.getId()).orElse(null);
+            if (previous != null) {
+                if (previous.isAbandoned()) {
+                    // Trying to update an abandoned activity
+                    throw new ResourceNotFoundException("Updating a deleted activity.");
+                } else {
+                    createdActivity = false;
+                }
             }
         }
 
@@ -182,10 +186,10 @@ public class ActivityController {
             } else {
                 return ResponseEntity.ok().build();
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             // This can occur due to malformed data (for example, URL longer than 255 characters)
             log.warn("Failed to save activity: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            throw e;
         }
     }
 
@@ -194,7 +198,7 @@ public class ActivityController {
      *
      * @param activityDTO DTO of the activity to store
      * @return 400 if the activity was malformed,
-     *         410 if the activity was marked as abandoned,
+     *         404 if the activity was marked as abandoned,
      *         200 if the activity was updated and
      *         201 if a new activity was created
      */
@@ -214,7 +218,7 @@ public class ActivityController {
         Optional<Activity> toDelete = activityRepository.findByIdAndAbandonedIsFalse(activityId);
         if (toDelete.isEmpty()) {
             // Activity not found
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            throw new ResourceNotFoundException("Activity " + activityId + " not found.");
         }
 
         // Set activity as abandoned
