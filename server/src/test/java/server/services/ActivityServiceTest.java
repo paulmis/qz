@@ -29,7 +29,7 @@ class ActivityServiceTest {
         for (int i = 0; i < 10; i++) {
             activities.add(new Activity("Activity " + i));
         }
-        lenient().when(activityRepository.findAll()).thenReturn(activities);
+        lenient().when(activityRepository.findByAbandonedIsFalse()).thenReturn(activities);
     }
 
     @Test
