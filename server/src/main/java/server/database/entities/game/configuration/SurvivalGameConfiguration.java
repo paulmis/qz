@@ -2,6 +2,7 @@ package server.database.entities.game.configuration;
 
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
+import java.time.Duration;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -38,10 +39,15 @@ public class SurvivalGameConfiguration extends GameConfiguration {
      * The speed increase/decrease of the game.
      */
     @Column(nullable = false)
-    Float speedModifier = 1.0f;
+    float speedModifier = 1.0f;
 
     @Override
     public SurvivalGameConfigurationDTO getDTO() {
-        return new ModelMapper().map(this, SurvivalGameConfigurationDTO.class);
+        ModelMapper mapper = new ModelMapper();
+        mapper.addConverter(
+                context -> (int) context.getSource().toMillis(),
+                Duration.class, Integer.class);
+
+        return mapper.map(this, SurvivalGameConfigurationDTO.class);
     }
 }

@@ -96,4 +96,15 @@ public class GameDTO implements DTO {
         this.players = gameDTO.getPlayers();
         this.host = gameDTO.getHost();
     }
+
+
+
+    /**
+     * Checks if the game is singleplayer or multiplayer.
+     *
+     * @return whether the game is singleplayer or multiplayer
+     */
+    public boolean isSingleplayer() {
+        return this.configuration.getCapacity() == 1;
+    }
 }

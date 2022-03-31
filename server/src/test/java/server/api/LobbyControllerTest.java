@@ -367,22 +367,6 @@ class LobbyControllerTest {
     }
 
     @Test
-    void createBadRequest() throws Exception {
-        // Mock the repositories
-        when(gamePlayerRepository.existsByUserIdAndGameStatusNot(john.getId(), GameStatus.FINISHED))
-                .thenReturn(false);
-        when(gameConfigurationRepository.save(mockLobbyConfiguration))
-                .thenThrow(ConstraintViolationException.class);
-
-        // Request
-        this.mockMvc
-                .perform(post("/api/lobby")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockLobby.getDTO())))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void startOk() throws Exception {
         // Request
         this.mockMvc
@@ -390,7 +374,7 @@ class LobbyControllerTest {
                 .andExpect(status().isOk());
 
         // Verify that the game has been started
-        verify(gameService).startGame(mockLobby);
+        verify(gameService).start(mockLobby);
         verifyNoMoreInteractions(gameService);
     }
 
@@ -416,7 +400,7 @@ class LobbyControllerTest {
     @Test
     void startServiceException() throws Exception {
         // Mock the game service to throw an exception (e.g. due to violated constraints)
-        doThrow(IllegalStateException.class).when(gameService).startGame(mockLobby);
+        doThrow(IllegalStateException.class).when(gameService).start(mockLobby);
 
         // Request
         this.mockMvc

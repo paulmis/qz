@@ -1,6 +1,7 @@
 package client.utils.communication;
 
 import commons.entities.messages.SSEMessageType;
+import commons.entities.utils.Multiplier;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -124,5 +125,20 @@ public class ReflectionUtils {
             throw new IllegalArgumentException();
         }
         return Float.parseFloat(field.getAnnotation(DecimalMax.class).value());
+    }
+
+    /**
+     * Helper method to get the multiplier value
+     * of a field by accessing the
+     * Multiplier annotation.
+     *
+     * @param field the requested field.
+     * @return the multiplier value that this field or 1 if it doesn't have one.
+     */
+    public static int getMultiplierValue(@NonNull Field field) {
+        if (!field.isAnnotationPresent(Multiplier.class)) {
+            return 1;
+        }
+        return field.getAnnotation(Multiplier.class).value();
     }
 }

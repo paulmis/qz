@@ -8,6 +8,7 @@ import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -107,6 +108,9 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public Game(GameDTO dto) {
         ModelMapper mapper = new ModelMapper();
+        mapper.addConverter(
+                context -> Duration.ofMillis(context.getSource()),
+                Integer.class, Duration.class);
         mapper.getConfiguration().setSkipNullEnabled(true);
         if (dto.getId() == null) {
             // This id will change once the game entity is saved, but it must be non-null
@@ -342,6 +346,15 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public boolean isFull() {
         return size() >= configuration.getCapacity();
+    }
+
+    /**
+     * Checks if the game is singleplayer, i.e. the capacity is 1.
+     *
+     * @return true if the game is singleplayer, false otherwise
+     */
+    public boolean isSingleplayer() {
+        return getConfiguration().getCapacity() == 1;
     }
 
     /**
