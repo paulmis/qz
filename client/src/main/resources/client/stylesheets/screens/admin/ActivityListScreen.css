@@ -1,0 +1,18 @@
+#topLevelAdminPanelAnchor{
+    -fx-background-image: url("/client/images/background.jpg");
+    -fx-background-size: cover;
+
+}
+
+#addActivityIcon {
+    -fx-fill: backgroundColor;
+}
+
+#editActivityIcon {
+    -fx-fill: backgroundColor;
+}
+
+#deleteActivityIcon {
+    -fx-fill: backgroundColor;
+}
+

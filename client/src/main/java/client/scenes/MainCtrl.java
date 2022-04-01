@@ -16,6 +16,10 @@
 
 package client.scenes;
 
+import client.scenes.admin.ActivityListScreenCtrl;
+import client.scenes.admin.ActivityView;
+import client.scenes.admin.EditActivityScreenCtrl;
+import client.scenes.admin.EditActivityScreenPane;
 import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
@@ -28,6 +32,7 @@ import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbarLayout;
+import commons.entities.ActivityDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.questions.QuestionDTO;
@@ -43,6 +48,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
+import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -81,6 +87,9 @@ public class MainCtrl {
     private LobbyCreationScreenCtrl lobbyCreationScreenCtrl;
     private Parent lobbyCreationScreen;
 
+    private ActivityListScreenCtrl activityListScreenCtrl;
+    private Parent activityListScreen;
+
     private Popup lobbySettingsPopUp;
     private Popup lobbyLeavePopUp;
     private Popup gameLeavePopUp;
@@ -101,7 +110,8 @@ public class MainCtrl {
                            Pair<GameScreenCtrl, Parent> gameScreen,
                            Pair<GlobalLeaderboardCtrl, Parent> globalLeaderboardScreen,
                            Pair<LobbyListCtrl, Parent> lobbyListScreen,
-                           Pair<LobbyCreationScreenCtrl, Parent> lobbyCreationScreen) {
+                           Pair<LobbyCreationScreenCtrl, Parent> lobbyCreationScreen,
+                           Pair<ActivityListScreenCtrl, Parent> activityListScreen) {
         this.primaryStage = primaryStage;
 
         this.serverConnectScreen = serverConnectScreen.getValue();
@@ -127,6 +137,9 @@ public class MainCtrl {
 
         this.lobbyCreationScreen = lobbyCreationScreen.getValue();
         this.lobbyCreationScreenCtrl = lobbyCreationScreen.getKey();
+
+        this.activityListScreen = activityListScreen.getValue();
+        this.activityListScreenCtrl = activityListScreen.getKey();
 
         primaryStage.getIcons().add(new Image(getClass().getResource("/client/images/logo.png").toExternalForm()));
 
@@ -277,6 +290,14 @@ public class MainCtrl {
         gameScreenCtrl.setQuestion(question);
         gameScreenCtrl.bindHandler(ServerUtils.sseHandler);
         this.showScreenLetterBox(gameScreen, StageScalingStrategy.Letterbox);
+    }
+
+    /**
+     * This function displays the game screen.
+     */
+    public void showActivityListScreen() {
+        this.showScreenLetterBox(activityListScreen, StageScalingStrategy.Letterbox);
+        activityListScreenCtrl.reset();
     }
 
     /**
