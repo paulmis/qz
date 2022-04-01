@@ -1,14 +1,10 @@
 package client.communication.admin;
 
-import client.utils.ClientState;
-import client.utils.communication.ServerUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import commons.entities.ActivityDTO;
+import static javax.ws.rs.core.MediaType.*;
 
+import client.utils.communication.ServerUtils;
+import commons.entities.ActivityDTO;
+import commons.entities.utils.ApiError;
 import java.io.*;
 import java.util.*;
 import javax.ws.rs.client.Entity;
@@ -16,20 +12,11 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
-
-import commons.entities.auth.UserDTO;
-import commons.entities.game.GameDTO;
-import commons.entities.utils.ApiError;
-import javafx.scene.image.Image;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.AttachmentBuilder;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
-
-import static javax.ws.rs.core.MediaType.*;
 
 
 /**
@@ -102,14 +89,6 @@ public class AdminCommunication {
         void handle(ApiError error);
     }
 
-    private byte[] convertToBytes(Object object) throws IOException {
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
-             ObjectOutputStream out = new ObjectOutputStream(bos)) {
-            out.writeObject(object);
-            return bos.toByteArray();
-        }
-    }
-
     /**
      * The update activity function. Updates an activity.
      *
@@ -117,7 +96,8 @@ public class AdminCommunication {
      * @param handleSuccess the handler for successful update.
      * @param handleFail the handler for a failed update.
      */
-    public void updateActivity(ActivityDTO activityDTO, File image, AdminCommunication.UpdateActivityHandlerSuccess handleSuccess,
+    public void updateActivity(ActivityDTO activityDTO, File image,
+                               AdminCommunication.UpdateActivityHandlerSuccess handleSuccess,
                                AdminCommunication.UpdateActivityHandlerFail handleFail) {
 
         // The list of attachments
@@ -128,7 +108,7 @@ public class AdminCommunication {
                 .mediaType(APPLICATION_JSON)
                 .object(activityDTO)
                 .contentDisposition(new ContentDisposition("form-data;name=\"activityDTO\""))
-        .build());
+                .build());
 
         // If the image is not null add it to the attachments.
         if (image != null) {
@@ -137,7 +117,7 @@ public class AdminCommunication {
                         .mediaType(APPLICATION_OCTET_STREAM)
                         .object(new FileInputStream(image))
                         .contentDisposition(new ContentDisposition("form-data;name=\"image\";filename=\"image\""))
-                .build());
+                        .build());
             } catch (FileNotFoundException e) {
                 log.error("Couldn't create input stream.");
                 e.printStackTrace();
@@ -191,15 +171,15 @@ public class AdminCommunication {
     /**
      * The delete activity function. Deletes an activity.
      *
-     * @param id the new version of the activity.
+     * @param activityId the new version of the activity.
      * @param handleSuccess the handler for successful delete.
      * @param handleFail the handler for a failed delete.
      */
-    public void deleteActivity(UUID id, AdminCommunication.DeleteActivityHandlerSuccess handleSuccess,
+    public void deleteActivity(UUID activityId, AdminCommunication.DeleteActivityHandlerSuccess handleSuccess,
                              AdminCommunication.DeleteActivityHandlerFail handleFail) {
         // Build the query invocation
         Invocation request = ServerUtils.getRequestTarget()
-                .path("/api/activity/" + id.toString() + "/delete")
+                .path("/api/activity/" + activityId.toString() + "/delete")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .buildPost(Entity.json(""));

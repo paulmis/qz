@@ -1,8 +1,5 @@
 package client.utils.communication;
 
-import javafx.scene.image.Image;
-
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Scanner;
 

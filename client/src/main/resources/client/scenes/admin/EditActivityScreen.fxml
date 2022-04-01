@@ -5,7 +5,6 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
@@ -44,11 +43,7 @@
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <ImageView fx:id="activityImageView" fitHeight="150.0" fitWidth="150.0" layoutX="172.0" layoutY="70.0" onMouseClicked="#changeImageClick" pickOnBounds="true">
-         <image>
-            <Image url="@../../../../../../../../../../Downloads/Broadway_tower_edit.jpg" />
-         </image>
-      </ImageView>
+      <ImageView fx:id="activityImageView" fitHeight="150.0" fitWidth="150.0" layoutX="172.0" layoutY="70.0" onMouseClicked="#changeImageClick" pickOnBounds="true" />
       <JFXTextArea fx:id="activityDescriptionTextArea" focusColor="#09802b" layoutX="247.0" layoutY="238.0" prefHeight="48.0" prefWidth="177.0" />
       <Label layoutX="90.0" layoutY="368.0" text="Source">
          <font>
@@ -56,5 +51,10 @@
          </font>
       </Label>
       <JFXTextArea fx:id="activitySourceTextArea" layoutX="247.0" layoutY="362.0" prefHeight="48.0" prefWidth="177.0" />
+      <Label fx:id="addImageActivityLabel" layoutX="185.0" layoutY="136.0" text="Press to add an image" visible="false">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

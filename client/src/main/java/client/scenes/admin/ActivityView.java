@@ -60,7 +60,7 @@ public class ActivityView {
         if (this.icon != null) {
             this.image = new Image(ServerUtils.getImagePathFromId(this.icon), true);
         } else {
-            this.image = new Image("https://onlinejpgtools.com/images/examples-onlinejpgtools/snowy-mountain-gray-srgb.jpg");
+            this.image = null;
         }
     }
 

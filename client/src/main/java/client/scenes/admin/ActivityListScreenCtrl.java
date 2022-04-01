@@ -1,17 +1,15 @@
 package client.scenes.admin;
 
+import static javafx.application.Platform.runLater;
+
 import client.communication.admin.AdminCommunication;
 import client.scenes.MainCtrl;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.ActivityDTO;
-
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -28,7 +26,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
-import static javafx.application.Platform.runLater;
 
 /**
  * This is the controller for the activity list screen.
@@ -134,7 +131,7 @@ public class ActivityListScreenCtrl implements Initializable {
                     } else {
                         imageView.setFitHeight(50);
                         imageView.setFitWidth(50);
-                        imageView.setImage(new Image(ServerUtils.getImagePathFromId(activityId),true));
+                        imageView.setImage(new Image(ServerUtils.getImagePathFromId(activityId), true));
                         setGraphic(imageView);
                     }
                 }
@@ -151,7 +148,7 @@ public class ActivityListScreenCtrl implements Initializable {
     private void addActivityButtonClick() {
         this.openEditActivity(null, (activity, image) -> server.updateActivity(activity, image,
                         () -> runLater(() -> {
-                            mainCtrl.showErrorSnackBar("Activity has been added.");
+                            mainCtrl.showInformationalSnackBar("Activity has been added.");
                             this.updateActivities();
                             this.closeEditActivity();
                         }), (error) -> runLater(() ->
@@ -167,7 +164,7 @@ public class ActivityListScreenCtrl implements Initializable {
         this.openEditActivity(new ActivityView(activityTable.getSelectionModel().getSelectedItem()),
                 (activity, image) -> server.updateActivity(activity, image,
                         () -> runLater(() -> {
-                            mainCtrl.showErrorSnackBar("Activity has been updated.");
+                            mainCtrl.showInformationalSnackBar("Activity has been updated.");
                             this.updateActivities();
                             this.closeEditActivity();
                         }), (error) -> runLater(() ->
@@ -204,7 +201,7 @@ public class ActivityListScreenCtrl implements Initializable {
      * @param saveHandler the handler for save.
      */
     private void openEditActivity(ActivityView activity, EditActivityScreenCtrl.SaveHandler saveHandler) {
-        editActivityPane = new EditActivityScreenPane(activity, saveHandler);
+        editActivityPane = new EditActivityScreenPane(activity, saveHandler, mainCtrl);
         this.topLevelAdminPanelAnchor.getChildren().add(editActivityPane);
         AnchorPane.setTopAnchor(editActivityPane, 0d);
         AnchorPane.setLeftAnchor(editActivityPane, 0d);

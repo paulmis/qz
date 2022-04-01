@@ -1,5 +1,6 @@
 package client.scenes.admin;
 
+import client.scenes.MainCtrl;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
@@ -20,13 +21,14 @@ public class EditActivityScreenPane extends StackPane {
      * @param activity the activity we want to edit.
      * @param saveHandler the save handler.
      */
-    public EditActivityScreenPane(ActivityView activity, EditActivityScreenCtrl.SaveHandler saveHandler) {
+    public EditActivityScreenPane(ActivityView activity, EditActivityScreenCtrl.SaveHandler saveHandler,
+                                  MainCtrl mainCtrl) {
 
         FXMLLoader fxmlLoader =
                 new FXMLLoader(getClass().getResource("/client/scenes/admin/EditActivityScreen.fxml"));
 
         fxmlLoader.setControllerFactory(param ->
-                controller = new EditActivityScreenCtrl(activity, saveHandler));
+                controller = new EditActivityScreenCtrl(activity, saveHandler, mainCtrl));
 
         try {
             view = (Node) fxmlLoader.load();

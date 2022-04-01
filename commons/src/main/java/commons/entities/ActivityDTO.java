@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.utils.DTO;
 import commons.entities.utils.Views;
-
-import java.io.Serializable;
 import java.util.UUID;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @JsonView(Views.Public.class)
-public class ActivityDTO implements DTO, Serializable {
+public class ActivityDTO implements DTO {
     /**
      * The ID of the activity.
      */

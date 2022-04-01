@@ -147,7 +147,7 @@ public class MainCtrl {
         lobbyLeavePopUp = new Popup();
         gameLeavePopUp = new Popup();
         lobbyDisbandPopUp = new Popup();
-        showActivityListScreen();
+        showServerConnectScreen();
     }
 
     enum StageScalingStrategy {

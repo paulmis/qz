@@ -75,7 +75,8 @@ public class Main extends Application {
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, serverConnectScreen, logInScreen, registerScreen,
-                lobbyScreen, gameScreen, globalLeaderboardScreen, lobbyListScreen, lobbyCreationScreen, activityListScreen);
+                lobbyScreen, gameScreen, globalLeaderboardScreen, lobbyListScreen, lobbyCreationScreen,
+                activityListScreen);
 
         primaryStage.setOnCloseRequest(e -> {
             e.consume();
