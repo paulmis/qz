@@ -225,4 +225,12 @@ public class RegisterScreenCtrl implements Initializable {
             System.out.print("User does not want to be remembered...\n");
         }
     }
+
+    /**
+     * Opens the admin panel.
+     */
+    @FXML
+    private void adminPanelButtonClick() {
+        mainCtrl.showActivityListScreen();
+    }
 }

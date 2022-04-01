@@ -121,7 +121,7 @@ public class ActivityController {
      *
      * @return the list of activities currently in use
      */
-    @GetMapping("")
+    @GetMapping
     ResponseEntity<List<ActivityDTO>> getInUse() {
         List<ActivityDTO> activities = activityRepository.findByAbandonedIsFalse()
                 .stream()

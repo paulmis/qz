@@ -25,3 +25,5 @@
 @import "screens/leaderboard/Leaderboard.css";
 @import "screens/lobby/LobbyList.css";
 @import "screens/lobby/LobbyCreationScreen.css";
+@import "screens/admin/ActivityListScreen.css";
+@import "screens/admin/EditActivityScreen.css";

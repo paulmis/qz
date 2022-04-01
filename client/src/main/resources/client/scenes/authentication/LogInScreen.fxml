@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -12,7 +14,6 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<?import javafx.scene.control.PasswordField?>
 <AnchorPane fx:id="authenticationAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="1024.0" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.authentication.LogInScreenCtrl">
    <opaqueInsets>
       <Insets />
@@ -71,5 +72,10 @@
             </Pane>
          </left>
       </BorderPane>
+      <JFXButton fx:id="adminPanelButton" contentDisplay="GRAPHIC_ONLY" onAction="#adminPanelButtonClick" style="-fx-background-color: white; -fx-background-radius: 20;" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="20.0">
+         <graphic>
+            <FontAwesomeIconView glyphName="COG" size="36" />
+         </graphic>
+      </JFXButton>
    </children>
 </AnchorPane>
