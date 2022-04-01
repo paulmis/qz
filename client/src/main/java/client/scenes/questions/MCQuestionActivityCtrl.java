@@ -2,12 +2,14 @@ package client.scenes.questions;
 
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
+import client.utils.communication.ServerUtils;
 import commons.entities.questions.MCQuestionDTO;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 /**
@@ -42,10 +44,13 @@ public class MCQuestionActivityCtrl extends MCQuestionCtrl {
         }
 
         // Looping over the answer controls
-        for (ImageView imageOption : imageOptionArray) {
+        for (int idx = 0; idx < imageOptionArray.size(); idx++) {
+            ImageView imageOption = imageOptionArray.get(idx);
+
             // Sets the image of the imageView to the url specified
             // in answerImages
-            imageOption.setImage(null);
+            imageOption.setImage(new Image(ServerUtils
+                    .getImagePathFromId(question.getActivities().get(idx).getIcon())));
 
             // This code resizes the image view to the surrounding vbox.
             // It uses a bind on the minimum of the vbox width and height and multiplies that by 0.8.

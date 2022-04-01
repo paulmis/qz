@@ -26,8 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 @Generated
 @Slf4j
 public abstract class MCQuestionCtrl implements Initializable {
-    private final MainCtrl mainCtrl;
-    private final GameCommunication communication;
+    protected final MainCtrl mainCtrl;
+    protected final GameCommunication communication;
 
     @FXML protected Label questionLabel;
     @FXML protected Label labelOptionA;
