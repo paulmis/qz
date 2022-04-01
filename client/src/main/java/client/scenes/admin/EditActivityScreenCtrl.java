@@ -77,6 +77,10 @@ public class EditActivityScreenCtrl implements Initializable {
             addImageActivityLabel.setVisible(true);
             this.activityImageView.setImage(generateImage(200, 200, 200, 1));
         }
+
+
+        // Make label pass-through
+        addImageActivityLabel.setMouseTransparent(true);
     }
 
     /**
