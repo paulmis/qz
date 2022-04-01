@@ -7,6 +7,8 @@ import commons.entities.messages.SSEMessageType;
 import commons.entities.utils.Views;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
+import javax.validation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -73,13 +75,19 @@ public class UserController {
             throw new UsernameInUseException("Username is already in use.");
         }
 
-        // Throw this error when the username has wrong length
-        if (newUsername.length() < 3 || newUsername.length() > 20) {
-            throw new IllegalArgumentException("Username must be between 3 - 20 characters long.");
-        }
+
 
         // Set the new username
         user.setUsername(newUsername);
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        // Validates the user
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
 
         // Persist the username
         userRepository.save(user);
