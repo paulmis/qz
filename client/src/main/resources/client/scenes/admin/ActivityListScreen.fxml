@@ -28,9 +28,9 @@
          <children>
             <TableView fx:id="activityTable" layoutX="5.0" layoutY="25.0" prefHeight="426.0" prefWidth="759.0" style="-fx-background-color: white;" tableMenuButtonVisible="true">
               <columns>
-                <TableColumn fx:id="pictureTableColumn" prefWidth="75.0" text="Picture" />
-                <TableColumn fx:id="descriptionTableColumn" prefWidth="75.0" text="Description" />
-                  <TableColumn fx:id="costTableColumn" prefWidth="75.0" text="Cost" />
+                <TableColumn fx:id="pictureTableColumn" maxWidth="1000.0" prefWidth="50.0" text="Picture" />
+                <TableColumn fx:id="descriptionTableColumn" prefWidth="319.0" text="Description" />
+                  <TableColumn fx:id="costTableColumn" prefWidth="143.0" text="Cost" />
                   <TableColumn fx:id="sourceTableColumn" prefWidth="75.0" text="Source" />
               </columns>
                <columnResizePolicy>
