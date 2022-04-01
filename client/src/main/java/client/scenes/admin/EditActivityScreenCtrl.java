@@ -4,6 +4,9 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextArea;
 import commons.entities.ActivityDTO;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -30,10 +33,14 @@ public class EditActivityScreenCtrl implements Initializable {
     @FXML private JFXTextArea activityDescriptionTextArea;
     @FXML private JFXTextArea activitySourceTextArea;
 
+    private File changedImage;
+
+    private boolean creating;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         activityCostTextField.setText(activity.getCost().toString());
-        activityImageView.setImage(activity.getImage().getImage());
+        activityImageView.setImage(activity.getImage());
         activityDescriptionTextArea.setText(activity.getDescription());
         activitySourceTextArea.setText(activity.getSource());
 
@@ -56,13 +63,17 @@ public class EditActivityScreenCtrl implements Initializable {
         activitySourceTextArea.textProperty().addListener((observable, oldValue, newValue) -> {
             activity.setSource(newValue);
         });
+
+        if (creating) {
+            saveActivityButton.setDisable(true);
+        }
     }
 
     /**
      * Handles the save activity action.
      */
     public interface SaveHandler {
-        void handle(ActivityDTO activity);
+        void handle(ActivityDTO activity, File image);
     }
 
 
@@ -74,12 +85,12 @@ public class EditActivityScreenCtrl implements Initializable {
      */
     public EditActivityScreenCtrl(ActivityView activity, SaveHandler saveHandler) {
         this.activity = Objects.requireNonNullElseGet(activity, () -> {
+            this.creating = true;
             var a = new ActivityDTO();
             a.setId(UUID.randomUUID());
             a.setCost(0L);
             a.setDescription("");
             a.setSource("");
-            a.setIcon("");
             return new ActivityView(a);
         });
 
@@ -90,7 +101,7 @@ public class EditActivityScreenCtrl implements Initializable {
 
     @FXML
     private void saveActivityButtonClick() {
-        saveHandler.handle(activity.toDTO());
+        saveHandler.handle(activity.toDTO(), changedImage);
     }
 
     @FXML
@@ -104,8 +115,10 @@ public class EditActivityScreenCtrl implements Initializable {
         File pictureFile = fileSelector.showOpenDialog(null);
         if (pictureFile != null) {
             this.saveActivityButton.setDisable(false);
-            this.activity.setImage(new ImageView(new Image(pictureFile.getAbsolutePath())));
-            this.activityImageView.setImage(this.activity.getImage().getImage());
+            changedImage = pictureFile;
+            this.saveActivityButton.setDisable(false);
+            this.activity.setImage(new Image(pictureFile.getAbsolutePath()));
+            this.activityImageView.setImage(this.activity.getImage());
         }
     }
 }

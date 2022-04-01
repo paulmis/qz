@@ -55,8 +55,7 @@ public class ServerUtils {
             .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
 
     public static String getImagePathFromId(String id) {
-        return "file:///C:/Users/rd211/Downloads/Broadway_tower_edit.jpg";
-        //return SERVER + "resource/" + id.toString();
+        return SERVER + "api/resource/" + id.toString();
     }
 
     /**
@@ -77,9 +76,9 @@ public class ServerUtils {
     private Client newClient() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-
         JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
-        return ClientBuilder.newClient().register(provider);
+        return ClientBuilder.newClient().register(provider).register(JacksonJsonProvider.class)
+                .register(JavaTimeModule.class).register(new org.apache.cxf.jaxrs.provider.MultipartProvider());
     }
 
     /** Gets a list of the leaderboard images from the server.

@@ -2,9 +2,12 @@ package client.scenes.admin;
 
 import client.communication.admin.AdminCommunication;
 import client.scenes.MainCtrl;
+import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.ActivityDTO;
+
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -14,14 +17,18 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+
+import static javafx.application.Platform.runLater;
 
 /**
  * This is the controller for the activity list screen.
@@ -32,19 +39,19 @@ public class ActivityListScreenCtrl implements Initializable {
     private final MainCtrl mainCtrl;
     private final AdminCommunication server;
 
-    @FXML private TableColumn<ActivityView, ImageView> pictureTableColumn;
-    @FXML private TableColumn<ActivityView, String> costTableColumn;
-    @FXML private TableColumn<ActivityView, String> descriptionTableColumn;
-    @FXML private TableColumn<ActivityView, String> sourceTableColumn;
+    @FXML private TableColumn<ActivityDTO, String> pictureTableColumn;
+    @FXML private TableColumn<ActivityDTO, String> costTableColumn;
+    @FXML private TableColumn<ActivityDTO, String> descriptionTableColumn;
+    @FXML private TableColumn<ActivityDTO, String> sourceTableColumn;
 
     @FXML private AnchorPane topLevelAdminPanelAnchor;
     @FXML private JFXButton activitiesGoBackButton;
-    @FXML private TableView<ActivityView> activityTable;
+    @FXML private TableView<ActivityDTO> activityTable;
     @FXML private JFXButton deleteActivityButton;
     @FXML private JFXButton editActivityButton;
     @FXML private JFXButton addActivityButton;
 
-    private final ObservableList<ActivityView> activities;
+    private final ObservableList<ActivityDTO> activities;
 
     private EditActivityScreenPane editActivityPane;
 
@@ -86,41 +93,24 @@ public class ActivityListScreenCtrl implements Initializable {
      * Resets the controller to a default state.
      */
     public void reset() {
-        activities.clear();
         createTableView();
-        mockActivities();
+        updateActivities();
     }
 
     /**
      * Gets all the activities from the server and adds them to the table.
      */
     private void updateActivities() {
-        server.getAllActivities(activities -> this.activities.setAll(
-                activities.stream().map(ActivityView::new).collect(Collectors.toList())
-        ), () -> mainCtrl.showErrorSnackBar("Getting activities failed. Check server connection!"));
-    }
-
-    /**
-     * A temporary mock function.
-     */
-    private void mockActivities() {
-        var activity = new ActivityDTO();
-        activity.setCost(123L);
-        activity.setDescription("An amazing description");
-        activity.setIcon("icon url");
-        activity.setId(UUID.randomUUID());
-        activity.setSource("a great website here");
-
-        this.activities.setAll(new ActivityView(activity));
+        server.getAllActivities(
+                this.activities::setAll,
+                (error) -> runLater(() ->
+                        mainCtrl.showErrorSnackBar("Getting activities failed." + error.getDescription())));
     }
 
     /**
      * Creates the table view and binds the properties.
      */
     private void createTableView() {
-        pictureTableColumn.setCellValueFactory(
-                new PropertyValueFactory<>("image")
-        );
         costTableColumn.setCellValueFactory(
                 new PropertyValueFactory<>("cost")
         );
@@ -131,6 +121,26 @@ public class ActivityListScreenCtrl implements Initializable {
                 new PropertyValueFactory<>("source")
         );
 
+        pictureTableColumn.setCellValueFactory(new PropertyValueFactory<>("icon"));
+
+        pictureTableColumn.setCellFactory(tc -> {
+            TableCell<ActivityDTO, String> cell = new TableCell<ActivityDTO, String>() {
+                private ImageView imageView = new ImageView();
+                @Override
+                protected void updateItem(String activityId, boolean empty) {
+                    super.updateItem(activityId, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        imageView.setFitHeight(50);
+                        imageView.setFitWidth(50);
+                        imageView.setImage(new Image(ServerUtils.getImagePathFromId(activityId),true));
+                        setGraphic(imageView);
+                    }
+                }
+            };
+            return cell;
+        });
         activityTable.setItems(activities);
     }
 
@@ -139,28 +149,14 @@ public class ActivityListScreenCtrl implements Initializable {
      */
     @FXML
     private void addActivityButtonClick() {
-        this.openEditActivity(null, activity -> {
-            server.updateActivity(activity, response -> {
-                switch (response.getStatus()) {
-                    case 410:
-                        mainCtrl.showErrorSnackBar("Source url too long.");
-                        break;
-                    case 200:
-                        mainCtrl.showErrorSnackBar("Activity has been updated.");
-                        this.updateActivities();
-                        this.closeEditActivity();
-                        break;
-                    case 201:
-                        mainCtrl.showErrorSnackBar("Activity has been added.");
-                        this.updateActivities();
-                        this.closeEditActivity();
-                        break;
-                    default:
-                        mainCtrl.showErrorSnackBar("Something went wrong.");
-                        break;
-                }
-            }, () -> mainCtrl.showErrorSnackBar("Failed to add the activity."));
-        });
+        this.openEditActivity(null, (activity, image) -> server.updateActivity(activity, image,
+                        () -> runLater(() -> {
+                            mainCtrl.showErrorSnackBar("Activity has been added.");
+                            this.updateActivities();
+                            this.closeEditActivity();
+                        }), (error) -> runLater(() ->
+                                mainCtrl.showErrorSnackBar("The following error occurred: " + error.getDescription()))
+        ));
     }
 
     /**
@@ -168,28 +164,15 @@ public class ActivityListScreenCtrl implements Initializable {
      */
     @FXML
     private void editActivityButtonClick() {
-        this.openEditActivity(activityTable.getSelectionModel().getSelectedItem(), activity -> {
-            server.updateActivity(activity, response -> {
-                switch (response.getStatus()) {
-                    case 410:
-                        mainCtrl.showErrorSnackBar("Source url too long.");
-                        break;
-                    case 200:
-                        mainCtrl.showErrorSnackBar("Activity has been updated.");
-                        this.updateActivities();
-                        this.closeEditActivity();
-                        break;
-                    case 201:
-                        mainCtrl.showErrorSnackBar("Activity has been added.");
-                        this.updateActivities();
-                        this.closeEditActivity();
-                        break;
-                    default:
-                        mainCtrl.showErrorSnackBar("Something went wrong.");
-                        break;
-                }
-            }, () -> mainCtrl.showErrorSnackBar("Failed to add the activity."));
-        });
+        this.openEditActivity(new ActivityView(activityTable.getSelectionModel().getSelectedItem()),
+                (activity, image) -> server.updateActivity(activity, image,
+                        () -> runLater(() -> {
+                            mainCtrl.showErrorSnackBar("Activity has been updated.");
+                            this.updateActivities();
+                            this.closeEditActivity();
+                        }), (error) -> runLater(() ->
+                                mainCtrl.showErrorSnackBar("The following error occurred: " + error.getDescription()))
+        ));
     }
 
     /**
@@ -197,20 +180,13 @@ public class ActivityListScreenCtrl implements Initializable {
      */
     @FXML
     private void deleteActivityButtonClick() {
-        server.deleteActivity(activityTable.getSelectionModel().getSelectedItem().getId(), response -> {
-            switch (response.getStatus()) {
-                case 200:
-                    mainCtrl.showErrorSnackBar("Delete activity!");
-                    this.updateActivities();
-                    break;
-                case 404:
-                    mainCtrl.showErrorSnackBar("Activity not found. Refresh!");
-                    break;
-                default:
-                    mainCtrl.showErrorSnackBar("Something went wrong while deleting the activity.");
-                    break;
-            }
-        }, () -> mainCtrl.showErrorSnackBar("Something went wrong. Check server connection."));
+        var selectedActivity = activityTable.getSelectionModel().getSelectedItem();
+        server.deleteActivity(selectedActivity.getId(),
+                () -> runLater(() -> {
+                    activities.remove(selectedActivity);
+                    mainCtrl.showInformationalSnackBar("Deleted activity!");
+                }),
+                (error) -> runLater(() -> mainCtrl.showErrorSnackBar(error.getDescription())));
     }
 
     /**

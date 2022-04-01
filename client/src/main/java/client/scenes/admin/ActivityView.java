@@ -9,7 +9,8 @@ import lombok.Data;
 
 /**
  * A helper class for wrapping an image
- * and displaying everything inside a row of a tableview.
+ * and displaying everything inside a compact way
+ * that avoids redownloading images.
  */
 @Data
 public class ActivityView {
@@ -42,7 +43,7 @@ public class ActivityView {
     /**
      * The actual image of the user.
      */
-    private ImageView image;
+    private Image image;
 
     /**
      * Creates an activity view from an activity DTO.
@@ -56,9 +57,11 @@ public class ActivityView {
         this.description = activityDTO.getDescription();
         this.source = activityDTO.getSource();
         this.icon = activityDTO.getIcon();
-        this.image = new ImageView(new Image(ServerUtils.getImagePathFromId(this.icon)));
-        this.image.setFitHeight(50);
-        this.image.setFitWidth(50);
+        if (this.icon != null) {
+            this.image = new Image(ServerUtils.getImagePathFromId(this.icon), true);
+        } else {
+            this.image = new Image("https://onlinejpgtools.com/images/examples-onlinejpgtools/snowy-mountain-gray-srgb.jpg");
+        }
     }
 
     /**
