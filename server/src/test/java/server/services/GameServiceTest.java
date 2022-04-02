@@ -1,5 +1,6 @@
 package server.services;
 
+import static commons.entities.game.PowerUp.DoublePoints;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -8,6 +9,7 @@ import static server.utils.TestHelpers.getUUID;
 import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GameStatus;
+import commons.entities.game.PowerUp;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
@@ -132,9 +134,10 @@ public class GameServiceTest {
         // Create the game
         game = new NormalGame();
         game.setId(getUUID(3));
-        game.setConfiguration(new NormalGameConfiguration(3, Duration.ofSeconds(13), 2, 2, 2f, 100, -10, 75));
+        game.setConfiguration(new NormalGameConfiguration(3, Duration.ofSeconds(13), 3, 2, 2f, 100, -10, 75));
         game.add(joePlayer);
         game.add(susannePlayer);
+        game.add(jamesPlayer);
 
         // Mock the repository
         lenient().when(questionRepository.count()).thenReturn(4L);
@@ -378,6 +381,13 @@ public class GameServiceTest {
         answerB.setQuestionId(questionA.getId());
         gameService.addAnswer(game, susannePlayer, answerB);
 
+        AnswerDTO answerC = new AnswerDTO();
+        answerC.setResponse(List.of(questionA.getAnswer().getDTO()));
+        answerC.setQuestionId(questionA.getId());
+        gameService.addAnswer(game, jamesPlayer, answerC);
+
+        jamesPlayer.getUserPowerUps().put(DoublePoints, game.getCurrentQuestionNumber());
+
         gameService.updateScores(game);
 
         assertEquals(100, joePlayer.getScore());
@@ -385,6 +395,9 @@ public class GameServiceTest {
 
         assertEquals(100, susannePlayer.getScore());
         assertEquals(1, susannePlayer.getStreak());
+
+        assertEquals(200, jamesPlayer.getScore());
+        assertEquals(1, jamesPlayer.getStreak());
     }
 
     @Test

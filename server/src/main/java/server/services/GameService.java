@@ -347,18 +347,8 @@ public class GameService {
             game.updateStreak(player, isCorrect);
 
             int streakScore = game.computeStreakScore(player, score);
-            int doublePointsScore = 0;
-
-            if (game.getCurrentQuestionNumber() == null) {
-                throw new IllegalArgumentException("Game has no question number for " + question.getId());
-            }
-
-            if (game.getCurrentQuestionNumber().equals(player.getUserPowerUps().get(PowerUp.DoublePoints))) {
-                 doublePointsScore = streakScore * 2;
-            }
-
-            player.setScore(player.getScore() + streakScore + doublePointsScore);
-
+            int doublePointsScore = game.computeDoublePointScore(player, streakScore);
+            player.setScore(player.getScore() + doublePointsScore);
             // Persist the score changes
             gamePlayerRepository.save(player);
         });
