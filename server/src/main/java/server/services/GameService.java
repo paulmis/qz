@@ -3,11 +3,11 @@ package server.services;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.PowerUp;
+import commons.entities.game.Reaction;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -387,5 +387,18 @@ public class GameService {
 
         log.info("Sending power-up " + powerUp.name() + " to game: " + game.getGameId());
         sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.POWER_UP_PLAYED, powerUp.name()));
+    }
+
+    /**
+     * Applies a power-up to a game.
+     *
+     * @param game the game.
+     * @param player the player that sent the power-up
+     * @param reaction the reaction that is to be sent to the other players.
+     * @throws SSEFailedException if it fails to send the messages.
+     */
+    public void sendReaction(Game game, GamePlayer player, Reaction reaction) throws SSEFailedException {
+        log.info("Sending reaction" + reaction.name() + " to game: " + game.getGameId());
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.REACTION, reaction.name()));
     }
 }

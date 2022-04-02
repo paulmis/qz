@@ -1,9 +1,9 @@
 package server.api;
 
 import commons.entities.game.PowerUp;
+import commons.entities.game.Reaction;
 import commons.entities.questions.QuestionDTO;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,6 @@ import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
-import server.services.SSEManager;
 
 
 /**
@@ -123,6 +122,36 @@ public class GameController {
         gamePlayerRepository.save(gamePlayer);
 
         // Return 200
+        return ResponseEntity.ok().build();
+    }
+
+
+    /**
+     * Get the URL of the image for the specified activity.
+     *
+     * @param reaction Reaction to get.
+     * @return URL of the image associated with the activity.
+     */
+    @GetMapping("/reaction")
+    ResponseEntity sendReaction(@PathVariable Reaction reaction) throws SSEFailedException {
+        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(AuthContext.get());
+        if (userOpt.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+
+        // If the user isn't in a game, throw exception
+        Optional<Game> gameOpt = gameRepository.getPlayersGame(userOpt.get().getId());
+        if (gameOpt.isEmpty()) {
+            throw new GameNotFoundException();
+        }
+
+        User user = userOpt.get();
+        Game game = gameOpt.get();
+
+        GamePlayer gamePlayer = (GamePlayer) game.getPlayers().get(user.getId());
+
+        gameService.sendReaction(game, gamePlayer, reaction);
+        gameRepository.save(game);
         return ResponseEntity.ok().build();
     }
 }
