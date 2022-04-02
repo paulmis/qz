@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
+import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
 
@@ -55,6 +57,9 @@ public class GameControllerTest {
 
     @MockBean
     private GameRepository gameRepository;
+
+    @MockBean
+    private GamePlayerRepository gamePlayerRepository;
 
     @MockBean
     private GameService gameService;
@@ -203,5 +208,13 @@ public class GameControllerTest {
         verify(gameRepository, times(1)).getPlayersGame(susanne.getId());
         verify(gameService, times(1)).removePlayer(game, susanne);
         verifyNoMoreInteractions(gameRepository, gameService);
+    }
+
+    @Test
+    void getGameLeaderboard() throws Exception {
+        this.mockMvc.perform(get("/api/game/{id}/leaderboard", game.getId()))
+                .andExpect(status().isOk());
+        verify(gamePlayerRepository, times(1))
+                .findByGame_IdEqualsAndAbandonedIsFalseOrderByScoreDesc(game.getId());
     }
 }

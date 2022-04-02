@@ -93,6 +93,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * Questions assigned to this game.
      */
     @ManyToMany
+    @OrderColumn
     protected List<Question> questions = new ArrayList<>();
     /**
      * PRNG.
