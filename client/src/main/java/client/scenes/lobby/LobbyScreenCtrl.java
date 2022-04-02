@@ -15,6 +15,7 @@ import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.messages.SSEMessageType;
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
@@ -116,10 +117,13 @@ public class LobbyScreenCtrl implements SSESource {
 
     /**
      * Reacts to the game being started by another player.
+     *
+     * @param preparationDuration Duration of preparation phase
      */
     @SSEEventHandler(SSEMessageType.GAME_START)
-    public void gameStarted() {
+    public void gameStarted(Integer preparationDuration) {
         mainCtrl.showGameScreen(ClientState.game.getCurrentQuestion());
+        mainCtrl.getGameScreenCtrl().startTimer(Duration.ofMillis(preparationDuration));
     }
 
     /**

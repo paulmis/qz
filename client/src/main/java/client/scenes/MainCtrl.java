@@ -36,6 +36,7 @@ import commons.entities.ActivityDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.questions.QuestionDTO;
+import java.util.List;
 import java.util.Optional;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -76,6 +77,7 @@ public class MainCtrl {
     private LobbyScreenCtrl lobbyScreenCtrl;
     private Parent lobbyScene;
 
+    @Getter
     private GameScreenCtrl gameScreenCtrl;
     private Parent gameScreen;
 

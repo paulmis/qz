@@ -37,6 +37,7 @@ import server.database.entities.question.Question;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.QuestionRepository;
+import server.services.fsm.GameFSM;
 
 /**
  * Tests for GameService class.
@@ -44,7 +45,7 @@ import server.database.repositories.question.QuestionRepository;
 @ExtendWith(MockitoExtension.class)
 public class GameServiceTest {
     @Mock
-    SSEManager sseManager;
+    private SSEManager sseManager;
 
     @Mock
     private QuestionRepository questionRepository;
@@ -195,8 +196,9 @@ public class GameServiceTest {
         // ToDo: fix QuestionRepository::findByIdNotIn
         //verify(questionRepository).findByIdNotIn(new ArrayList<>());
         verify(questionRepository).findAll();
-        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
-        verifyNoMoreInteractions(questionRepository, sseManager);
+        verify(fsmManager, times(1)).addFSM(any(Game.class), any(GameFSM.class));
+        verify(fsmManager, times(1)).startFSM(any(UUID.class));
+        verifyNoMoreInteractions(questionRepository, fsmManager);
     }
 
     @Test

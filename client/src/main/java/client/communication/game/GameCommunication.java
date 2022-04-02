@@ -8,10 +8,7 @@ import commons.entities.AnswerDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.questions.QuestionDTO;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
@@ -64,33 +61,40 @@ public class GameCommunication {
         });
     }
 
-//    public static void updateScoreLeaderboard(UUID gameId,
-//                                              UpdateScoreLeaderboardHandlerSuccess handlerSuccess,
-//                                              UpdateScoreLeaderboardHandlerFail handlerFail) {
-//        Invocation request = ServerUtils.getRequestTarget()
-//                .path("/api/game/" + gameId + "/leaderboard")
-//                .request(APPLICATION_JSON)
-//                .buildGet();
-//
-//        request.submit(new InvocationCallback<Response>() {
-//            @Override
-//            public void completed(Response response) {
-//                if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-//                    log.debug("Leaderboard request completed successfully");
-//                    handlerSuccess.handle(response.readEntity(GamePlayerDTO[].class));
-//                } else {
-//                    log.error("Failed to update leaderboard: {}", response.getStatus());
-//                    handlerFail.handle();
-//                }
-//            }
-//
-//            @Override
-//            public void failed(Throwable throwable) {
-//                log.error("Failed to update leaderboard", throwable);
-//                throwable.printStackTrace();
-//            }
-//        });
-//    }
+    /**
+     * Update the player scores and the leaderboard.
+     *
+     * @param gameId game ID we're currently in.
+     * @param handlerSuccess Success handler/callback.
+     * @param handlerFail Failure handler/callback.
+     */
+    public static void updateScoreLeaderboard(UUID gameId,
+                                              UpdateScoreLeaderboardHandlerSuccess handlerSuccess,
+                                              UpdateScoreLeaderboardHandlerFail handlerFail) {
+        Invocation request = ServerUtils.getRequestTarget()
+                .path("/api/game/" + gameId + "/leaderboard")
+                .request(APPLICATION_JSON)
+                .buildGet();
+
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                    log.debug("Leaderboard request completed successfully");
+                    handlerSuccess.handle(response.readEntity(List.class));
+                } else {
+                    log.error("Failed to update leaderboard: {}", response.getStatus());
+                    handlerFail.handle();
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                log.error("Failed to update leaderboard", throwable);
+                throwable.printStackTrace();
+            }
+        });
+    }
 
     /**
      * Requests the current question from the server.
@@ -237,16 +241,17 @@ public class GameCommunication {
      *
      * @return a list of leaderboard images.
      */
-    public List<URL> getLeaderBoardImages() {
+    public Map<UUID, URL> getLeaderBoardImages(List<UUID> userIds) {
+        // TODO: implement this properly
         try {
-            return Arrays.asList(
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"));
+            Map<UUID, URL> leaderBoardImages = new HashMap<>();
+            for (UUID userId : userIds) {
+                leaderBoardImages.put(userId, new URL(
+                        "https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"));
+            }
+            return leaderBoardImages;
         } catch (Exception e) {
-            return new ArrayList<>();
+            return new HashMap<>();
         }
     }
 
@@ -261,7 +266,7 @@ public class GameCommunication {
      * Handler for when getting the game leaderboard succeeds.
      */
     public interface UpdateScoreLeaderboardHandlerSuccess {
-        void handle(List<GamePlayerDTO> players);
+        void handle(List<LinkedHashMap> players);
     }
 
     /**

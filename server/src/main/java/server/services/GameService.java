@@ -127,9 +127,6 @@ public class GameService {
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
             definiteGame = gameRepository.save(definiteGame);
 
-            // Distribute the start event to all players
-            sseManager.send(definiteGame.getUserIds(), new SSEMessage(SSEMessageType.GAME_START));
-
             // Create and start a finite state machine for the game.
             fsmManager.addFSM(definiteGame,
                     new DefiniteGameFSM(
@@ -183,8 +180,11 @@ public class GameService {
     @Transactional
     public void nextQuestion(Game<?> game, Long delay)
             throws IOException, GameFinishedException {
+        log.debug("[{}] Trying to move to next question", game.getId());
+
         // Check if the game should finish
         if (game.shouldFinish()) {
+            log.info("[{}] Game should finish", game.getId());
             throw new GameFinishedException();
         }
 
@@ -327,6 +327,8 @@ public class GameService {
             return;
         }
 
+        log.debug("[{}] Updating scores for question {}.", game.getId(), question.getId());
+
         Map<UUID, Integer> scores = question.checkAnswer(answerCollection).entrySet().stream().collect(
                 Collectors.toMap(
                         Map.Entry::getKey,
@@ -347,6 +349,8 @@ public class GameService {
 
             // Persist the score changes
             gamePlayerRepository.save(player);
+
+            log.debug("[{}] player {} now has {} points", game.getId(), player.getId(), score);
         });
 
         log.debug("[{}] Scores updated.", game.getId());
