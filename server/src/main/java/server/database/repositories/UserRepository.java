@@ -25,6 +25,14 @@ public interface UserRepository extends PagingAndSortingRepository<User, UUID> {
     boolean existsByEmailIgnoreCaseOrUsername(String email, String username);
 
     /**
+     * Checks if the provided username is unique.
+     *
+     * @param username the username to check
+     * @return whether the username already exists in the database
+     */
+    boolean existsByUsername(String username);
+
+    /**
      * Get the list of all users ordered by their score.
      *
      * @param pageable the pageable object
