@@ -41,6 +41,16 @@ public class UserInfoPane extends StackPane {
     }
 
     /**
+     * Sets the visibility property of this widget and update its content.
+     *
+     * @param value true to show the widget, false to hide it.
+     */
+    public void setVisibility(boolean value) {
+        this.setVisible(value);
+        controller.setupData();
+    }
+
+    /**
      * Fix the position of the widget, according to the button opening it and the whole window.
      *
      * @param btnWidget the button from which the widget was opened

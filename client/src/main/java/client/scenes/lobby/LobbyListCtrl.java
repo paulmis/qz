@@ -81,7 +81,7 @@ public class LobbyListCtrl implements Initializable {
             runLater(() -> userInfo.setupPosition(userButton, lobbyListAnchorPane));
         } else {
             // Toggle visibility
-            userInfo.setVisible(!userInfo.isVisible());
+            userInfo.setVisibility(!userInfo.isVisible());
         }
     }
 

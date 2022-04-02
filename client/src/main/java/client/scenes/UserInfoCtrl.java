@@ -89,6 +89,11 @@ public class UserInfoCtrl implements Initializable {
     public void setupData() {
         usernameField.setText(ClientState.user.getUsername());
         // ToDo: load user image
-        playerImageView.setImage(new Image("https://upload.wikimedia.org/wikipedia/commons/e/e3/Klaus_Iohannis_din_interviul_cu_Dan_Tapalag%C4%83_cropped.jpg"));
+        String profilePicURL = "https://upload.wikimedia.org/wikipedia/commons/e/e3/Klaus_Iohannis_din_interviul_cu_Dan_Tapalag%C4%83_cropped.jpg";
+        if (ClientState.user.getProfilePic() != null
+                && !ClientState.user.getProfilePic().isBlank()) {
+            profilePicURL = ServerUtils.getImagePathFromId(ClientState.user.getProfilePic());
+        }
+        playerImageView.setImage(new Image(profilePicURL));
     }
 }
