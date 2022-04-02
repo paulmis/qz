@@ -13,21 +13,21 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.questions.MCQuestionCostCtrl">
    <children>
-      <GridPane styleClass="questionArea" alignment="CENTER" layoutX="14.0" layoutY="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+      <GridPane alignment="CENTER" layoutX="14.0" layoutY="10.0" prefHeight="97.0" prefWidth="600.0" styleClass="questionArea" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
          <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="80.0" minWidth="10.0" prefWidth="80.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="483.0" minWidth="10.0" prefWidth="480.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="118.0" minWidth="10.0" prefWidth="103.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="522.0" minWidth="10.0" prefWidth="497.0" />
          </columnConstraints>
          <rowConstraints>
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <VBox fx:id="imageVBox" alignment="CENTER">
+            <VBox fx:id="imageVBox" alignment="CENTER_RIGHT">
                <children>
-                  <ImageView fx:id="questionPic" fitHeight="76.0" fitWidth="76.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="questionPic" fitHeight="87.0" fitWidth="89.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </VBox>
-            <Label fx:id="questionLabel" alignment="CENTER" maxHeight="200.0" prefHeight="76.0" prefWidth="492.0" text="Question" wrapText="true" GridPane.columnIndex="1">
+            <Label fx:id="questionLabel" alignment="CENTER" contentDisplay="CENTER" maxHeight="200.0" prefHeight="97.0" prefWidth="515.0" text="Question" wrapText="true" GridPane.columnIndex="1">
                <font>
                   <Font name="System Bold" size="22.0" />
                </font>
