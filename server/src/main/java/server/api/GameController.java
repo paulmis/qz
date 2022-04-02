@@ -3,6 +3,7 @@ package server.api;
 import commons.entities.game.PowerUp;
 import commons.entities.questions.QuestionDTO;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
+import server.services.SSEManager;
 
 
 /**
