@@ -51,7 +51,7 @@ public class ServerUtils {
 
     private static String SERVER = "http://localhost:8080/";
     public static SSEHandler sseHandler = new SSEHandler();
-    public static Client client = ClientBuilder.newClient();
+    public static Client client = newClient();
 
     public static String getImagePathFromId(String id) {
         return SERVER + "api/resource/" + id.toString();
@@ -72,7 +72,7 @@ public class ServerUtils {
      *
      * @return the new client.
      */
-    private Client newClient() {
+    private static Client newClient() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
