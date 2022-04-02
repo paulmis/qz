@@ -3,6 +3,7 @@ package server.api;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static server.utils.TestHelpers.getUUID;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import commons.entities.auth.LoginDTO;
 import commons.entities.auth.UserDTO;
 import commons.entities.game.GameStatus;
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,6 +35,7 @@ import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
+import server.services.storage.StorageService;
 
 /**
  * Tests for AuthController.
@@ -49,6 +53,9 @@ public class AuthControllerTests {
 
     @MockBean
     private GameRepository gameRepository;
+
+    @MockBean
+    private StorageService storageService;
 
     User joe;
     UserDTO joeDTO;
@@ -89,11 +96,49 @@ public class AuthControllerTests {
             .thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(joe);
 
+        // Convert the DTO to a MultipartFile (JSON)
+        MockMultipartFile userMP = new MockMultipartFile(
+                "userData",
+                "blob",
+                "application/json",
+                objectMapper.writeValueAsString(joeDTO).getBytes());
+
         // Perform the request
         this.mvc
-                .perform(post("/api/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(joeDTO)))
+                .perform(multipart("/api/auth/register")
+                        .file(userMP))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void registerImageOk() throws Exception {
+        // Mock the repository
+        when(userRepository.existsByEmailIgnoreCaseOrUsername(joeDTO.getEmail(), joeDTO.getUsername()))
+                .thenReturn(false);
+        when(userRepository.save(any(User.class))).thenReturn(joe);
+
+        // Convert the DTO to a MultipartFile (JSON)
+        MockMultipartFile userMP = new MockMultipartFile(
+                "userData",
+                "blob",
+                "application/json",
+                objectMapper.writeValueAsString(joeDTO).getBytes());
+
+        // Create a dummy image file
+        MockMultipartFile imageMP = new MockMultipartFile(
+                "image",
+                "activity.png",
+                "image/png",
+                "imageContent".getBytes());
+
+        // Mock the response from the storage service
+        when(storageService.store(any(InputStream.class))).thenReturn(getUUID(3));
+
+        // Perform the request
+        this.mvc
+                .perform(multipart("/api/auth/register")
+                        .file(userMP)
+                        .file(imageMP))
                 .andExpect(status().isCreated());
     }
 
@@ -103,11 +148,17 @@ public class AuthControllerTests {
         when(userRepository.existsByEmailIgnoreCaseOrUsername(joeDTO.getEmail(), joeDTO.getUsername()))
             .thenReturn(true);
 
+        // Convert the DTO to a MultipartFile (JSON)
+        MockMultipartFile userMP = new MockMultipartFile(
+                "userData",
+                "blob",
+                "application/json",
+                objectMapper.writeValueAsString(joeDTO).getBytes());
+
         // Perform the request
         this.mvc
-                .perform(post("/api/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(joeDTO)))
+                .perform(multipart("/api/auth/register")
+                        .file(userMP))
                 .andExpect(status().isConflict());
     }
 
