@@ -6,7 +6,9 @@ import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GamePlayerDTO;
+import commons.entities.game.PowerUp;
 import commons.entities.questions.QuestionDTO;
+import commons.entities.utils.ApiError;
 import java.net.URL;
 import java.util.*;
 import javax.ws.rs.client.Entity;
@@ -194,27 +196,6 @@ public class GameCommunication {
     }
 
     /**
-     * Gets a list of all the powerUp urls from the backend.
-     *
-     * @return List of emoji urls
-     */
-    public List<URL> getPowerUps() {
-        try {
-            return Arrays.asList(
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
      * Function that causes the user to leave the game.
      */
     public void quitGame(QuitGameHandler quitGameHandler) {
@@ -254,6 +235,42 @@ public class GameCommunication {
         } catch (Exception e) {
             return new HashMap<>();
         }
+    }
+
+
+    /**
+     * Sends a power-up to the game.
+     *
+     * @param powerUp the power-up to send.
+     * @param handleSuccess the success handler.
+     * @param handleFail the fail handler.
+     */
+    public void sendPowerUp(PowerUp powerUp, SendPowerUpHandlerSuccess handleSuccess,
+                            SendPowerUpHandlerFail handleFail) {
+        // Build the query invocation
+        Invocation request = ServerUtils.getRequestTarget()
+                .path("/api/game/powerUp")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPost(Entity.entity(powerUp, APPLICATION_JSON));
+
+        // Perform the query asynchronously
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    handleSuccess.handle();
+                } else {
+                    handleFail.handle(response.readEntity(ApiError.class));
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                handleFail.handle(null);
+                throwable.printStackTrace();
+            }
+        });
     }
 
     /**
@@ -317,6 +334,20 @@ public class GameCommunication {
      */
     public interface PutAnswerHandlerFail {
         void handle();
+    }
+
+    /**
+     * Handler for when sending a power-up succeeds.
+     */
+    public interface SendPowerUpHandlerSuccess {
+        void handle();
+    }
+
+    /**
+     * Handler for when sending a power-up fails.
+     */
+    public interface SendPowerUpHandlerFail {
+        void handle(ApiError error);
     }
 
 }

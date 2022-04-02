@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.entities.game.GamePlayerDTO;
+import commons.entities.game.PowerUp;
 import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import server.api.exceptions.GameNotFoundException;
+import server.api.exceptions.PowerUpAlreadyUsedException;
+import server.api.exceptions.SSEFailedException;
+import server.api.exceptions.UserNotFoundException;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
@@ -108,5 +113,44 @@ public class GameController {
                 .findByGame_IdEqualsAndAbandonedIsFalseOrderByScoreDesc(gameId)
                 .stream().map(GamePlayer::getDTO).collect(Collectors.toList());
         return ResponseEntity.ok(players);
+    }
+
+    /**
+     * Allow users to use powerups.
+     *
+     * @param powerUp powerup to use
+     * @return 200 if the powerup was used successfully, 404 if the powerup was not found,
+     * @throws SSEFailedException if the powerup failed to use
+     */
+    @PostMapping("/powerUp")
+    ResponseEntity sendPowerUp(@RequestBody PowerUp powerUp) throws SSEFailedException {
+        // If the user or the game don't exist, throw exception
+        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(AuthContext.get());
+        if (userOpt.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+
+        // If the user isn't in a game, throw exception
+        Optional<Game> gameOpt = gameRepository.getPlayersGame(userOpt.get().getId());
+        if (gameOpt.isEmpty()) {
+            throw new GameNotFoundException();
+        }
+
+        User user = userOpt.get();
+        Game game = gameOpt.get();
+
+        GamePlayer gamePlayer = (GamePlayer) game.getPlayers().get(user.getId());
+
+        // If power-up has already been used, throw exception
+        if (gamePlayer.getUserPowerUps().keySet().contains(powerUp)) {
+            throw new PowerUpAlreadyUsedException();
+        }
+
+        gameService.sendPowerUp(game, gamePlayer, powerUp);
+        gamePlayer.getUserPowerUps().put(powerUp, game.getCurrentQuestionNumber());
+        gameRepository.save(game);
+
+        // Return 200
+        return ResponseEntity.ok().build();
     }
 }

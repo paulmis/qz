@@ -248,6 +248,7 @@ public class MainCtrl {
         gameScreenCtrl.setQuestion(question);
         gameScreenCtrl.bindHandler(ServerUtils.sseHandler);
         this.showScreenLetterBox(gameScreen, StageScalingStrategy.Letterbox);
+        gameScreenCtrl.reset();
     }
 
     /**

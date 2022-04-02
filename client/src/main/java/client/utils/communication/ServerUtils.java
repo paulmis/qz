@@ -51,8 +51,7 @@ public class ServerUtils {
 
     private static String SERVER = "http://localhost:8080/";
     public static SSEHandler sseHandler = new SSEHandler();
-    public static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
-            .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
+    public static Client client = ClientBuilder.newClient();
 
     public static String getImagePathFromId(String id) {
         return SERVER + "api/resource/" + id.toString();
@@ -189,52 +188,6 @@ public class ServerUtils {
             @Override
             public void failed(Throwable throwable) {
                 logInHandlerFail.handle();
-                throwable.printStackTrace();
-            }
-        });
-    }
-
-
-
-
-    /**
-     * Handler for when getting the logged in user succeeds.
-     */
-    public interface GetUserInfoHandlerSuccess {
-        void handle(UserDTO userDTO);
-    }
-
-    /**
-     * Handler for when getting the logged in user fails.
-     */
-    public interface GetUserInfoHandlerFail {
-        void handle();
-    }
-
-    /**
-     * Function that gets all the info about the currently logged in user.
-     *
-     * @param getUserInfoHandlerSuccess The function that will be called if the request is successful.
-     * @param getUserInfoHandlerFail The function that will be called if the request is unsuccessful.
-     */
-    public void getMyInfo(GetUserInfoHandlerSuccess getUserInfoHandlerSuccess,
-                          GetUserInfoHandlerFail getUserInfoHandlerFail) {
-        Invocation invocation = client
-                .target(SERVER).path("/api/user")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildGet();
-
-        invocation.submit(new InvocationCallback<UserDTO>() {
-
-            @Override
-            public void completed(UserDTO o) {
-                getUserInfoHandlerSuccess.handle(o);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                getUserInfoHandlerFail.handle();
                 throwable.printStackTrace();
             }
         });

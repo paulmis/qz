@@ -384,12 +384,9 @@ public class GameServiceTest {
 
         assertEquals(100, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
-        assertEquals(1, joePlayer.getPowerUpPoints());
 
         assertEquals(100, susannePlayer.getScore());
         assertEquals(1, susannePlayer.getStreak());
-        assertEquals(1, susannePlayer.getPowerUpPoints());
-
     }
 
     @Test
@@ -410,11 +407,9 @@ public class GameServiceTest {
         gameService.updateScores(game);
         assertEquals(100, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
-        assertEquals(1, joePlayer.getPowerUpPoints());
 
         assertEquals(-10, susannePlayer.getScore());
         assertEquals(0, susannePlayer.getStreak());
-        assertEquals(0, susannePlayer.getPowerUpPoints());
     }
 
     @Test
@@ -440,10 +435,8 @@ public class GameServiceTest {
 
         assertEquals(-10, joePlayer.getScore());
         assertEquals(0, joePlayer.getStreak());
-        assertEquals(0, joePlayer.getPowerUpPoints());
 
         assertEquals(-10, susannePlayer.getScore());
         assertEquals(0, susannePlayer.getStreak());
-        assertEquals(0, susannePlayer.getPowerUpPoints());
     }
 }
