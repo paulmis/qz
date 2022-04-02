@@ -51,8 +51,7 @@ public class ServerUtils {
 
     private static String SERVER = "http://localhost:8080/";
     public static SSEHandler sseHandler = new SSEHandler();
-    public static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
-            .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
+    public static Client client = ClientBuilder.newClient();
 
     public static String getImagePathFromId(String id) {
         return SERVER + "api/resource/" + id.toString();
@@ -77,8 +76,7 @@ public class ServerUtils {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
-        return ClientBuilder.newClient().register(provider).register(JacksonJsonProvider.class)
-                .register(JavaTimeModule.class);
+        return ClientBuilder.newClient().register(provider);
     }
 
     /** Gets a list of the leaderboard images from the server.
