@@ -25,12 +25,6 @@ public class UserDTO implements DTO {
     protected UUID id;
 
     /**
-     * User's nickname.
-     */
-    @JsonView(Views.Public.class)
-    protected String nickname;
-
-    /**
      * User's name.
      */
     @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters long.")

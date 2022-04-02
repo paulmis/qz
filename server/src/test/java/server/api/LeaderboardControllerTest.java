@@ -50,7 +50,6 @@ class LeaderboardControllerTest {
 
     private User getUser(int id, int gamesPlayed, int score) {
         User user = new User("user" + id,
-                "user" + id,
                 "email" + id,
                 "password" + id,
                 score,

@@ -4,6 +4,7 @@ import static javafx.application.Platform.runLater;
 
 import client.communication.LobbyListCommunication;
 import client.communication.game.LobbyCommunication;
+import client.communication.user.UserCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.UserInfoPane;
 import client.utils.AlgorithmicUtils;
@@ -74,7 +75,7 @@ public class LobbyListCtrl implements Initializable {
     private void userButtonClick() {
         if (userInfo == null) {
             // Create userInfo
-            userInfo = new UserInfoPane(new ServerUtils(), mainCtrl);
+            userInfo = new UserInfoPane(new ServerUtils(), new UserCommunication(), mainCtrl);
             lobbyListAnchorPane.getChildren().add(userInfo);
             userInfo.setVisible(true);
             runLater(() -> userInfo.setupPosition(userButton, lobbyListAnchorPane));

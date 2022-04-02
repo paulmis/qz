@@ -1,8 +1,11 @@
 package client.scenes;
 
+import static javafx.application.Platform.runLater;
+
+import client.communication.user.UserCommunication;
 import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
-import com.google.inject.Inject;
+import commons.entities.game.GameStatus;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -13,10 +16,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+
 /**
  * Control of the user info widget.
  */
 public class UserInfoCtrl implements Initializable {
+    private final UserCommunication userCommunication;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
@@ -27,32 +32,18 @@ public class UserInfoCtrl implements Initializable {
     @FXML
     private ImageView playerImageView;
 
+
     /**
-     * Initialize a new controller using dependency injection.
+     * User info controller initializes the communication and mainctrl variables.
      *
-     * @param server   Reference to communication utilities object.
-     * @param mainCtrl Reference to the main controller.
+     * @param server the server object.
+     * @param userCommunication the user communication object.
+     * @param mainCtrl the main controller object.
      */
-    @Inject
-    public UserInfoCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public UserInfoCtrl(ServerUtils server, UserCommunication userCommunication, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
-    }
-
-    @FXML
-    private void editButtonClick() {
-        usernameField.setEditable(!this.usernameField.isEditable());
-        if (!usernameField.isEditable()) {
-            // Just finished editing, sent update to server
-            // ToDo: call endpoint
-            System.out.println("New nickname is " + usernameField.getText());
-        }
-    }
-
-    @FXML
-    private void signOutButtonClick() {
-        server.signOut();
-        mainCtrl.showServerConnectScreen();
+        this.userCommunication = userCommunication;
     }
 
     @Override
@@ -65,11 +56,38 @@ public class UserInfoCtrl implements Initializable {
         );
     }
 
+    @FXML
+    private void editButtonClick() {
+        usernameField.setEditable(!this.usernameField.isEditable());
+        if (!usernameField.isEditable() && !ClientState.user.getUsername().equals(usernameField.getText())) {
+            // Send update to server
+            userCommunication.changeUsername(
+                    this.usernameField.getText(),
+                    // Success
+                    user -> runLater(() ->
+                            mainCtrl.showInformationalSnackBar("Changed username!")),
+                    // Failure
+                    (error) -> runLater(() -> {
+                        mainCtrl.showErrorSnackBar(error == null
+                                ? "Failed to change username"
+                                : error.getDescription());
+
+                        this.usernameField.setEditable(true);
+                    }));
+        }
+    }
+
+    @FXML
+    private void signOutButtonClick() {
+        server.signOut();
+        mainCtrl.showServerConnectScreen();
+    }
+
     /**
      * Sets current username in the widget.
      */
     public void setupData() {
-        usernameField.setText(ClientState.user.getNickname());
+        usernameField.setText(ClientState.user.getUsername());
         // ToDo: load user image
         playerImageView.setImage(new Image("https://upload.wikimedia.org/wikipedia/commons/e/e3/Klaus_Iohannis_din_interviul_cu_Dan_Tapalag%C4%83_cropped.jpg"));
     }
