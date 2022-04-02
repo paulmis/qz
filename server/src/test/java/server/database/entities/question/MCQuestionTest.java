@@ -38,7 +38,7 @@ class MCQuestionTest {
 
     @Test
     void testFromDTOConstructor() {
-        MCQuestionDTO questionDTO = new MCQuestionDTO(false, "");
+        MCQuestionDTO questionDTO = new MCQuestionDTO(false);
         questionDTO.setText("Question text");
 
         MCQuestion q = new MCQuestion(questionDTO);

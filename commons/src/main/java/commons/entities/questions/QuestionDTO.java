@@ -20,8 +20,8 @@ import lombok.*;
 @ToString(callSuper = true)
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = MCQuestionDTO.class, name = "MCQuestionDTO"),
-        @JsonSubTypes.Type(value = EstimateQuestionDTO.class, name = "EstimateQuestionDTO")
+    @JsonSubTypes.Type(value = MCQuestionDTO.class, name = "MCQuestionDTO"),
+    @JsonSubTypes.Type(value = EstimateQuestionDTO.class, name = "EstimateQuestionDTO")
 })
 @JsonView(Views.Public.class)
 public class QuestionDTO implements DTO {

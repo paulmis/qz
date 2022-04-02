@@ -2,17 +2,15 @@ package client.scenes.questions;
 
 import static javafx.application.Platform.runLater;
 
-import java.net.URL;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
 import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
-import com.jfoenix.controls.JFXButton;
 import commons.entities.AnswerDTO;
 import commons.entities.questions.EstimateQuestionDTO;
+import java.net.URL;
+import java.util.List;
+import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -20,8 +18,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-import lombok.extern.slf4j.Slf4j;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -40,9 +38,9 @@ public class EstimateQuestionCtrl extends QuestionCtrl {
     /**
      * Constructor for the estimate question control.
      *
-     * @param mainCtrl the main controller
+     * @param mainCtrl          the main controller
      * @param gameCommunication the communication class
-     * @param question the question to show
+     * @param question          the question to show
      */
     public EstimateQuestionCtrl(MainCtrl mainCtrl, GameCommunication gameCommunication, EstimateQuestionDTO question) {
         super(mainCtrl, gameCommunication);
@@ -53,7 +51,7 @@ public class EstimateQuestionCtrl extends QuestionCtrl {
      * This function runs after every control has
      * been created and initialized already.
      *
-     * @param location The location parameter.
+     * @param location  The location parameter.
      * @param resources The resource bundle.
      */
     @Override
@@ -111,7 +109,7 @@ public class EstimateQuestionCtrl extends QuestionCtrl {
         log.debug("Showing answer: {}", answer);
         boolean correctAnswer;
         try {
-            long oldGuess= Long.parseLong(guessField.getText());
+            long oldGuess = Long.parseLong(guessField.getText());
             correctAnswer = oldGuess == answer.getResponse().get(0).getCost();
         } catch (NumberFormatException numEx) {
             correctAnswer = false;

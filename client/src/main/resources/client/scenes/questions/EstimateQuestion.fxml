@@ -18,13 +18,16 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <VBox fx:id="imageVBox" alignment="TOP_CENTER" layoutY="99.0" prefHeight="301.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="99.0">
+      <VBox alignment="TOP_CENTER" layoutY="99.0" prefHeight="301.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="99.0">
          <children>
-            <ImageView fx:id="questionIcon" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true">
+            <VBox fx:id="imageVBox" alignment="CENTER">
                <VBox.margin>
                   <Insets bottom="20.0" />
                </VBox.margin>
-            </ImageView>
+               <children>
+                  <ImageView fx:id="questionIcon" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </VBox>
             <GridPane fx:id="answerBox" maxHeight="150.0" prefHeight="75.0">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" prefWidth="100.0" />
