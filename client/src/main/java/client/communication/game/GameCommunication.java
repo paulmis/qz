@@ -259,11 +259,7 @@ public class GameCommunication {
         request.submit(new InvocationCallback<Response>() {
             @Override
             public void completed(Response response) {
-                if (response.getStatus() == 200) {
                     handleSuccess.handle();
-                } else {
-                    handleFail.handle(response.readEntity(ApiError.class));
-                }
             }
 
             @Override

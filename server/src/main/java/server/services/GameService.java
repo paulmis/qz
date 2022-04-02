@@ -390,7 +390,7 @@ public class GameService {
     }
 
     /**
-     * Applies a power-up to a game.
+     * Sends a reaction to the players in a game.
      *
      * @param game the game.
      * @param player the player that sent the power-up
