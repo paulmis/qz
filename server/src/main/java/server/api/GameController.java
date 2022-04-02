@@ -116,9 +116,8 @@ public class GameController {
         }
 
         gameService.sendPowerUp(game, gamePlayer, powerUp);
-        gameRepository.save(game);
         gamePlayer.getUserPowerUps().put(powerUp, game.getCurrentQuestionNumber());
-        gamePlayerRepository.save(gamePlayer);
+        gameRepository.save(game);
 
         // Return 200
         return ResponseEntity.ok().build();
