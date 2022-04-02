@@ -283,22 +283,6 @@ public class NormalGameTest {
     }
 
     @Test
-    void updatePowerUpPointsCorrect() {
-        joePlayer.setPowerUpPoints(0);
-
-        game.updatePowerUpPoints(joePlayer, true);
-        assertEquals(1, joePlayer.getPowerUpPoints());
-    }
-
-    @Test
-    void updatePowerUpPointsWrong() {
-        joePlayer.setPowerUpPoints(0);
-
-        game.updatePowerUpPoints(joePlayer, false);
-        assertEquals(0, joePlayer.getPowerUpPoints());
-    }
-
-    @Test
     void incrementQuestionNull() {
         game.incrementQuestion();
         assertEquals(0, game.getCurrentQuestionNumber());

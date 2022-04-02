@@ -49,4 +49,8 @@ public enum SSEMessageType {
      * Sent when a new message is sent in a lobby or game.
      */
     CHAT_MESSAGE,
+    /**
+     * Sent when a power-up is played.
+     */
+    POWER_UP_PLAYED,
 }

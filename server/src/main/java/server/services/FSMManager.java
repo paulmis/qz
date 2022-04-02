@@ -29,6 +29,11 @@ public class FSMManager {
         fsmMap.put(game.getId(), fsm);
     }
 
+
+    public GameFSM getFSM(Game game) {
+        return fsmMap.get(game.getId());
+    }
+
     /**
      * Removes a finite state machine from the manager.
      *

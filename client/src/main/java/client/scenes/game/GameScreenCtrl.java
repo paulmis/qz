@@ -16,6 +16,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
 import commons.entities.AnswerDTO;
+import commons.entities.game.PowerUp;
 import commons.entities.messages.SSEMessageType;
 import commons.entities.questions.QuestionDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
@@ -133,7 +134,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         // The following function calls handle
         // the set-up of the emojis, powerUps, leaderBoard and volume controls.
         setUpEmojis();
@@ -141,6 +141,13 @@ public class GameScreenCtrl implements Initializable, SSESource {
         setUpTopBarLeaderBoard();
         setUpVolume();
         setUpTimer();
+    }
+
+    /**
+     * Resets the controller to a predefined state.
+     */
+    public void reset() {
+        setUpPowerUps();
     }
 
     /**
@@ -188,6 +195,24 @@ public class GameScreenCtrl implements Initializable, SSESource {
                     );
                 }
         );
+    }
+
+    /**
+     * Handles the power-up played event.
+     *
+     * @param powerUp the power-up that has been played.
+     */
+    @SSEEventHandler(SSEMessageType.POWER_UP_PLAYED)
+    public void handlePowerUP(PowerUp powerUp) {
+        mainCtrl.showInformationalSnackBar("A " + powerUp.name() + " Power-Up has been played!");
+
+        switch (powerUp) {
+            case HalveTime:
+                timeLeft.set(timeLeft.get() / 2);
+                break;
+            default:
+                break;
+        }
     }
 
     /**
@@ -371,26 +396,33 @@ public class GameScreenCtrl implements Initializable, SSESource {
         // Clears the power ups bar of elements.
         powerUpHBox.getChildren().clear();
 
-        // Gets the power ups from the server.
-        // This is subject to change in the future.
-        List<URL> powerUpUrls = communication.getPowerUps();
+
+        var powerUps = Arrays.stream(PowerUp.values()).collect(Collectors.toList());
 
         try {
-            powerUpUrls.forEach(powerUpUrl -> {
+            powerUps.forEach(powerUp -> {
                 JFXButton jfxButton = new JFXButton();
                 jfxButton.setPadding(Insets.EMPTY);
-                jfxButton.setRipplerFill(Color.WHITESMOKE);
 
                 jfxButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
                 ImageView image = new ImageView();
 
-                image.setImage(new Image(String.valueOf(powerUpUrl),
-                        35,
-                        35,
+                String imageLocation = Objects.requireNonNull(getClass()
+                        .getResource("/client/images/powerups/" + powerUp.name() + ".png"))
+                        .toExternalForm();
+
+                image.setImage(new Image(imageLocation,
+                        40,
+                        40,
                         false,
                         true));
+
                 jfxButton.setGraphic(image);
+
+                jfxButton.setOnAction(event -> communication.sendPowerUp(powerUp,
+                        () -> runLater(() -> jfxButton.setDisable(true)),
+                        error -> runLater(() ->
+                                mainCtrl.showErrorSnackBar("Error occured: " + error.getDescription()))));
 
                 powerUpHBox.getChildren().add(jfxButton);
             });
