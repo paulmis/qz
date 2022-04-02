@@ -259,14 +259,16 @@ public class GameCommunication {
         request.submit(new InvocationCallback<Response>() {
             @Override
             public void completed(Response response) {
-                log.info("Reaction sent successfully!");
-                handleSuccess.handle();
+                if (response.getStatus() == 200) {
+                    handleSuccess.handle();
+                } else {
+                    handleFail.handle(response.readEntity(ApiError.class));
+                }
             }
 
             @Override
             public void failed(Throwable throwable) {
-                log.info("Failed to send reaction!");
-                handleFail.handle();
+                handleFail.handle(null);
                 throwable.printStackTrace();
             }
         });
@@ -346,7 +348,7 @@ public class GameCommunication {
      * Handler for when sending a reaction fails.
      */
     public interface SendReactionHandlerFail {
-        void handle();
+        void handle(ApiError error);
     }
 
 }

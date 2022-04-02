@@ -132,8 +132,8 @@ public class GameController {
      * @param reaction Reaction to get.
      * @return URL of the image associated with the activity.
      */
-    @GetMapping("/reaction")
-    ResponseEntity sendReaction(@PathVariable Reaction reaction) throws SSEFailedException {
+    @PostMapping("/reaction")
+    ResponseEntity sendReaction(@RequestBody Reaction reaction) throws SSEFailedException {
         Optional<User> userOpt = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (userOpt.isEmpty()) {
             throw new UserNotFoundException();
@@ -151,7 +151,6 @@ public class GameController {
         GamePlayer gamePlayer = (GamePlayer) game.getPlayers().get(user.getId());
 
         gameService.sendReaction(game, gamePlayer, reaction);
-        gameRepository.save(game);
         return ResponseEntity.ok().build();
     }
 }

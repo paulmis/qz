@@ -228,7 +228,8 @@ public class GameScreenCtrl implements Initializable, SSESource {
     @SSEEventHandler(SSEMessageType.REACTION)
     public void handleReaction(Reaction reaction) {
         mainCtrl.showInformationalSnackBar("User sent " + reaction.name());
-
+        String imageLocation = Objects.requireNonNull(getClass()
+                        .getResource("/client/images/reactions/" + reaction.name() + ".png")).toExternalForm();
         // TO DO :
     }
 
