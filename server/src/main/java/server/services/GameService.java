@@ -347,8 +347,8 @@ public class GameService {
             game.updateStreak(player, isCorrect);
 
             int streakScore = game.computeStreakScore(player, score);
-            int doublePointsScore = game.computeDoublePointScore(player, streakScore);
-            player.setScore(player.getScore() + doublePointsScore);
+            //Apply double points power up
+            game.applyScorePowerUpModifiers(player, streakScore, 2);
             // Persist the score changes
             gamePlayerRepository.save(player);
         });

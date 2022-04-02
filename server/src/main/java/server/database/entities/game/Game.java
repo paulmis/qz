@@ -313,16 +313,16 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      *
      * @param gamePlayer the game player that has the applied the power up.
      * @param score  the score on which the double points is calculated.
-     * @return the new double points score.
+     * @param modifier the power up score modifier
      */
-    public int computeDoublePointScore(GamePlayer gamePlayer, double score) {
+    public void applyScorePowerUpModifiers(GamePlayer gamePlayer, double score, float modifier) {
         if (this.getCurrentQuestionNumber() == null) {
             throw new IllegalArgumentException("Game has no question number");
         }
-
-        return (int) score * (this.getCurrentQuestionNumber()
+        // Returns either the base score if condition is false, or returns double the base score
+        gamePlayer.setScore((int) score * Math.round(this.getCurrentQuestionNumber()
                 .equals(gamePlayer.getUserPowerUps().get(PowerUp.DoublePoints))
-                ? 2 : 1);
+                ? modifier : 1));
     }
 
     /**
