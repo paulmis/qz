@@ -111,13 +111,13 @@ public class GameController {
         GamePlayer gamePlayer = (GamePlayer) game.getPlayers().get(user.getId());
 
         // If power-up has already been used, throw exception
-        if (gamePlayer.getUserPowerUps().contains(powerUp)) {
+        if (gamePlayer.getUserPowerUps().keySet().contains(powerUp)) {
             throw new PowerUpAlreadyUsedException();
         }
 
         gameService.sendPowerUp(game, gamePlayer, powerUp);
         gameRepository.save(game);
-        gamePlayer.getUserPowerUps().add(powerUp);
+        gamePlayer.getUserPowerUps().put(powerUp, game.getCurrentQuestionNumber());
         gamePlayerRepository.save(gamePlayer);
 
         // Return 200
