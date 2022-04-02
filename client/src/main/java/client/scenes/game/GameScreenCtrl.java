@@ -135,13 +135,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        reset();
-    }
-
-    /**
-     * Resets the controller to a predefined state.
-     */
-    public void reset() {
         // The following function calls handle
         // the set-up of the emojis, powerUps, leaderBoard and volume controls.
         setUpEmojis();
@@ -152,6 +145,13 @@ public class GameScreenCtrl implements Initializable, SSESource {
 
         // This loads the estimate question type.
         loadMockEstimate();
+    }
+
+    /**
+     * Resets the controller to a predefined state.
+     */
+    public void reset() {
+        setUpPowerUps();
     }
 
     /**
@@ -439,7 +439,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
                         error -> runLater(() ->
                                 mainCtrl.showErrorSnackBar("Error occured: " + error.getDescription()))));
 
-                jfxButton.setDisable(true);
                 powerUpHBox.getChildren().add(jfxButton);
             });
         } catch (Exception e) {
