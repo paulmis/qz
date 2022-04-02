@@ -61,12 +61,18 @@ public class User extends BaseEntity<UserDTO> {
     @NonNull protected String password;
 
     /**
+     * The filepath to the user profile picture.
+     */
+    @Column(nullable = false)
+    @NonNull private String profilePic = "";
+
+    /**
      * score - integer representing a player's total score.
      */
     protected int score = 0;
 
     /**
-     * id - random unique uuid assigned to a certain player.
+     * number of games played by a certain user.
      */
     protected int gamesPlayed = 0;
 
@@ -79,12 +85,15 @@ public class User extends BaseEntity<UserDTO> {
     protected Set<GamePlayer> gamePlayers = Collections.synchronizedSet(new HashSet<>());
 
     /**
-     * Construct a new entity from a DTO ignoring score and gamePlayer fields.
+     * Construct a new entity from a DTO ignoring score, gamesPlayed and gamePlayer fields.
      *
      * @param dto DTO to map to entity.
      */
     public User(UserDTO dto) {
         this(dto.getUsername(), dto.getEmail(), dto.getPassword());
+        if (dto.getProfilePic() != null && !dto.getProfilePic().isBlank()) {
+            this.profilePic = dto.getProfilePic();
+        }
     }
 
     @Override

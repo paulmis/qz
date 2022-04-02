@@ -53,6 +53,12 @@ public class UserDTO implements DTO {
     protected String password;
 
     /**
+     * User's profile picture.
+     */
+    @JsonView(Views.Public.class)
+    protected String profilePic;
+
+    /**
      * User's global score.
      */
     @JsonView(Views.Public.class)
