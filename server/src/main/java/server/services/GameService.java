@@ -349,6 +349,10 @@ public class GameService {
             int streakScore = game.computeStreakScore(player, score);
             player.setScore(player.getScore() + streakScore);
 
+            int doublePointsScore = streakScore * (game.getCurrentQuestionNumber().equals(player.getUserPowerUps()
+                            .get(PowerUp.DoublePoints)) ? 2 : 1);
+            player.setScore(player.getScore() + doublePointsScore);
+
             // Persist the score changes
             gamePlayerRepository.save(player);
         });
@@ -364,14 +368,14 @@ public class GameService {
      * @throws SSEFailedException if it fails to send the messages.
      */
     public void sendPowerUp(Game game, GamePlayer player, PowerUp powerUp) throws SSEFailedException {
+        GameFSM gameFSM = fsmManager.getFSM(game);
+        // If the game is in a state other than a question, disallow the use of power ups
+        if (gameFSM.getState() != FSMState.QUESTION) {
+            throw new PowerUpDisabledException();
+        }
+        // Actions based on selected power ups
         switch (powerUp) {
             case HalveTime:
-                GameFSM gameFSM = fsmManager.getFSM(game);
-
-                if (gameFSM.getState() != FSMState.QUESTION) {
-                    throw new PowerUpDisabledException();
-                }
-
                 var newDelay = (gameFSM.getFuture().getScheduledDate().getTime() - (new Date()).getTime()) / 2;
 
                 // Doesn't let the user play this power-up if there are only 1 second left
