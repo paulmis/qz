@@ -98,13 +98,12 @@ public class UserControllerTests {
         var joePlayer = new GamePlayer(joe);
         game.add(joePlayer);
         when(gameRepository.getPlayersLobbyOrGame(joe.getId())).thenReturn(Optional.of(game));
+        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
+        when(userRepository.existsByUsername(joe.getUsername())).thenReturn(true);
     }
 
     @Test
     void getOk() throws Exception {
-        // Mock the repository
-        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
-
         // Perform the request
         MvcResult res = this.mvc
                 .perform(
@@ -134,10 +133,6 @@ public class UserControllerTests {
 
     @Test
     void changeUsernameOk() throws Exception {
-        // Mock the repository
-        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
-        when(userRepository.existsByUsername("joe")).thenReturn(true);
-
         this.mvc.perform(post("/api/user/username")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("George Bush"))
@@ -147,10 +142,6 @@ public class UserControllerTests {
 
     @Test
     void changeUsernameSame() throws Exception {
-        // Mock the repository
-        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
-        when(userRepository.existsByUsername("joe")).thenReturn(true);
-
         this.mvc.perform(
                 post("/api/user/username")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -162,8 +153,6 @@ public class UserControllerTests {
     @Test
     void changeUsernameUsed() throws Exception {
         // Mock the repository
-        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
-        when(userRepository.existsByUsername("joe")).thenReturn(true);
         when(userRepository.existsByUsername("Donald Trump")).thenReturn(true);
 
         this.mvc.perform(
@@ -176,10 +165,6 @@ public class UserControllerTests {
 
     @Test
     void changeUsernameSSE() throws Exception {
-        // Mock the repository
-        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
-        when(userRepository.existsByUsername("joe")).thenReturn(true);
-
         this.mvc.perform(
                 post("/api/user/username")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -194,8 +179,6 @@ public class UserControllerTests {
     @Test
     void changeUsernameNoSSE() throws Exception {
         // Mock the repository
-        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
-        when(userRepository.existsByUsername("joe")).thenReturn(true);
         when(userRepository.existsByUsername("Donald Trump")).thenReturn(true);
 
         this.mvc.perform(
@@ -210,10 +193,6 @@ public class UserControllerTests {
 
     @Test
     void changeUsernameShort() throws Exception {
-        // Mock the repository
-        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
-        when(userRepository.existsByUsername("joe")).thenReturn(true);
-
         this.mvc.perform(
                 post("/api/user/username")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -224,10 +203,6 @@ public class UserControllerTests {
 
     @Test
     void changeUsernameLong() throws Exception {
-        // Mock the repository
-        when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
-        when(userRepository.existsByUsername("joe")).thenReturn(true);
-
         this.mvc.perform(
                 post("/api/user/username")
                         .contentType(MediaType.APPLICATION_JSON)
