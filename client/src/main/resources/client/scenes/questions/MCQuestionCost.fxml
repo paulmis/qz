@@ -24,7 +24,10 @@
          <children>
             <VBox fx:id="imageVBox" alignment="CENTER_RIGHT">
                <children>
-                  <ImageView fx:id="questionPic" fitHeight="87.0" fitWidth="89.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="questionPic" fitHeight="87.0" fitWidth="89.0" pickOnBounds="true" preserveRatio="true">
+                     <VBox.margin>
+                        <Insets right="10.0" />
+                     </VBox.margin></ImageView>
                </children>
             </VBox>
             <Label fx:id="questionLabel" alignment="CENTER" contentDisplay="CENTER" maxHeight="200.0" prefHeight="97.0" prefWidth="515.0" text="Question" wrapText="true" GridPane.columnIndex="1">
