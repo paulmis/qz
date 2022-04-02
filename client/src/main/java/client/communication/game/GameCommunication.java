@@ -12,6 +12,7 @@ import java.util.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 
@@ -81,7 +82,7 @@ public class GameCommunication {
             public void completed(Response response) {
                 if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                     log.debug("Leaderboard request completed successfully");
-                    handlerSuccess.handle(response.readEntity(List.class));
+                    handlerSuccess.handle(response.readEntity(new GenericType<List<GamePlayerDTO>>() {}));
                 } else {
                     log.error("Failed to update leaderboard: {}", response.getStatus());
                     handlerFail.handle();
@@ -266,7 +267,7 @@ public class GameCommunication {
      * Handler for when getting the game leaderboard succeeds.
      */
     public interface UpdateScoreLeaderboardHandlerSuccess {
-        void handle(List<LinkedHashMap> players);
+        void handle(List<GamePlayerDTO> players);
     }
 
     /**

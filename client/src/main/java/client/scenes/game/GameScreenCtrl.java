@@ -12,8 +12,6 @@ import client.utils.communication.SSEEventHandler;
 import client.utils.communication.SSEHandler;
 import client.utils.communication.SSESource;
 import client.utils.communication.ServerUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
@@ -25,7 +23,6 @@ import commons.entities.questions.QuestionDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.*;
@@ -201,15 +198,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
                 // Success
                 (leaderboard) -> runLater(() -> {
                     log.debug("Received leaderboard: {}", leaderboard);
-
-                    // Initialize the mapper instance
-                    ObjectMapper mapper = new ObjectMapper();
-                    mapper.registerModule(new JavaTimeModule());
-
-                    List<GamePlayerDTO> players = leaderboard.stream()
-                            .map((LinkedHashMap p) -> mapper.convertValue(p, GamePlayerDTO.class))
-                            .collect(Collectors.toList());
-                    this.showLeaderboard(players);
+                    this.showLeaderboard(leaderboard);
                 }),
                 // Failure
                 () -> runLater(
@@ -229,20 +218,19 @@ public class GameScreenCtrl implements Initializable, SSESource {
         avatarHBox.getChildren().clear();
 
         // We need to keep track of the counter
-        int i = 0;
-        for (GamePlayerDTO player : players) {
-            log.debug("Adding player {} to leaderboard", player.getId());
+        for (int i = 0; i < players.size(); ++i) {
+            log.debug("Adding player {} to leaderboard", players.get(i).getId());
 
             Circle imageCircle = new Circle(19);
             imageCircle.setId("Rank" + i);
 
             // Create the tooltip
             Tooltip tooltip = new Tooltip();
-            tooltip.setText(player.getNickname() + ": " + player.getScore());
+            tooltip.setText(players.get(i).getNickname() + ": " + players.get(i).getScore());
             Tooltip.install(imageCircle, tooltip);
 
             // This sets the fill of the circle to the image pattern
-            URL imageUrl = images.get(player.getId());
+            URL imageUrl = images.get(players.get(i).getId());
             imageCircle.setFill(new ImagePattern(new Image(String.valueOf(imageUrl),
                     40,
                     40,
@@ -252,10 +240,23 @@ public class GameScreenCtrl implements Initializable, SSESource {
             // Adding the image to the hbox
             avatarHBox.getChildren().add(imageCircle);
 
-            if (player.getUserId().equals(ClientState.user.getId())) {
-                pointsLabel.setText(String.valueOf(player.getScore()));
+            if (players.get(i).getUserId().equals(ClientState.user.getId())) {
+                pointsLabel.setText(String.valueOf(players.get(i).getScore()));
+
+                if (ClientState.previousScore.isPresent()) {
+                    if (ClientState.previousScore.get() < players.get(i).getScore()) {
+                        mainCtrl.showInformationalSnackBar("You have gained "
+                                        + (players.get(i).getScore() - ClientState.previousScore.get()) + " points!",
+                                javafx.util.Duration.seconds(2));
+                    } else {
+                        mainCtrl.showErrorSnackBar("You have lost "
+                                        + (ClientState.previousScore.get() - players.get(i).getScore()) + " points!",
+                                javafx.util.Duration.seconds(2));
+                    }
+                    ClientState.previousScore = Optional.of(players.get(i).getScore());
+                }
+
             }
-            ++i;
         }
     }
 

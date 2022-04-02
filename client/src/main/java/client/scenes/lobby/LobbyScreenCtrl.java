@@ -17,6 +17,7 @@ import commons.entities.game.GamePlayerDTO;
 import commons.entities.messages.SSEMessageType;
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -124,6 +125,7 @@ public class LobbyScreenCtrl implements SSESource {
     public void gameStarted(Integer preparationDuration) {
         mainCtrl.showGameScreen(ClientState.game.getCurrentQuestion());
         mainCtrl.getGameScreenCtrl().startTimer(Duration.ofMillis(preparationDuration));
+        ClientState.previousScore = Optional.of(0);
     }
 
     /**
