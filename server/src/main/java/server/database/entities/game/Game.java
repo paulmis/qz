@@ -319,7 +319,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         if (this.getCurrentQuestionNumber() == null) {
             throw new IllegalArgumentException("Game has no question number");
         }
-        // Returns either the base score if condition is false, or returns double the base score
+        // Sets the game players' score to either the base score if condition is false,
+        // or returns the base score * modifier
         gamePlayer.setScore((int) score * Math.round(this.getCurrentQuestionNumber()
                 .equals(gamePlayer.getUserPowerUps().get(PowerUp.DoublePoints))
                 ? modifier : 1));
