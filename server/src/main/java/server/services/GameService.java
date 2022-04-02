@@ -2,9 +2,12 @@ package server.services;
 
 import commons.entities.AnswerDTO;
 import commons.entities.game.GameStatus;
+import commons.entities.game.PowerUp;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import server.api.exceptions.PowerUpDisabledException;
 import server.api.exceptions.SSEFailedException;
 import server.configuration.quiz.QuizConfiguration;
 import server.database.entities.User;
@@ -30,6 +34,8 @@ import server.database.repositories.question.QuestionRepository;
 import server.services.answer.AnswerCollection;
 import server.services.fsm.DefiniteGameFSM;
 import server.services.fsm.FSMContext;
+import server.services.fsm.FSMState;
+import server.services.fsm.GameFSM;
 
 /**
  * Get the questions for a specific game.
@@ -339,7 +345,6 @@ public class GameService {
             boolean isCorrect = score > game.getConfiguration().getCorrectAnswerThreshold();
 
             game.updateStreak(player, isCorrect);
-            game.updatePowerUpPoints(player, isCorrect);
 
             int streakScore = game.computeStreakScore(player, score);
             player.setScore(player.getScore() + streakScore);
@@ -347,5 +352,34 @@ public class GameService {
             // Persist the score changes
             gamePlayerRepository.save(player);
         });
+    }
+
+
+    /**
+     * Applies a power-up to a game.
+     *
+     * @param game the game.
+     * @param player the player that sent the power-up
+     * @param powerUp the power-up that is to be applied.
+     * @throws SSEFailedException if it fails to send the messages.
+     */
+    public void sendPowerUp(Game game, GamePlayer player, PowerUp powerUp) throws SSEFailedException {
+        switch (powerUp) {
+            case HalveTime:
+                GameFSM gameFSM = fsmManager.getFSM(game);
+
+                if (gameFSM.getState() != FSMState.QUESTION) {
+                    throw new PowerUpDisabledException();
+                }
+
+                var newDelay = (gameFSM.getFuture().getScheduledDate().getTime() - (new Date()).getTime()) / 2;
+                gameFSM.reprogramCurrentTask(Duration.ofMillis(newDelay));
+                break;
+            default:
+                break;
+        }
+
+        log.info("Sending power-up " + powerUp.name() + " to game: " + game.getGameId());
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.POWER_UP_PLAYED, powerUp.name()));
     }
 }

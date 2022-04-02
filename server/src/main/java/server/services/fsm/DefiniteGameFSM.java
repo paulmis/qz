@@ -156,7 +156,7 @@ public class DefiniteGameFSM extends GameFSM {
         setFuture(
             new FSMFuture(
                 Optional.of(getContext().getTaskScheduler().schedule(this::runQuestion, executionTime)),
-                executionTime)
+                executionTime, this::runQuestion)
         );
     }
 
