@@ -81,6 +81,7 @@ public class GameService {
     public List<Question> provideQuestions(int count, List<Question> usedQuestions) throws IllegalStateException {
         // Check that there are enough questions
         if (questionRepository.count() < count + usedQuestions.size()) {
+            log.error("Could not provide {} questions: not enough questions in the database.", count);
             throw new IllegalStateException("Not enough questions in the database.");
         }
 
@@ -118,6 +119,7 @@ public class GameService {
             throws NotImplementedException, IllegalStateException, SSEFailedException {
         // Make sure that the lobby is full and not started
         if (game.getStatus() != GameStatus.CREATED || !game.isFull()) {
+            log.debug("[{}] Cannot start game: game is not full or has already started.", game.getId());
             throw new IllegalStateException();
         }
 
@@ -143,6 +145,7 @@ public class GameService {
             // Return the started game
             return definiteGame;
         } else {
+            log.warn("[{}] Attempt to start an unsupported game type: {}", game.getId(), game.getClass().getName());
             throw new NotImplementedException("Starting games other than definite games is not yet supported.");
         }
     }
