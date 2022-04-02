@@ -214,6 +214,8 @@ public class GameScreenCtrl implements Initializable, SSESource {
             case HalveTime:
                 timeLeft.set(timeLeft.get() / 2);
                 break;
+            case DoublePoints:
+                break;
             default:
                 break;
         }
