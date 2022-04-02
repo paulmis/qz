@@ -99,7 +99,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     @Transient
     private SaveableRandom random = new SaveableRandom(this.seed);
-
+    
     /**
      * Creates a new game from a DTO.
      * Only an empty lobby (no players or questions) can be initialized.
@@ -316,18 +316,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public void updateStreak(GamePlayer gamePlayer, boolean isCorrect) {
         gamePlayer.setStreak(isCorrect ? gamePlayer.getStreak() + 1 : 0);
-    }
-
-    /**
-     * Updates the power-up points of the player based on if his answer is correct.
-     *
-     * @param gamePlayer the game player that added the answer.
-     * @param isCorrect  if the answer is correct.
-     */
-    public void updatePowerUpPoints(GamePlayer gamePlayer, boolean isCorrect) {
-        if (isCorrect) {
-            gamePlayer.setPowerUpPoints(gamePlayer.getPowerUpPoints() + 1);
-        }
     }
 
     /**

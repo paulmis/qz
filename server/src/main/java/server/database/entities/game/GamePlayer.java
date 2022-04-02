@@ -2,7 +2,12 @@ package server.database.entities.game;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import commons.entities.game.GamePlayerDTO;
+import commons.entities.game.PowerUp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.persistence.*;
 import lombok.*;
 import org.modelmapper.ModelMapper;
@@ -45,9 +50,11 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     protected Integer streak = 0;
 
     /**
-     * The power-up points of a player which can be used to play power-ups.
+     * Maps power-up used to the question number that is was used on.
+     * Allows for double point power-up to easily check.
      */
-    protected Integer powerUpPoints = 0;
+    @ElementCollection
+    protected Map<PowerUp, Integer> userPowerUps = new HashMap<>();
 
     /**
      * The date the player joined the lobby.
