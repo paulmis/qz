@@ -97,7 +97,7 @@ public class ServerUtils {
     }
 
     /**
-     * Handler for when the register succeds.
+     * Handler for when the register succeeds.
      */
     public interface RegisterHandler {
         void handle(Response response, ApiError error);
