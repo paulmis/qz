@@ -129,6 +129,7 @@ public class AdminCommunication {
 
         // Build the query invocation
         Invocation request = ServerUtils.getRequestTarget()
+                .register(new org.apache.cxf.jaxrs.provider.MultipartProvider())
                 .path("/api/activity/save/image")
                 .request(APPLICATION_JSON)
                 .header("Content-Type", "multipart/form-data")

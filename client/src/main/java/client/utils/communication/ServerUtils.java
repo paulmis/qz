@@ -78,7 +78,7 @@ public class ServerUtils {
         mapper.registerModule(new JavaTimeModule());
         JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
         return ClientBuilder.newClient().register(provider).register(JacksonJsonProvider.class)
-                .register(JavaTimeModule.class).register(new org.apache.cxf.jaxrs.provider.MultipartProvider());
+                .register(JavaTimeModule.class);
     }
 
     /** Gets a list of the leaderboard images from the server.
