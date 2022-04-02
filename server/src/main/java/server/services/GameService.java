@@ -322,8 +322,9 @@ public class GameService {
     public void updateScores(Game game, Question question) {
         AnswerCollection answerCollection = getAnswers(game, question);
         if (answerCollection == null) {
+            // If there are no answers, there's nothing to do
             log.error("[{}] No answer collection for question {}.", game.getId(), question.getId());
-            throw new IllegalArgumentException("No answer collection for question " + question.getId());
+            return;
         }
 
         Map<UUID, Integer> scores = question.checkAnswer(answerCollection).entrySet().stream().collect(
@@ -347,5 +348,7 @@ public class GameService {
             // Persist the score changes
             gamePlayerRepository.save(player);
         });
+
+        log.debug("[{}] Scores updated.", game.getId());
     }
 }
