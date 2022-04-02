@@ -17,6 +17,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
 import commons.entities.AnswerDTO;
+import commons.entities.game.GamePlayerDTO;
 import commons.entities.messages.SSEMessageType;
 import commons.entities.questions.QuestionDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
@@ -87,6 +88,8 @@ public class GameScreenCtrl implements Initializable, SSESource {
     private ScrollPane emojiScrollPane;
     @FXML
     private ScrollPane powerUpScrollPane;
+    @FXML
+    private Label pointsLabel;
     @FXML
     private AnchorPane settingsPanel;
     @FXML
@@ -192,6 +195,18 @@ public class GameScreenCtrl implements Initializable, SSESource {
                     );
                 }
         );
+
+//        GameCommunication.updateScoreLeaderboard(
+//                ClientState.game.getId(),
+//                // Success
+//                (leaderboard) -> runLater(() -> {
+//                    log.debug("Received leaderboard: {}", (GamePlayerDTO[]) leaderboard);
+//                }),
+//                // Failure
+//                () -> runLater(
+//                        () -> mainCtrl.showErrorSnackBar("Unable to retrieve the leaderboard")
+//                )
+//        );
     }
 
     /**

@@ -5,6 +5,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import commons.entities.AnswerDTO;
+import commons.entities.game.GamePlayerDTO;
 import commons.entities.questions.QuestionDTO;
 import java.net.URL;
 import java.util.ArrayList;
@@ -62,6 +63,34 @@ public class GameCommunication {
             }
         });
     }
+
+//    public static void updateScoreLeaderboard(UUID gameId,
+//                                              UpdateScoreLeaderboardHandlerSuccess handlerSuccess,
+//                                              UpdateScoreLeaderboardHandlerFail handlerFail) {
+//        Invocation request = ServerUtils.getRequestTarget()
+//                .path("/api/game/" + gameId + "/leaderboard")
+//                .request(APPLICATION_JSON)
+//                .buildGet();
+//
+//        request.submit(new InvocationCallback<Response>() {
+//            @Override
+//            public void completed(Response response) {
+//                if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+//                    log.debug("Leaderboard request completed successfully");
+//                    handlerSuccess.handle(response.readEntity(GamePlayerDTO[].class));
+//                } else {
+//                    log.error("Failed to update leaderboard: {}", response.getStatus());
+//                    handlerFail.handle();
+//                }
+//            }
+//
+//            @Override
+//            public void failed(Throwable throwable) {
+//                log.error("Failed to update leaderboard", throwable);
+//                throwable.printStackTrace();
+//            }
+//        });
+//    }
 
     /**
      * Requests the current question from the server.
@@ -226,6 +255,20 @@ public class GameCommunication {
      */
     public interface QuitGameHandler {
         void handle(Response response);
+    }
+
+    /**
+     * Handler for when getting the game leaderboard succeeds.
+     */
+    public interface UpdateScoreLeaderboardHandlerSuccess {
+        void handle(List<GamePlayerDTO> players);
+    }
+
+    /**
+     * Handler for when getting the game leaderboard fails.
+     */
+    public interface UpdateScoreLeaderboardHandlerFail {
+        void handle();
     }
 
     /**

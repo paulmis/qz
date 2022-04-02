@@ -54,6 +54,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import lombok.Generated;
+import lombok.Getter;
 
 /**
  * Main controller for the client application.

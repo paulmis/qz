@@ -102,9 +102,11 @@ public class GameController {
      * @return the leaderboard for the game.
      */
     @GetMapping("/{gameId}/leaderboard")
-    ResponseEntity<List<GamePlayerDTO>> getGameLeaderboard(@PathVariable UUID gameId) {
+    ResponseEntity<GamePlayerDTO[]> getGameLeaderboard(@PathVariable UUID gameId) {
         // Return the players in the game, sorted by score
-        return ResponseEntity.ok(gamePlayerRepository.findByGame_IdEqualsAndAbandonedIsFalseOrderByScoreDesc(gameId)
-                .map(GamePlayer::getDTO).collect(Collectors.toList()));
+        List<GamePlayerDTO> players = gamePlayerRepository.findByGame_IdEqualsAndAbandonedIsFalseOrderByScoreDesc(gameId)
+                .stream().map(GamePlayer::getDTO).collect(Collectors.toList());
+        GamePlayerDTO[] playersArray = new GamePlayerDTO[players.size()];
+        return ResponseEntity.ok(players.toArray(playersArray));
     }
 }
