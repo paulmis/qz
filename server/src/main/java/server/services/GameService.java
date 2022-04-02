@@ -373,6 +373,12 @@ public class GameService {
                 }
 
                 var newDelay = (gameFSM.getFuture().getScheduledDate().getTime() - (new Date()).getTime()) / 2;
+
+                // Doesn't let the user play this power-up if there are only 1 second left
+                if (newDelay < 1000) {
+                    throw new PowerUpDisabledException();
+                }
+
                 gameFSM.reprogramCurrentTask(Duration.ofMillis(newDelay));
                 break;
             default:
