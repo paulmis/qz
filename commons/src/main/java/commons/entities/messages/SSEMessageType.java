@@ -50,7 +50,7 @@ public enum SSEMessageType {
      */
     CHAT_MESSAGE,
     /**
-     * Sent when a power-up is played
+     * Sent when a power-up is played.
      */
     POWER_UP_PLAYED,
 }
