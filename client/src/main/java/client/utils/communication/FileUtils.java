@@ -1,12 +1,18 @@
 package client.utils.communication;
 
 import java.io.*;
+import java.util.Objects;
 import java.util.Scanner;
 
 /**
  * Utilities for creating, editing and retrieving local files.
  */
 public class FileUtils {
+
+    public static String defaultUserPic = Objects
+            .requireNonNull(FileUtils.class.getResource("/client/images/logo.png"))
+            .toExternalForm();
+
     /**
      * Saves the server path to a local file.
      *

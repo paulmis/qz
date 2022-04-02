@@ -4,10 +4,13 @@ import static javafx.application.Platform.runLater;
 
 import client.communication.user.UserCommunication;
 import client.utils.ClientState;
+import client.utils.communication.FileUtils;
 import client.utils.communication.ServerUtils;
 import commons.entities.game.GameStatus;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.io.File;
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
@@ -88,8 +91,8 @@ public class UserInfoCtrl implements Initializable {
      */
     public void setupData() {
         usernameField.setText(ClientState.user.getUsername());
-        // ToDo: load user image
-        String profilePicURL = "https://upload.wikimedia.org/wikipedia/commons/e/e3/Klaus_Iohannis_din_interviul_cu_Dan_Tapalag%C4%83_cropped.jpg";
+
+        String profilePicURL = FileUtils.defaultUserPic;
         if (ClientState.user.getProfilePic() != null
                 && !ClientState.user.getProfilePic().isBlank()) {
             profilePicURL = ServerUtils.getImagePathFromId(ClientState.user.getProfilePic());
