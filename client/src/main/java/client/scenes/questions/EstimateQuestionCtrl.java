@@ -90,12 +90,6 @@ public class EstimateQuestionCtrl extends QuestionCtrl {
 
         // Set question image
         questionIcon.setImage(new Image(ServerUtils.getImagePathFromId(question.getQuestionIcon())));
-
-        // Resize the image view to the surrounding vbox.
-        questionIcon.fitHeightProperty().bind(Bindings.min(
-                imageVBox.widthProperty(),
-                imageVBox.heightProperty()).multiply(0.8));
-        questionIcon.fitWidthProperty().bind(questionIcon.fitHeightProperty());
     }
 
     @Override
@@ -115,6 +109,7 @@ public class EstimateQuestionCtrl extends QuestionCtrl {
             correctAnswer = false;
         }
         guessField.setEditable(false);
+        guessField.setText(answer.getResponse().get(0).getCost().toString());
         guessField.getStyleClass().add("show-answer");
         guessField.getStyleClass().add(correctAnswer
                 ? "correct-answer"

@@ -112,9 +112,7 @@ public class EstimateQuestion extends Question {
      */
     @Override
     public AnswerDTO getRightAnswer() {
-        AnswerDTO rightAnswer = new AnswerDTO();
-        rightAnswer.setResponse(List.of(getActivities().get(0).getDTO()));
-        return rightAnswer;
+        return new AnswerDTO(this.getId(), List.of(getActivities().get(0).getDTO()));
     }
 
     /**

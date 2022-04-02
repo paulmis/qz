@@ -537,13 +537,12 @@ public class GameScreenCtrl implements Initializable, SSESource {
             if (question == null) {
                 log.debug("Question is null, showing start game pane");
                 this.centerPane = new StartGamePane(mainCtrl, communication);
-                mainBorderPane.setCenter(this.centerPane);
                 // Otherwise, show a question pane
             } else {
-                log.debug("Showing question pane");
+                log.debug("Showing question pane for type {}", question.getClass().getSimpleName());
                 this.centerPane = new QuestionPane(mainCtrl, communication, question);
-                mainBorderPane.setCenter(this.centerPane);
             }
+            mainBorderPane.setCenter(this.centerPane);
         } catch (IOException e) {
             log.error("Error loading the FXML file");
             e.printStackTrace();
