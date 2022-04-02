@@ -6,6 +6,7 @@ import client.communication.LobbyListCommunication;
 import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
+import client.utils.ClientState;
 import client.utils.communication.*;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
@@ -16,6 +17,8 @@ import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
+import java.time.Duration;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -98,9 +101,16 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
         sseHandler.initialize(this);
     }
 
+    /**
+     * Reacts to the game being started.
+     *
+     * @param preparationDuration Duration of preparation phase
+     */
     @SSEEventHandler(SSEMessageType.GAME_START)
-    public void startGame() {
+    public void startGame(Integer preparationDuration) {
         mainCtrl.showGameScreen(null);
+        mainCtrl.getGameScreenCtrl().startTimer(Duration.ofMillis(preparationDuration));
+        ClientState.previousScore = Optional.of(0);
     }
 
     /**

@@ -17,6 +17,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
 import commons.entities.AnswerDTO;
+import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
 import commons.entities.messages.SSEMessageType;
 import commons.entities.questions.QuestionDTO;
@@ -33,10 +34,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -88,6 +86,8 @@ public class GameScreenCtrl implements Initializable, SSESource {
     private ScrollPane emojiScrollPane;
     @FXML
     private ScrollPane powerUpScrollPane;
+    @FXML
+    private Label pointsLabel;
     @FXML
     private AnchorPane settingsPanel;
     @FXML
@@ -199,6 +199,72 @@ public class GameScreenCtrl implements Initializable, SSESource {
                     );
                 }
         );
+
+        GameCommunication.updateScoreLeaderboard(
+                ClientState.game.getId(),
+                // Success
+                (leaderboard) -> runLater(() -> {
+                    log.debug("Received leaderboard: {}", leaderboard);
+                    this.showLeaderboard(leaderboard);
+                }),
+                // Failure
+                () -> runLater(
+                        () -> mainCtrl.showErrorSnackBar("Unable to retrieve the leaderboard")
+                )
+        );
+    }
+
+    private void showLeaderboard(List<GamePlayerDTO> players) {
+        log.info("Showing leaderboard");
+
+        // Get images for all players
+        Map<UUID, URL> images = communication.getLeaderBoardImages(
+                players.stream().map(GamePlayerDTO::getId).collect(Collectors.toList()));
+
+        // Clear the in-game leaderboard
+        avatarHBox.getChildren().clear();
+
+        // We need to keep track of the counter
+        for (int i = 0; i < players.size(); ++i) {
+            log.debug("Adding player {} to leaderboard", players.get(i).getId());
+
+            Circle imageCircle = new Circle(19);
+            imageCircle.setId("Rank" + i);
+
+            // Create the tooltip
+            Tooltip tooltip = new Tooltip();
+            tooltip.setText(players.get(i).getNickname() + ": " + players.get(i).getScore());
+            Tooltip.install(imageCircle, tooltip);
+
+            // This sets the fill of the circle to the image pattern
+            URL imageUrl = images.get(players.get(i).getId());
+            imageCircle.setFill(new ImagePattern(new Image(String.valueOf(imageUrl),
+                    40,
+                    40,
+                    false,
+                    true)));
+
+            // Adding the image to the hbox
+            avatarHBox.getChildren().add(imageCircle);
+
+            if (players.get(i).getUserId().equals(ClientState.user.getId())) {
+                pointsLabel.setText(String.valueOf(players.get(i).getScore()));
+
+                if (ClientState.previousScore.isPresent()) {
+                    if (ClientState.previousScore.get() < players.get(i).getScore()) {
+                        mainCtrl.showInformationalSnackBar("You have gained "
+                                        + (players.get(i).getScore() - ClientState.previousScore.get()) + " points!",
+                                javafx.util.Duration.seconds(2));
+                    } else {
+                        mainCtrl.showErrorSnackBar("You have lost "
+                                        + (ClientState.previousScore.get() - players.get(i).getScore()) + " points!",
+                                javafx.util.Duration.seconds(2));
+                    }
+                    ClientState.previousScore = Optional.of(players.get(i).getScore());
+                }
+
+            }
+        }
     }
 
     /**
@@ -455,38 +521,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
 
         // Clears the avatars from the leaderboard
         avatarHBox.getChildren().clear();
-
-        // Gets the leaderboard image urls from the server.
-        List<URL> leaderBoardUrls = communication.getLeaderBoardImages();
-
-        try {
-
-            // Iterate over the retrieved images
-            for (int i = 0; i < leaderBoardUrls.size(); i++) {
-
-                // We need to use a circle in order to make the
-                // avatar frame.
-                Circle imageCircle = new Circle(19);
-                URL imageUrl = leaderBoardUrls.get(i);
-
-                // We set the id of the circle to Rank + the place in the rank.
-                // This is done in order to style it in the css of the control.
-                imageCircle.setId("Rank" + i);
-
-
-                // This sets the fill of the circle to the image pattern
-                imageCircle.setFill(new ImagePattern(new Image(String.valueOf(imageUrl),
-                        40,
-                        40,
-                        false,
-                        true)));
-
-                // Adding the image to the hbox
-                avatarHBox.getChildren().add(imageCircle);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**
