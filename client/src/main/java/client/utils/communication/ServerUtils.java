@@ -19,6 +19,7 @@ package client.utils.communication;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM;
 
 import client.utils.Authenticator;
 import client.utils.ClientState;
@@ -32,6 +33,9 @@ import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.NormalGameDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.utils.ApiError;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -42,6 +46,10 @@ import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.AttachmentBuilder;
+import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 
 /**
  * Utilities for communicating with the server.
@@ -79,7 +87,8 @@ public class ServerUtils {
         return ClientBuilder.newClient().register(provider);
     }
 
-    /** Gets a list of the leaderboard images from the server.
+    /**
+     * Gets a list of the leaderboard images from the server.
      *
      * @return a list of leaderboard images.
      */
@@ -106,22 +115,51 @@ public class ServerUtils {
     /**
      * Function that registers a new user.
      *
-     * @param username string representing
-     *              the email of the user.
-     * @param email string representing
-     *              the email of the user.
-     * @param password string representing
-     *                 the password of the user.
+     * @param username        string representing the name of the user.
+     * @param email           string representing the email of the user.
+     * @param password        string representing the password of the user.
+     * @param image           the file of the user profile pic.
+     * @param registerHandler handler called when a response is received.
      */
     public void register(String username, String email, String password,
-                           RegisterHandler registerHandler) {
+                         File image, RegisterHandler registerHandler) {
         client = this.newClient();
+
+        // The list of attachments
+        List<Attachment> attachments = new ArrayList<>();
+
+        // Add the user dto as an attachment.
         UserDTO user = new UserDTO(username, email, password);
+        attachments.add((new AttachmentBuilder())
+                .mediaType(APPLICATION_JSON)
+                .object(user)
+                .contentDisposition(new ContentDisposition("form-data;name=\"userData\""))
+                .build());
+
+        // If the image is not null add it to the attachments.
+        if (image != null) {
+            try {
+                attachments.add((new AttachmentBuilder())
+                        .mediaType(APPLICATION_OCTET_STREAM)
+                        .object(new FileInputStream(image))
+                        .contentDisposition(new ContentDisposition("form-data;name=\"image\";filename=\"image\""))
+                        .build());
+            } catch (FileNotFoundException e) {
+                log.error("Couldn't create input stream.");
+                e.printStackTrace();
+            }
+        }
+
+        // Create the multipart body that holds all attachments.
+        var multiPartBody = new MultipartBody(attachments);
+
         var invocation = client
-                .target(SERVER).path("/api/auth/register")
+                .target(SERVER)
+                .register(new org.apache.cxf.jaxrs.provider.MultipartProvider())
+                .path("/api/auth/register")
                 .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildPost(Entity.entity(user, APPLICATION_JSON));
+                .header("Content-Type", "multipart/form-data")
+                .buildPost(Entity.entity(multiPartBody, "multipart/mixed"));
 
         invocation.submit(new InvocationCallback<Response>() {
             @Override
@@ -162,7 +200,7 @@ public class ServerUtils {
     /**
      * Logs the user in, granting access to the API.
      *
-     * @param email string representing the email of the user.
+     * @param email    string representing the email of the user.
      * @param password string representing the password of the user.
      */
     public void logIn(String email, String password,
@@ -213,7 +251,8 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON)
                 .get();
         if (r.getStatus() == Response.Status.OK.getStatusCode()) {
-            return r.readEntity(new GenericType<List<UserDTO>>() {});
+            return r.readEntity(new GenericType<List<UserDTO>>() {
+            });
         }
         return new ArrayList<>();
     }

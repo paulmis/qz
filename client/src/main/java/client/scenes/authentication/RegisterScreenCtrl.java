@@ -36,6 +36,7 @@ public class RegisterScreenCtrl implements Initializable {
     private final MainCtrl mainCtrl;
     private String emailText;
     private String passwordText;
+    private File userImage = null;
 
     @FXML private JFXButton signUpButton;
     @FXML private JFXButton haveAccountButton;
@@ -85,10 +86,8 @@ public class RegisterScreenCtrl implements Initializable {
     private void setUsername() {
         if (usernameField.getText().length() > 0) {
             System.out.print(usernameField.getText() + emailText + passwordText);
-            server.register(usernameField.getText(), emailText,  passwordText, new ServerUtils.RegisterHandler() {
-                @Override
-                public void handle(Response response, ApiError error) {
-                    javafx.application.Platform.runLater(() -> {
+            server.register(usernameField.getText(), emailText,  passwordText, userImage,
+                    (response, error) -> javafx.application.Platform.runLater(() -> {
                         switch (response.getStatus()) {
                             case 201: {
                                 mainCtrl.showLobbyListScreen();
@@ -110,9 +109,7 @@ public class RegisterScreenCtrl implements Initializable {
                             }
                             //If the function fails it triggers the error message.
                         }
-                    });
-                }
-            });
+                    }));
         } else {
             //No username set
         }
@@ -135,6 +132,7 @@ public class RegisterScreenCtrl implements Initializable {
             usernameSetButton.setDisable(false);
             uploadImage.setVisible(false);
             profilePicture.setImage(new Image(pictureFile.getAbsolutePath()));
+            userImage = pictureFile;
         }
     }
 
