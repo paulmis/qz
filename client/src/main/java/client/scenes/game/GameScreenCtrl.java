@@ -4,7 +4,6 @@ import static javafx.application.Platform.runLater;
 
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
-import client.scenes.questions.EstimateQuestionPane;
 import client.scenes.questions.QuestionPane;
 import client.scenes.questions.StartGamePane;
 import client.utils.ClientState;
@@ -142,9 +141,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
         setUpTopBarLeaderBoard();
         setUpVolume();
         setUpTimer();
-
-        // This loads the estimate question type.
-        loadMockEstimate();
     }
 
     /**
@@ -226,17 +222,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
         // TODO: display final standings instead
         mainCtrl.showInformationalSnackBar("The game has ended");
         mainCtrl.showLobbyListScreen();
-    }
-
-
-    /**
-     * A mock function that loads the estimate control.
-     */
-    private void loadMockEstimate() {
-        this.centerPane = new EstimateQuestionPane(
-                "Short question",
-                log::debug);
-        mainBorderPane.setCenter(this.centerPane);
     }
 
     /**

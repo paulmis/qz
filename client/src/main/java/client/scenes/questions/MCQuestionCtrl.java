@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import lombok.Generated;
@@ -25,10 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Generated
 @Slf4j
-public abstract class MCQuestionCtrl implements Initializable {
-    protected final MainCtrl mainCtrl;
-    protected final GameCommunication communication;
-
+public abstract class MCQuestionCtrl extends QuestionCtrl {
     @FXML protected Label questionLabel;
     @FXML protected Label labelOptionA;
     @FXML protected Label labelOptionB;
@@ -52,8 +48,7 @@ public abstract class MCQuestionCtrl implements Initializable {
      * @param question the question to show
      */
     public MCQuestionCtrl(MainCtrl mainCtrl, GameCommunication gameCommunication, MCQuestionDTO question) {
-        this.mainCtrl = mainCtrl;
-        this.communication = gameCommunication;
+        super(mainCtrl, gameCommunication);
         this.question = question;
     }
 
@@ -89,11 +84,6 @@ public abstract class MCQuestionCtrl implements Initializable {
         }
     }
 
-    /**
-     * Shows the correct answer in the UI.
-     *
-     * @param answer the correct answer.
-     */
     protected void showAnswer(AnswerDTO answer) {
         if (!this.question.getId().equals(answer.getQuestionId())) {
             log.warn("Received answer for a different question: expected {} but got {}",

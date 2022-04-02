@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.*;
+import commons.entities.questions.QuestionDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -151,8 +152,10 @@ public class MCQuestion extends Question {
     public MCQuestionDTO getDTO() {
         String iconId = "";
         if (guessConsumption && answer != null && answer.getIcon() != null) {
-            iconId = answer.getDTO().getIcon().toString();
+            iconId = answer.getIcon();
         }
-        return new MCQuestionDTO(super.toDTO(), guessConsumption, iconId);
+        QuestionDTO baseDTO = super.toDTO();
+        baseDTO.setQuestionIcon(iconId);
+        return new MCQuestionDTO(baseDTO, guessConsumption);
     }
 }

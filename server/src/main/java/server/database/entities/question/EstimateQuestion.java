@@ -1,6 +1,8 @@
 package server.database.entities.question;
 
 import commons.entities.AnswerDTO;
+import commons.entities.questions.EstimateQuestionDTO;
+import commons.entities.questions.MCQuestionDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +62,7 @@ public class EstimateQuestion extends Question {
      *
      * @param dto DTO to map to entity.
      */
-    public EstimateQuestion(QuestionDTO dto) {
+    public EstimateQuestion(EstimateQuestionDTO dto) {
         new ModelMapper().map(dto, this);
     }
 
@@ -121,7 +123,13 @@ public class EstimateQuestion extends Question {
      * @return the game superclass DTO
      */
     @Override
-    public QuestionDTO getDTO() {
-        return new ModelMapper().map(this, QuestionDTO.class);
+    public EstimateQuestionDTO getDTO() {
+        String iconId = "";
+        if (activities.get(0) != null && activities.get(0).getIcon() != null) {
+            iconId = activities.get(0).getIcon();
+        }
+        QuestionDTO baseDTO = super.toDTO();
+        baseDTO.setQuestionIcon(iconId);
+        return new EstimateQuestionDTO(baseDTO);
     }
 }
