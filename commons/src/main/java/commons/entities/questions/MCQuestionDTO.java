@@ -2,6 +2,7 @@ package commons.entities.questions;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonView;
+import commons.entities.ActivityDTO;
 import commons.entities.utils.Views;
 import lombok.*;
 
@@ -24,12 +25,19 @@ public class MCQuestionDTO extends QuestionDTO {
     protected boolean guessConsumption = true;
 
     /**
+     * Icon corresponding to the question.
+     * For guess consumption only.
+     */
+    protected String questionIcon = "";
+
+    /**
      * Copy constructor.
      *
      * @param questionDTO the question to copy
      */
-    public MCQuestionDTO(QuestionDTO questionDTO, boolean guessConsumption) {
+    public MCQuestionDTO(QuestionDTO questionDTO, boolean guessConsumption, String questionIcon) {
         super(questionDTO);
         this.guessConsumption = guessConsumption;
+        this.questionIcon = questionIcon;
     }
 }

@@ -149,6 +149,10 @@ public class MCQuestion extends Question {
      */
     @Override
     public MCQuestionDTO getDTO() {
-        return new MCQuestionDTO(super.toDTO(), guessConsumption);
+        String iconId = "";
+        if (guessConsumption && answer != null && answer.getIcon() != null) {
+            iconId = answer.getDTO().getIcon().toString();
+        }
+        return new MCQuestionDTO(super.toDTO(), guessConsumption, iconId);
     }
 }
