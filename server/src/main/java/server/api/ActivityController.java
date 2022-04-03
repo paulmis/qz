@@ -59,7 +59,7 @@ public class ActivityController {
                 log.trace("Stored image '{}' for activity '{}'", imageId, activityDTO.getId());
 
                 // Set the image resource ID and return the activity
-                activityDTO.setIcon(imageId.toString());
+                activityDTO.setIconId(imageId);
 
             } catch (IOException e) {
                 log.error("Failed to store image for activity '{}'", activityDTO.getId(), e);
@@ -109,9 +109,9 @@ public class ActivityController {
     ResponseEntity getActivityImage(@PathVariable UUID activityId) {
         log.trace("Getting image for activity '{}'", activityId);
 
-        return activityRepository.findById(activityId).map(Activity::getIcon).map(icon -> {
+        return activityRepository.findById(activityId).map(Activity::getIconId).map(icon -> {
             HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(storageService.getURI(UUID.fromString(icon)));
+            headers.setLocation(storageService.getURI(icon));
             return new ResponseEntity<>(headers, HttpStatus.FOUND);
         }).orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
     }
@@ -167,7 +167,7 @@ public class ActivityController {
                 log.trace("Stored image '{}' for activity '{}'", imageId, activityDTO.getId());
 
                 // Set the image resource ID
-                activityDTO.setIcon(imageId.toString());
+                activityDTO.setIconId(imageId);
 
             } catch (IOException e) {
                 log.error("Failed to store the image for activity '{}'", activityDTO.getId(), e);

@@ -3,6 +3,7 @@ package server.database.entities.question;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import commons.entities.AnswerDTO;
 import commons.entities.questions.MCQuestionDTO;
+import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -149,6 +150,12 @@ public class MCQuestion extends Question {
      */
     @Override
     public MCQuestionDTO getDTO() {
-        return new MCQuestionDTO(super.toDTO(), guessConsumption);
+        UUID iconId = null;
+        if (guessConsumption && answer != null && answer.getIconId() != null) {
+            iconId = answer.getIconId();
+        }
+        QuestionDTO baseDTO = super.toDTO();
+        baseDTO.setQuestionIconId(iconId);
+        return new MCQuestionDTO(baseDTO, guessConsumption);
     }
 }

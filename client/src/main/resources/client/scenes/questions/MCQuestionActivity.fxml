@@ -9,7 +9,7 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.questions.MCQuestionActivityCtrl">
    <children>
-      <Label fx:id="questionLabel" alignment="CENTER" maxHeight="200.0" prefHeight="50.0" text="Question" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+      <Label fx:id="questionLabel" styleClass="questionArea" alignment="CENTER" maxHeight="200.0" prefHeight="50.0" text="Question" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
          <font>
             <Font name="System Bold" size="22.0" />
          </font>

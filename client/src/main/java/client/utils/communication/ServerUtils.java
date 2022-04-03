@@ -16,8 +16,6 @@
 
 package client.utils.communication;
 
-import static java.util.concurrent.TimeUnit.MICROSECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM;
 
@@ -28,16 +26,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import commons.entities.auth.LoginDTO;
 import commons.entities.auth.UserDTO;
-import commons.entities.game.GameDTO;
-import commons.entities.game.GamePlayerDTO;
-import commons.entities.game.NormalGameDTO;
-import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.utils.ApiError;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,7 +54,7 @@ public class ServerUtils {
     public static SSEHandler sseHandler = new SSEHandler();
     public static Client client = newClient();
 
-    public static String getImagePathFromId(String id) {
+    public static String getImagePathFromId(UUID id) {
         return SERVER + "api/resource/" + id.toString();
     }
 
@@ -106,7 +99,7 @@ public class ServerUtils {
     }
 
     /**
-     * Handler for when the register succeds.
+     * Handler for when the register succeeds.
      */
     public interface RegisterHandler {
         void handle(Response response, ApiError error);
