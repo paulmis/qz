@@ -119,7 +119,7 @@ public class ActivityListScreenCtrl implements Initializable {
                 new PropertyValueFactory<>("source")
         );
 
-        pictureTableColumn.setCellValueFactory(new PropertyValueFactory<>("icon"));
+        pictureTableColumn.setCellValueFactory(new PropertyValueFactory<>("iconId"));
 
         pictureTableColumn.setCellFactory(tc -> {
             TableCell<ActivityDTO, UUID> cell = new TableCell<ActivityDTO, UUID>() {
