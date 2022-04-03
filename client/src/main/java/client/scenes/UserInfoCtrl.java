@@ -93,10 +93,9 @@ public class UserInfoCtrl implements Initializable {
         usernameField.setText(ClientState.user.getUsername());
 
         String profilePicURL = FileUtils.defaultUserPic;
-        if (ClientState.user.getProfilePic() != null
-                && !ClientState.user.getProfilePic().isBlank()) {
+        if (ClientState.user.getProfilePic() != null) {
             profilePicURL = ServerUtils.getImagePathFromId(ClientState.user.getProfilePic());
         }
-        playerImageView.setImage(new Image(profilePicURL));
+        playerImageView.setImage(new Image(profilePicURL, true));
     }
 }

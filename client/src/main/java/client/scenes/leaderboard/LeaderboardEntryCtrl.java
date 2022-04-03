@@ -45,7 +45,7 @@ public class LeaderboardEntryCtrl implements Initializable {
         this.scoreLabel.setText(String.valueOf(user.getScore()));
 
         String imageUrl = FileUtils.defaultUserPic;
-        if (user.getProfilePic() != null && !user.getProfilePic().isBlank()) {
+        if (user.getProfilePic() != null) {
             imageUrl = ServerUtils.getImagePathFromId(user.getProfilePic());
         }
         this.imageView.setImage(new Image(imageUrl, true));

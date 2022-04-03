@@ -5,6 +5,7 @@ import commons.entities.auth.UserDTO;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -63,8 +64,7 @@ public class User extends BaseEntity<UserDTO> {
     /**
      * The filepath to the user profile picture.
      */
-    @Column(nullable = false)
-    @NonNull private String profilePic = "";
+    private UUID profilePic = null;
 
     /**
      * score - integer representing a player's total score.
@@ -91,7 +91,7 @@ public class User extends BaseEntity<UserDTO> {
      */
     public User(UserDTO dto) {
         this(dto.getUsername(), dto.getEmail(), dto.getPassword());
-        if (dto.getProfilePic() != null && !dto.getProfilePic().isBlank()) {
+        if (dto.getProfilePic() != null) {
             this.profilePic = dto.getProfilePic();
         }
     }

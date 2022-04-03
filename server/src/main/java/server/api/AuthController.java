@@ -85,7 +85,7 @@ public class AuthController {
                 log.trace("Stored image '{}' for user '{}'", imageId, userData.getId());
 
                 // Set the image resource ID
-                userData.setProfilePic(imageId.toString());
+                userData.setProfilePic(imageId);
 
             } catch (IOException e) {
                 log.error("Failed to store the image for user '{}'", userData.getId(), e);

@@ -1,6 +1,7 @@
 package client.scenes.leaderboard;
 
 import client.utils.communication.FileUtils;
+import client.utils.communication.ServerUtils;
 import commons.entities.auth.UserDTO;
 import java.io.IOException;
 import java.net.URL;
@@ -187,10 +188,10 @@ public class LeaderboardCtrl implements Initializable {
             boxes.get(i).setMaterial(materials.get(i));
             texts.get(i).setText(leaderboard.get(i).getUsername());
             String imageUrl = defaultPic;
-            if (leaderboard.get(i).getProfilePic() != null && !leaderboard.get(i).getProfilePic().isBlank()) {
-                imageUrl = leaderboard.get(i).getProfilePic();
+            if (leaderboard.get(i).getProfilePic() != null) {
+                imageUrl = ServerUtils.getImagePathFromId(leaderboard.get(i).getProfilePic());
             }
-            images.get(i).setFill(new ImagePattern(new Image(imageUrl)));
+            images.get(i).setFill(new ImagePattern(new Image(imageUrl, true)));
         });
     }
 }
