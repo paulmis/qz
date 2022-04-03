@@ -17,9 +17,6 @@
 package client.scenes;
 
 import client.scenes.admin.ActivityListScreenCtrl;
-import client.scenes.admin.ActivityView;
-import client.scenes.admin.EditActivityScreenCtrl;
-import client.scenes.admin.EditActivityScreenPane;
 import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
@@ -32,7 +29,6 @@ import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbarLayout;
-import commons.entities.ActivityDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.questions.QuestionDTO;
@@ -48,12 +44,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
-import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import lombok.Generated;
+import lombok.Getter;
 
 /**
  * Main controller for the client application.
@@ -61,40 +57,37 @@ import lombok.Generated;
 @Generated
 public class MainCtrl {
 
+    /**
+     * The size listener for the scene.
+     * We keep a reference to it to be
+     * able to remove it when needed.
+     */
+    SceneSizeChangeListener sizeListener =
+            null;
     private Stage primaryStage;
-
     private ServerConnectScreenCtrl serverConnectScreenCtrl;
     private Parent serverConnectScreen;
-    
     private LogInScreenCtrl logInScreenCtrl;
     private Parent logInScreen;
-
     private RegisterScreenCtrl registerScreenCtrl;
     private Parent registerScreen;
-
     private LobbyScreenCtrl lobbyScreenCtrl;
     private Parent lobbyScene;
-
+    @Getter
     private GameScreenCtrl gameScreenCtrl;
     private Parent gameScreen;
-
     private GlobalLeaderboardCtrl globalLeaderboardCtrl;
     private Parent globalLeaderboardScreen;
-
     private LobbyListCtrl lobbyListCtrl;
     private Parent lobbyListScreen;
-
     private LobbyCreationScreenCtrl lobbyCreationScreenCtrl;
     private Parent lobbyCreationScreen;
-
     private ActivityListScreenCtrl activityListScreenCtrl;
     private Parent activityListScreen;
-
     private Popup lobbySettingsPopUp;
     private Popup lobbyLeavePopUp;
     private Popup gameLeavePopUp;
     private Popup lobbyDisbandPopUp;
-
     private Parent activeScreen;
 
     /**
@@ -148,41 +141,6 @@ public class MainCtrl {
         gameLeavePopUp = new Popup();
         lobbyDisbandPopUp = new Popup();
         showServerConnectScreen();
-    }
-
-    enum StageScalingStrategy {
-        /**
-         * Does absolutely nothing.
-         * Should be used only when a screen is really good at resizing.
-         */
-        Identity,
-        /**
-         * Stretches the UI to fit the window.
-         * Very situational. Looks ugly.
-         */
-        Stretch,
-        /**
-         * Scales the UI by the ratio and adds some
-         * white borders where it couldn't fit.
-         * One of the better options. The design will always scale good.
-         */
-        Letterbox,
-        /**
-         * This is the same as Identity but it also scales the UI
-         * as much as it can.
-         * Should be used when a screen resizes good enough but text and other
-         * stuff should be also big.
-         */
-        ScaledIdentity,
-        /**
-         * This forces a ratio on the user window.
-         * Pretty cool but buggy (Try resizing down the window, there doesn't seem to actually be a solution to this)
-         */
-        ForcedScaled,
-        /**
-         * Fixes the window size.
-         */
-        Fixed,
     }
 
     private void showScreenLetterBox(Parent parent, StageScalingStrategy strategy) {
@@ -314,7 +272,7 @@ public class MainCtrl {
      * This function opens a popup with
      * the game config settings.
      *
-     * @param config the config of the game.
+     * @param config      the config of the game.
      * @param saveHandler the action that is to be performed on config save.
      */
     public void openLobbySettings(GameConfigurationDTO config, ConfigurationScreenCtrl.SaveHandler saveHandler) {
@@ -351,7 +309,7 @@ public class MainCtrl {
      * This function opens a popup with
      * a leave warning for leaving the lobby.
      *
-     * @param leaveHandler the action that is to be performed when the user leaves the lobby.
+     * @param leaveHandler  the action that is to be performed when the user leaves the lobby.
      * @param cancelHandler the action that is to be performed when the user cancels leaving the lobby.
      */
     public void openLobbyLeaveWarning(LobbyLeaveScreenCtrl.LeaveHandler leaveHandler,
@@ -359,17 +317,17 @@ public class MainCtrl {
         lobbyLeavePopUp.setOnShown(e -> {
             lobbyLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - lobbyLeavePopUp.getWidth() / 2);
-            
+
             lobbyLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
                     - lobbyLeavePopUp.getHeight() / 2);
         });
-        
+
         var lobbyLeavePane = new PopupPane(new LobbyLeaveScreenCtrl(leaveHandler, cancelHandler),
                 "/lobby/LobbyLeaveScreen");
         lobbyLeavePopUp.getContent().add(lobbyLeavePane);
         lobbyLeavePopUp.show(primaryStage);
     }
-    
+
     /**
      * This function closes the lobby leave popUp.
      */
@@ -377,12 +335,12 @@ public class MainCtrl {
         lobbyLeavePopUp.hide();
         lobbyLeavePopUp.getContent().clear();
     }
-    
+
     /**
      * This function opens a popup with
      * a leave warning for leaving the game.
      *
-     * @param leaveHandler the action that is to be performed when the user leaves the game.
+     * @param leaveHandler  the action that is to be performed when the user leaves the game.
      * @param cancelHandler the action that is to be performed when the user cancels leaving the lobby.
      */
     public void openGameLeaveWarning(GameLeaveScreenCtrl.LeaveHandler leaveHandler,
@@ -390,17 +348,17 @@ public class MainCtrl {
         gameLeavePopUp.setOnShown(e -> {
             gameLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
                     - gameLeavePopUp.getWidth() / 2);
-            
+
             gameLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
                     - gameLeavePopUp.getHeight() / 2);
         });
-        
+
         var gameLeavePane = new PopupPane(new GameLeaveScreenCtrl(leaveHandler, cancelHandler),
                 "GameLeaveScreen");
         gameLeavePopUp.getContent().add(gameLeavePane);
         gameLeavePopUp.show(primaryStage);
     }
-    
+
     /**
      * This function closes the game leave popUp.
      */
@@ -414,7 +372,7 @@ public class MainCtrl {
      * a disband warning for disbanding the lobby.
      *
      * @param disbandHandler the action that is to be performed when the host disbands the lobby.
-     * @param cancelHandler the action that is to be performed when the host cancels disbanding the lobby.
+     * @param cancelHandler  the action that is to be performed when the host cancels disbanding the lobby.
      */
     public void openLobbyDisbandWarning(LobbyDisbandScreenCtrl.DisbandHandler disbandHandler,
                                         LobbyDisbandScreenCtrl.CancelHandler cancelHandler) {
@@ -479,12 +437,22 @@ public class MainCtrl {
      * @param message The text message that will be displayed in the snackBar.
      */
     public void showErrorSnackBar(String message) {
-        var snack = new JFXSnackbar();
+        showErrorSnackBar(message, Duration.seconds(3));
+    }
+
+    /**
+     * Displays an error snackBar to the user.
+     *
+     * @param message  The text message that will be displayed in the snackBar.
+     * @param duration The duration of the snackBar.
+     */
+    public void showErrorSnackBar(String message, Duration duration) {
+        JFXSnackbar snack = new JFXSnackbar();
         snack.setStyle("-fx-text-fill: red");
         snack.registerSnackbarContainer((Pane) activeScreen);
         snack.fireEvent(new JFXSnackbar.SnackbarEvent(
                 new JFXSnackbarLayout(message),
-                Duration.seconds(3), new PseudoClass() {
+                duration, new PseudoClass() {
                     @Override
                     public String getPseudoClassName() {
                         return "error";
@@ -500,31 +468,33 @@ public class MainCtrl {
      * @param message The text message that will be displayed in the snackBar.
      */
     public void showInformationalSnackBar(String message) {
-        var snack = new JFXSnackbar();
+        showInformationalSnackBar(message, Duration.seconds(3));
+    }
+
+    /**
+     * Displays an informational snackBar to the user.
+     *
+     * @param message  The text message that will be displayed in the snackBar.
+     * @param duration The duration of the snackBar.
+     */
+    public void showInformationalSnackBar(String message, Duration duration) {
+        JFXSnackbar snack = new JFXSnackbar();
         snack.registerSnackbarContainer((Pane) activeScreen);
         snack.enqueue(new JFXSnackbar.SnackbarEvent(
                 new JFXSnackbarLayout(message),
-                Duration.seconds(3), null));
+                duration, null));
         snack.toFront();
         snack.setViewOrder(-1);
     }
 
     /**
-     * The size listener for the scene.
-     * We keep a reference to it to be
-     * able to remove it when needed.
-     */
-    SceneSizeChangeListener sizeListener =
-            null;
-
-    /**
      * This function sets the scaling of a scene using the provided strategy.
      *
-     * @param scene The scene which is inside the stage.
+     * @param scene       The scene which is inside the stage.
      * @param contentPane The pane that contains everything relevant in the screen.
-     * @param initWidth The initial width the scene had.
-     * @param initHeight The initial height the scene had.
-     * @param strategy The resize strategy provided.
+     * @param initWidth   The initial width the scene had.
+     * @param initHeight  The initial height the scene had.
+     * @param strategy    The resize strategy provided.
      */
     private void scaling(final Scene scene,
                          final Pane contentPane, float initWidth, float initHeight, StageScalingStrategy strategy) {
@@ -573,6 +543,56 @@ public class MainCtrl {
     }
 
     /**
+     * Initializes the game scene based on the current stage of the game.
+     */
+    void joinGame() {
+        switch (ClientState.gameStage) {
+            case QUESTION:
+                showGameScreen(null);
+                break;
+            case ANSWER:
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    enum StageScalingStrategy {
+        /**
+         * Does absolutely nothing.
+         * Should be used only when a screen is really good at resizing.
+         */
+        Identity,
+        /**
+         * Stretches the UI to fit the window.
+         * Very situational. Looks ugly.
+         */
+        Stretch,
+        /**
+         * Scales the UI by the ratio and adds some
+         * white borders where it couldn't fit.
+         * One of the better options. The design will always scale good.
+         */
+        Letterbox,
+        /**
+         * This is the same as Identity but it also scales the UI
+         * as much as it can.
+         * Should be used when a screen resizes good enough but text and other
+         * stuff should be also big.
+         */
+        ScaledIdentity,
+        /**
+         * This forces a ratio on the user window.
+         * Pretty cool but buggy (Try resizing down the window, there doesn't seem to actually be a solution to this)
+         */
+        ForcedScaled,
+        /**
+         * Fixes the window size.
+         */
+        Fixed,
+    }
+
+    /**
      * This class is our change listener for
      * automatic scene scaling.
      */
@@ -588,12 +608,12 @@ public class MainCtrl {
         /**
          * Constructor for the listener.
          *
-         * @param scene The scene which properties we listen on.
-         * @param ratio The initial ratio.
-         * @param initHeight The initial width.
-         * @param initWidth The initial height.
+         * @param scene       The scene which properties we listen on.
+         * @param ratio       The initial ratio.
+         * @param initHeight  The initial width.
+         * @param initWidth   The initial height.
          * @param contentPane The pane which contains the important content of the scene.
-         * @param strategy The resizing strategy we will use.
+         * @param strategy    The resizing strategy we will use.
          */
         public SceneSizeChangeListener(Scene scene, double ratio, double initHeight, double initWidth,
                                        Pane contentPane, StageScalingStrategy strategy) {
@@ -610,8 +630,8 @@ public class MainCtrl {
          * This is the change handler.
          *
          * @param observableValue The bindable property.
-         * @param oldValue The old value of the property.
-         * @param newValue The new value of the property.
+         * @param oldValue        The old value of the property.
+         * @param newValue        The new value of the property.
          */
         @Override
         public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
@@ -652,21 +672,6 @@ public class MainCtrl {
                 default:
                     break;
             }
-        }
-    }
-
-    /**
-     * Initializes the game scene based on the current stage of the game.
-     */
-    void joinGame() {
-        switch (ClientState.gameStage) {
-            case QUESTION:
-                showGameScreen(null);
-                break;
-            case ANSWER:
-                break;
-            default:
-                throw new IllegalArgumentException();
         }
     }
 }

@@ -1,10 +1,14 @@
 package server.api;
 
+import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
 import commons.entities.game.Reaction;
 import commons.entities.questions.QuestionDTO;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +31,7 @@ import server.services.GameService;
 /**
  * Controller that handles all game related REST requests.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/game")
 public class GameController {
@@ -52,12 +57,14 @@ public class GameController {
         // If the user or the game don't exist, return 404
         Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (user.isEmpty()) {
+            log.warn("User {} does not exist", AuthContext.get());
             return ResponseEntity.notFound().build();
         }
 
         // If the user isn't in a game, return 404
         Optional<Game> game = gameRepository.getPlayersGame(user.get().getId());
         if (game.isEmpty()) {
+            log.trace("User '{}' is not in a game", user.get().getId());
             return ResponseEntity.notFound().build();
         }
 
@@ -65,6 +72,7 @@ public class GameController {
         gameService.removePlayer(game.get(), user.get());
         gameRepository.save(game.get());
 
+        log.debug("User '{}' left game '{}'", user.get().getId(), game.get().getId());
         // Return 200
         return ResponseEntity.ok().build();
     }
@@ -80,18 +88,41 @@ public class GameController {
         // Check if game exists.
         Optional<Game> game = gameRepository.findById(gameId);
         if (game.isEmpty()) {
+            log.warn("User {} does not exist", AuthContext.get());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         Optional<Question> question = game.get().getQuestion();
         // Check if question is not empty;
         if (question.isEmpty()) {
+            log.warn("Question does not exist on game {}", game.get().getId());
             throw new IllegalStateException("Question is empty");
         }
         // Send 200 status and payload if question exists.
         return ResponseEntity.ok(question.get().getDTO());
     }
 
+    /**
+     * Get the leaderboard for a specific game.
+     *
+     * @param gameId the UUID of the game to get the leaderboard for.
+     * @return the leaderboard for the game.
+     */
+    @GetMapping("/{gameId}/leaderboard")
+    ResponseEntity<List<GamePlayerDTO>> getGameLeaderboard(@PathVariable UUID gameId) {
+        // Return the players in the game, sorted by score
+        List<GamePlayerDTO> players = gamePlayerRepository
+                .findByGame_IdEqualsAndAbandonedIsFalseOrderByScoreDesc(gameId)
+                .stream().map(GamePlayer::getDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(players);
+    }
 
+    /**
+     * Allow users to use powerups.
+     *
+     * @param powerUp powerup to use
+     * @return 200 if the powerup was used successfully, 404 if the powerup was not found,
+     * @throws SSEFailedException if the powerup failed to use
+     */
     @PostMapping("/powerUp")
     ResponseEntity sendPowerUp(@RequestBody PowerUp powerUp) throws SSEFailedException {
         // If the user or the game don't exist, throw exception
@@ -112,14 +143,13 @@ public class GameController {
         GamePlayer gamePlayer = (GamePlayer) game.getPlayers().get(user.getId());
 
         // If power-up has already been used, throw exception
-        if (gamePlayer.getUserPowerUps().contains(powerUp)) {
+        if (gamePlayer.getUserPowerUps().keySet().contains(powerUp)) {
             throw new PowerUpAlreadyUsedException();
         }
 
         gameService.sendPowerUp(game, gamePlayer, powerUp);
+        gamePlayer.getUserPowerUps().put(powerUp, game.getCurrentQuestionNumber());
         gameRepository.save(game);
-        gamePlayer.getUserPowerUps().add(powerUp);
-        gamePlayerRepository.save(gamePlayer);
 
         // Return 200
         return ResponseEntity.ok().build();
