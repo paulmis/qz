@@ -229,6 +229,6 @@ public class ServerUtils {
     }
 
     public void signOut() {
-        client = newClient();
+        resetClient();
     }
 }
