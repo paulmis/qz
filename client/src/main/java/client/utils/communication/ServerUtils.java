@@ -79,6 +79,16 @@ public class ServerUtils {
         return ClientBuilder.newClient().register(provider);
     }
 
+    /**
+     * Resets the client.
+     */
+    private void resetClient() {
+        if (client != null) {
+            client.close();
+        }
+        client = newClient();
+    }
+
     /** Gets a list of the leaderboard images from the server.
      *
      * @return a list of leaderboard images.
@@ -115,7 +125,7 @@ public class ServerUtils {
      */
     public void register(String username, String email, String password,
                            RegisterHandler registerHandler) {
-        client = this.newClient();
+        resetClient();
         UserDTO user = new UserDTO(username, email, password);
         var invocation = client
                 .target(SERVER).path("/api/auth/register")
@@ -168,7 +178,7 @@ public class ServerUtils {
     public void logIn(String email, String password,
                       LogInHandlerSuccess logInHandlerSuccess, LogInHandlerFail logInHandlerFail) {
 
-        client = this.newClient();
+        resetClient();
         UserDTO user = new UserDTO("", email, password);
         Invocation invocation = client
                 .target(SERVER).path("/api/auth/login")
