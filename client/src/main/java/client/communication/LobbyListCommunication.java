@@ -41,10 +41,12 @@ public class LobbyListCommunication {
      * @param createLobbyHandlerSuccess The function that will be called if the request is successful.
      * @param createLobbyHandlerFail The function that will be called if the request is unsuccessful.
      */
-    public void createLobby(GameConfigurationDTO config, CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
+    public void createLobby(GameConfigurationDTO config,
+                            boolean isPrivate, CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
                             CreateLobbyHandlerFail createLobbyHandlerFail) {
         var game = new NormalGameDTO();
         game.setConfiguration(config);
+        game.setIsPrivate(isPrivate);
 
         Invocation invocation = ServerUtils.getRequestTarget()
                 .path("/api/lobby")
@@ -161,6 +163,57 @@ public class LobbyListCommunication {
             public void failed(Throwable throwable) {
                 joinLobbyHandlerFail.handle();
                 throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Handler for when joining a private lobby succeeds.
+     */
+    public interface JoinPrivateLobbyHandlerSuccess {
+        void handle(GameDTO gameDTO);
+    }
+
+    /**
+     * Handler if the joining of the private lobby fails.
+     */
+    public interface JoinPrivateLobbyHandlerFail {
+        void handle(ApiError error);
+    }
+
+    /**
+     * This function handles a user joining a lobby.
+     *
+     * @param gameId The human readable id of the game.
+     * @param joinLobbyHandlerSuccess The function that will be called if the request is successful.
+     * @param joinLobbyHandlerFail The function that will be called if the request is unsuccessful.
+     */
+    public void joinPrivateLobby(String gameId, JoinPrivateLobbyHandlerSuccess joinLobbyHandlerSuccess,
+                          JoinPrivateLobbyHandlerFail joinLobbyHandlerFail) {
+        Invocation invocation = ServerUtils.getRequestTarget()
+                .path("/api/lobby/join/" + gameId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPut(Entity.entity("", APPLICATION_JSON));
+
+        invocation.submit(new InvocationCallback<Response>() {
+
+            @Override
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    ClientState.game = response.readEntity(GameDTO.class);
+                    ServerUtils.sseHandler.subscribe();
+                    joinLobbyHandlerSuccess.handle(ClientState.game);
+                } else {
+                    ApiError error = response.readEntity(ApiError.class);
+                    joinLobbyHandlerFail.handle(error);
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                throwable.printStackTrace();
+                joinLobbyHandlerFail.handle(null);
             }
         });
     }
