@@ -38,12 +38,12 @@ public class LobbyListCommunication {
     /**
      * This function makes a call to create a new lobby.
      *
-     * @param createLobbyHandlerSuccess The function that will be called if the request is successful.
-     * @param createLobbyHandlerFail The function that will be called if the request is unsuccessful.
+     * @param handleSuccess The function that will be called if the request is successful.
+     * @param handleFail The function that will be called if the request is unsuccessful.
      */
     public void createLobby(GameConfigurationDTO config,
-                            boolean isPrivate, CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
-                            CreateLobbyHandlerFail createLobbyHandlerFail) {
+                            boolean isPrivate, CreateLobbyHandlerSuccess handleSuccess,
+                            CreateLobbyHandlerFail handleFail) {
         var game = new NormalGameDTO();
         game.setConfiguration(config);
         game.setIsPrivate(isPrivate);
@@ -60,11 +60,11 @@ public class LobbyListCommunication {
             public void completed(Response response) {
                 if (response.getStatus() == 201) {
                     ClientState.game = response.readEntity(GameDTO.class);
-                    createLobbyHandlerSuccess.handle(ClientState.game);
+                    handleSuccess.handle(ClientState.game);
                 } else {
                     ServerUtils.sseHandler.kill();
                     ApiError error = response.readEntity(ApiError.class);
-                    createLobbyHandlerFail.handle(error);
+                    handleFail.handle(error);
                 }
             }
 
@@ -72,7 +72,7 @@ public class LobbyListCommunication {
             public void failed(Throwable throwable) {
                 throwable.printStackTrace();
                 ServerUtils.sseHandler.kill();
-                createLobbyHandlerFail.handle(null);
+                handleFail.handle(null);
             }
         });
     }
@@ -185,11 +185,11 @@ public class LobbyListCommunication {
      * This function handles a user joining a lobby.
      *
      * @param gameId The human readable id of the game.
-     * @param joinLobbyHandlerSuccess The function that will be called if the request is successful.
-     * @param joinLobbyHandlerFail The function that will be called if the request is unsuccessful.
+     * @param handleSuccess The function that will be called if the request is successful.
+     * @param handleFail The function that will be called if the request is unsuccessful.
      */
-    public void joinPrivateLobby(String gameId, JoinPrivateLobbyHandlerSuccess joinLobbyHandlerSuccess,
-                          JoinPrivateLobbyHandlerFail joinLobbyHandlerFail) {
+    public void joinPrivateLobby(String gameId, JoinPrivateLobbyHandlerSuccess handleSuccess,
+                          JoinPrivateLobbyHandlerFail handleFail) {
         Invocation invocation = ServerUtils.getRequestTarget()
                 .path("/api/lobby/join/" + gameId)
                 .request(APPLICATION_JSON)
@@ -203,17 +203,17 @@ public class LobbyListCommunication {
                 if (response.getStatus() == 200) {
                     ClientState.game = response.readEntity(GameDTO.class);
                     ServerUtils.sseHandler.subscribe();
-                    joinLobbyHandlerSuccess.handle(ClientState.game);
+                    handleSuccess.handle(ClientState.game);
                 } else {
                     ApiError error = response.readEntity(ApiError.class);
-                    joinLobbyHandlerFail.handle(error);
+                    handleFail.handle(error);
                 }
             }
 
             @Override
             public void failed(Throwable throwable) {
                 throwable.printStackTrace();
-                joinLobbyHandlerFail.handle(null);
+                handleFail.handle(null);
             }
         });
     }
