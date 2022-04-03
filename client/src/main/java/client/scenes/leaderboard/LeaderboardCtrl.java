@@ -6,7 +6,6 @@ import commons.entities.auth.UserDTO;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -191,7 +190,7 @@ public class LeaderboardCtrl implements Initializable {
             if (leaderboard.get(i).getProfilePic() != null) {
                 imageUrl = ServerUtils.getImagePathFromId(leaderboard.get(i).getProfilePic());
             }
-            images.get(i).setFill(new ImagePattern(new Image(imageUrl, true)));
+            images.get(i).setFill(new ImagePattern(new Image(imageUrl)));
         });
     }
 }
