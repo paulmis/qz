@@ -89,27 +89,35 @@ public class EstimateQuestionCtrl extends QuestionCtrl {
         this.questionLabel.setText(question.getText());
 
         // Set question image
-        questionIcon.setImage(new Image(ServerUtils.getImagePathFromId(question.getQuestionIcon())));
+        questionIcon.setImage(new Image(ServerUtils.getImagePathFromId(question.getQuestionIconId())));
     }
 
     @Override
     protected void showAnswer(AnswerDTO answer) {
         if (!this.question.getId().equals(answer.getQuestionId())) {
-            log.warn("Received answer for a different question: expected {} but got {}",
+            log.error("Received answer for a different question: expected {} but got {}",
                     this.question.getId(), answer.getQuestionId());
+            mainCtrl.showErrorSnackBar("Received answer for the wrong question.");
             return;
         }
 
         log.debug("Showing answer: {}", answer);
+
+        // Evaluate the correctness of the answer
         boolean correctAnswer;
         try {
             long oldGuess = Long.parseLong(guessField.getText());
             correctAnswer = oldGuess == answer.getResponse().get(0).getCost();
         } catch (NumberFormatException numEx) {
+            // No answer was given, automatically wrong
             correctAnswer = false;
         }
-        guessField.setEditable(false);
+
+        // Display the correct answer
         guessField.setText(answer.getResponse().get(0).getCost().toString());
+
+        // Apply the style to indicate that the answer is being shown
+        guessField.setEditable(false);
         guessField.getStyleClass().add("show-answer");
         guessField.getStyleClass().add(correctAnswer
                 ? "correct-answer"

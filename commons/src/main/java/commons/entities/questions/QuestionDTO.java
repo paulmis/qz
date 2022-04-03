@@ -41,10 +41,10 @@ public class QuestionDTO implements DTO {
     protected String text;
 
     /**
-     * Icon corresponding to the question.
-     * For guess consumption only.
+     * ID of the icon corresponding to the question.
+     * Nullable, as some questions don't need it.
      */
-    protected String questionIcon = "";
+    protected UUID questionIconId = null;
 
     /**
      * Copy constructor.
@@ -55,6 +55,6 @@ public class QuestionDTO implements DTO {
         this.id = questionDTO.id;
         this.activities = questionDTO.activities;
         this.text = questionDTO.text;
-        this.questionIcon = questionDTO.questionIcon;
+        this.questionIconId = questionDTO.questionIconId;
     }
 }

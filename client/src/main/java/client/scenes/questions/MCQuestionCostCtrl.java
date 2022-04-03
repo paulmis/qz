@@ -33,7 +33,7 @@ public class MCQuestionCostCtrl extends MCQuestionCtrl {
         }
 
         // Set question image
-        questionPic.setImage(new Image(ServerUtils.getImagePathFromId(question.getQuestionIcon())));
+        questionPic.setImage(new Image(ServerUtils.getImagePathFromId(question.getQuestionIconId())));
 
         // Resize the image view to the surrounding vbox.
         questionPic.fitHeightProperty().bind(Bindings.min(

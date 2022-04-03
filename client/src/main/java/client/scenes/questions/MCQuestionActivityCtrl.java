@@ -50,7 +50,7 @@ public class MCQuestionActivityCtrl extends MCQuestionCtrl {
             // Sets the image of the imageView to the url specified
             // in answerImages
             imageOption.setImage(new Image(ServerUtils
-                    .getImagePathFromId(question.getActivities().get(idx).getIcon())));
+                    .getImagePathFromId(question.getActivities().get(idx).getIconId())));
 
             // This code resizes the image view to the surrounding vbox.
             // It uses a bind on the minimum of the vbox width and height and multiplies that by 0.8.

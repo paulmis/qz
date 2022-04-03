@@ -122,12 +122,12 @@ public class EstimateQuestion extends Question {
      */
     @Override
     public EstimateQuestionDTO getDTO() {
-        String iconId = "";
-        if (activities.get(0) != null && activities.get(0).getIcon() != null) {
-            iconId = activities.get(0).getIcon();
+        UUID iconId = null;
+        if (activities.get(0) != null && activities.get(0).getIconId() != null) {
+            iconId = activities.get(0).getIconId();
         }
         QuestionDTO baseDTO = super.toDTO();
-        baseDTO.setQuestionIcon(iconId);
+        baseDTO.setQuestionIconId(iconId);
         return new EstimateQuestionDTO(baseDTO);
     }
 }

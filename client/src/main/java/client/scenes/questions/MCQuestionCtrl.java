@@ -86,20 +86,24 @@ public abstract class MCQuestionCtrl extends QuestionCtrl {
 
     protected void showAnswer(AnswerDTO answer) {
         if (!this.question.getId().equals(answer.getQuestionId())) {
-            log.warn("Received answer for a different question: expected {} but got {}",
+            log.error("Received answer for a different question: expected {} but got {}",
                 this.question.getId(), answer.getQuestionId());
+            mainCtrl.showErrorSnackBar("Received answer for the wrong question.");
             return;
         }
 
         log.debug("Showing answer: {}", answer);
+
+        // Evaluate each button to show the correct answer
         UUID answerActivity = answer.getResponse().get(0).getId();
         for (int i = 0; i < getButtons().size(); ++i) {
             JFXButton button = getButtons().get(i);
             button.setMouseTransparent(true);
 
+            // ToDo: the game should consider correct all the options with the correct _displayed_ value
             if (question.getActivities().get(i).getId().equals(answerActivity)) {
                 button.getStyleClass().add("correct-answer");
-            } else if (this.chosenAnswer == this.getButtons().get(i)) {
+            } else if (this.chosenAnswer == button) {
                 button.getStyleClass().add("incorrect-answer");
             }
         }

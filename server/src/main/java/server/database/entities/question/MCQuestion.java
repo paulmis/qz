@@ -150,12 +150,12 @@ public class MCQuestion extends Question {
      */
     @Override
     public MCQuestionDTO getDTO() {
-        String iconId = "";
-        if (guessConsumption && answer != null && answer.getIcon() != null) {
-            iconId = answer.getIcon();
+        UUID iconId = null;
+        if (guessConsumption && answer != null && answer.getIconId() != null) {
+            iconId = answer.getIconId();
         }
         QuestionDTO baseDTO = super.toDTO();
-        baseDTO.setQuestionIcon(iconId);
+        baseDTO.setQuestionIconId(iconId);
         return new MCQuestionDTO(baseDTO, guessConsumption);
     }
 }
