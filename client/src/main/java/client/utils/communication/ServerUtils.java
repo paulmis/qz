@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
@@ -80,6 +81,25 @@ public class ServerUtils {
             client.close();
         }
         client = newClient();
+    }
+
+    /**
+     * Function to check if entered email is indeed an email.
+     *
+     * @param email email string entered by user
+     * @return true if it is a valid email, false otherwise
+     */
+    public static boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."
+                + "[a-zA-Z0-9_+&*-]+)*@"
+                + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
+                + "A-Z]{2,7}$";
+
+        Pattern emailPattern = Pattern.compile(emailRegex);
+        if (email == null) {
+            return false;
+        }
+        return emailPattern.matcher(email).matches();
     }
 
     /** Gets a list of the leaderboard images from the server.
