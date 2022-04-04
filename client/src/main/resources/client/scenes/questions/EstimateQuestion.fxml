@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -11,13 +13,21 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.questions.EstimateQuestionCtrl">
    <children>
-      <Label fx:id="questionLabel" alignment="CENTER" maxHeight="200.0" prefHeight="50.0" text="Question" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+      <Label fx:id="questionLabel" alignment="CENTER" layoutY="23.0" maxHeight="200.0" prefHeight="57.0" prefWidth="600.0" text="Question" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="23.0">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <VBox alignment="CENTER" layoutY="174.6666717529297" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="174.66666666666669">
+      <VBox alignment="TOP_CENTER" layoutY="99.0" prefHeight="301.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="99.0">
          <children>
+            <VBox fx:id="imageVBox" alignment="CENTER">
+               <VBox.margin>
+                  <Insets bottom="20.0" />
+               </VBox.margin>
+               <children>
+                  <ImageView fx:id="questionIcon" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </VBox>
             <GridPane fx:id="answerBox" maxHeight="150.0" prefHeight="75.0">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" prefWidth="100.0" />
@@ -28,12 +38,12 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Label fx:id = "estimatePrompt" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="About">
+                  <Label fx:id="estimatePrompt" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="About">
                      <font>
                         <Font size="24.0" />
                      </font>
                   </Label>
-                  <Label fx:id = "whLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="wh" GridPane.columnIndex="2">
+                  <Label fx:id="whLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="wh" GridPane.columnIndex="2">
                      <font>
                         <Font size="24.0" />
                      </font>

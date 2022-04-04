@@ -114,7 +114,7 @@ class ActivityControllerTest {
     @Test
     void getActivityImage() throws Exception {
         Activity activity = new Activity();
-        activity.setIcon(getUUID(2).toString());
+        activity.setIconId(getUUID(2));
         when(activityRepository.findById(getUUID(1))).thenReturn(Optional.of(activity));
         when(storageService.getURI(getUUID(2))).thenReturn(URI.create("https://example.com/image"));
 
@@ -148,14 +148,17 @@ class ActivityControllerTest {
     @Test
     void addActivitiesBatchWithImages() throws Exception {
         // Create a list of activities and corresponding DTOs
-        activityA.setIcon("activity1.png");
-        activityC.setIcon("activity2.png");
-
         List<Activity> activities = List.of(activityA, activityC);
         List<ActivityDTO> activitiesDTO = activities.stream().map(Activity::getDTO).collect(Collectors.toList());
+        activitiesDTO.get(0).setIcon("activity1.png");
+        activitiesDTO.get(1).setIcon("activity2.png");
+
+        List<ActivityDTO> outputDTO = activities.stream().map(Activity::getDTO).collect(Collectors.toList());
+        outputDTO.get(1).setIconId(getUUID(3));
+        List<Activity> outputActivities = outputDTO.stream().map(Activity::new).collect(Collectors.toList());
 
         // Capture the arguments of the call to saveAll
-        when(activityRepository.saveAll(activityCaptor.capture())).thenReturn(activities);
+        when(activityRepository.saveAll(activityCaptor.capture())).thenReturn(outputActivities);
         // Mock the response from the storage service
         when(storageService.store(any(InputStream.class))).thenReturn(getUUID(3));
 
@@ -180,7 +183,7 @@ class ActivityControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 // Verify that we received the correct list of activity DTOs
-                .andExpect(content().json(objectMapper.writeValueAsString(activitiesDTO)));
+                .andExpect(content().json(objectMapper.writeValueAsString(outputDTO)));
 
         // Verify that the activities were saved
         verify(activityRepository, times(1)).saveAll(any());
@@ -189,7 +192,7 @@ class ActivityControllerTest {
         // For the second activity, the icon identifier will change.
         // This is because the UUID will be updated to match the one returned by the storage service.
         // Verify that this happens.
-        assertEquals(getUUID(3).toString(), activityCaptor.getValue().get(1).getIcon());
+        assertEquals(getUUID(3), activityCaptor.getValue().get(1).getIconId());
 
         // Verify that the images were saved
         verify(storageService, times(1)).store(any());
@@ -263,7 +266,7 @@ class ActivityControllerTest {
         when(activityRepository.save(any(Activity.class))).thenAnswer(new Answer<Activity>() {
             @Override
             public Activity answer(InvocationOnMock invocation) throws Throwable {
-                ((Activity) invocation.getArgument(0)).setIcon(getUUID(3).toString());
+                ((Activity) invocation.getArgument(0)).setIconId(getUUID(3));
                 return invocation.getArgument(0);
             }
         });
@@ -276,7 +279,7 @@ class ActivityControllerTest {
                 .andExpect(status().isOk());
 
         verify(activityRepository, times(1)).findById(activityA.getId());
-        activityA.setIcon(getUUID(3).toString());
+        activityA.setIconId(getUUID(3));
         verify(activityRepository, times(1)).save(activityA);
         verifyNoMoreInteractions(activityRepository);
 

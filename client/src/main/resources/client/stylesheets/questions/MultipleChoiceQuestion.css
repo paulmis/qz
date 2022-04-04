@@ -30,11 +30,15 @@
     -fx-text-fill: answersTextColor;
 }
 
+.questionArea {
+    -fx-background-color: backgroundColor;
+}
+
 .chosen-answer {
     -fx-background-color: chosenAnswerColor;
 }
 
-.chosen-answer > .label {
+.chosen-answer .label {
     -fx-font-size: 20px;
     -fx-font-weight: bold;
 }
@@ -47,7 +51,7 @@
     -fx-background-color: correctAnswerColor !important;
 }
 
-.correct-answer > .label {
+.correct-answer .label {
     -fx-font-size: 20px !important;
     -fx-font-weight: bold !important;
 }

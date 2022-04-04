@@ -31,9 +31,9 @@ public class ActivityView {
     protected Long cost;
 
     /**
-     * URL of the picture of the activity.
+     * ID of the picture of the activity.
      */
-    protected String icon;
+    protected UUID icon;
 
     /**
      * Source of the information in the activity.
@@ -56,7 +56,7 @@ public class ActivityView {
         this.cost = activityDTO.getCost();
         this.description = activityDTO.getDescription();
         this.source = activityDTO.getSource();
-        this.icon = activityDTO.getIcon();
+        this.icon = activityDTO.getIconId();
         if (this.icon != null) {
             this.image = new Image(ServerUtils.getImagePathFromId(this.icon), true);
         } else {
@@ -72,7 +72,7 @@ public class ActivityView {
     public ActivityDTO toDTO() {
         var activityDTO = new ActivityDTO();
         activityDTO.setSource(this.source);
-        activityDTO.setIcon(this.icon);
+        activityDTO.setIconId(this.icon);
         activityDTO.setDescription(this.description);
         activityDTO.setCost(this.cost);
         activityDTO.setId(this.id);
