@@ -53,6 +53,7 @@ public class GameService {
     private QuestionRepository questionRepository;
 
     @Autowired
+    @Getter
     private GameRepository gameRepository;
 
     @Autowired
@@ -358,7 +359,7 @@ public class GameService {
             // Persist the score changes
             gamePlayerRepository.save(player);
 
-            log.debug("[{}] player {} now has {} points", game.getId(), player.getId(), score);
+            log.debug("[{}] player {} now has {} points", game.getId(), player.getId(), player.getScore());
         });
 
         log.debug("[{}] Scores updated.", game.getId());
