@@ -20,6 +20,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.input.Clipboard;
@@ -42,7 +44,7 @@ public class LobbyScreenCtrl implements SSESource {
     private final ServerUtils server;
     
     @FXML
-    private AnchorPane mainAnchor;
+    private AnchorPane lobbyMainAnchor;
     @FXML
     private Label gameName;
     @FXML
@@ -243,9 +245,9 @@ public class LobbyScreenCtrl implements SSESource {
         if (userInfo == null) {
             // Create userInfo
             userInfo = new UserInfoPane(server, new UserCommunication(), mainCtrl);
-            mainAnchor.getChildren().add(userInfo);
+            lobbyMainAnchor.getChildren().add(userInfo);
             userInfo.setVisible(true);
-            runLater(() -> userInfo.setupPosition(userButton, mainAnchor));
+            runLater(() -> userInfo.setupPosition(userButton, lobbyMainAnchor));
         } else {
             // Toggle visibility
             userInfo.setVisibility(!userInfo.isVisible());
@@ -280,7 +282,6 @@ public class LobbyScreenCtrl implements SSESource {
     public void updateView() {
         GameDTO gameDTO = ClientState.game;
 
-        // ToDo: have a game name in gameDTO
         // Set game's name as "host's game"
         String hostNickname = gameDTO.getPlayers().stream()
                 .filter(player -> player.getId().equals(gameDTO.getHost()))
