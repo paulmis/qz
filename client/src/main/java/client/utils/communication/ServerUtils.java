@@ -81,7 +81,16 @@ public class ServerUtils {
     }
 
     /**
-     * Gets a list of the leaderboard images from the server.
+     * Resets the client.
+     */
+    private void resetClient() {
+        if (client != null) {
+            client.close();
+        }
+        client = newClient();
+    }
+
+    /** Gets a list of the leaderboard images from the server.
      *
      * @return a list of leaderboard images.
      */
@@ -115,8 +124,8 @@ public class ServerUtils {
      * @param registerHandler handler called when a response is received.
      */
     public void register(String username, String email, String password,
-                         File image, RegisterHandler registerHandler) {
-        client = this.newClient();
+                           RegisterHandler registerHandler) {
+        resetClient();
 
         // The list of attachments
         List<Attachment> attachments = new ArrayList<>();
@@ -199,7 +208,7 @@ public class ServerUtils {
     public void logIn(String email, String password,
                       LogInHandlerSuccess logInHandlerSuccess, LogInHandlerFail logInHandlerFail) {
 
-        client = this.newClient();
+        resetClient();
         UserDTO user = new UserDTO("", email, password);
         Invocation invocation = client
                 .target(SERVER).path("/api/auth/login")
@@ -251,6 +260,6 @@ public class ServerUtils {
     }
 
     public void signOut() {
-        client = newClient();
+        resetClient();
     }
 }

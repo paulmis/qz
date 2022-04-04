@@ -7,5 +7,9 @@ public enum PowerUp {
     /**
      * The halve time power-up.
      */
-    HalveTime
+    HalveTime,
+    /**
+     * The point doubling power-up.
+     */
+    DoublePoints
 }

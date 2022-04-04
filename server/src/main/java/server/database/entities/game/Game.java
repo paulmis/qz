@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
+import commons.entities.game.PowerUp;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -306,6 +307,24 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         return (int) Math.round((gamePlayer.getStreak() >= configuration.getStreakSize())
                 ? baseScore * configuration.getStreakMultiplier()
                 : baseScore);
+    }
+
+    /**
+     * Computes the double points on a power up score given a base score.
+     *
+     * @param gamePlayer the game player that has the applied the power up.
+     * @param score  the score on which the double points is calculated.
+     * @param modifier the power up score modifier
+     */
+    public void applyScorePowerUpModifiers(GamePlayer gamePlayer, double score, float modifier) {
+        if (this.getCurrentQuestionNumber() == null) {
+            throw new IllegalArgumentException("Game has no question number");
+        }
+        // Sets the game players' score to either the base score if condition is false,
+        // or returns the base score * modifier
+        gamePlayer.setScore((int) score * Math.round(this.getCurrentQuestionNumber()
+                .equals(gamePlayer.getUserPowerUps().get(PowerUp.DoublePoints))
+                ? modifier : 1));
     }
 
     /**
