@@ -5,6 +5,7 @@ import commons.entities.AnswerDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -51,7 +52,7 @@ public class OrderQuestion extends Question {
      * @param text       the description of the question.
      * @param increasing if the user has to provide the answer in increasing order or not.
      */
-    public OrderQuestion(UUID id, List<Activity> activities, String text, boolean increasing) {
+    public OrderQuestion(UUID id, Set<Activity> activities, String text, boolean increasing) {
         super(activities, text);
         this.setId(id);
         this.increasing = increasing;

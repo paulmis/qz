@@ -3,10 +3,8 @@ package server.database.entities.question;
 import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import commons.entities.questions.QuestionDTO;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -36,7 +34,7 @@ public class MatchQuestion extends Question {
      * @param activities the list of activities that compose the question.
      * @param text       the description of the question.
      */
-    public MatchQuestion(UUID id, List<Activity> activities, String text) {
+    public MatchQuestion(UUID id, Set<Activity> activities, String text) {
         super(activities, text);
         this.setId(id);
     }

@@ -2,10 +2,8 @@ package server.database.entities.question;
 
 import commons.entities.AnswerDTO;
 import commons.entities.questions.QuestionDTO;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.persistence.*;
 import lombok.*;
@@ -33,7 +31,7 @@ public abstract class Question extends BaseEntity<QuestionDTO> {
             inverseJoinColumns = @JoinColumn(name = "activity_id"))
     @ToString.Exclude
     @NonNull
-    protected List<Activity> activities = new ArrayList<>();
+    protected Set<Activity> activities = new HashSet<>();
 
     /**
      * Question asked the user.
