@@ -3,7 +3,6 @@ package server.database.entities.question;
 import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import commons.entities.questions.QuestionDTO;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;

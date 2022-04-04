@@ -39,7 +39,7 @@ class MatchQuestionTest {
         }
         q = new MatchQuestion();
         q.setId(getUUID(10));
-        q.setActivities(components);
+        q.setActivities(new HashSet<>(components));
     }
 
     @Test
@@ -230,9 +230,9 @@ class MatchQuestionTest {
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
         Question matchNoArgs = new MatchQuestion();
         matchNoArgs.setId(getUUID(0));
-        matchNoArgs.setActivities(List.copyOf(activities));
+        matchNoArgs.setActivities(new HashSet<>(List.copyOf(activities)));
         matchNoArgs.setText(questionText);
-        Question matchAllArgs = new MatchQuestion(getUUID(0), activities, questionText);
+        Question matchAllArgs = new MatchQuestion(getUUID(0), new HashSet<>(activities), questionText);
 
         // Constructor comparison
         assertEquals(matchNoArgs.getId(), matchAllArgs.getId());
@@ -246,7 +246,7 @@ class MatchQuestionTest {
         String questionText = "aQuestion";
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        Question matchAllArgs = new MatchQuestion(getUUID(0), activities, questionText);
+        Question matchAllArgs = new MatchQuestion(getUUID(0), new HashSet<>(activities), questionText);
         Question matchCopy = new MatchQuestion(matchAllArgs);
 
         // Constructor comparison
