@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.entities.game.Game;
+import server.database.repositories.game.GameRepository;
 import server.services.fsm.GameFSM;
 
 /**
@@ -23,13 +24,19 @@ public class FSMManager {
     /**
      * Adds a new finite state machine to the manager.
      *
+     * @param game the game associated with the FSM
      * @param fsm the finite state machine to add
      */
     public void addFSM(Game game, GameFSM fsm) {
         fsmMap.put(game.getId(), fsm);
     }
 
-
+    /**
+     * Returns the FSM associated to a certain game.
+     *
+     * @param game the game to retrieve
+     * @return the FSM associated to the game
+     */
     public GameFSM getFSM(Game game) {
         return fsmMap.get(game.getId());
     }

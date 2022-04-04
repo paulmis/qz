@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import server.database.entities.game.Game;
-import server.services.GameService;
 
 /**
  * The GameFSM class is a Finite State Machine that is used to manage a game.
@@ -17,9 +16,9 @@ import server.services.GameService;
 @Data
 public abstract class GameFSM {
     /**
-     * Game that is being managed.
+     * ID of the game being managed.
      */
-    @NonNull private Game game;
+    @NonNull protected Game game;
 
     /**
      * Execution context of the FSM.
@@ -48,7 +47,7 @@ public abstract class GameFSM {
      * @param delay Delay before executing the task.
      */
     public void scheduleTask(Runnable task, Duration delay) {
-        log.debug("[{}] Scheduling task in {}", game.getId(), delay);
+        log.debug("[{}] Scheduling task in {}", getGame().getId(), delay);
         Date executionTime = Date.from(Instant.now().plus(delay));
         setFuture(new FSMFuture(
                 Optional.of(context.getTaskScheduler().schedule(task, executionTime)),
@@ -61,7 +60,7 @@ public abstract class GameFSM {
      * @param delay the new delay.
      */
     public void reprogramCurrentTask(Duration delay) {
-        log.debug("[{}] Reprogramming task in {}", game.getId(), delay);
+        log.debug("[{}] Reprogramming task in {}", getGame().getId(), delay);
         Date executionTime = Date.from(Instant.now().plus(delay));
 
         if (future.getFuture().isPresent()) {
@@ -76,7 +75,7 @@ public abstract class GameFSM {
      * Stop the finite state machine.
      */
     public void stop() {
-        log.debug("[{}] Stopping FSM", game.getId());
+        log.debug("[{}] Stopping FSM", getGame().getId());
         setRunning(false);
     }
 

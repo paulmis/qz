@@ -104,7 +104,6 @@ class DefiniteGameFSMTest {
         assertEquals(FSMState.PREPARING, fsm.getState());
     }
 
-
     @Test
     void runLeaderboard() throws IOException {
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);

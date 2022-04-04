@@ -90,7 +90,7 @@ public class LobbyController {
         lobby.add(new GamePlayer(founder));
 
         // Save the game with the added host and player
-        // If the game is singleplayer, start it
+        // If the game is single-player, start it
         if (lobby.isSingleplayer()) {
             lobby = (NormalGame) gameService.start(lobby);
         } else {
@@ -229,7 +229,7 @@ public class LobbyController {
         // If the game doesn't start successfully, return 409
         // If the SSE events are not yet set-up return 425
         try {
-            gameService.start(lobby);
+            gameService.start(lobby.getId());
         } catch (IOException ex) {
             log.error("Could not start game", ex);
             return ResponseEntity.status(HttpStatus.TOO_EARLY).body(ex.getMessage());

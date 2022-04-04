@@ -21,9 +21,9 @@ public interface GameRepository extends JpaRepository<Game, UUID> {
      * @param id user's id
      * @return empty if there is no active lobby for the player, otherwise the lobby
      */
-    @Query("SELECT g FROM Game g "
-        + "LEFT JOIN GamePlayer gp ON g.id = gp.game "
-        + "WHERE gp.user.id = ?1 AND g.status = commons.entities.game.GameStatus.CREATED")
+    @Query("select g from Game g inner join g.players players " +
+            "where players.user.id = ?1 " +
+            "and g.status = commons.entities.game.GameStatus.CREATED")
     Optional<Game> getPlayersLobby(@NonNull UUID id);
 
     /**
@@ -32,9 +32,10 @@ public interface GameRepository extends JpaRepository<Game, UUID> {
      * @param userId user's id
      * @return empty optional if there is no active game for the player, otherwise returns game
      */
-    @Query("SELECT g FROM Game g "
-            + "LEFT JOIN GamePlayer gp ON g.id = gp.game "
-            + "WHERE gp.user.id = ?1 AND g.status = commons.entities.game.GameStatus.ONGOING AND gp.abandoned = false")
+    @Query("select g from Game g inner join g.players players " +
+            "where players.user.id = ?1 " +
+            "and g.status = commons.entities.game.GameStatus.ONGOING " +
+            "and players.abandoned = false")
     Optional<Game> getPlayersGame(@NonNull UUID userId);
 
     /**

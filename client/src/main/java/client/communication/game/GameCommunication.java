@@ -203,7 +203,7 @@ public class GameCommunication {
                 .path("/api/game/leave")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .buildPost(Entity.json("{}"));
+                .buildPost(Entity.json(""));
 
         request.submit(new InvocationCallback<Response>() {
             @Override

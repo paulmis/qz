@@ -202,6 +202,47 @@ public class GameScreenCtrl implements Initializable, SSESource {
                 (leaderboard) -> runLater(() -> {
                     log.debug("Received leaderboard: {}", leaderboard);
                     this.showLeaderboard(leaderboard);
+
+                    // Show player's updated score
+                    Optional<GamePlayerDTO> myPlayer = leaderboard.stream()
+                            .filter(player -> player.getUserId().equals(ClientState.user.getId()))
+                            .findFirst();
+                    if (myPlayer.isPresent()) {
+                        this.showScore(myPlayer.get());
+                    }
+                }),
+                // Failure
+                () -> runLater(
+                        () -> mainCtrl.showErrorSnackBar("Unable to retrieve the leaderboard")
+                )
+        );
+    }
+
+    @SSEEventHandler(SSEMessageType.PLAYER_LEFT)
+    public void playerLeftReact(UUID userId) {
+        String username = ClientState.game.getPlayers().stream()
+                .filter(player -> player.getUserId().equals(userId))
+                .map(GamePlayerDTO::getNickname)
+                .findFirst().orElse("<Unknown>");
+        mainCtrl.showInformationalSnackBar("Player " + username + " has left the game.");
+        updateInGame();
+    }
+
+    @SSEEventHandler(SSEMessageType.PLAYER_REJOINED)
+    public void playerRejoinedReact() {
+        mainCtrl.showInformationalSnackBar("A player has rejoined the game.");
+        updateInGame();
+    }
+
+    public void updateInGame() {
+        log.debug("An update in the game has occurred");
+        // Update Leaderboard to show changes
+        GameCommunication.updateScoreLeaderboard(
+                ClientState.game.getId(),
+                // Success
+                (leaderboard) -> runLater(() -> {
+                    log.debug("Received leaderboard: {}", leaderboard);
+                    this.showLeaderboard(leaderboard);
                 }),
                 // Failure
                 () -> runLater(
@@ -258,21 +299,29 @@ public class GameScreenCtrl implements Initializable, SSESource {
 
             if (player.getUserId().equals(ClientState.user.getId())) {
                 // Set up points of the logged in player
-                pointsLabel.setText(String.valueOf(player.getScore()));
-
-                if (ClientState.previousScore.isPresent()) {
-                    if (ClientState.previousScore.get() < player.getScore()) {
-                        mainCtrl.showInformationalSnackBar("You have gained "
-                                        + (player.getScore() - ClientState.previousScore.get()) + " points!",
-                                javafx.util.Duration.seconds(2));
-                    } else {
-                        mainCtrl.showErrorSnackBar("You have lost "
-                                        + (ClientState.previousScore.get() - player.getScore()) + " points!",
-                                javafx.util.Duration.seconds(2));
-                    }
-                    ClientState.previousScore = Optional.of(player.getScore());
-                }
             }
+        }
+    }
+
+    /**
+     * Displays the score of the player.
+     *
+     * @param player the player information
+     */
+    public void showScore(GamePlayerDTO player) {
+        pointsLabel.setText(String.valueOf(player.getScore()));
+
+        if (ClientState.previousScore.isPresent()) {
+            if (ClientState.previousScore.get() < player.getScore()) {
+                mainCtrl.showInformationalSnackBar("You have gained "
+                                + (player.getScore() - ClientState.previousScore.get()) + " points!",
+                        javafx.util.Duration.seconds(2));
+            } else {
+                mainCtrl.showErrorSnackBar("You have lost "
+                                + (ClientState.previousScore.get() - player.getScore()) + " points!",
+                        javafx.util.Duration.seconds(2));
+            }
+            ClientState.previousScore = Optional.of(player.getScore());
         }
     }
 
@@ -549,7 +598,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
                 // If confirmed, exit the game
                 () -> {
                     mainCtrl.closeGameLeaveWarning();
-                    this.communication.quitGame(
+                    communication.quitGame(
                             (response) -> runLater(() -> {
                                 switch (response.getStatus()) {
                                     case 200:
@@ -604,17 +653,18 @@ public class GameScreenCtrl implements Initializable, SSESource {
      * @param question the question to show.
      */
     public void setQuestion(QuestionDTO question) {
-        // If the question is null, display an empty start pane
         try {
             if (question == null) {
+                // If the question is null, display an empty start pane
                 log.debug("Question is null, showing start game pane");
                 this.centerPane = new StartGamePane(mainCtrl, communication);
-                // Otherwise, show a question pane
             } else {
+                // Otherwise, show a question pane
                 log.debug("Showing question pane for type {}", question.getClass().getSimpleName());
                 this.centerPane = new QuestionPane(mainCtrl, communication, question);
             }
             mainBorderPane.setCenter(this.centerPane);
+            updateInGame();
         } catch (IOException e) {
             log.error("Error loading the FXML file");
             e.printStackTrace();
