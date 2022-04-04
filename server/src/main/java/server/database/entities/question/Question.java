@@ -26,7 +26,7 @@ public abstract class Question extends BaseEntity<QuestionDTO> {
     /**
      * List of activities used to generate the question.
      */
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "activities_asked",
             joinColumns = @JoinColumn(name = "question_id"),
