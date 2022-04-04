@@ -32,12 +32,12 @@ import server.utils.SaveableRandom;
 @AllArgsConstructor
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
+@Table(indexes = {@Index(name = "gameId", columnList = "gameId")})
 public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * ID of the game shown to the user.
      * Should be randomly generated.
      */
-    // TODO: add a custom generation strategy
     @Column(nullable = false, unique = true)
     protected String gameId;
 
@@ -74,6 +74,11 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     @JsonIgnore
     protected long seed;
+    /**
+     * A boolean representing if this lobby is private.
+     */
+    @Column(nullable = false)
+    protected Boolean isPrivate;
 
     /**
      * Whether the players are allowed to submit an answer or not.
@@ -101,7 +106,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     @Transient
     private SaveableRandom random = new SaveableRandom(this.seed);
-    
+
+
     /**
      * Creates a new game from a DTO.
      * Only an empty lobby (no players or questions) can be initialized.
@@ -120,6 +126,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         } else {
             this.id = dto.getId();
         }
+        this.isPrivate = dto.getIsPrivate();
         this.gameId = dto.getGameId();
         this.createDate = dto.getCreateDate();
         if (dto.getConfiguration() instanceof NormalGameConfigurationDTO) {
@@ -374,6 +381,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         return new GameDTO(
                 this.id,
                 this.gameId,
+                this.isPrivate,
                 this.createDate,
                 this.gameType,
                 this.configuration.getDTO(),

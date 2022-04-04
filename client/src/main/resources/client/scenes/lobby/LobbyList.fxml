@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
@@ -80,6 +80,28 @@
                   <Tooltip text="Join a Random Lobby" />
                </tooltip>
             </JFXButton>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutY="412.0" prefHeight="112.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 0 20 20 0;">
+         <children>
+            <TextField fx:id="privateLobbyTextField" layoutX="11.0" layoutY="61.0" prefHeight="46.0" prefWidth="129.0" promptText="Game id">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </TextField>
+            <JFXButton fx:id="joinPrivateLobbyButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" disable="true" layoutX="140.0" layoutY="62.0" onAction="#joinPrivateLobbyButtonClick" prefHeight="40.0" prefWidth="40.0" text="Join" textFill="WHITE">
+               <graphic>
+                  <FontAwesomeIconView glyphName="SEND" size="36" />
+               </graphic>
+               <tooltip>
+                  <Tooltip text="Refresh Lobby List" />
+               </tooltip>
+            </JFXButton>
+            <Label layoutX="16.0" layoutY="20.0" text="Join a private lobby">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
          </children>
       </AnchorPane>
    </children>

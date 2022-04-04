@@ -17,7 +17,7 @@
          <children>
             <HBox alignment="BOTTOM_RIGHT" prefHeight="47.0" prefWidth="1009.0" spacing="15.0">
                <children>
-                  <JFXButton fx:id="userButton" alignment="CENTER" buttonType="RAISED" contentDisplay="GRAPHIC_ONLY" text="Button" onAction="#showUserInfo">
+                  <JFXButton fx:id="userButton" alignment="CENTER" buttonType="RAISED" contentDisplay="GRAPHIC_ONLY" onAction="#showUserInfo" text="Button">
                      <graphic>
                         <FontAwesomeIconView fill="#5e5e5e" glyphName="USER" size="20" text="" />
                      </graphic>
@@ -102,12 +102,12 @@
                                           </HBox>
                                           <HBox alignment="CENTER">
                                              <children>
-                                                <Label fx:id="gameId" text="3wsZ4DlO89">
+                                                <Label fx:id="labelGameId" text="3wsZ4DlO89">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
                                                 </Label>
-                                                <JFXButton fx:id="copyLinkButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY">
+                                                <JFXButton fx:id="copyLinkButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" onAction="#copyLinkButtonClick">
                                                    <graphic>
                                                       <FontAwesomeIconView fill="#282626" glyphName="COPY" size="20" text="" />
                                                    </graphic>
