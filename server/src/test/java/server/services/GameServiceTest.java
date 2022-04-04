@@ -1,5 +1,6 @@
 package server.services;
 
+import static commons.entities.game.PowerUp.DoublePoints;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -386,6 +387,32 @@ public class GameServiceTest {
         assertEquals(1, joePlayer.getStreak());
 
         assertEquals(100, susannePlayer.getScore());
+        assertEquals(1, susannePlayer.getStreak());
+    }
+
+    @Test
+    void updateDoublePointsScoresCorrect() {
+        game.addQuestions(List.of(questionA, questionB));
+        game.setCurrentQuestionNumber(0);
+
+        AnswerDTO answerA = new AnswerDTO();
+        answerA.setResponse(List.of(questionA.getAnswer().getDTO()));
+        answerA.setQuestionId(questionA.getId());
+        gameService.addAnswer(game, joePlayer, answerA);
+
+        AnswerDTO answerB = new AnswerDTO();
+        answerB.setResponse(List.of(questionA.getAnswer().getDTO()));
+        answerB.setQuestionId(questionA.getId());
+        gameService.addAnswer(game, susannePlayer, answerB);
+
+        susannePlayer.getUserPowerUps().put(DoublePoints, game.getCurrentQuestionNumber());
+
+        gameService.updateScores(game);
+
+        assertEquals(100, joePlayer.getScore());
+        assertEquals(1, joePlayer.getStreak());
+
+        assertEquals(200, susannePlayer.getScore());
         assertEquals(1, susannePlayer.getStreak());
     }
 
