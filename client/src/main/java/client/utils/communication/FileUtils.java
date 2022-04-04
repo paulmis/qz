@@ -1,10 +1,7 @@
 package client.utils.communication;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Utilities for creating, editing and retrieving local files.
@@ -86,6 +83,8 @@ public class FileUtils {
                 // If credentials exists then set the username and password from the file
                 if (scanner.hasNextLine()) {
                     username = scanner.nextLine();
+                }
+                if (scanner.hasNextLine()) {
                     password = scanner.nextLine();
                 }
                 scanner.close();

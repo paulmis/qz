@@ -78,12 +78,12 @@ public class LogInScreenCtrl implements Initializable {
         emailField.setText(credentials.get(0));
         passwordField.setText(credentials.get(1));
 
-        // On enter, switch text field to password
+        // On enter, run the login code
         emailField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent enter) {
                 if (enter.getCode().equals(KeyCode.ENTER)) {
-                    passwordField.requestFocus();
+                    logInButtonClick();
                 }
             }
         });
@@ -105,34 +105,42 @@ public class LogInScreenCtrl implements Initializable {
      */
     @FXML
     private void logInButtonClick() {
-        if (rememberUser.isSelected()) {
-            file.saveCredentials(localFile, emailField.getText(), passwordField.getText());
-        } else {
-            localFile.delete();
-        }
-        server.logIn(
-            emailField.getText(), passwordField.getText(),
-            // Success
-            (s) -> runLater(() -> {
-                // If the user is in a lobby/game, put them in the apposite screen
-                if (s.getGame() != null) {
-                    ClientState.game = s.getGame();
-                    ServerUtils.sseHandler.subscribe();
-                    if (s.getGame().getStatus() == GameStatus.CREATED) {
-                        mainCtrl.showLobbyScreen();
-                        //ToDo: add `mainCtrl.checkHost();` when ClientState.user is updated on login.
-                    } else {
-                        mainCtrl.showGameScreen(s.getGame().getCurrentQuestion());
-                    }
+        if (!emailField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
+            if (server.IsValidEmail(emailField.getText())) {
+                if (rememberUser.isSelected()) {
+                    file.saveCredentials(localFile, emailField.getText(), passwordField.getText());
                 } else {
-                    mainCtrl.showLobbyListScreen();
+                    localFile.delete();
                 }
-            }),
-            // Failure
-            () -> runLater(() -> {
-                mainCtrl.showErrorSnackBar("Something went wrong while logging you in.");
-            })
-        );
+                server.logIn(
+                        emailField.getText(), passwordField.getText(),
+                        // Success
+                        (s) -> runLater(() -> {
+                            // If the user is in a lobby/game, put them in the apposite screen
+                            if (s.getGame() != null) {
+                                ClientState.game = s.getGame();
+                                ServerUtils.sseHandler.subscribe();
+                                if (s.getGame().getStatus() == GameStatus.CREATED) {
+                                    mainCtrl.showLobbyScreen();
+                                    //ToDo: add `mainCtrl.checkHost();` when ClientState.user is updated on login.
+                                } else {
+                                    mainCtrl.showGameScreen(s.getGame().getCurrentQuestion());
+                                }
+                            } else {
+                                mainCtrl.showLobbyListScreen();
+                            }
+                        }),
+                        // Failure
+                        () -> runLater(() -> {
+                            mainCtrl.showErrorSnackBar("Something went wrong while logging you in.");
+                        })
+                );
+            } else {
+                mainCtrl.showErrorSnackBar("Enter a valid email");
+            }
+        } else {
+            mainCtrl.showErrorSnackBar("Missing email and/or password");
+        }
     }
 
     /**
