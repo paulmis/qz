@@ -42,6 +42,12 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     protected String gameId;
 
     /**
+     * The name of the game given by the user.
+     */
+    @Column(nullable = false)
+    protected String gameName;
+
+    /**
      * Timestamp of game creation.
      */
     @Column(columnDefinition = "TIMESTAMP")
@@ -135,6 +141,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         this.status = dto.getStatus();
         this.currentQuestionNumber = dto.getCurrentQuestionNumber();
         this.gameType = dto.getGameType();
+        this.gameName = dto.getGameName();
     }
 
     /**
@@ -381,6 +388,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         return new GameDTO(
                 this.id,
                 this.gameId,
+                this.gameName,
                 this.isPrivate,
                 this.createDate,
                 this.gameType,

@@ -40,6 +40,11 @@ public class GameDTO implements DTO {
     protected String gameId;
 
     /**
+     * The name of the game given by the user.
+     */
+    protected String gameName;
+
+    /**
      * If the lobby is private or not.
      */
     protected Boolean isPrivate;
@@ -92,6 +97,7 @@ public class GameDTO implements DTO {
     public GameDTO(GameDTO gameDTO) {
         this.id = gameDTO.getId();
         this.gameId = gameDTO.getGameId();
+        this.gameName = gameDTO.getGameName();
         this.isPrivate = gameDTO.getIsPrivate();
         this.createDate = gameDTO.getCreateDate();
         this.gameType = gameDTO.getGameType();
