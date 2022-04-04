@@ -217,7 +217,7 @@ public class RegisterScreenCtrl implements Initializable {
     @FXML
     private void signUpButtonClick() {
         if (!emailField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
-            if (server.IsValidEmail(emailField.getText())) {
+            if (server.isValidEmail(emailField.getText())) {
                 emailText = emailField.getText();
                 passwordText = passwordField.getText();
                 pane2.setVisible(false);

@@ -89,7 +89,7 @@ public class ServerUtils {
      * @param email email string entered by user
      * @return true if it is a valid email, false otherwise
      */
-    public boolean isValidEmail(String email) {
+    public static boolean isValidEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."
                 + "[a-zA-Z0-9_+&*-]+)*@"
                 + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
