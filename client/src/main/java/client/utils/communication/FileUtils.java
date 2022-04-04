@@ -61,7 +61,7 @@ public class FileUtils {
             // Check if local file exists
             if (localFile.exists()) {
                 Scanner scanner = new Scanner(localFile);
-                // If server path exists then set the sever path in client and set checkbox to checked
+                // If server path exists then set the sever path to the one saved in the file
                 if (scanner.hasNextLine()) {
                     serverPath = scanner.nextLine();
                 }
@@ -74,7 +74,7 @@ public class FileUtils {
     }
 
     /**
-     * Retrieves the server path from the local file.
+     * Retrieves the user credentials from the local file.
      */
     public static List<String> retrieveCredentials(File localFile) {
         String username = null;
@@ -83,7 +83,7 @@ public class FileUtils {
             // Check if local file exists
             if (localFile.exists()) {
                 Scanner scanner = new Scanner(localFile);
-                // If server path exists then set the sever path in client and set checkbox to checked
+                // If credentials exists then set the username and password from the file
                 if (scanner.hasNextLine()) {
                     username = scanner.nextLine();
                     password = scanner.nextLine();
