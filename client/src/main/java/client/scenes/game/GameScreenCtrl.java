@@ -7,6 +7,7 @@ import client.scenes.MainCtrl;
 import client.scenes.questions.QuestionPane;
 import client.scenes.questions.StartGamePane;
 import client.utils.ClientState;
+import client.utils.communication.FileUtils;
 import client.utils.communication.SSEEventHandler;
 import client.utils.communication.SSEHandler;
 import client.utils.communication.SSESource;
@@ -138,7 +139,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
         // the set-up of the emojis, powerUps, leaderBoard and volume controls.
         setUpEmojis();
         setUpPowerUps();
-        setUpTopBarLeaderBoard();
+        setUpLeaderBoard();
         setUpVolume();
         setUpTimer();
     }
@@ -176,7 +177,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @SSEEventHandler(SSEMessageType.STOP_QUESTION)
     public void toAnswerStage(Integer delay) {
-        // TODO: implement
         log.debug("The answer stage has been reached. Delay: {}", delay);
         GameCommunication.updateCurrentAnswer(
                 ClientState.game.getId(),
@@ -210,55 +210,68 @@ public class GameScreenCtrl implements Initializable, SSESource {
         );
     }
 
+    /**
+     * Sets up the top bar leaderboard
+     * of the users.
+     */
+    private void setUpLeaderBoard() {
+        // Clears the avatars from the leaderboard
+        avatarHBox.getChildren().clear();
+    }
+
+    /**
+     * Updates the leaderboard.
+     *
+     * @param players players of the game.
+     */
     private void showLeaderboard(List<GamePlayerDTO> players) {
         log.info("Showing leaderboard");
-
-        // Get images for all players
-        Map<UUID, URL> images = communication.getLeaderBoardImages(
-                players.stream().map(GamePlayerDTO::getId).collect(Collectors.toList()));
 
         // Clear the in-game leaderboard
         avatarHBox.getChildren().clear();
 
         // We need to keep track of the counter
         for (int i = 0; i < players.size(); ++i) {
-            log.debug("Adding player {} to leaderboard", players.get(i).getId());
+            GamePlayerDTO player = players.get(i);
+            log.debug("Adding player {} to leaderboard", player.getId());
 
+            // Fill of the circle to the image pattern
+            String imageUrl = FileUtils.defaultUserPic;
+            if (player.getProfilePic() != null) {
+                imageUrl = ServerUtils.getImagePathFromId(player.getProfilePic());
+            }
             Circle imageCircle = new Circle(19);
             imageCircle.setId("Rank" + i);
-
-            // Create the tooltip
-            Tooltip tooltip = new Tooltip();
-            tooltip.setText(players.get(i).getNickname() + ": " + players.get(i).getScore());
-            Tooltip.install(imageCircle, tooltip);
-
-            // This sets the fill of the circle to the image pattern
-            URL imageUrl = images.get(players.get(i).getId());
-            imageCircle.setFill(new ImagePattern(new Image(String.valueOf(imageUrl),
+            imageCircle.setFill(new ImagePattern(new Image(imageUrl,
                     40,
                     40,
                     false,
                     true)));
 
-            // Adding the image to the hbox
+            // Adding the image to the HBox
             avatarHBox.getChildren().add(imageCircle);
 
-            if (players.get(i).getUserId().equals(ClientState.user.getId())) {
-                pointsLabel.setText(String.valueOf(players.get(i).getScore()));
+            // Create the tooltip
+            Tooltip tooltip = new Tooltip();
+            tooltip.setText(player.getNickname() + ": " + player.getScore());
+            Tooltip.install(imageCircle, tooltip);
+
+            if (player.getUserId().equals(ClientState.user.getId())) {
+                // Set up points of the logged in player
+                pointsLabel.setText(String.valueOf(player.getScore()));
 
                 if (ClientState.previousScore.isPresent()) {
-                    if (ClientState.previousScore.get() < players.get(i).getScore()) {
+                    if (ClientState.previousScore.get() < player.getScore()) {
                         mainCtrl.showInformationalSnackBar("You have gained "
-                                        + (players.get(i).getScore() - ClientState.previousScore.get()) + " points!",
+                                        + (player.getScore() - ClientState.previousScore.get()) + " points!",
                                 javafx.util.Duration.seconds(2));
                     } else {
                         mainCtrl.showErrorSnackBar("You have lost "
-                                        + (ClientState.previousScore.get() - players.get(i).getScore()) + " points!",
+                                        + (ClientState.previousScore.get() - player.getScore()) + " points!",
                                 javafx.util.Duration.seconds(2));
                     }
-                    ClientState.previousScore = Optional.of(players.get(i).getScore());
+                    ClientState.previousScore = Optional.of(player.getScore());
                 }
-
             }
         }
     }
@@ -277,6 +290,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
                 timeLeft.set(timeLeft.get() / 2);
                 break;
             case DoublePoints:
+                // ToDo
                 break;
             default:
                 break;
@@ -499,16 +513,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
         }
     }
 
-
-    /**
-     * Sets up the top bar leaderboard
-     * of the users.
-     */
-    private void setUpTopBarLeaderBoard() {
-
-        // Clears the avatars from the leaderboard
-        avatarHBox.getChildren().clear();
-    }
 
     /**
      * Handles the emojiBar toggle button.

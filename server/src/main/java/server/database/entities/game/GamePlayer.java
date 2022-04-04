@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.persistence.*;
 import lombok.*;
@@ -78,11 +76,6 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
         joinDate = LocalDateTime.now();
     }
 
-
-    public String getUsername() {
-        return user.getUsername();
-    }
-
     /**
      * Creates a new game player from the DTO.
      *
@@ -98,11 +91,13 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     /**
      * Converts to game player dto.
      *
-     * @return the gameplayer dto
+     * @return the game player dto
      */
     public GamePlayerDTO getDTO() {
         var gamePlayerDTO = new ModelMapper().map(this, GamePlayerDTO.class);
-        gamePlayerDTO.setNickname(getUsername());
+        // Some info of the user are passed to the game DTO
+        gamePlayerDTO.setNickname(user.getUsername());
+        gamePlayerDTO.setProfilePic(user.getProfilePic());
         return gamePlayerDTO;
     }
 }

@@ -219,26 +219,6 @@ public class GameCommunication {
     }
 
     /**
-     * Gets a list of the leaderboard images from the server.
-     *
-     * @return a list of leaderboard images.
-     */
-    public Map<UUID, URL> getLeaderBoardImages(List<UUID> userIds) {
-        // TODO: implement this properly
-        try {
-            Map<UUID, URL> leaderBoardImages = new HashMap<>();
-            for (UUID userId : userIds) {
-                leaderBoardImages.put(userId, new URL(
-                        "https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"));
-            }
-            return leaderBoardImages;
-        } catch (Exception e) {
-            return new HashMap<>();
-        }
-    }
-
-
-    /**
      * Sends a power-up to the game.
      *
      * @param powerUp the power-up to send.
