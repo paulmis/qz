@@ -15,10 +15,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.animation.TranslateTransition;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 import lombok.Generated;
@@ -65,15 +68,36 @@ public class LogInScreenCtrl implements Initializable {
         this.localFile = new File(System.getProperty("user.home") + "/Documents/quizzzCredentials.txt");
         // Check if local file has a saved user credentials
         List<String> credentials = file.retrieveCredentials(localFile);
-        // Set saved credentials
+        // Check if credentials are saved
         if (!credentials.contains(null)) {
             rememberUser.setSelected(true);
         } else {
             credentials.add(0, "");
             credentials.add(1, "");
         }
+        // Set saved credentials
         emailField.setText(credentials.get(0));
         passwordField.setText(credentials.get(1));
+
+        // On enter, switch text field to password
+        emailField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent enter) {
+                if (enter.getCode().equals(KeyCode.ENTER)) {
+                    passwordField.requestFocus();
+                }
+            }
+        });
+
+        // On enter, run the login code
+        passwordField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent enter) {
+                if (enter.getCode().equals(KeyCode.ENTER)) {
+                    logInButtonClick();
+                }
+            }
+        });
     }
 
     /**
