@@ -9,3 +9,16 @@
 #whLabel {
     -fx-text-fill: answersTextColor;
 }
+
+.correct-answer {
+    -fx-background-color: correctAnswerColor !important;
+}
+
+.incorrect-answer {
+    -fx-background-color: incorrectAnswerColor !important;
+}
+
+.show-answer {
+    -fx-font-size: 20px !important;
+    -fx-font-weight: bold !important;
+}

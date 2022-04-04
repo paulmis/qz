@@ -5,6 +5,7 @@ import lombok.Generated;
 import lombok.NonNull;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import server.configuration.quiz.QuizConfiguration;
+import server.database.repositories.game.GameRepository;
 import server.services.GameService;
 import server.services.SSEManager;
 
@@ -41,5 +42,9 @@ public class FSMContext {
      */
     public QuizConfiguration getQuizConfiguration() {
         return gameService.getQuizConfiguration();
+    }
+
+    public GameRepository getRepository() {
+        return gameService.getGameRepository();
     }
 }

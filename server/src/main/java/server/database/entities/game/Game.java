@@ -7,7 +7,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
+import commons.entities.game.PowerUp;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,12 +32,12 @@ import server.utils.SaveableRandom;
 @AllArgsConstructor
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
+@Table(indexes = {@Index(name = "gameId", columnList = "gameId")})
 public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * ID of the game shown to the user.
      * Should be randomly generated.
      */
-    // TODO: add a custom generation strategy
     @Column(nullable = false, unique = true)
     protected String gameId;
 
@@ -72,6 +74,11 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     @JsonIgnore
     protected long seed;
+    /**
+     * A boolean representing if this lobby is private.
+     */
+    @Column(nullable = false)
+    protected Boolean isPrivate;
 
     /**
      * Whether the players are allowed to submit an answer or not.
@@ -91,13 +98,15 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Questions assigned to this game.
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
+    @OrderColumn
     protected List<Question> questions = new ArrayList<>();
     /**
      * PRNG.
      */
     @Transient
     private SaveableRandom random = new SaveableRandom(this.seed);
+
 
     /**
      * Creates a new game from a DTO.
@@ -107,6 +116,9 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public Game(GameDTO dto) {
         ModelMapper mapper = new ModelMapper();
+        mapper.addConverter(
+                context -> Duration.ofMillis(context.getSource()),
+                Integer.class, Duration.class);
         mapper.getConfiguration().setSkipNullEnabled(true);
         if (dto.getId() == null) {
             // This id will change once the game entity is saved, but it must be non-null
@@ -114,6 +126,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         } else {
             this.id = dto.getId();
         }
+        this.isPrivate = dto.getIsPrivate();
         this.gameId = dto.getGameId();
         this.createDate = dto.getCreateDate();
         if (dto.getConfiguration() instanceof NormalGameConfigurationDTO) {
@@ -134,7 +147,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
-     * Get UUIDs of GamePlayers.
+     * Returns ids of all users in the game.
      *
      * @return UUIDs of all GamePlayers in the current game.
      */
@@ -304,6 +317,24 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
+     * Computes the double points on a power up score given a base score.
+     *
+     * @param gamePlayer the game player that has the applied the power up.
+     * @param score  the score on which the double points is calculated.
+     * @param modifier the power up score modifier
+     */
+    public void applyScorePowerUpModifiers(GamePlayer gamePlayer, double score, float modifier) {
+        if (this.getCurrentQuestionNumber() == null) {
+            throw new IllegalArgumentException("Game has no question number");
+        }
+        // Sets the game players' score to either the base score if condition is false,
+        // or returns the base score * modifier
+        gamePlayer.setScore(gamePlayer.getScore() + (int) score * Math.round(this.getCurrentQuestionNumber()
+                .equals(gamePlayer.getUserPowerUps().get(PowerUp.DoublePoints))
+                ? modifier : 1));
+    }
+
+    /**
      * Updates the streak of the game player based on if his answer was correct.
      * Resets the streak if an answer was wrong and adds 1 if the answer was right.
      *
@@ -312,18 +343,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public void updateStreak(GamePlayer gamePlayer, boolean isCorrect) {
         gamePlayer.setStreak(isCorrect ? gamePlayer.getStreak() + 1 : 0);
-    }
-
-    /**
-     * Updates the power-up points of the player based on if his answer is correct.
-     *
-     * @param gamePlayer the game player that added the answer.
-     * @param isCorrect  if the answer is correct.
-     */
-    public void updatePowerUpPoints(GamePlayer gamePlayer, boolean isCorrect) {
-        if (isCorrect) {
-            gamePlayer.setPowerUpPoints(gamePlayer.getPowerUpPoints() + 1);
-        }
     }
 
     /**
@@ -345,6 +364,15 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
+     * Checks if the game is singleplayer, i.e. the capacity is 1.
+     *
+     * @return true if the game is singleplayer, false otherwise
+     */
+    public boolean isSingleplayer() {
+        return getConfiguration().getCapacity() == 1;
+    }
+
+    /**
      * Converts the game superclass to a DTO.
      *
      * @return the game superclass DTO
@@ -353,6 +381,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         return new GameDTO(
                 this.id,
                 this.gameId,
+                this.isPrivate,
                 this.createDate,
                 this.gameType,
                 this.configuration.getDTO(),

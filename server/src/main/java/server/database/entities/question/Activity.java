@@ -2,7 +2,9 @@ package server.database.entities.question;
 
 import static server.utils.TestHelpers.getUUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import commons.entities.ActivityDTO;
+import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
@@ -52,9 +54,9 @@ public class Activity extends BaseEntity<ActivityDTO> {
     private long cost;
 
     /**
-     * The filepath to the icon of the activity.
+     * The resource ID of the icon of the activity.
      */
-    private String icon;
+    private UUID iconId;
 
     /**
      * Source of the information in the activity.
@@ -64,8 +66,17 @@ public class Activity extends BaseEntity<ActivityDTO> {
     @URL
     private String source;
 
+    /**
+     * Marks the activity as abandoned (i.e. it will not be used to generate new questions).
+     */
+    @Column(nullable = false)
+    @JsonIgnore
+    private boolean abandoned = false;
+
     @Override
     public ActivityDTO getDTO() {
-        return new ModelMapper().map(this, ActivityDTO.class);
+        ActivityDTO dto = new ModelMapper().map(this, ActivityDTO.class);
+        dto.setIcon(null);
+        return dto;
     }
 }

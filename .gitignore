@@ -43,3 +43,8 @@ __pycache__/
 
 ### VS Code ###
 .vscode/
+
+### Uploads ###
+server/uploads/
+uploads/
+

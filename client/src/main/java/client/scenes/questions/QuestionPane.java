@@ -3,9 +3,11 @@ package client.scenes.questions;
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
 import commons.entities.AnswerDTO;
+import commons.entities.questions.EstimateQuestionDTO;
 import commons.entities.questions.MCQuestionDTO;
 import commons.entities.questions.QuestionDTO;
 import java.io.IOException;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
@@ -24,7 +26,7 @@ import org.apache.commons.lang3.NotImplementedException;
 public class QuestionPane extends StackPane {
 
     private Node view;
-    private MCQuestionCtrl controller;
+    private QuestionCtrl controller;
 
     /** Creates the Node view of the control
      * and adds it to the children of the StackPane
@@ -45,18 +47,30 @@ public class QuestionPane extends StackPane {
             if (mcQuestion.isGuessConsumption()) {
                 loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionCost.fxml"));
                 loader.setControllerFactory(param ->
-                    controller = new MCQuestionCostCtrl(mainCtrl, gameCommunication, mcQuestion));
+                        controller = new MCQuestionCostCtrl(mainCtrl, gameCommunication, mcQuestion));
             } else {
                 loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionActivity.fxml"));
                 loader.setControllerFactory(param ->
-                    controller = new MCQuestionActivityCtrl(mainCtrl, gameCommunication, mcQuestion));
+                        controller = new MCQuestionActivityCtrl(mainCtrl, gameCommunication, mcQuestion));
             }
+        } else if (question instanceof EstimateQuestionDTO) {
+            // Estimate question
+            EstimateQuestionDTO estQuestion = (EstimateQuestionDTO) question;
+
+            loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/EstimateQuestion.fxml"));
+            loader.setControllerFactory(param ->
+                    controller = new EstimateQuestionCtrl(mainCtrl, gameCommunication, estQuestion));
         } else {
             throw new NotImplementedException(question.getClass().getName() + " questions type not implemented");
         }
 
         // Load and add the FXML scene
-        view = loader.load();
+        try {
+            view = loader.load();
+        } catch (IOException e) {
+            Platform.exit();
+            System.exit(0);
+        }
         getChildren().add(view);
     }
 

@@ -19,15 +19,21 @@ package client;
 import static com.google.inject.Guice.createInjector;
 
 import client.scenes.MainCtrl;
+import client.scenes.admin.ActivityListScreenCtrl;
 import client.scenes.authentication.LogInScreenCtrl;
 import client.scenes.authentication.RegisterScreenCtrl;
 import client.scenes.authentication.ServerConnectScreenCtrl;
 import client.scenes.game.GameScreenCtrl;
 import client.scenes.leaderboard.GlobalLeaderboardCtrl;
+import client.scenes.lobby.LobbyCreationScreenCtrl;
 import client.scenes.lobby.LobbyListCtrl;
 import client.scenes.lobby.LobbyScreenCtrl;
 import com.google.inject.Injector;
+import java.util.Optional;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import lombok.Generated;
 
@@ -61,9 +67,35 @@ public class Main extends Application {
                 "client", "scenes", "leaderboard", "GlobalLeaderboard.fxml");
         var lobbyListScreen = FXML.load(LobbyListCtrl.class,
                 "client", "scenes", "lobby", "LobbyList.fxml");
+        var activityListScreen = FXML.load(ActivityListScreenCtrl.class,
+                "client", "scenes", "admin", "ActivityListScreen.fxml");
+        var lobbyCreationScreen = FXML.load(LobbyCreationScreenCtrl.class,
+                "client", "scenes", "lobby", "LobbyCreationScreen.fxml");
+
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, serverConnectScreen, logInScreen, registerScreen,
-                lobbyScreen, gameScreen, globalLeaderboardScreen, lobbyListScreen);
+                lobbyScreen, gameScreen, globalLeaderboardScreen, lobbyListScreen, lobbyCreationScreen,
+                activityListScreen);
+
+        primaryStage.setOnCloseRequest(e -> {
+            e.consume();
+            exitButtonClicked();
+        });
+    }
+
+    /**
+     * Function that fires when exiting the application. Shows a alert to confirm leaving.
+     */
+    public void exitButtonClicked() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                        "Are you sure you want to exit Quizzz?",
+                        ButtonType.YES,
+                        ButtonType.NO);
+        Optional<ButtonType> confirmExit = alert.showAndWait();
+        if (confirmExit.isPresent() && confirmExit.get() == ButtonType.YES) {
+            Platform.exit();
+            System.exit(0);
+        }
     }
 }

@@ -8,6 +8,7 @@ import client.utils.communication.SSEEventHandler;
 import client.utils.communication.SSEHandler;
 import client.utils.communication.SSESource;
 import commons.entities.messages.SSEMessageType;
+import commons.entities.utils.Multiplier;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -34,6 +35,7 @@ public class ReflectionUtilsTest {
         @Description("age in years")
         @DecimalMax("160")
         @DecimalMin("0")
+        @Multiplier(value =  2)
         public Integer age;
 
         @Description("height in centimeters")
@@ -117,6 +119,15 @@ public class ReflectionUtilsTest {
 
         assertThrows(IllegalArgumentException.class, () -> ReflectionUtils.getSSEEventName(otherMethod));
         assertEquals(SSEMessageType.INIT, ReflectionUtils.getSSEEventName(getBalanceMethod));
+    }
+
+    @Test
+    void getMultiplierValue() throws NoSuchFieldException {
+        var ageField = personObj.getClass().getField("age");
+        var balanceField = personObj.getClass().getField("balance");
+
+        assertEquals(1, ReflectionUtils.getMultiplierValue(balanceField));
+        assertEquals(2, ReflectionUtils.getMultiplierValue(ageField));
     }
 
 }

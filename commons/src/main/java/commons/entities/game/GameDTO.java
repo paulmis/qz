@@ -40,6 +40,11 @@ public class GameDTO implements DTO {
     protected String gameId;
 
     /**
+     * If the lobby is private or not.
+     */
+    protected Boolean isPrivate;
+
+    /**
      * The creation date of the game.
      */
     protected LocalDateTime createDate;
@@ -87,6 +92,7 @@ public class GameDTO implements DTO {
     public GameDTO(GameDTO gameDTO) {
         this.id = gameDTO.getId();
         this.gameId = gameDTO.getGameId();
+        this.isPrivate = gameDTO.getIsPrivate();
         this.createDate = gameDTO.getCreateDate();
         this.gameType = gameDTO.getGameType();
         this.configuration = gameDTO.getConfiguration();
@@ -95,5 +101,16 @@ public class GameDTO implements DTO {
         this.currentQuestion = gameDTO.getCurrentQuestion();
         this.players = gameDTO.getPlayers();
         this.host = gameDTO.getHost();
+    }
+
+
+
+    /**
+     * Checks if the game is singleplayer or multiplayer.
+     *
+     * @return whether the game is singleplayer or multiplayer
+     */
+    public boolean isSingleplayer() {
+        return this.configuration.getCapacity() == 1;
     }
 }

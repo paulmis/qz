@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -21,16 +23,16 @@
          <left>
             <Pane fx:id="pane" prefHeight="576.0" prefWidth="262.0" BorderPane.alignment="CENTER">
                <children>
-                  <TextField fx:id="emailField" layoutX="53.0" layoutY="239.0" onKeyTyped="#resetMessage" prefHeight="22.0" prefWidth="161.0">
+                  <TextField fx:id="emailField" layoutX="53.0" layoutY="239.0" prefHeight="22.0" prefWidth="161.0">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </TextField>
-                  <TextField fx:id="passwordField" layoutX="53.0" layoutY="290.0" onKeyTyped="#resetMessage" prefHeight="22.0" prefWidth="161.0">
+                  <PasswordField fx:id="passwordField" layoutX="53.0" layoutY="290.0" prefHeight="22.0" prefWidth="161.0">
                      <font>
                         <Font size="13.0" />
                      </font>
-                  </TextField>
+                  </PasswordField>
                   <CheckBox fx:id="rememberMe" layoutX="52.0" layoutY="329.0" mnemonicParsing="false" onMouseClicked="#rememberMeTick" text="Remember me">
                      <font>
                         <Font name="System Bold" size="12.0" />
@@ -66,14 +68,14 @@
                         <Image url="@/client/images/logo.png" />
                      </image>
                   </ImageView>
-                  <Label fx:id="wrongCredentials" layoutX="47.0" layoutY="470.0" text="Wrong email or password !">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Label>
                </children>
             </Pane>
          </left>
       </BorderPane>
+      <JFXButton fx:id="adminPanelButton" contentDisplay="GRAPHIC_ONLY" onAction="#adminPanelButtonClick" style="-fx-background-color: white; -fx-background-radius: 20;" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="20.0">
+         <graphic>
+            <FontAwesomeIconView glyphName="COG" size="36" />
+         </graphic>
+      </JFXButton>
    </children>
 </AnchorPane>

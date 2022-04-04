@@ -3,6 +3,7 @@ package client.scenes.lobby;
 import static javafx.application.Platform.runLater;
 
 import client.communication.game.LobbyCommunication;
+import client.communication.user.UserCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.UserInfoPane;
 import client.utils.ClientState;
@@ -15,20 +16,26 @@ import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.messages.SSEMessageType;
+import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import lombok.Generated;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Lobby controller.
  */
 @Getter
 @Generated
+@Slf4j
 public class LobbyScreenCtrl implements SSESource {
     private final LobbyCommunication communication;
     private final MainCtrl mainCtrl;
@@ -39,7 +46,7 @@ public class LobbyScreenCtrl implements SSESource {
     @FXML
     private Label gameName;
     @FXML
-    private Label gameId;
+    private Label labelGameId;
     @FXML
     private Label gameType;
     @FXML
@@ -81,30 +88,47 @@ public class LobbyScreenCtrl implements SSESource {
     }
 
     /**
-     * Reacts to a player joining the lobby.
+     * Reacts to the lobby being modified.
      */
-    @SSEEventHandler(SSEMessageType.PLAYER_JOINED)
-    public void playerJoined() {
-        updateView();
+    @SSEEventHandler(SSEMessageType.LOBBY_MODIFIED)
+    public void lobbyModified() {
+        log.info("Lobby modified");
+        // Ask for the new lobby
+        communication.getLobbyInfo(
+            ClientState.game.getId(),
+            (game) -> runLater(() -> {
+                log.info("Lobby info with {} players received", game.getPlayers().size());
+                ClientState.game = game;
+                updateView();
+            }),
+            (error) -> runLater(() -> {
+                mainCtrl.showErrorSnackBar(
+                    error == null
+                        ? "Unable to update the lobby"
+                        : error.getDescription());
+            })
+        );
     }
 
-
-
-
     /**
-     * Reacts to a player leaving the lobby.
+     * Reacts to the lobby being disbanded.
      */
-    @SSEEventHandler(SSEMessageType.PLAYER_LEFT)
-    public void playerLeft() {
-        updateView();
+    @SSEEventHandler(SSEMessageType.LOBBY_DELETED)
+    public void lobbyDisbanded() {
+        mainCtrl.showErrorSnackBar("Lobby has been disbanded");
+        mainCtrl.showLobbyListScreen();
     }
 
     /**
      * Reacts to the game being started by another player.
+     *
+     * @param preparationDuration Duration of preparation phase
      */
     @SSEEventHandler(SSEMessageType.GAME_START)
-    public void gameStarted() {
+    public void gameStarted(Integer preparationDuration) {
         mainCtrl.showGameScreen(ClientState.game.getCurrentQuestion());
+        mainCtrl.getGameScreenCtrl().startTimer(Duration.ofMillis(preparationDuration));
+        ClientState.previousScore = Optional.of(0);
     }
 
     /**
@@ -218,7 +242,7 @@ public class LobbyScreenCtrl implements SSESource {
     public void showUserInfo() {
         if (userInfo == null) {
             // Create userInfo
-            userInfo = new UserInfoPane(server, mainCtrl);
+            userInfo = new UserInfoPane(server, new UserCommunication(), mainCtrl);
             mainAnchor.getChildren().add(userInfo);
             userInfo.setVisible(true);
             runLater(() -> userInfo.setupPosition(userButton, mainAnchor));
@@ -266,7 +290,7 @@ public class LobbyScreenCtrl implements SSESource {
         gameName.setText(hostNickname + "'s game");
 
         // Set game id
-        gameId.setText(gameDTO.getGameId());
+        labelGameId.setText(gameDTO.getGameId());
 
         // Set game class
         gameType.setText(gameDTO.getClass().getName()
@@ -312,5 +336,14 @@ public class LobbyScreenCtrl implements SSESource {
                 .collect(Collectors.toList());
 
         playerList.getChildren().addAll(playerElements);
+    }
+
+    @FXML
+    private void copyLinkButtonClick() {
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        content.putString(labelGameId.getText());
+        clipboard.setContent(content);
+        mainCtrl.showInformationalSnackBar("Copied!");
     }
 }

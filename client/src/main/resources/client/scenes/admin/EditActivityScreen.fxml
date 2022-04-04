@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="editActivityAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: white; -fx-background-radius: 20; -fx-border-radius: 20;" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.admin.EditActivityScreenCtrl">
+   <children>
+      <Label alignment="CENTER" layoutX="206.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Activity">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <JFXButton fx:id="saveActivityButton" layoutX="103.0" layoutY="438.0" onAction="#saveActivityButtonClick" prefHeight="48.0" prefWidth="293.0" ripplerFill="#3baa80" style="-fx-background-color: green; -fx-background-radius: 20;" text="Save activity" textFill="WHITE">
+         <graphic>
+            <FontAwesomeIconView fx:id="saveActivityIcon" fill="WHITE" glyphName="CHECK" size="36" />
+         </graphic>
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </JFXButton>
+      <Label layoutX="90.0" layoutY="244.0" text="Description">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="90.0" layoutY="311.0" text="Cost">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <TextField fx:id="activityCostTextField" layoutX="247.0" layoutY="311.0" prefHeight="35.0" prefWidth="141.0" promptText="Enter the cost here" style="-fx-background-color: lightGray;">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font></TextField>
+      <Label layoutX="394.0" layoutY="319.0" text="Wh">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <ImageView fx:id="activityImageView" fitHeight="150.0" fitWidth="150.0" layoutX="172.0" layoutY="70.0" onMouseClicked="#changeImageClick" pickOnBounds="true" />
+      <JFXTextArea fx:id="activityDescriptionTextArea" focusColor="#09802b" layoutX="247.0" layoutY="238.0" prefHeight="48.0" prefWidth="177.0" />
+      <Label layoutX="90.0" layoutY="368.0" text="Source">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <JFXTextArea fx:id="activitySourceTextArea" layoutX="247.0" layoutY="362.0" prefHeight="48.0" prefWidth="177.0" />
+      <Label fx:id="addImageActivityLabel" layoutX="185.0" layoutY="136.0" text="Press to add an image" visible="false">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

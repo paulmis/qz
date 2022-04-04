@@ -31,9 +31,14 @@ public class ActivityDTO implements DTO {
     protected Long cost;
 
     /**
-     * URL of the picture of the activity.
+     * URI or filepath of the picture of the activity.
      */
     protected String icon;
+
+    /**
+     * ID of the picture of the activity.
+     */
+    protected UUID iconId;
 
     /**
      * Source of the information in the activity.
