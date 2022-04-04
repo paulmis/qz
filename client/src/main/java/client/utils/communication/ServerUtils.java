@@ -51,7 +51,7 @@ public class ServerUtils {
 
     private static String SERVER = "http://localhost:8080/";
     public static SSEHandler sseHandler = new SSEHandler();
-    public static Client client = ClientBuilder.newClient();
+    public static Client client = newClient();
 
     public static String getImagePathFromId(String id) {
         return SERVER + "api/resource/" + id.toString();
@@ -72,11 +72,21 @@ public class ServerUtils {
      *
      * @return the new client.
      */
-    private Client newClient() {
+    private static Client newClient() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
         return ClientBuilder.newClient().register(provider);
+    }
+
+    /**
+     * Resets the client.
+     */
+    private void resetClient() {
+        if (client != null) {
+            client.close();
+        }
+        client = newClient();
     }
 
     /** Gets a list of the leaderboard images from the server.
@@ -115,7 +125,7 @@ public class ServerUtils {
      */
     public void register(String username, String email, String password,
                            RegisterHandler registerHandler) {
-        client = this.newClient();
+        resetClient();
         UserDTO user = new UserDTO(username, email, password);
         var invocation = client
                 .target(SERVER).path("/api/auth/register")
@@ -168,7 +178,7 @@ public class ServerUtils {
     public void logIn(String email, String password,
                       LogInHandlerSuccess logInHandlerSuccess, LogInHandlerFail logInHandlerFail) {
 
-        client = this.newClient();
+        resetClient();
         UserDTO user = new UserDTO("", email, password);
         Invocation invocation = client
                 .target(SERVER).path("/api/auth/login")
@@ -219,6 +229,6 @@ public class ServerUtils {
     }
 
     public void signOut() {
-        client = newClient();
+        resetClient();
     }
 }
