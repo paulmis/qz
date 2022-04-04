@@ -58,6 +58,7 @@ class MatchQuestionTest {
             expectedRightChoice.add(getActivity(idx).getDTO());
         }
         AnswerDTO expectedRightAnswer = new AnswerDTO();
+        expectedRightAnswer.setQuestionId(q.getId());
         expectedRightAnswer.setResponse(expectedRightChoice);
         assertEquals(expectedRightAnswer, q.getRightAnswer());
     }
