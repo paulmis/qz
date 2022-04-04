@@ -139,16 +139,16 @@ public class GameScreenCtrl implements Initializable, SSESource {
     public void toQuestionStage(Integer delay) {
         log.debug("Question stage handler triggered. Delay: {}", delay);
 
-        communication.getQuestionNumber(ClientState.game.getId(), questionNumber -> runLater(()->{
+        communication.getQuestionNumber(ClientState.game.getId(), questionNumber -> runLater(() -> {
             // Sets the question number
-            Integer qNumber = questionNumber + 1;
+            Integer qnum = questionNumber + 1;
             if (ClientState.game.getConfiguration() instanceof NormalGameConfigurationDTO) {
                 questionNumberLabel.setText(
-                        qNumber
+                        qnum
                                 + "/"
-                                + ((NormalGameConfigurationDTO)ClientState.game.getConfiguration()).getNumQuestions());
+                                + ((NormalGameConfigurationDTO) ClientState.game.getConfiguration()).getNumQuestions());
             } else {
-                questionNumberLabel.setText(qNumber.toString());
+                questionNumberLabel.setText(qnum.toString());
             }
         }), error -> runLater(() -> log.error("error occurred: " + error.getDescription())));
 
