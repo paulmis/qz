@@ -117,7 +117,8 @@ public class DefiniteGameFSM extends GameFSM {
         setState(FSMState.ANSWER);
 
         // Update the scores
-        getContext().getGameService().updateScores(getGame());
+        refreshGame();
+        getContext().getGameService().updateScores(this.game);
 
         // Delay before progressing to the next stage
         long delay = getContext().getQuizConfiguration().getTiming().getAnswerTime();

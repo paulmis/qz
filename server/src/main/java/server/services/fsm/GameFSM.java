@@ -19,7 +19,7 @@ public abstract class GameFSM {
     /**
      * Game that is being managed.
      */
-    @NonNull private Game game;
+    @NonNull protected Game game;
 
     /**
      * Execution context of the FSM.
@@ -93,4 +93,8 @@ public abstract class GameFSM {
      * Run the finite state machine.
      */
     public abstract void run();
+
+    public void refreshGame() {
+        game = context.getRepository().findById(game.getId()).get();
+    }
 }
