@@ -60,8 +60,8 @@ public class GameController {
         Game game = gameRepository.getPlayersGame(user.getId()).orElseThrow(GameNotFoundException::new);
 
         // Mark the player as abandoned
-        gameService.removePlayer(game.get(), user.get());
-        gameRepository.save(game.get());
+        gameService.removePlayer(game, user);
+        gameRepository.save(game);
 
         log.debug("User '{}' left game '{}'", user.getUsername(), game.getId());
         // Return 200

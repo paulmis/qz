@@ -229,7 +229,7 @@ public class LobbyController {
         // If the game doesn't start successfully, return 409
         // If the SSE events are not yet set-up return 425
         try {
-            gameService.start(lobby.getId());
+            gameService.start(lobby);
         } catch (IOException ex) {
             log.error("Could not start game", ex);
             return ResponseEntity.status(HttpStatus.TOO_EARLY).body(ex.getMessage());
