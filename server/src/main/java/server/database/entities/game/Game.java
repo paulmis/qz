@@ -93,7 +93,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Questions assigned to this game.
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @OrderColumn
     protected List<Question> questions = new ArrayList<>();
     /**
@@ -322,7 +322,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         }
         // Sets the game players' score to either the base score if condition is false,
         // or returns the base score * modifier
-        gamePlayer.setScore((int) score * Math.round(this.getCurrentQuestionNumber()
+        gamePlayer.setScore(gamePlayer.getScore() + (int) score * Math.round(this.getCurrentQuestionNumber()
                 .equals(gamePlayer.getUserPowerUps().get(PowerUp.DoublePoints))
                 ? modifier : 1));
     }
