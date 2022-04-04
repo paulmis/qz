@@ -30,8 +30,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
@@ -89,16 +89,16 @@ public class ServerUtils {
      * @param email email string entered by user
      * @return true if it is a valid email, false otherwise
      */
-    public boolean IsValidEmail(String email)
-    {
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
-                "[a-zA-Z0-9_+&*-]+)*@" +
-                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
-                "A-Z]{2,7}$";
+    public boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."
+                + "[a-zA-Z0-9_+&*-]+)*@"
+                + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
+                + "A-Z]{2,7}$";
 
         Pattern emailPattern = Pattern.compile(emailRegex);
-        if (email == null)
+        if (email == null) {
             return false;
+        }
         return emailPattern.matcher(email).matches();
     }
 
