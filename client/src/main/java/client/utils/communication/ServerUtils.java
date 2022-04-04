@@ -90,23 +90,6 @@ public class ServerUtils {
         client = newClient();
     }
 
-    /** Gets a list of the leaderboard images from the server.
-     *
-     * @return a list of leaderboard images.
-     */
-    public List<URL> getLeaderBoardImages() {
-        try {
-            return Arrays.asList(
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"));
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
     /**
      * Handler for when the register succeeds.
      */
@@ -124,7 +107,7 @@ public class ServerUtils {
      * @param registerHandler handler called when a response is received.
      */
     public void register(String username, String email, String password,
-                           RegisterHandler registerHandler) {
+                           File image, RegisterHandler registerHandler) {
         resetClient();
 
         // The list of attachments
@@ -239,7 +222,7 @@ public class ServerUtils {
      * @param serverPath the server path to connect to
      */
     public void connect(String serverPath) {
-        this.SERVER = serverPath;
+        SERVER = serverPath;
     }
 
     /**
@@ -253,7 +236,7 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON)
                 .get();
         if (r.getStatus() == Response.Status.OK.getStatusCode()) {
-            return r.readEntity(new GenericType<List<UserDTO>>() {
+            return r.readEntity(new GenericType<>() {
             });
         }
         return new ArrayList<>();
