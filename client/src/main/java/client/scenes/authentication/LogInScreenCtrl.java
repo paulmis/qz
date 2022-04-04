@@ -9,7 +9,6 @@ import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameStatus;
-
 import java.io.File;
 import java.net.URL;
 import java.util.List;
