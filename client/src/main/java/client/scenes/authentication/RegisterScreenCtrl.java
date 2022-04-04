@@ -127,11 +127,12 @@ public class RegisterScreenCtrl implements Initializable {
         selectFile.getExtensionFilters().add(imageFilter);
         // Filter that allows user to only select image files of types jpg png
         File pictureFile = selectFile.showOpenDialog(mainCtrl.getPrimaryStage());
+
         // Opens up a dialogue that lets user select a file
         if (pictureFile != null) {  // Every user needs to select a picture
             usernameSetButton.setDisable(false);
             uploadImage.setVisible(false);
-            profilePicture.setImage(new Image(pictureFile.getAbsolutePath()));
+            profilePicture.setImage(new Image(pictureFile.toURI().toString()));
             userImage = pictureFile;
         }
     }
