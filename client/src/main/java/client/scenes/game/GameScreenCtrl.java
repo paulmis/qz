@@ -218,6 +218,11 @@ public class GameScreenCtrl implements Initializable, SSESource {
         );
     }
 
+    /**
+     * Handles the "player left" notification.
+     *
+     * @param userId ID of the user leaving
+     */
     @SSEEventHandler(SSEMessageType.PLAYER_LEFT)
     public void playerLeftReact(UUID userId) {
         String username = ClientState.game.getPlayers().stream()
@@ -228,12 +233,18 @@ public class GameScreenCtrl implements Initializable, SSESource {
         updateInGame();
     }
 
+    /**
+     * Handles the "player joined" notification.
+     */
     @SSEEventHandler(SSEMessageType.PLAYER_REJOINED)
     public void playerRejoinedReact() {
         mainCtrl.showInformationalSnackBar("A player has rejoined the game.");
         updateInGame();
     }
 
+    /**
+     * Adapts to change in game.
+     */
     public void updateInGame() {
         log.debug("An update in the game has occurred");
         // Update Leaderboard to show changes

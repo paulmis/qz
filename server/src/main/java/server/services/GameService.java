@@ -354,7 +354,7 @@ public class GameService {
 
             int streakScore = game.computeStreakScore(player, score);
             //Apply double points power up
-            //game.applyScorePowerUpModifiers(player, streakScore, 2);
+            game.applyScorePowerUpModifiers(player, streakScore, 2);
             // Persist the score changes
             gamePlayerRepository.save(player);
 
