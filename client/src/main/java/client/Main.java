@@ -60,7 +60,7 @@ public class Main extends Application {
         var registerScreen = FXML.load(RegisterScreenCtrl.class,
                 "client", "scenes", "authentication", "RegisterScreen.fxml");
         var lobbyScreen = FXML.load(LobbyScreenCtrl.class,
-                "client", "scenes", "lobby", "LobbyScreen.fxml");
+                "client", "scenes", "lobby", "LobbyScreen2.fxml");
         var gameScreen = FXML.load(GameScreenCtrl.class,
                 "client", "scenes", "GameScreen.fxml");
         var globalLeaderboardScreen = FXML.load(GlobalLeaderboardCtrl.class,
