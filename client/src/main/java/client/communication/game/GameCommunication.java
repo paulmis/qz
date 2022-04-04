@@ -218,6 +218,39 @@ public class GameCommunication {
         });
     }
 
+
+    /**
+     * Function that causes the user to leave the game.
+     */
+    public void getQuestionNumber(UUID gameId,
+                                  GetQuestionNumberHandlerSuccess handleSuccess,
+                                  GetQuestionNumberHandlerFail handleFail) {
+        Invocation invocation = ServerUtils.getRequestTarget()
+                .path("/api/game/" + gameId + "/questionNumber")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildGet();
+
+        // Perform the query asynchronously
+        invocation.submit(new InvocationCallback<Response>() {
+
+            @Override
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    handleSuccess.handle(response.readEntity(Integer.class));
+                } else {
+                    handleFail.handle(response.readEntity(ApiError.class));
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                handleFail.handle(null);
+                throwable.printStackTrace();
+            }
+        });
+    }
+
     /**
      * Gets a list of the leaderboard images from the server.
      *
@@ -347,6 +380,20 @@ public class GameCommunication {
      * Handler for when sending a power-up fails.
      */
     public interface SendPowerUpHandlerFail {
+        void handle(ApiError error);
+    }
+
+    /**
+     * Handler for when getting the question number succeeds.
+     */
+    public interface GetQuestionNumberHandlerSuccess {
+        void handle(Integer questionNumber);
+    }
+
+    /**
+     * Handler for when getting the question number fails.
+     */
+    public interface GetQuestionNumberHandlerFail {
         void handle(ApiError error);
     }
 

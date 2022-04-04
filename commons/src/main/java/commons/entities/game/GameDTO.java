@@ -67,7 +67,7 @@ public class GameDTO implements DTO {
     /**
      * The number of the current question.
      */
-    protected Integer currentQuestionNumber = null;
+    protected Integer currentQuestionNumber;
 
     /**
      * The current question.
