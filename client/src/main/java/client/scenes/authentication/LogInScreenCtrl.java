@@ -4,17 +4,20 @@ import static javafx.application.Platform.runLater;
 
 import client.scenes.MainCtrl;
 import client.utils.ClientState;
+import client.utils.communication.FileUtils;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameStatus;
+
+import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
@@ -26,12 +29,14 @@ import lombok.Generated;
 @Generated
 public class LogInScreenCtrl implements Initializable {
 
+    private final FileUtils file;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private File localFile;
 
     @FXML private JFXButton logInButton;
     @FXML private JFXButton createAccountButton;
-    @FXML private CheckBox rememberMe;
+    @FXML private CheckBox rememberUser;
     @FXML private TextField emailField;
     @FXML private TextField passwordField;
     @FXML private Pane pane;
@@ -41,9 +46,10 @@ public class LogInScreenCtrl implements Initializable {
      *
      */
     @Inject
-    public LogInScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public LogInScreenCtrl(FileUtils file, ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
+        this.file = file;
     }
 
     /**
@@ -55,6 +61,19 @@ public class LogInScreenCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Create a local file in documents to store user credentials
+        this.localFile = new File(System.getProperty("user.home") + "/Documents/quizzzCredentials.txt");
+        // Check if local file has a saved user credentials
+        List<String> credentials = file.retrieveCredentials(localFile);
+        // Set saved credentials
+        if (!credentials.contains(null)) {
+            rememberUser.setSelected(true);
+        } else {
+            credentials.add(0, "");
+            credentials.add(1, "");
+        }
+        emailField.setText(credentials.get(0));
+        passwordField.setText(credentials.get(1));
     }
 
     /**
@@ -63,6 +82,11 @@ public class LogInScreenCtrl implements Initializable {
      */
     @FXML
     private void logInButtonClick() {
+        if (rememberUser.isSelected()) {
+            file.saveCredentials(localFile, emailField.getText(), passwordField.getText());
+        } else {
+            localFile.delete();
+        }
         server.logIn(
             emailField.getText(), passwordField.getText(),
             // Success
@@ -95,15 +119,6 @@ public class LogInScreenCtrl implements Initializable {
     @FXML
     private void createAccountButtonClick() {
         panelTransition();
-    }
-
-    /**
-     * Function that keeps track if user
-     * wants to be remembered locally or not.
-     */
-    @FXML
-    private void rememberMeTick() {
-        rememberMe.getUserData();
     }
 
     /**
