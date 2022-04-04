@@ -343,12 +343,14 @@ public class LobbyController {
 
         // Check that the player is not already in a lobby or a game
         if (gameRepository.getPlayersLobbyOrGame(user.getId()).isPresent()) {
+            log.error("Player tried to join a lobby while being already in one.");
             throw new PlayerAlreadyInLobbyOrGameException();
         }
 
         // Check that the game hasn't started yet and add the player
         GamePlayer player = new GamePlayer(user);
         if (lobby.getStatus() != GameStatus.CREATED || !lobby.add(player)) {
+            log.error("Player tried to join a started game.");
             throw new GameAlreadyStartedException(user, lobby);
         }
 
