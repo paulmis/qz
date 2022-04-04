@@ -66,6 +66,7 @@ public class LobbyServiceTest {
         // Create the game
         lobby = new NormalGame();
         lobby.setId(getUUID(0));
+        lobby.setGameId("aS33DB");
         lobby.setConfiguration(new NormalGameConfiguration(3, Duration.ofSeconds(13), 2, 2, 2f, 100, 0, 75));
         lobby.add(joePlayer);
         lobby.add(susannePlayer);
@@ -76,6 +77,9 @@ public class LobbyServiceTest {
 
     @Test
     void removePlayerOk() {
+        // Mock the repository
+        when(gameRepository.save(lobby)).thenReturn(lobby);
+
         // Call the service function
         assertTrue(lobbyService.removePlayer(lobby, joe));
 

@@ -8,6 +8,7 @@ import commons.entities.game.GameDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.GameType;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -92,13 +93,14 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * Questions assigned to this game.
      */
     @ManyToMany
+    @OrderColumn
     protected List<Question> questions = new ArrayList<>();
     /**
      * PRNG.
      */
     @Transient
     private SaveableRandom random = new SaveableRandom(this.seed);
-
+    
     /**
      * Creates a new game from a DTO.
      * Only an empty lobby (no players or questions) can be initialized.
@@ -107,6 +109,9 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public Game(GameDTO dto) {
         ModelMapper mapper = new ModelMapper();
+        mapper.addConverter(
+                context -> Duration.ofMillis(context.getSource()),
+                Integer.class, Duration.class);
         mapper.getConfiguration().setSkipNullEnabled(true);
         if (dto.getId() == null) {
             // This id will change once the game entity is saved, but it must be non-null
@@ -134,7 +139,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
-     * Get UUIDs of GamePlayers.
+     * Returns ids of all users in the game.
      *
      * @return UUIDs of all GamePlayers in the current game.
      */
@@ -315,18 +320,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
-     * Updates the power-up points of the player based on if his answer is correct.
-     *
-     * @param gamePlayer the game player that added the answer.
-     * @param isCorrect  if the answer is correct.
-     */
-    public void updatePowerUpPoints(GamePlayer gamePlayer, boolean isCorrect) {
-        if (isCorrect) {
-            gamePlayer.setPowerUpPoints(gamePlayer.getPowerUpPoints() + 1);
-        }
-    }
-
-    /**
      * Get the number of players in the game.
      *
      * @return the number of players still in the game
@@ -342,6 +335,15 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     public boolean isFull() {
         return size() >= configuration.getCapacity();
+    }
+
+    /**
+     * Checks if the game is singleplayer, i.e. the capacity is 1.
+     *
+     * @return true if the game is singleplayer, false otherwise
+     */
+    public boolean isSingleplayer() {
+        return getConfiguration().getCapacity() == 1;
     }
 
     /**

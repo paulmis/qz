@@ -34,7 +34,6 @@ public class LogInScreenCtrl implements Initializable {
     @FXML private CheckBox rememberMe;
     @FXML private TextField emailField;
     @FXML private TextField passwordField;
-    @FXML private Label wrongCredentials;
     @FXML private Pane pane;
 
     /**
@@ -56,7 +55,6 @@ public class LogInScreenCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.wrongCredentials.setVisible(false);
     }
 
     /**
@@ -85,7 +83,6 @@ public class LogInScreenCtrl implements Initializable {
             }),
             // Failure
             () -> runLater(() -> {
-                wrongCredentials.setVisible(true);
                 mainCtrl.showErrorSnackBar("Something went wrong while logging you in.");
             })
         );
@@ -98,15 +95,6 @@ public class LogInScreenCtrl implements Initializable {
     @FXML
     private void createAccountButtonClick() {
         panelTransition();
-    }
-
-    /**
-     * Function that resets the message
-     * when entering a new email / password.
-     */
-    @FXML
-    private void resetMessage() {
-        this.wrongCredentials.setVisible(false);
     }
 
     /**
@@ -131,5 +119,10 @@ public class LogInScreenCtrl implements Initializable {
         panelTranslate.setAutoReverse(false);
         panelTranslate.setOnFinished(e -> mainCtrl.showRegisterScreen());
         panelTranslate.play();
+    }
+
+    @FXML
+    private void adminPanelButtonClick() {
+        mainCtrl.showActivityListScreen();
     }
 }

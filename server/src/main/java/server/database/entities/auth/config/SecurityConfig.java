@@ -40,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/api/leaderboard/**").permitAll()
                     // TODO: proper access control here
                     .antMatchers("/api/activity/**").permitAll()
-                    // TODO: proper access control here
+                    .antMatchers("/api/resource/**").permitAll()
                     .antMatchers("/api/question/**").permitAll()
                     .antMatchers("/api/lobby/available").permitAll()
                     .antMatchers("/api/**").hasRole("USER")

@@ -2,7 +2,12 @@ package server.database.entities.game;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import commons.entities.game.GamePlayerDTO;
+import commons.entities.game.PowerUp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.persistence.*;
 import lombok.*;
 import org.modelmapper.ModelMapper;
@@ -30,11 +35,6 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     protected User user;
 
     /**
-     * The player's nickname within the game.
-     */
-    protected String nickname;
-
-    /**
      * Indicates whether the player abandoned the game before it ended.
      */
     protected boolean abandoned = false;
@@ -50,9 +50,11 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
     protected Integer streak = 0;
 
     /**
-     * The power-up points of a player which can be used to play power-ups.
+     * Maps power-up used to the question number that is was used on.
+     * Allows for double point power-up to easily check.
      */
-    protected Integer powerUpPoints = 0;
+    @ElementCollection
+    protected Map<PowerUp, Integer> userPowerUps = new HashMap<>();
 
     /**
      * The date the player joined the lobby.
@@ -76,14 +78,9 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
         joinDate = LocalDateTime.now();
     }
 
-    /**
-     * Returns player's nickname. If one isn't set, returns their username.
-     *
-     * @return player's nickname
-     */
-    public String getNickname() {
-        // the user != null is necessary
-        return nickname == null && user != null ? user.getUsername() : nickname;
+
+    public String getUsername() {
+        return user.getUsername();
     }
 
     /**
@@ -94,12 +91,18 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
      */
     public GamePlayer(GamePlayerDTO dto, User user) {
         this.user = user;
-        this.nickname = dto.getNickname();
         this.score = dto.getScore();
         this.streak = dto.getStreak();
     }
 
+    /**
+     * Converts to game player dto.
+     *
+     * @return the gameplayer dto
+     */
     public GamePlayerDTO getDTO() {
-        return new ModelMapper().map(this, GamePlayerDTO.class);
+        var gamePlayerDTO = new ModelMapper().map(this, GamePlayerDTO.class);
+        gamePlayerDTO.setNickname(getUsername());
+        return gamePlayerDTO;
     }
 }

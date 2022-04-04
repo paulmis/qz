@@ -9,10 +9,7 @@ import java.util.UUID;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import jdk.jfr.Description;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * Data transfer object for the survival-mode game configuration.`
@@ -21,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true)
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 @JsonView(Views.Public.class)
 public class SurvivalGameConfigurationDTO extends GameConfigurationDTO {
@@ -30,7 +28,7 @@ public class SurvivalGameConfigurationDTO extends GameConfigurationDTO {
     @DecimalMin(value = "0.1")
     @DecimalMax(value = "10.0")
     @Description("Speed modifier")
-    protected Float speedModifier;
+    protected Float speedModifier = 1f;
 
     /**
      * Normal game config constructor.
@@ -45,7 +43,7 @@ public class SurvivalGameConfigurationDTO extends GameConfigurationDTO {
      * @param pointsWrong the number of points per incorrect answer.
      * @param correctAnswerThreshold the correct answer threshold.
      */
-    public SurvivalGameConfigurationDTO(UUID id, Duration answerTime, Integer capacity, Float speedModifier,
+    public SurvivalGameConfigurationDTO(UUID id, Integer answerTime, Integer capacity, Float speedModifier,
                                         Integer streakSize,
                                         Float streakMultiplier,
                                         Integer pointsCorrect,

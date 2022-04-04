@@ -52,7 +52,7 @@ class QuestionControllerTest {
         for (int i = 0; i < 10; i++) {
             activities.add(new Activity("Activity " + i));
         }
-        lenient().when(activityRepository.findAll()).thenReturn(activities);
+        lenient().when(activityRepository.findByAbandonedIsFalse()).thenReturn(activities);
 
         User user = new User("John", "test@example.com", "password");
         SecurityContextHolder.getContext().setAuthentication(

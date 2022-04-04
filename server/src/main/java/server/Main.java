@@ -17,24 +17,36 @@
 package server;
 
 import lombok.Generated;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.servlet.HandlerExceptionResolver;
+import server.configuration.FileSystemStorageConfiguration;
+import server.configuration.ResourceConfiguration;
 import server.configuration.quiz.QuizConfiguration;
+import server.services.storage.StorageService;
 
 /**
  * Main Spring Boot application class.
  */
-@SpringBootApplication
-@EntityScan(basePackages = { "commons", "server" })
 @Generated
-@EnableConfigurationProperties({QuizConfiguration.class})
+@SpringBootApplication
+@EntityScan(basePackages = {"commons", "server"})
+@EnableConfigurationProperties({FileSystemStorageConfiguration.class,
+                                ResourceConfiguration.class,
+                                QuizConfiguration.class})
 public class Main {
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
+    }
+
+    @Bean
+    CommandLineRunner init(StorageService storageService) {
+        return args -> {
+            storageService.init();
+        };
     }
 }

@@ -52,7 +52,24 @@ public abstract class GameFSM {
         Date executionTime = Date.from(Instant.now().plus(delay));
         setFuture(new FSMFuture(
                 Optional.of(context.getTaskScheduler().schedule(task, executionTime)),
-                executionTime));
+                executionTime, task));
+    }
+
+    /**
+     * Reprograms the current task to a different time.
+     *
+     * @param delay the new delay.
+     */
+    public void reprogramCurrentTask(Duration delay) {
+        log.debug("[{}] Reprogramming task in {}", game.getId(), delay);
+        Date executionTime = Date.from(Instant.now().plus(delay));
+
+        if (future.getFuture().isPresent()) {
+            future.getFuture().get().cancel(true);
+            setFuture(new FSMFuture(
+                    Optional.of(context.getTaskScheduler().schedule(future.getRunnable(), executionTime)),
+                    executionTime, future.getRunnable()));
+        }
     }
 
     /**

@@ -2,9 +2,12 @@ package server.services;
 
 import commons.entities.AnswerDTO;
 import commons.entities.game.GameStatus;
+import commons.entities.game.PowerUp;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -15,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import server.api.exceptions.PowerUpDisabledException;
+import server.api.exceptions.SSEFailedException;
 import server.configuration.quiz.QuizConfiguration;
 import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
@@ -29,6 +34,8 @@ import server.database.repositories.question.QuestionRepository;
 import server.services.answer.AnswerCollection;
 import server.services.fsm.DefiniteGameFSM;
 import server.services.fsm.FSMContext;
+import server.services.fsm.FSMState;
+import server.services.fsm.GameFSM;
 
 /**
  * Get the questions for a specific game.
@@ -74,6 +81,7 @@ public class GameService {
     public List<Question> provideQuestions(int count, List<Question> usedQuestions) throws IllegalStateException {
         // Check that there are enough questions
         if (questionRepository.count() < count + usedQuestions.size()) {
+            log.error("Could not provide {} questions: not enough questions in the database.", count);
             throw new IllegalStateException("Not enough questions in the database.");
         }
 
@@ -107,10 +115,11 @@ public class GameService {
      * @throws IOException             if sending the GAME_START message fails
      */
     @Transactional
-    public void startGame(Game game)
-            throws NotImplementedException, IllegalStateException, IOException {
+    public Game start(Game game)
+            throws NotImplementedException, IllegalStateException, SSEFailedException {
         // Make sure that the lobby is full and not started
         if (game.getStatus() != GameStatus.CREATED || !game.isFull()) {
+            log.debug("[{}] Cannot start game: game is not full or has already started.", game.getId());
             throw new IllegalStateException();
         }
 
@@ -120,24 +129,25 @@ public class GameService {
         // Initialize the answers collection
         allGameAnswers.put(game.getId(), new ConcurrentHashMap<>());
 
-        // Initialize the questions
+        // Initialize the game
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;
             definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
-
-            // Distribute the start event to all players
-            sseManager.send(definiteGame.getUserIds(), new SSEMessage(SSEMessageType.GAME_START));
+            definiteGame = gameRepository.save(definiteGame);
 
             // Create and start a finite state machine for the game.
             fsmManager.addFSM(definiteGame,
-                    new DefiniteGameFSM(definiteGame,
+                    new DefiniteGameFSM(
+                            definiteGame,
                             new FSMContext(this)));
-            fsmManager.startFSM(definiteGame);
+            fsmManager.startFSM(definiteGame.getId());
+
+            // Return the started game
+            return definiteGame;
         } else {
+            log.warn("[{}] Attempt to start an unsupported game type: {}", game.getId(), game.getClass().getName());
             throw new NotImplementedException("Starting games other than definite games is not yet supported.");
         }
-
-        gameRepository.save(game);
     }
 
     /**
@@ -179,8 +189,11 @@ public class GameService {
     @Transactional
     public void nextQuestion(Game<?> game, Long delay)
             throws IOException, GameFinishedException {
+        log.debug("[{}] Trying to move to next question", game.getId());
+
         // Check if the game should finish
         if (game.shouldFinish()) {
+            log.info("[{}] Game should finish", game.getId());
             throw new GameFinishedException();
         }
 
@@ -318,9 +331,12 @@ public class GameService {
     public void updateScores(Game game, Question question) {
         AnswerCollection answerCollection = getAnswers(game, question);
         if (answerCollection == null) {
+            // If there are no answers, there's nothing to do
             log.error("[{}] No answer collection for question {}.", game.getId(), question.getId());
-            throw new IllegalArgumentException("No answer collection for question " + question.getId());
+            return;
         }
+
+        log.debug("[{}] Updating scores for question {}.", game.getId(), question.getId());
 
         Map<UUID, Integer> scores = question.checkAnswer(answerCollection).entrySet().stream().collect(
                 Collectors.toMap(
@@ -335,13 +351,51 @@ public class GameService {
             boolean isCorrect = score > game.getConfiguration().getCorrectAnswerThreshold();
 
             game.updateStreak(player, isCorrect);
-            game.updatePowerUpPoints(player, isCorrect);
 
             int streakScore = game.computeStreakScore(player, score);
             player.setScore(player.getScore() + streakScore);
 
             // Persist the score changes
             gamePlayerRepository.save(player);
+
+            log.debug("[{}] player {} now has {} points", game.getId(), player.getId(), score);
         });
+
+        log.debug("[{}] Scores updated.", game.getId());
+    }
+
+
+    /**
+     * Applies a power-up to a game.
+     *
+     * @param game the game.
+     * @param player the player that sent the power-up
+     * @param powerUp the power-up that is to be applied.
+     * @throws SSEFailedException if it fails to send the messages.
+     */
+    public void sendPowerUp(Game game, GamePlayer player, PowerUp powerUp) throws SSEFailedException {
+        switch (powerUp) {
+            case HalveTime:
+                GameFSM gameFSM = fsmManager.getFSM(game);
+
+                if (gameFSM.getState() != FSMState.QUESTION) {
+                    throw new PowerUpDisabledException();
+                }
+
+                var newDelay = (gameFSM.getFuture().getScheduledDate().getTime() - (new Date()).getTime()) / 2;
+
+                // Doesn't let the user play this power-up if there are only 1 second left
+                if (newDelay < 1000) {
+                    throw new PowerUpDisabledException();
+                }
+
+                gameFSM.reprogramCurrentTask(Duration.ofMillis(newDelay));
+                break;
+            default:
+                break;
+        }
+
+        log.info("Sending power-up " + powerUp.name() + " to game: " + game.getGameId());
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.POWER_UP_PLAYED, powerUp.name()));
     }
 }

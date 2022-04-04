@@ -49,10 +49,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ServerUtils {
 
-    private static final String SERVER = "http://localhost:8080/";
+    private static String SERVER = "http://localhost:8080/";
     public static SSEHandler sseHandler = new SSEHandler();
-    public static Client client = ClientBuilder.newClient().register(JavaTimeModule.class)
-            .register(JacksonJsonProvider.class).register(JavaTimeModule.class);
+    public static Client client = ClientBuilder.newClient();
+
+    public static String getImagePathFromId(String id) {
+        return SERVER + "api/resource/" + id.toString();
+    }
 
     /**
      * Provides a request target for the server that can be used to build and invoke a query.
@@ -72,7 +75,6 @@ public class ServerUtils {
     private Client newClient() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-
         JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
         return ClientBuilder.newClient().register(provider);
     }
@@ -192,224 +194,12 @@ public class ServerUtils {
     }
 
     /**
-     * Handler for when the create lobby succeeds.
-     */
-    public interface CreateLobbyHandlerSuccess {
-        void handle(GameDTO game);
-    }
-
-    /**
-     * Handler for when the create lobby fails.
-     */
-    public interface CreateLobbyHandlerFail {
-        void handle();
-    }
-
-    /**
-     * This function makes a call to create a new lobby.
+     * Function to connect to the server and sets the server path.
      *
-     * @param createLobbyHandlerSuccess The function that will be called if the request is successful.
-     * @param createLobbyHandlerFail The function that will be called if the request is unsuccessful.
+     * @param serverPath the server path to connect to
      */
-    public void createLobby(CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
-                            CreateLobbyHandlerFail createLobbyHandlerFail) {
-        var config = new NormalGameConfigurationDTO(null, Duration.ofSeconds(5), 1, 3, 3, 2f, 100, 0, 75);
-        var game = new NormalGameDTO();
-        game.setId(UUID.randomUUID());
-        game.setConfiguration(config);
-
-        Invocation invocation = client
-                .target(SERVER).path("/api/lobby")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildPost(Entity.entity(game, APPLICATION_JSON));
-
-        invocation.submit(new InvocationCallback<GameDTO>() {
-
-            @Override
-            public void completed(GameDTO game) {
-                System.out.println(game);
-                ClientState.game = game;
-                createLobbyHandlerSuccess.handle(game);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                createLobbyHandlerFail.handle();
-                throwable.printStackTrace();
-            }
-        });
-    }
-
-    /**
-     * Handler for when getting all lobbies succeeds.
-     */
-    public interface GetLobbiesHandlerSuccess {
-        void handle(List<GameDTO> games);
-    }
-
-    /**
-     * Handler for when getting all lobbies fails.
-     */
-    public interface GetLobbiesHandlerFail {
-        void handle();
-    }
-
-    /**
-     * Function that gets all the lobbies in the database.
-     *
-     * @param getLobbiesHandlerSuccess The function that will be called if the request is successful.
-     * @param getLobbiesHandlerFail The function that will be called if the request is unsuccessful.
-     */
-    public void getLobbies(GetLobbiesHandlerSuccess getLobbiesHandlerSuccess,
-                            GetLobbiesHandlerFail getLobbiesHandlerFail) {
-        Invocation invocation = client
-                .target(SERVER).path("/api/lobby/available")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildGet();
-
-        invocation.submit(new InvocationCallback<List<GameDTO>>() {
-
-            @Override
-            public void completed(List<GameDTO> o) {
-                getLobbiesHandlerSuccess.handle(o);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                getLobbiesHandlerFail.handle();
-                throwable.printStackTrace();
-            }
-        });
-    }
-
-    /**
-     * Handler for when joining a lobby succeeds.
-     */
-    public interface JoinLobbyHandlerSuccess {
-        void handle(GameDTO gameDTO);
-    }
-
-    /**
-     * Handler if the joining of the lobby fails.
-     */
-    public interface JoinLobbyHandlerFail {
-        void handle();
-    }
-
-    /**
-     * This function handles a user joining a lobby.
-     *
-     * @param lobbyId The id of the lobby that the user wants to join.
-     * @param joinLobbyHandlerSuccess The function that will be called if the request is successful.
-     * @param joinLobbyHandlerFail The function that will be called if the request is unsuccessful.
-     */
-    public void joinLobby(UUID lobbyId, JoinLobbyHandlerSuccess joinLobbyHandlerSuccess,
-                           JoinLobbyHandlerFail joinLobbyHandlerFail) {
-        Invocation invocation = client
-                .target(SERVER).path("/api/lobby/" + lobbyId.toString() + "/join")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildPut(Entity.entity("", APPLICATION_JSON));
-
-        invocation.submit(new InvocationCallback<GameDTO>() {
-
-            @Override
-            public void completed(GameDTO game) {
-                System.out.println(game);
-                ClientState.game = game;
-                sseHandler.subscribe();
-                joinLobbyHandlerSuccess.handle(game);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                joinLobbyHandlerFail.handle();
-                throwable.printStackTrace();
-            }
-        });
-    }
-
-    /**
-     * Handler for when getting the logged in user succeeds.
-     */
-    public interface GetUserInfoHandlerSuccess {
-        void handle(UserDTO userDTO);
-    }
-
-    /**
-     * Handler for when getting the logged in user fails.
-     */
-    public interface GetUserInfoHandlerFail {
-        void handle();
-    }
-
-    /**
-     * Function that gets all the info about the currently logged in user.
-     *
-     * @param getUserInfoHandlerSuccess The function that will be called if the request is successful.
-     * @param getUserInfoHandlerFail The function that will be called if the request is unsuccessful.
-     */
-    public void getMyInfo(GetUserInfoHandlerSuccess getUserInfoHandlerSuccess,
-                          GetUserInfoHandlerFail getUserInfoHandlerFail) {
-        Invocation invocation = client
-                .target(SERVER).path("/api/user")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildGet();
-
-        invocation.submit(new InvocationCallback<UserDTO>() {
-
-            @Override
-            public void completed(UserDTO o) {
-                getUserInfoHandlerSuccess.handle(o);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                getUserInfoHandlerFail.handle();
-                throwable.printStackTrace();
-            }
-        });
-    }
-
-    public String connect() {
-        System.out.println("New connection!\n");
-        return "200";
-    }
-
-    /**
-     * Handler for starting a game.
-     */
-    public interface StartLobbyHandler {
-        void handle(Response response);
-    }
-
-    /**
-     * This function starts a lobby from the server.
-     *
-     * @param startLobbyHandler the handler of the response.
-     */
-    public void startLobby(StartLobbyHandler startLobbyHandler) {
-        Invocation invocation = client.target(SERVER)
-            .path("/api/lobby/" + ClientState.game.getId() + "/start")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildPut(Entity.entity("", APPLICATION_JSON));
-
-        invocation.submit(new InvocationCallback<Response>() {
-
-            @Override
-            public void completed(Response o) {
-                startLobbyHandler.handle(o);
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-
-            }
-        });
+    public void connect(String serverPath) {
+        this.SERVER = serverPath;
     }
 
     /**

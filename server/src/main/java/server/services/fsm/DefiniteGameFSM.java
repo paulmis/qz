@@ -46,6 +46,11 @@ public class DefiniteGameFSM extends GameFSM {
         // At the beginning of the game, give users a few seconds to prepare.
         if (getState() == FSMState.IDLE) {
             log.debug("[{}] FSM is in PREPARING state.", getGame().getId());
+
+            // Distribute the start event to all players
+            getContext().getSseManager().send(getGame().getUserIds(), new SSEMessage(SSEMessageType.GAME_START,
+                    getContext().getQuizConfiguration().getTiming().getPreparationTime()));
+
             setState(FSMState.PREPARING);
             scheduleTask(this::run,
                     Duration.ofMillis(getContext().getQuizConfiguration().getTiming().getPreparationTime()));
@@ -111,6 +116,9 @@ public class DefiniteGameFSM extends GameFSM {
         log.trace("[{}] FSM runAnswer called.", getGame().getId());
         setState(FSMState.ANSWER);
 
+        // Update the scores
+        getContext().getGameService().updateScores(getGame());
+
         // Delay before progressing to the next stage
         long delay = getContext().getQuizConfiguration().getTiming().getAnswerTime();
         // Show the leaderboard every <leaderboardInterval> questions
@@ -146,7 +154,7 @@ public class DefiniteGameFSM extends GameFSM {
         int delay = getContext().getQuizConfiguration().getTiming().getLeaderboardTime();
 
         // Notify all players to show the leaderboard.
-        getContext().getSseManager().send(getGame().getPlayerIds(),
+        getContext().getSseManager().send(getGame().getUserIds(),
             new SSEMessage(SSEMessageType.SHOW_LEADERBOARD, delay));
         log.trace("[{}] Leaderboard shown.", getGame().getId());
 
@@ -156,7 +164,7 @@ public class DefiniteGameFSM extends GameFSM {
         setFuture(
             new FSMFuture(
                 Optional.of(getContext().getTaskScheduler().schedule(this::runQuestion, executionTime)),
-                executionTime)
+                executionTime, this::runQuestion)
         );
     }
 
