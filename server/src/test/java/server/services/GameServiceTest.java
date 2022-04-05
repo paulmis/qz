@@ -394,9 +394,9 @@ public class GameServiceTest {
         gameService.updateScores(game);
 
         //Calculate time based score manually
-        int expectScoreJoe = (int) ((double) 6/13 * (1.2*100 - 0.8*100) + 0.8*100);
+        int expectScoreJoe = (int) ((double) 6 / 13 * (1.2 * 100 - 0.8 * 100) + 0.8 * 100);
         //Calculate time based score manually
-        int expectScoreSusanne = (int) ((double) 2/13 * (1.2*100 - 0.8*100) + 0.8*100);
+        int expectScoreSusanne = (int) ((double) 2 / 13 * (1.2 * 100 - 0.8 * 100) + 0.8 * 100);
 
         assertEquals(expectScoreJoe, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
@@ -427,9 +427,9 @@ public class GameServiceTest {
         gameService.updateScores(game);
 
         //Calculate time based score manually for Joe
-        int expectScoreJoe = (int) ((double) 2/13 * (1.2*100 - 0.8*100) + 0.8*100);
+        int expectScoreJoe = (int) ((double) 2 / 13 * (1.2 * 100 - 0.8 * 100) + 0.8 * 100);
         //Calculate time based score manually for Susanne
-        int expectScoreSusanne = (int) (2 * ((double) 2/13 * (1.2*100 - 0.8*100) + 0.8*100));
+        int expectScoreSusanne = (int) (2 * ((double) 2 / 13 * (1.2 * 100 - 0.8 * 100) + 0.8 * 100));
 
         assertEquals(expectScoreJoe, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
@@ -458,7 +458,7 @@ public class GameServiceTest {
         gameService.updateScores(game);
 
         //Calculate time based score manually for Joe
-        int expectScoreJoe = (int) ((double) 2/13 * (1.2*100 - 0.8*100) + 0.8*100);
+        int expectScoreJoe = (int) ((double) 2 / 13 * (1.2 * 100 - 0.8 * 100) + 0.8 * 100);
 
         assertEquals(expectScoreJoe, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
