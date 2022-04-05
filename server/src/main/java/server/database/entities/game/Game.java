@@ -332,7 +332,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         // Time based score only to be computer on correct answers
         if (baseScore >= 0) {
             return (int) Math.round(timeLeftAsPercentage
-                    * (1.2 * baseScore - 0.8 * baseScore) + (0.8 * baseScore));
+                    * (0.4 * baseScore) + (0.8 * baseScore));
         } else {
             return baseScore;
         }
