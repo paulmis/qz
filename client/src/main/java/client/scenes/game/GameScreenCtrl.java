@@ -4,6 +4,7 @@ import static javafx.application.Platform.runLater;
 
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
+import client.scenes.leaderboard.LeaderboardPane;
 import client.scenes.questions.QuestionPane;
 import client.scenes.questions.StartGamePane;
 import client.utils.ClientState;
@@ -271,10 +272,32 @@ public class GameScreenCtrl implements Initializable, SSESource {
     }
 
     /**
-     * Updates the leaderboard.
+     * Shows the in game leaderboard.
      *
-     * @param players players of the game.
+     * @param delay integer representing how long to show the leaderboard.
      */
+    @SSEEventHandler(SSEMessageType.SHOW_LEADERBOARD)
+    public void toLeaderboardStage(Integer delay) {
+        GameCommunication.updateScoreLeaderboard(
+                ClientState.game.getId(),
+                // Success
+                (leaderboard) -> runLater(() -> {
+                    log.debug("Received leaderboard: {}", leaderboard);
+                    var leaderboardNode = new LeaderboardPane();
+                    leaderboardNode.setViewOrder(Integer.MAX_VALUE);
+                    leaderboardNode.resetInGame(leaderboard);
+                    this.mainBorderPane.setCenter(leaderboardNode);
+                    if (delay != null) {
+                        startTimer(Duration.ofMillis(delay));
+                    }
+                }),
+                // Failure
+                () -> runLater(
+                        () -> mainCtrl.showErrorSnackBar("Unable to retrieve the leaderboard")
+                )
+        );
+    }
+
     private void showLeaderboard(List<GamePlayerDTO> players) {
         log.info("Showing leaderboard");
 
@@ -397,8 +420,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
         // Clean up the game and kill the connection
         ClientState.game = null;
         ServerUtils.sseHandler.kill();
-
-        // TODO: display final standings instead
         mainCtrl.showInformationalSnackBar("The game has ended");
         mainCtrl.showLobbyListScreen();
         this.timer.cancel();
@@ -617,6 +638,15 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @FXML
     private void quitButtonClick(ActionEvent actionEvent) {
+
+        // This makes the button just get you out of the lobby
+        // if it has already finished.
+        if (ClientState.game == null) {
+            mainCtrl.showLobbyListScreen();
+            ServerUtils.sseHandler.kill();
+            return;
+        }
+
         // Open the warning and wait for user action
         mainCtrl.openGameLeaveWarning(
                 // If confirmed, exit the game
