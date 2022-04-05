@@ -2,6 +2,8 @@ package client.scenes.leaderboard;
 
 import commons.entities.auth.UserDTO;
 import java.util.List;
+
+import commons.entities.game.GamePlayerDTO;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -36,8 +38,7 @@ public class LeaderboardPane extends StackPane {
         try {
             view = fxmlLoader.load();
         } catch (Exception e) {
-            Platform.exit();
-            System.exit(0);
+            e.printStackTrace();
         }
 
         // Adds it to the view of this control(stack pane)
@@ -62,5 +63,9 @@ public class LeaderboardPane extends StackPane {
      */
     public void reset(List<UserDTO> leaderboard) {
         controller.reset(leaderboard);
+    }
+
+    public void resetInGame(List<GamePlayerDTO> leaderboard) {
+        controller.resetInGame(leaderboard);
     }
 }
