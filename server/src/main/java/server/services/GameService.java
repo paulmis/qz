@@ -28,6 +28,7 @@ import server.database.entities.game.GamePlayer;
 import server.database.entities.game.exceptions.GameFinishedException;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
+import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.QuestionRepository;
@@ -59,6 +60,9 @@ public class GameService {
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     @Getter
@@ -181,11 +185,9 @@ public class GameService {
      * Transitions the game to the next question stage.
      *
      * @param game the game to transition
-     * @throws IOException if an SSE connection send failed.
      */
     @Transactional
-    public void nextQuestion(Game<?> game, Long delay)
-            throws IOException, GameFinishedException {
+    public void nextQuestion(Game<?> game, Long delay) throws GameFinishedException {
         log.debug("[{}] Trying to move to next question", game.getId());
 
         // Check if the game should finish
@@ -208,10 +210,8 @@ public class GameService {
      * Transitions the game to the answer stage.
      *
      * @param game the game to transition
-     * @throws IOException if an SSE connection send failed.
      */
-    public boolean showAnswer(Game<?> game, Long delay)
-            throws IOException {
+    public boolean showAnswer(Game<?> game, Long delay) {
         // Disable answering
         game.setAcceptingAnswers(false);
         game = gameRepository.save(game);
@@ -225,14 +225,28 @@ public class GameService {
      * Finishes the game.
      *
      * @param game the game to transition
-     * @throws IOException if an SSE connection send failed.
      */
-    public void finish(Game<?> game)
-            throws IOException {
+    public void finish(Game<?> game) {
         // Mark the game as finished
         game.setStatus(GameStatus.FINISHED);
         game = gameRepository.save(game);
 
+
+        var leaderboard = game.getPlayers()
+                .entrySet()
+                .stream()
+                .filter(uuidGamePlayerEntry -> !uuidGamePlayerEntry.getValue().isAbandoned())
+                .sorted((o1, o2) -> Integer.compare(o1.getValue().getScore(), o1.getValue().getScore()))
+                .collect(Collectors.toList());
+
+        for (int i = 0; i < leaderboard.size(); i++) {
+            var entry = leaderboard.get(i);
+            User user = userRepository.findById(entry.getKey()).get();
+
+            user.setGamesWon(user.getGamesWon() + (i == 0 ? 1 : 0));
+            user.setScore(Math.max(user.getScore(), entry.getValue().getScore()));
+            userRepository.save(user);
+        }
         // Distribute the event to all players
         log.debug("[{}] Game is finished.", game.getId());
         sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.GAME_END));

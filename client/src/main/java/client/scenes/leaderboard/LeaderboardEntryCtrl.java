@@ -38,7 +38,7 @@ public class LeaderboardEntryCtrl implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.rankLabel.setText(String.valueOf(rank));
         this.nameLabel.setText(user.getUsername());
-        this.gamesLabel.setText(String.valueOf(user.getGamesPlayed()));
+        this.gamesLabel.setText(String.valueOf(user.getGamesWon()));
         this.scoreLabel.setText(String.valueOf(user.getScore()));
 
         String imageUrl = FileUtils.defaultUserPic;
