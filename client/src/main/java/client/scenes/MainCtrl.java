@@ -542,21 +542,6 @@ public class MainCtrl {
         }
     }
 
-    /**
-     * Initializes the game scene based on the current stage of the game.
-     */
-    void joinGame() {
-        switch (ClientState.gameStage) {
-            case QUESTION:
-                showGameScreen(null);
-                break;
-            case ANSWER:
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
     enum StageScalingStrategy {
         /**
          * Does absolutely nothing.

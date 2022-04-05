@@ -32,7 +32,7 @@ class MCQuestionTest {
             components.add(a);
         }
         q = new MCQuestion();
-        q.setActivities(components);
+        q.setActivities(new HashSet<>(components));
         ((MCQuestion) q).setAnswer(components.get(1));
     }
 
@@ -48,9 +48,10 @@ class MCQuestionTest {
     @Test
     void getRightAnswerTest() {
         int rightAnswerIdx = 2;
-        ((MCQuestion) q).setAnswer(q.getActivities().get(rightAnswerIdx));
+        ((MCQuestion) q).setAnswer(new ArrayList<>(q.getActivities()).get(rightAnswerIdx));
         AnswerDTO rightAnswer = new AnswerDTO();
-        rightAnswer.setResponse(new ArrayList<>(List.of(q.getActivities().get(rightAnswerIdx).getDTO())));
+        rightAnswer.setResponse(
+                new ArrayList<>(List.of(new ArrayList<>(q.getActivities()).get(rightAnswerIdx).getDTO())));
         assertEquals(rightAnswer, q.getRightAnswer());
     }
 
@@ -119,14 +120,15 @@ class MCQuestionTest {
         mcNoArgs.setId(getUUID(0));
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        mcNoArgs.setActivities(List.copyOf(activities));
+        mcNoArgs.setActivities(new HashSet<>(List.copyOf(activities)));
         String questionText = "aQuestion";
         mcNoArgs.setText(questionText);
         Activity answer = getActivity(2);
         ((MCQuestion) mcNoArgs).setAnswer(answer);
         boolean guessConsumption = true;
         ((MCQuestion) mcNoArgs).setGuessConsumption(guessConsumption);
-        Question mcAllArgs = new MCQuestion(getUUID(0), activities, questionText, answer, guessConsumption);
+        Question mcAllArgs = new MCQuestion(getUUID(0),
+                new HashSet<>(activities), questionText, answer, guessConsumption);
 
         // Constructor comparison
         assertEquals(mcNoArgs.getId(), mcAllArgs.getId());
@@ -144,7 +146,8 @@ class MCQuestionTest {
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
         Activity answer = getActivity(2);
         boolean guessConsumption = true;
-        Question mcAllArgs = new MCQuestion(getUUID(0), activities, questionText, answer, guessConsumption);
+        Question mcAllArgs = new MCQuestion(getUUID(0),
+                new HashSet<>(activities), questionText, answer, guessConsumption);
         Question mcCopy = new MCQuestion(mcAllArgs, answer, guessConsumption);
 
         // Constructor comparison

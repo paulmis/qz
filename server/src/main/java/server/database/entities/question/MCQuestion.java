@@ -6,6 +6,7 @@ import commons.entities.questions.MCQuestionDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.*;
@@ -60,7 +61,7 @@ public class MCQuestion extends Question {
      * @param guessConsumption if the user has to guess the energy consumption of the activity
      *                         or the activity with a given consumption.
      */
-    public MCQuestion(UUID id, List<Activity> activities, String text, Activity answer, boolean guessConsumption) {
+    public MCQuestion(UUID id, Set<Activity> activities, String text, Activity answer, boolean guessConsumption) {
         super(activities, text);
         this.setId(id);
         this.answer = answer;
@@ -88,7 +89,7 @@ public class MCQuestion extends Question {
      * @param text       the description of the question.
      * @param answer     the Activity that corresponds to the correct answer.
      */
-    public MCQuestion(List<Activity> activities, String text, Activity answer) {
+    public MCQuestion(Set<Activity> activities, String text, Activity answer) {
         super(activities, text);
         this.answer = answer;
     }

@@ -138,7 +138,7 @@ public class LogInScreenCtrl implements Initializable {
                                     mainCtrl.showLobbyScreen();
                                     //ToDo: add `mainCtrl.checkHost();` when ClientState.user is updated on login.
                                 } else {
-                                    mainCtrl.showGameScreen(s.getGame().getCurrentQuestion());
+                                    mainCtrl.showGameScreen(null);
                                 }
                             } else {
                                 mainCtrl.showLobbyListScreen();
