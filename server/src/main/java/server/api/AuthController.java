@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,17 +100,26 @@ public class AuthController {
         }
 
         // Persist the user and return 201 with the user data
-        User user = userRepository.save(new User(userData));
+        try {
+            User user = userRepository.save(new User(userData));
+            log.info("Created user with email {} and username {}", user.getEmail(), user.getUsername());
 
-        log.info("Created user with email {} and username {}", user.getEmail(), user.getUsername());
+            return ResponseEntity
+                    .created(URI.create("/api/user/" + user.getId()))
+                    .body(
+                            new LoginDTO(
+                                    handler.generateToken(user.getEmail()),
+                                    null,
+                                    user.getDTO()));
+        } catch (Exception e) {
+            log.error("Failed to create user with email {} and username {}",
+                    userData.getEmail(),
+                    userData.getUsername(),
+                    e);
+            storageService.delete(userData.getProfilePic());
 
-        return ResponseEntity
-                .created(URI.create("/api/user/" + user.getId()))
-                .body(
-                        new LoginDTO(
-                                handler.generateToken(user.getEmail()),
-                                null,
-                                user.getDTO()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     /**

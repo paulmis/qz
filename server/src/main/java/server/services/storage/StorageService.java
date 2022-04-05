@@ -56,6 +56,14 @@ public interface StorageService {
     void deleteAll();
 
     /**
+     * Delete a resource.
+     *
+     * @param resourceId resource ID.
+     * @return true if the resource was deleted, false otherwise.
+     */
+    boolean delete(UUID resourceId);
+
+    /**
      * Get the URI of a resource.
      *
      * @param resourceId resource ID.
