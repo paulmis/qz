@@ -146,7 +146,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
             if (ClientState.game.getConfiguration() instanceof NormalGameConfigurationDTO) {
                 questionNumberLabel.setText(
                         qnum
-                                + "/"
+                                + " of "
                                 + ((NormalGameConfigurationDTO) ClientState.game.getConfiguration()).getNumQuestions());
             } else {
                 questionNumberLabel.setText(qnum.toString());
