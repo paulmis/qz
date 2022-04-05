@@ -240,9 +240,7 @@ public class LeaderboardCtrl implements Initializable {
             );
         }
 
-        var tempImagePattern =
-                new ImagePattern(
-                        new Image("https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg"));
+        String defaultPic = FileUtils.defaultUserPic;
 
         IntStream.range(0, Math.min(3, leaderboard.size())).forEach(i -> {
             boxes.get(i).setVisible(true);
@@ -251,65 +249,11 @@ public class LeaderboardCtrl implements Initializable {
             texts3D.get(i).setVisible(true);
             boxes.get(i).setMaterial(materials.get(i));
             texts.get(i).setText(leaderboard.get(i).getNickname());
-            images.get(i).setFill(tempImagePattern);
-        });
-    }
-
-    /**
-     * This function resets the leaderboard.
-     *
-     * @param leaderboard the leaderboard element.
-     */
-    public void resetInGame(List<GamePlayerDTO> leaderboard) {
-        if (cupModel != null) {
-            group.getChildren().remove(cupModel);
-        }
-
-        usersBox.getChildren().clear();
-
-        var boxes = List.of(firstBox, secondBox, thirdBox);
-        boxes.forEach(box -> box.setVisible(false));
-
-        var images = List.of(firstImage, secondImage, thirdImage);
-        images.forEach(image -> image.setVisible(false));
-
-        var texts = List.of(firstText, secondText, thirdText);
-        texts.forEach(text -> text.setVisible(false));
-
-        var texts3D = List.of(first3DText, second3DText, third3DText);
-        texts3D.forEach(text -> text.setVisible(false));
-
-        var materials = List.of(new PhongMaterial(Color.GOLD),
-                new PhongMaterial(Color.SILVER),
-                new PhongMaterial(Color.BROWN));
-
-        if (leaderboard.size() == 0) {
-            first3DText.setVisible(true);
-            first3DText.setText3D("No players");
-            first3DText.setTranslateX(-100);
-        } else {
-            CompletableFuture.runAsync(this::createCup);
-
-            usersBox.setVisible(true);
-            usersBox.getChildren().addAll(
-                    IntStream.range(0, leaderboard.size())
-                            .mapToObj(value -> new LeaderboardEntryPane(leaderboard.get(value), value + 1))
-                            .collect(Collectors.toList())
-            );
-        }
-
-        var tempImagePattern =
-                new ImagePattern(
-                        new Image("https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg"));
-
-        IntStream.range(0, Math.min(3, leaderboard.size())).forEach(i -> {
-            boxes.get(i).setVisible(true);
-            images.get(i).setVisible(true);
-            texts.get(i).setVisible(true);
-            texts3D.get(i).setVisible(true);
-            boxes.get(i).setMaterial(materials.get(i));
-            texts.get(i).setText(leaderboard.get(i).getNickname());
-            images.get(i).setFill(tempImagePattern);
+            String imageUrl = defaultPic;
+            if (leaderboard.get(i).getProfilePic() != null) {
+                imageUrl = ServerUtils.getImagePathFromId(leaderboard.get(i).getProfilePic());
+            }
+            images.get(i).setFill(new ImagePattern(new Image(imageUrl)));
         });
     }
 }

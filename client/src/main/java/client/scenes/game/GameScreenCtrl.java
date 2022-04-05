@@ -297,25 +297,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
         );
     }
 
-    @SSEEventHandler(SSEMessageType.SHOW_LEADERBOARD)
-    public void toLeaderboardStage(Integer delay) {
-        GameCommunication.updateScoreLeaderboard(
-                ClientState.game.getId(),
-                // Success
-                (leaderboard) -> runLater(() -> {
-                    log.debug("Received leaderboard: {}", leaderboard);
-                    var leaderboardNode = new LeaderboardPane();
-                    leaderboardNode.resetInGame(leaderboard);
-                    this.mainBorderPane.setCenter(leaderboardNode);
-                    startTimer(Duration.ofMillis(delay));
-                }),
-                // Failure
-                () -> runLater(
-                        () -> mainCtrl.showErrorSnackBar("Unable to retrieve the leaderboard")
-                )
-        );
-    }
-
     private void showLeaderboard(List<GamePlayerDTO> players) {
         log.info("Showing leaderboard");
 
