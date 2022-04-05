@@ -3,6 +3,7 @@ package client.utils.communication;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static javafx.application.Platform.runLater;
 
+import client.utils.ReflectionUtils;
 import commons.entities.messages.SSEMessageType;
 import java.lang.reflect.Method;
 import java.util.HashMap;

@@ -7,6 +7,7 @@ import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import client.utils.ClientState;
+import client.utils.ReflectionUtils;
 import client.utils.communication.*;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;

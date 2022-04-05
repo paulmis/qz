@@ -1,11 +1,10 @@
 package client.scenes.authentication;
 
 import client.scenes.MainCtrl;
-import client.utils.communication.FileUtils;
+import client.utils.PreferencesManager;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.EventHandler;
@@ -23,10 +22,8 @@ import lombok.Generated;
 @Generated
 public class ServerConnectScreenCtrl implements Initializable {
 
-    private final FileUtils file;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
-    private File localFile;
     private String serverPath;
 
     @FXML private JFXButton connectButton;
@@ -38,9 +35,8 @@ public class ServerConnectScreenCtrl implements Initializable {
      *
      */
     @Inject
-    public ServerConnectScreenCtrl(FileUtils file, ServerUtils server, MainCtrl mainCtrl) {
+    public ServerConnectScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
-        this.file = file;
         this.server = server;
     }
 
@@ -53,10 +49,8 @@ public class ServerConnectScreenCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Create a local file in documents to store server path
-        this.localFile = new File(System.getProperty("user.home") + "/Documents/quizzzServerPath.txt");
-        // Check if local file has a saved server path
-        this.serverPath = file.retrievePath(localFile);
+        // Check if local preferences contain a saved server path
+        this.serverPath = PreferencesManager.preferences.get("serverPath", null);
         if (serverPath != null) {
             rememberServer.setSelected(true);
         } else {
@@ -82,9 +76,9 @@ public class ServerConnectScreenCtrl implements Initializable {
     private void clickConnectButton() {
         this.serverPath = urlField.getText().isEmpty() ? "http://localhost:8080/" : urlField.getText();
         if (rememberServer.isSelected()) {
-            file.savePath(localFile, this.serverPath);
+            PreferencesManager.preferences.put("serverPath", this.serverPath);
         } else {
-            localFile.delete();
+            PreferencesManager.preferences.remove("serverPath");
         }
         server.connect(this.serverPath);
         System.out.print("Connecting to server....\n");
