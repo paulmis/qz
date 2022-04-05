@@ -44,7 +44,7 @@ import server.services.fsm.FSMState;
 import server.services.fsm.GameFSM;
 
 /**
- * Get the questions for a specific game.
+ * Handles a specific game.
  */
 @Service
 @Slf4j
@@ -56,17 +56,14 @@ public class GameService {
     private QuizConfiguration quizConfiguration;
 
     @Autowired
-    private ActivityRepository activityRepository;
-
-    @Autowired
-    private QuestionRepository questionRepository;
-
-    @Autowired
     @Getter
     private GameRepository gameRepository;
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
+
+    @Autowired
+    private QuestionService questionService;
 
     @Autowired
     @Getter
@@ -78,303 +75,6 @@ public class GameService {
     @Autowired
     @Getter
     private ThreadPoolTaskScheduler taskScheduler;
-
-    /**
-     * Provides the specified amount of questions.
-     *
-     * @param count The amount of questions to return.
-     * @return Randomly generated questions.
-     * @throws IllegalStateException If the amount of activities in the database is
-     *                               not sufficient to generate any question.
-     */
-    public List<Question> provideQuestions(int count) throws IllegalStateException {
-        // Check that there are enough activities
-        if (activityRepository.count() < 5) {
-            log.error("Could not provide any question: not enough activities in the database.");
-            throw new IllegalStateException("Not enough activities in the database.");
-        }
-
-        // Init
-        List<Question> questions = new ArrayList<>();
-        final int questionTypes = 4;
-
-        // Filter the acceptable activities
-        // Ideally, this would be done via queries
-        List<Activity> activities = activityRepository.findByAbandonedIsFalse().stream()
-                .filter(activity ->
-                        // activities need to have a gerund form
-                        activity.getDescription().contains("ing")
-                        // activities should not be expressed in question form
-                        && !activity.getDescription().endsWith("?")
-                ).collect(Collectors.toList());
-
-        for (int idx = 0; idx < count * questionTypes; idx++) {
-            // Select an answer
-            Activity answer = activities.get(new Random().nextInt(activities.size()));
-
-            // Sanitize the description
-            String answerDescription = answer.getDescription();
-            // 1. remove initial upper-case letter
-            answerDescription = answerDescription.substring(0, 1).toLowerCase(Locale.ROOT)
-                    + answerDescription.substring(1);
-            // 2. remove final full-stop, if present
-            if (answerDescription.substring(answerDescription.length() - 1).equals(".")) {
-                answerDescription = answerDescription.substring(0, answerDescription.length() - 1);
-            }
-
-            Question newQuestion;
-            switch (idx % questionTypes) {
-                case 0: {
-                    // MC - Guess the cost
-                    newQuestion = new MCQuestion();
-                    ((MCQuestion) newQuestion).setQuestionType(MCType.GUESS_COST);
-                    ((MCQuestion) newQuestion).setAnswer(answer);
-
-                    // Set the question
-                    newQuestion.setText("What is the energetic cost of " + answerDescription + "?");
-
-                    // Set the options
-                    // 1. collect information over the answer's order of magnitude
-                    long answerCost = answer.getCost();
-                    long minLimT = 1;
-                    long maxLimT = 10;
-                    while (answerCost >= 10) {
-                        answerCost /= 10;
-                        minLimT *= 10;
-                        maxLimT *= 10;
-                    }
-
-                    // 2. define a filter
-                    final long minLim = minLimT;
-                    final long maxLim = maxLimT;
-                    Function<Long, Boolean> goodChoice =
-                            (cost) -> cost != answer.getCost()
-                                    && cost >= minLim
-                                    && cost < maxLim;
-
-                    // 3. apply the filter
-                    List<Activity> options = activities.stream()
-                            .filter(act -> goodChoice.apply(act.getCost()))
-                            .collect(Collectors.toList());
-                    Collections.shuffle(options);
-                    if (options.size() < 3) {
-                        // Not enough activities, retry with another answer
-                        idx--;
-                        continue;
-                    }
-
-                    // 4. select options with distinct costs (magnitude-wise)
-                    Set<Activity> chosen = new HashSet<>(List.of(answer));
-                    for (int optIdx = 0; optIdx < options.size(); optIdx++) {
-                        boolean optionOk = true;
-                        Activity option = options.get(optIdx);
-                        for (Activity opt : chosen) {
-                            if (option.getCost() / minLim == opt.getCost() / minLim) {
-                                optionOk = false;
-                                break;
-                            }
-                        }
-                        if (optionOk) {
-                            chosen.add(option);
-                            if (chosen.size() == 4) {
-                                break;
-                            }
-                        }
-                    }
-
-                    // 5. check if enough options were selected
-                    if (chosen.size() < 4) {
-                        // Try again with a different answer
-                        idx--;
-                        continue;
-                    }
-
-                    // 6. set chosen activities
-                    newQuestion.setActivities(chosen);
-                    break;
-                }
-                case 1: {
-                    // MC - Guess the activity
-                    newQuestion = new MCQuestion();
-                    ((MCQuestion) newQuestion).setQuestionType(MCType.GUESS_ACTIVITY);
-                    ((MCQuestion) newQuestion).setAnswer(answer);
-
-                    // Set the question
-                    newQuestion.setText("Which of these activities costs " + answer.getCost() + "Wh?");
-
-                    // Set the options
-                    // 1. collect information over the answer's order of magnitude
-                    long answerCost = answer.getCost();
-                    long minLimT = 1;
-                    long maxLimT = 10;
-                    while (answerCost >= 10) {
-                        answerCost /= 10;
-                        minLimT *= 10;
-                        maxLimT *= 10;
-                    }
-
-                    // 2. define a filter
-                    final long minLim = minLimT;
-                    final long maxLim = maxLimT;
-                    Function<Long, Boolean> goodChoice =
-                            (cost) -> cost != answer.getCost()
-                                    && cost >= minLim
-                                    && cost < maxLim;
-
-                    // 3. apply the filter
-                    List<Activity> options = activities.stream()
-                            .filter(act -> goodChoice.apply(act.getCost()))
-                            .collect(Collectors.toList());
-                    Collections.shuffle(options);
-                    if (options.size() < 3) {
-                        // Not enough activities, retry with another answer
-                        idx--;
-                        continue;
-                    }
-
-                    // 4. select options with distinct costs (magnitude-wise)
-                    Set<Activity> chosen = new HashSet<>(List.of(answer));
-                    for (int optIdx = 0; optIdx < options.size(); optIdx++) {
-                        boolean optionOk = true;
-                        Activity option = options.get(optIdx);
-                        for (Activity opt : chosen) {
-                            if (option.getCost() / minLim == opt.getCost() / minLim) {
-                                optionOk = false;
-                                break;
-                            }
-                        }
-                        if (optionOk) {
-                            chosen.add(option);
-                            if (chosen.size() == 4) {
-                                break;
-                            }
-                        }
-                    }
-
-                    // 5. check if enough options were selected
-                    if (chosen.size() < 4) {
-                        // Try again with a different answer
-                        idx--;
-                        continue;
-                    }
-
-                    // 6. set chosen activities
-                    newQuestion.setActivities(chosen);
-                    break;
-                }
-                case 2: {
-                    // MC - Instead of
-                    newQuestion = new MCQuestion();
-                    ((MCQuestion) newQuestion).setQuestionType(MCType.INSTEAD_OF);
-
-                    // Set the question
-                    newQuestion.setText("Instead of " + answerDescription + ", you could be...");
-
-                    // Set the answer
-                    Activity correctOption = activities.stream()
-                            .filter(act -> act.getCost() != answer.getCost())
-                            .min(Comparator.comparingLong(Activity::getCost))
-                            .orElse(null);
-                    if (correctOption == null) {
-                        // Retry with a different answer
-                        idx--;
-                        continue;
-                    }
-                    ((MCQuestion) newQuestion).setAnswer(correctOption);
-
-                    // Set the options
-                    // 1. collect information over the answer's order of magnitude
-                    long answerCost = answer.getCost();
-                    long minLimT = 1;
-                    long maxLimT = 10;
-                    while (answerCost >= 10) {
-                        answerCost /= 10;
-                        minLimT *= 10;
-                        maxLimT *= 10;
-                    }
-
-                    // 2. define a filter
-                    final long minLim = minLimT;
-                    final long maxLim = maxLimT;
-                    Function<Long, Boolean> goodChoice =
-                            (cost) -> cost != answer.getCost()
-                                    && cost >= minLim
-                                    && cost < maxLim;
-
-                    // 3. apply the filter
-                    List<Activity> options = activities.stream()
-                            .filter(act -> goodChoice.apply(act.getCost()))
-                            .collect(Collectors.toList());
-                    Collections.shuffle(options);
-                    if (options.size() < 3) {
-                        // Not enough activities, retry with another answer
-                        idx--;
-                        continue;
-                    }
-
-                    // 4. select options with distinct costs (magnitude-wise)
-                    Set<Activity> chosen = new HashSet<>(List.of(correctOption));
-                    for (int optIdx = 0; optIdx < options.size(); optIdx++) {
-                        boolean optionOk = true;
-                        Activity option = options.get(optIdx);
-                        for (Activity opt : chosen) {
-                            if (option.getCost() / minLim == opt.getCost() / minLim) {
-                                optionOk = false;
-                                break;
-                            }
-                        }
-                        if (optionOk) {
-                            chosen.add(option);
-                            if (chosen.size() == 4) {
-                                break;
-                            }
-                        }
-                    }
-
-                    // 5. check if enough options were selected
-                    if (chosen.size() < 4) {
-                        // Try again with a different answer
-                        idx--;
-                        continue;
-                    }
-
-                    // 6. set chosen activities
-                    newQuestion.setActivities(chosen);
-                    break;
-                }
-                case 3: {
-                    // Estimate
-                    newQuestion = new EstimateQuestion();
-
-                    // Set the question
-                    newQuestion.setText("How much does " + answerDescription + " costs approximately?");
-
-                    // Set the activity
-                    newQuestion.setActivities(Set.of(answer));
-                    break;
-                }
-                default: {
-                    log.error("Creating an undefined question type.");
-                    throw new IllegalStateException("Undefined question type.");
-                }
-            }
-
-            // Append the new question
-            questions.add(newQuestion);
-        }
-
-        // Randomize the list and return the requested amount of questions
-        Collections.shuffle(questions);
-
-        // Select only the needed questions
-        questions = questions.subList(0, count);
-
-        // Save the new questions
-        questions = questions.stream()
-                .map(quest -> quest = questionRepository.save(quest))
-                .collect(Collectors.toList());
-        return questions;
-    }
 
     /**
      * Starts a new game, by verifying the starting conditions and creating a questions set.
@@ -402,7 +102,7 @@ public class GameService {
         // Initialize the game
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;
-            definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount()));
+            definiteGame.addQuestions(questionService.provideQuestions(definiteGame.getQuestionsCount()));
             definiteGame = gameRepository.save(definiteGame);
 
             // Create and start a finite state machine for the game.
