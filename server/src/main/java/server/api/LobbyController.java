@@ -80,7 +80,8 @@ public class LobbyController {
         User founder = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(UserNotFoundException::new);
 
         // Check that the user isn't in another game
-        if (gamePlayerRepository.existsByUserIdAndGameStatusNot(founder.getId(), GameStatus.FINISHED)) {
+        if (gamePlayerRepository
+                .existsByUserIdAndGameStatusNotAndAbandonedIsFalse(founder.getId(), GameStatus.FINISHED)) {
             throw new PlayerAlreadyInLobbyOrGameException();
         }
 
@@ -196,11 +197,7 @@ public class LobbyController {
         log.debug("User {} joined game {}", user.getId(), lobby.getId());
 
         // Distribute the notifications to all players in the lobby
-        try {
-            sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
-        } catch (IOException ex) {
-            log.error("Failed to notify players about the new player", ex);
-        }
+        sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
 
         // Return 200
         return ResponseEntity.ok(lobby.getDTO());
@@ -227,12 +224,7 @@ public class LobbyController {
 
         // If the game doesn't start successfully, return 409
         // If the SSE events are not yet set-up return 425
-        try {
-            gameService.start(lobby);
-        } catch (IOException ex) {
-            log.error("Could not start game", ex);
-            return ResponseEntity.status(HttpStatus.TOO_EARLY).body(ex.getMessage());
-        }
+        gameService.start(lobby);
 
         // Otherwise, return 200
         log.debug("Started game {}", lobby.getId());
@@ -278,11 +270,7 @@ public class LobbyController {
         log.info("Updated lobby {} configuration", lobby.getId());
 
         // Distribute the notifications to all players in the lobby
-        try {
-            sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
-        } catch (IOException ex) {
-            log.error("Failed to notify players about the new configuration", ex);
-        }
+        sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
 
         // Return 200
         return new ResponseEntity<>(HttpStatus.OK);
@@ -358,11 +346,7 @@ public class LobbyController {
         log.debug("User {} joined game {}", user.getId(), lobby.getId());
 
         // Distribute the notifications to all players in the lobby
-        try {
-            sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
-        } catch (IOException ex) {
-            log.error("Failed to notify players about the new player", ex);
-        }
+        sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
 
         // Return 200
         return ResponseEntity.ok(lobby.getDTO());

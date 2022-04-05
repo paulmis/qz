@@ -49,8 +49,6 @@ public class LobbyService {
         } catch (LastPlayerRemovedException ex) {
             gameRepository.delete(lobby);
             log.info("[{}] Last player removed, deleting lobby", lobby.getGameId());
-        } catch (IOException ex) {
-            log.error("Failed to notify players about the new configuration", ex);
         }
         return true;
     }
@@ -76,11 +74,7 @@ public class LobbyService {
         gameRepository.delete(lobby);
 
         // Update players of the deletion
-        try {
-            sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_DELETED));
-        } catch (IOException e) {
-            log.error("[{}] Couldn't notify other players of lobby deletion", lobby.getGameId(), e);
-        }
+        sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_DELETED));
 
         // Close connection to the players
         sseManager.disconnect(lobby.getUserIds());

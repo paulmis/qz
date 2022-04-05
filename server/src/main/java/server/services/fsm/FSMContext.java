@@ -2,6 +2,7 @@ package server.services.fsm;
 
 import lombok.Data;
 import lombok.Generated;
+import lombok.Getter;
 import lombok.NonNull;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import server.configuration.quiz.QuizConfiguration;
@@ -15,7 +16,7 @@ import server.services.SSEManager;
 @Data
 @Generated
 public class FSMContext {
-    @NonNull private GameService gameService;
+    @Getter @NonNull private GameService gameService;
 
     /**
      * Get the {@link SSEManager} of the execution context.

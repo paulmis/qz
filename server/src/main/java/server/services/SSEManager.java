@@ -146,7 +146,7 @@ public class SSEManager {
      * @return Whether the message was successfully sent or not.
      * @throws SSEFailedException If the message could not be sent.
      */
-    public boolean send(UUID userId, SseEmitter.SseEventBuilder message) throws SSEFailedException {
+    public boolean send(UUID userId, SseEmitter.SseEventBuilder message) {
         // Check that the emitter for the user exists
         if (!emitters.containsKey(userId)) {
             log.debug("Cannot send message: user {} has no registered emitter", userId);
@@ -161,7 +161,7 @@ public class SSEManager {
             return true;
         } catch (IOException e) {
             log.info("Failed to send message to user {}", userId);
-            throw new SSEFailedException(e.getMessage());
+            return false;
         }
     }
 
@@ -171,9 +171,8 @@ public class SSEManager {
      * @param userId User ID to send the message to.
      * @param message Message to send.
      * @return Whether the message was successfully sent or not.
-     * @throws SSEFailedException If the message could not be sent.
      */
-    public boolean send(UUID userId, SSEMessage message) throws SSEFailedException {
+    public boolean send(UUID userId, SSEMessage message) {
         log.trace("Sending message of type {} to user {}", message.getType(), userId);
         return send(userId, SSE.createEvent(message));
     }
@@ -184,9 +183,8 @@ public class SSEManager {
      * @param users User IDs to send the message to.
      * @param message Message to send.
      * @return Whether the message was sent to all specified users or not.
-     * @throws SSEFailedException If the message could not be sent.
      */
-    public boolean send(Iterable<UUID> users, SseEmitter.SseEventBuilder message) throws SSEFailedException {
+    public boolean send(Iterable<UUID> users, SseEmitter.SseEventBuilder message) {
         boolean success = true;
         for (UUID userId : users) {
             success &= send(userId, message);
@@ -200,9 +198,9 @@ public class SSEManager {
      * @param users User IDs to send the message to.
      * @param message Message to send.
      * @return Whether the message was sent to all specified users or not.
-     * @throws SSEFailedException If the message could not be sent.
      */
-    public boolean send(Iterable<UUID> users, SSEMessage message) throws SSEFailedException {
+    public boolean send(Iterable<UUID> users, SSEMessage message) {
+        log.error(String.valueOf(message));
         return send(users, SSE.createEvent(message));
     }
 
@@ -210,14 +208,13 @@ public class SSEManager {
      * Send a message to all users.
      *
      * @param message Message to send.
-     * @throws SSEFailedException If the message could not be sent.
      */
-    public void sendAll(SseEmitter.SseEventBuilder message) throws SSEFailedException {
+    public void sendAll(SseEmitter.SseEventBuilder message) {
         for (SseEmitter emitter : emitters.values()) {
             try {
                 emitter.send(message);
             } catch (IOException e) {
-                throw new SSEFailedException(e.getMessage());
+                log.error("Failed to send sse message: " + e.getMessage());
             }
         }
     }
@@ -226,9 +223,8 @@ public class SSEManager {
      * Send a message to all users.
      *
      * @param message Message to send.
-     * @throws SSEFailedException If the message could not be sent.
      */
-    public void sendAll(SSEMessage message) throws SSEFailedException {
+    public void sendAll(SSEMessage message) {
         log.trace("Sending message of type {} to all users", message.getType());
         sendAll(SSE.createEvent(message));
     }
