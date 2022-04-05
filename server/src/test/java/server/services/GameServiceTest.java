@@ -381,19 +381,27 @@ public class GameServiceTest {
         AnswerDTO answerA = new AnswerDTO();
         answerA.setResponse(List.of(questionA.getAnswer().getDTO()));
         answerA.setQuestionId(questionA.getId());
+        answerA.setAnswerTime(LocalDateTime.now().minusSeconds(6L));
         gameService.addAnswer(game, joePlayer, answerA);
 
         AnswerDTO answerB = new AnswerDTO();
         answerB.setResponse(List.of(questionA.getAnswer().getDTO()));
         answerB.setQuestionId(questionA.getId());
+        answerB.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, susannePlayer, answerB);
+
 
         gameService.updateScores(game);
 
-        assertEquals(100, joePlayer.getScore());
+        //Calculate time based score manually
+        int expectScoreJoe = (int) ((double) 6 / 13 * (0.4 * 100) + (0.8 * 100));
+        //Calculate time based score manually
+        int expectScoreSusanne = (int) ((double) 2 / 13 * (0.4 * 100) + (0.8 * 100));
+
+        assertEquals(expectScoreJoe, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
 
-        assertEquals(100, susannePlayer.getScore());
+        assertEquals(expectScoreSusanne, susannePlayer.getScore());
         assertEquals(1, susannePlayer.getStreak());
     }
 
@@ -405,21 +413,28 @@ public class GameServiceTest {
         AnswerDTO answerA = new AnswerDTO();
         answerA.setResponse(List.of(questionA.getAnswer().getDTO()));
         answerA.setQuestionId(questionA.getId());
+        answerA.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, joePlayer, answerA);
 
         AnswerDTO answerB = new AnswerDTO();
         answerB.setResponse(List.of(questionA.getAnswer().getDTO()));
         answerB.setQuestionId(questionA.getId());
+        answerB.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, susannePlayer, answerB);
 
         susannePlayer.getUserPowerUps().put(DoublePoints, game.getCurrentQuestionNumber());
 
         gameService.updateScores(game);
 
-        assertEquals(100, joePlayer.getScore());
+        //Calculate time based score manually for Joe
+        int expectScoreJoe = (int) ((double) 2 / 13 * (0.4 * 100) + (0.8 * 100));
+        //Calculate time based score manually for Susanne
+        int expectScoreSusanne = (int) (2 * ((double) 2 / 13 * (0.4 * 100) + (0.8 * 100)));
+
+        assertEquals(expectScoreJoe, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
 
-        assertEquals(200, susannePlayer.getScore());
+        assertEquals(expectScoreSusanne, susannePlayer.getScore());
         assertEquals(1, susannePlayer.getStreak());
     }
 
@@ -430,16 +445,22 @@ public class GameServiceTest {
 
         AnswerDTO answerJoe = new AnswerDTO();
         answerJoe.setResponse(List.of(questionA.getAnswer().getDTO()));
+        answerJoe.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, joePlayer, answerJoe);
 
         AnswerDTO answerSusanne = new AnswerDTO();
         ActivityDTO answerBActivity = new ActivityDTO();
         answerBActivity.setCost(300L);
         answerSusanne.setResponse(List.of(answerBActivity));
+        answerSusanne.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, susannePlayer, answerSusanne);
 
         gameService.updateScores(game);
-        assertEquals(100, joePlayer.getScore());
+
+        //Calculate time based score manually for Joe
+        int expectScoreJoe = (int) ((double) 2 / 13 * (0.4 * 100) + (0.8 * 100));
+
+        assertEquals(expectScoreJoe, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
 
         assertEquals(-10, susannePlayer.getScore());
@@ -457,12 +478,14 @@ public class GameServiceTest {
         ActivityDTO answerAActivity = new ActivityDTO();
         answerAActivity.setCost(300L);
         answerA.setResponse(List.of(answerAActivity));
+        answerA.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, joePlayer, answerA);
 
         AnswerDTO answerB = new AnswerDTO();
         ActivityDTO answerBActivity = new ActivityDTO();
         answerBActivity.setCost(300L);
         answerB.setResponse(List.of(answerBActivity));
+        answerB.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, susannePlayer, answerB);
 
         gameService.updateScores(game);
