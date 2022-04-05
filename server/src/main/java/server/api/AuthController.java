@@ -7,6 +7,7 @@ import commons.entities.utils.Views;
 import java.net.URI;
 import java.util.Optional;
 import javax.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import server.api.exceptions.UserAlreadyExistsException;
 import server.database.entities.User;
 import server.database.entities.auth.config.JWTHandler;
@@ -25,6 +29,7 @@ import server.database.repositories.game.GameRepository;
 /**
  * Controller that handles authentication requests.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -56,6 +61,9 @@ public class AuthController {
     public ResponseEntity<LoginDTO> register(@Valid @RequestBody UserDTO userData) {
         // If a user with this email or username already exists, return 409
         if (userRepository.existsByEmailIgnoreCaseOrUsername(userData.getEmail(), userData.getUsername())) {
+            log.info("Could not create user with email {} and username {}: user already exists",
+                    userData.getEmail(),
+                    userData.getUsername());
             throw new UserAlreadyExistsException();
         }
 
@@ -63,18 +71,24 @@ public class AuthController {
         try {
             userData.setPassword(passwordEncoder.encode(userData.getPassword()));
         } catch (IllegalArgumentException ex) {
+            log.info("Could not create user with email {} and username {}: password is not valid",
+                    userData.getEmail(),
+                    userData.getUsername());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         // Persist the user and return 201 with the user data
         User user = userRepository.save(new User(userData));
+
+        log.info("Created user with email {} and username {}", user.getEmail(), user.getUsername());
+
         return ResponseEntity
-            .created(URI.create("/api/user/" + user.getId()))
-            .body(
-                new LoginDTO(
-                    handler.generateToken(user.getEmail()),
-                    null,
-                    user.getDTO()));
+                .created(URI.create("/api/user/" + user.getId()))
+                .body(
+                        new LoginDTO(
+                                handler.generateToken(user.getEmail()),
+                                null,
+                                user.getDTO()));
     }
 
     /**
@@ -90,7 +104,8 @@ public class AuthController {
         try {
             // TODO: allow authentication with both mail and username
             // Authenticate the user
-            var authToken = new UsernamePasswordAuthenticationToken(userData.getEmail(), userData.getPassword());
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userData.getEmail(),
+                    userData.getPassword());
             org.springframework.security.core.userdetails.User userPrincipal =
                     (org.springframework.security.core.userdetails.User)
                             (authenticationManager.authenticate(authToken)).getPrincipal();
@@ -107,13 +122,16 @@ public class AuthController {
             // Find the current lobby or game
             Optional<Game> game = gameRepository.getPlayersLobbyOrGame(user.get().getId());
 
+            log.info("User {} logged in", user.get().getEmail());
+
             // Return 200 and the user data
             return ResponseEntity.ok(
-                new LoginDTO(
-                    handler.generateToken(user.get().getEmail()),
-                    game.isEmpty() ? null : game.get().getDTO(),
-                    user.get().getDTO()));
+                    new LoginDTO(
+                            handler.generateToken(user.get().getEmail()),
+                            game.isEmpty() ? null : game.get().getDTO(),
+                            user.get().getDTO()));
         } catch (AuthenticationException ex) {
+            log.info("Could not login user with email {}: {}", userData.getEmail(), ex.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }

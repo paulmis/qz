@@ -54,7 +54,11 @@ public enum SSEMessageType {
      */
     POWER_UP_PLAYED,
     /**
-     * Sent when an user sends a reaction.
+     * Periodic keep-alive message.
+     */
+    KEEPALIVE,
+    /**
+     * Sent when a user sends a reaction.
      */
     REACTION
 }
