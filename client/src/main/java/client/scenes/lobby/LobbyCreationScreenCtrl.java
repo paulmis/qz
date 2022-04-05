@@ -183,6 +183,7 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
         server.createLobby(
             config,
             isPrivateProperty.get(),
+            lobbyNameField.getText(),
             // Success
             game -> runLater(() -> {
                 if (game.getStatus() == GameStatus.CREATED) {

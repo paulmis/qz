@@ -117,6 +117,17 @@ public class GameController {
     }
 
     /**
+     * Get the current question number of the game.
+     *
+     * @param gameId the UUID of the game to get the question number for.
+     * @return the question number.
+     */
+    @GetMapping("/{gameId}/questionNumber")
+    ResponseEntity<Integer> getQuestionNumber(@PathVariable UUID gameId) {
+        return ResponseEntity.ok(gameRepository.getById(gameId).getCurrentQuestionNumber());
+    }
+
+    /**
      * Allow users to use powerups.
      *
      * @param powerUp powerup to use

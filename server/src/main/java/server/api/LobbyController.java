@@ -87,6 +87,10 @@ public class LobbyController {
         NormalGame lobby = new NormalGame(gameDTO);
         lobby.setGameId(RandomStringUtils.random(6, true, true));
         lobby.setStatus(GameStatus.CREATED);
+        if (lobby.getGameName() == null) {
+            lobby.setGameName(founder.getUsername());
+        }
+
         lobby.add(new GamePlayer(founder));
 
         // Save the game with the added host and player
