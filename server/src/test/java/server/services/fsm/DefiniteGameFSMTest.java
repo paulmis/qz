@@ -9,6 +9,7 @@ import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -70,7 +71,7 @@ class DefiniteGameFSMTest {
         context = new FSMContext(gameService);
 
         lenient().when(gameService.getQuizConfiguration()).thenReturn(quizConfiguration);
-        lenient().doNothing().when(gameService).updateScores(any());
+        lenient().doNothing().when(gameService).updateScores(any(), LocalDateTime.now());
         lenient().when(quizConfiguration.getLeaderboardInterval()).thenReturn(5);
         lenient().when(gameService.getTaskScheduler()).thenReturn(taskScheduler);
         lenient().when(gameService.getSseManager()).thenReturn(sseManager);

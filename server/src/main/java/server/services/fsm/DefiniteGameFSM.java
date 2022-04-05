@@ -4,6 +4,7 @@ import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 import lombok.SneakyThrows;
@@ -127,7 +128,7 @@ public class DefiniteGameFSM extends GameFSM {
         refreshGame();
 
         // Update the scores
-        getContext().getGameService().updateScores(this.game);
+        getContext().getGameService().updateScores(this.game, LocalDateTime.now());
 
         // Delay before progressing to the next stage
         long delay = getContext().getQuizConfiguration().getTiming().getAnswerTime();

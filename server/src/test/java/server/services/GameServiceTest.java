@@ -388,7 +388,7 @@ public class GameServiceTest {
         answerB.setQuestionId(questionA.getId());
         gameService.addAnswer(game, susannePlayer, answerB);
 
-        gameService.updateScores(game);
+        gameService.updateScores(game, LocalDateTime.now());
 
         assertEquals(100, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
@@ -414,7 +414,7 @@ public class GameServiceTest {
 
         susannePlayer.getUserPowerUps().put(DoublePoints, game.getCurrentQuestionNumber());
 
-        gameService.updateScores(game);
+        gameService.updateScores(game, LocalDateTime.now());
 
         assertEquals(100, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
@@ -438,7 +438,7 @@ public class GameServiceTest {
         answerSusanne.setResponse(List.of(answerBActivity));
         gameService.addAnswer(game, susannePlayer, answerSusanne);
 
-        gameService.updateScores(game);
+        gameService.updateScores(game, LocalDateTime.now());
         assertEquals(100, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
 
@@ -465,7 +465,7 @@ public class GameServiceTest {
         answerB.setResponse(List.of(answerBActivity));
         gameService.addAnswer(game, susannePlayer, answerB);
 
-        gameService.updateScores(game);
+        gameService.updateScores(game, LocalDateTime.now());
 
         assertEquals(-10, joePlayer.getScore());
         assertEquals(0, joePlayer.getStreak());
