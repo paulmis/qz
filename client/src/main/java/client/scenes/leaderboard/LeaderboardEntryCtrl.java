@@ -6,8 +6,6 @@ import commons.entities.auth.UserDTO;
 import commons.entities.game.GamePlayerDTO;
 import java.net.URL;
 import java.util.ResourceBundle;
-
-import commons.entities.game.GamePlayerDTO;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;

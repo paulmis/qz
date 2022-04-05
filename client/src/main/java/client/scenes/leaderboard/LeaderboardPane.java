@@ -3,9 +3,6 @@ package client.scenes.leaderboard;
 import commons.entities.auth.UserDTO;
 import commons.entities.game.GamePlayerDTO;
 import java.util.List;
-
-import commons.entities.game.GamePlayerDTO;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
