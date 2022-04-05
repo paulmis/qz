@@ -98,9 +98,6 @@ public class UserControllerTests {
         var joePlayer = new GamePlayer(joe);
         game.add(joePlayer);
 
-        // Login dto
-
-
         when(gameRepository.getPlayersLobbyOrGame(joe.getId())).thenReturn(Optional.of(game));
         when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
         when(userRepository.existsByUsername(joe.getUsername())).thenReturn(true);

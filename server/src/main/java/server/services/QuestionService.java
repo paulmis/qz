@@ -38,6 +38,8 @@ public class QuestionService {
     public List<Question> provideQuestions(int count) throws IllegalStateException {
         // Init
         List<Question> questions = new ArrayList<>();
+
+        // Number of question types that the application can generate
         final int questionTypes = 4;
 
         // Retrieve the acceptable activities
@@ -50,8 +52,11 @@ public class QuestionService {
         }
 
         int failedAttempts = 0;
+        // Generate a pool of "count" questions of each kind
+        // This allows the selection of questions for the game to be
+        // generally uniform between question types, but not hard coded
         for (int idx = 0; idx < count * questionTypes; idx++) {
-            // Check failed attempts
+            // Check failed attempts, otherwise the for might run forever
             if (failedAttempts >= 1000) {
                 log.error("Could not provide any question: not enough activities in the database.");
                 throw new IllegalStateException("Not enough activities in the database.");
@@ -65,7 +70,7 @@ public class QuestionService {
 
             // Generate question
             Question newQuestion;
-            if (idx % questionTypes < 3) {
+            if (idx % questionTypes < 3) { // Three kinds of MC questions
                 // MC questions
                 MCType type;
                 Activity correctOption;
@@ -126,7 +131,7 @@ public class QuestionService {
                     idx--;
                     continue;
                 }
-            } else if (idx % questionTypes == 3) {
+            } else if (idx % questionTypes == 3) { // fourth kind: estimate question
                 // Estimate questions
                 newQuestion = new EstimateQuestion();
 
@@ -145,7 +150,7 @@ public class QuestionService {
             questions.add(newQuestion);
         }
 
-        // Randomize the list and return the requested amount of questions
+        // Randomize the pool of generated questions
         Collections.shuffle(questions);
 
         // Select only the needed questions
