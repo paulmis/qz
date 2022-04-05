@@ -4,6 +4,8 @@ import static javafx.application.Platform.runLater;
 
 import client.scenes.MainCtrl;
 import client.utils.ClientState;
+import client.utils.PreferencesManager;
+import client.utils.communication.EncryptionUtils;
 import client.utils.communication.FileUtils;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
@@ -24,11 +26,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Log in Screen controller class.
  */
 @Generated
+@Slf4j
 public class LogInScreenCtrl implements Initializable {
 
     private final FileUtils file;
@@ -45,7 +49,6 @@ public class LogInScreenCtrl implements Initializable {
 
     /**
      * Constructor for the log in screen control.
-     *
      */
     @Inject
     public LogInScreenCtrl(FileUtils file, ServerUtils server, MainCtrl mainCtrl) {
@@ -58,15 +61,24 @@ public class LogInScreenCtrl implements Initializable {
      * This function runs after every control has
      * been created and initialized already.
      *
-     * @param location These location parameter.
+     * @param location  These location parameter.
      * @param resources The resource bundle.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        String tkn = PreferencesManager.preferences.get("token", null);
+        try {
+            if (tkn != null && (tkn = EncryptionUtils.decrypt(tkn, EncryptionUtils.ENCRYPTION_KEY)) != null) {
+                server.checkTokenValid(tkn, (s) -> runLater(mainCtrl::showLobbyListScreen));
+            }
+        } catch (Exception e) {
+            log.error("Error while decrypting token", e);
+        }
+
         // Create a local file in documents to store user credentials
         this.localFile = new File(System.getProperty("user.home") + "/Documents/quizzzCredentials.txt");
         // Check if local file has a saved user credentials
-        List<String> credentials = file.retrieveCredentials(localFile);
+        List<String> credentials = FileUtils.retrieveCredentials(localFile);
         // Check if credentials are saved
         if (!credentials.contains(null)) {
             rememberUser.setSelected(true);
@@ -106,9 +118,9 @@ public class LogInScreenCtrl implements Initializable {
     @FXML
     private void logInButtonClick() {
         if (!emailField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
-            if (server.isValidEmail(emailField.getText())) {
+            if (ServerUtils.isValidEmail(emailField.getText())) {
                 if (rememberUser.isSelected()) {
-                    file.saveCredentials(localFile, emailField.getText(), passwordField.getText());
+                    FileUtils.saveCredentials(localFile, emailField.getText(), passwordField.getText());
                 } else {
                     localFile.delete();
                 }
