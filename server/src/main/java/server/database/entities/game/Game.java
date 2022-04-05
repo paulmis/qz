@@ -171,7 +171,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * @return set of UUIDs of all players in the game.
      */
     public Set<UUID> getUserIds() {
-        return players.keySet();
+        return players.keySet().stream().filter(uuid -> !players.get(uuid).isAbandoned()).collect(Collectors.toSet());
     }
 
     /**

@@ -56,7 +56,7 @@ public class LeaderboardController {
     public ResponseEntity<List<UserDTO>> getGamesLeaderboard(@RequestParam Optional<Integer> page,
                                                              @RequestParam Optional<Integer> size) {
         Pageable paging = PageRequest.of(page.orElse(0), Math.min(MAX_PAGE_SIZE, size.orElse(MAX_PAGE_SIZE)));
-        List<UserDTO> userLeaderboard = userRepository.findAllByOrderByGamesPlayedDesc(paging).stream()
+        List<UserDTO> userLeaderboard = userRepository.findAllByOrderByGamesWonDesc(paging).stream()
                 .map(User::getDTO).collect(Collectors.toList());
         return ResponseEntity.ok(userLeaderboard);
     }

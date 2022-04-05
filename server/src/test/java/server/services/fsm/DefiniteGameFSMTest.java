@@ -99,6 +99,9 @@ class DefiniteGameFSMTest {
     @Test
     void run() {
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
+        fsm.getContext().setGameService(gameService);
+        when(fsm.getContext().getRepository()).thenReturn(gameRepository);
+        when(gameRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(game));
         fsm.run();
 
         // Verify that the game is in the correct state
@@ -108,6 +111,9 @@ class DefiniteGameFSMTest {
     @Test
     void runLeaderboard() throws IOException {
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
+        fsm.getContext().setGameService(gameService);
+        when(fsm.getContext().getRepository()).thenReturn(gameRepository);
+        when(gameRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(game));
         fsm.setRunning(true);
         // Force the game to be in the leaderboard state
         fsm.runLeaderboard();

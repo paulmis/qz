@@ -74,7 +74,7 @@ public class User extends BaseEntity<UserDTO> {
     /**
      * number of games played by a certain user.
      */
-    protected int gamesPlayed = 0;
+    protected int gamesWon = 0;
 
     /**
      * Relation to player entities for each individual game.

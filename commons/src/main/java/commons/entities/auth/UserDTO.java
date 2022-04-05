@@ -68,5 +68,5 @@ public class UserDTO implements DTO {
      * Number of games played by the user.
      */
     @JsonView(Views.Public.class)
-    protected int gamesPlayed;
+    protected int gamesWon;
 }
