@@ -6,6 +6,7 @@ import commons.entities.questions.MCQuestionDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
@@ -37,7 +38,7 @@ public class EstimateQuestion extends Question {
      * @param activities the list of activities that compose the question.
      * @param text       the description of the question.
      */
-    public EstimateQuestion(UUID id, List<Activity> activities, String text) {
+    public EstimateQuestion(UUID id, Set<Activity> activities, String text) {
         super(activities, text);
 
         if (activities.size() != 1) {
@@ -100,7 +101,7 @@ public class EstimateQuestion extends Question {
 
                     // Calculate the percentage of points for the user.
                     return MathHelpers.calculatePercentage(answer.getResponse().get(0).getCost(),
-                            getActivities().get(0).getCost());
+                            getActivities().iterator().next().getCost());
                 }
         ));
     }
@@ -112,7 +113,7 @@ public class EstimateQuestion extends Question {
      */
     @Override
     public AnswerDTO getRightAnswer() {
-        return new AnswerDTO(this.getId(), List.of(getActivities().get(0).getDTO()));
+        return new AnswerDTO(this.getId(), List.of(getActivities().iterator().next().getDTO()));
     }
 
     /**
@@ -123,8 +124,8 @@ public class EstimateQuestion extends Question {
     @Override
     public EstimateQuestionDTO getDTO() {
         UUID iconId = null;
-        if (activities.get(0) != null && activities.get(0).getIconId() != null) {
-            iconId = activities.get(0).getIconId();
+        if (activities.iterator().next() != null && activities.iterator().next().getIconId() != null) {
+            iconId = activities.iterator().next().getIconId();
         }
         QuestionDTO baseDTO = super.toDTO();
         baseDTO.setQuestionIconId(iconId);

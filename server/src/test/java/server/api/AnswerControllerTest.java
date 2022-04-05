@@ -14,10 +14,7 @@ import commons.entities.auth.UserDTO;
 import commons.entities.game.GameStatus;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,12 +83,12 @@ class AnswerControllerTest {
     private void init() throws IOException {
         // Setup mock question
         mockQuestion = new MCQuestion();
-        mockQuestion.setActivities(List.of(
+        mockQuestion.setActivities(new HashSet<>(List.of(
                 getActivity(1),
                 getActivity(2),
                 getActivity(3),
-                getActivity(4)));
-        ((MCQuestion) mockQuestion).setAnswer(mockQuestion.getActivities().get(1));
+                getActivity(4))));
+        ((MCQuestion) mockQuestion).setAnswer(new ArrayList<>(mockQuestion.getActivities()).get(1));
         mockQuestion.setId(getUUID(2));
 
         // Set up a mock game
@@ -158,7 +155,8 @@ class AnswerControllerTest {
     public void userAnswerOkTest() throws Exception {
         // Request
         AnswerDTO userAnswer = new AnswerDTO();
-        userAnswer.setResponse(List.of(mockQuestion.getActivities().get(0).getDTO()));
+        userAnswer.setResponse(List.of(
+                new ArrayList<>(mockQuestion.getActivities()).get(0).getDTO()));
         userAnswer.setQuestionId(mockQuestion.getId());
         this.mockMvc
                 .perform(MockMvcRequestBuilders.put(answerEndpoint(mockLobby.getId()))
@@ -227,12 +225,12 @@ class AnswerControllerTest {
     public void getCorrectAnswerDifferentIdxTest() throws Exception {
         // Setup additional mock question
         Question secondQuestion = new MCQuestion();
-        secondQuestion.setActivities(List.of(
+        secondQuestion.setActivities(new HashSet<>(List.of(
                 getActivity(10),
                 getActivity(20),
                 getActivity(30),
-                getActivity(40)));
-        ((MCQuestion) secondQuestion).setAnswer(secondQuestion.getActivities().get(0));
+                getActivity(40))));
+        ((MCQuestion) secondQuestion).setAnswer(secondQuestion.getActivities().iterator().next());
         mockLobby.setQuestions(List.of(mockQuestion, secondQuestion));
         mockLobby.setCurrentQuestionNumber(0);
 

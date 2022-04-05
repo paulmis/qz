@@ -11,10 +11,7 @@ import commons.entities.game.GameStatus;
 import commons.entities.game.NormalGameDTO;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -78,10 +75,10 @@ public class NormalGameTest {
 
 
         var activities = List.of(activityA, activityB, activityC, activityD);
-        questionA.setActivities(activities);
+        questionA.setActivities(new HashSet<>(activities));
         questionA.setAnswer(activityA);
 
-        questionB.setActivities(activities);
+        questionB.setActivities(new HashSet<>(activities));
         questionB.setAnswer(activityB);
 
         // Create config

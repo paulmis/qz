@@ -66,7 +66,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Current question number.
      */
-    @Column(nullable = true)
     protected Integer currentQuestionNumber = null;
 
     /**
@@ -84,23 +83,27 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * Whether the players are allowed to submit an answer or not.
      */
     protected boolean acceptingAnswers = false;
+
     /**
      * List of players currently in the game mapped by their user IDs.
      */
     @JsonManagedReference
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     protected Map<UUID, GamePlayer> players = new HashMap<>();
+
     /**
      * The head of the lobby - person in charge with special privileges.
      */
     @OneToOne(fetch = FetchType.LAZY)
     protected GamePlayer host;
+
     /**
      * Questions assigned to this game.
      */
     @ManyToMany(fetch = FetchType.EAGER)
     @OrderColumn
     protected List<Question> questions = new ArrayList<>();
+
     /**
      * PRNG.
      */
