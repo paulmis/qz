@@ -225,7 +225,7 @@ public class ServerUtils {
      * Handler for when token is valid.
      */
     public interface LoginValidHandler {
-        void handle(UserDTO user);
+        void handle(LoginDTO data);
     }
 
     /**
@@ -243,13 +243,14 @@ public class ServerUtils {
             @Override
             public void completed(Response o) {
                 if (o.getStatus() == 200) {
-                    UserDTO user = o.readEntity(UserDTO.class);
-                    log.info("Token is valid: {}", user);
+                    LoginDTO data = o.readEntity(LoginDTO.class);
+                    log.info("Token is valid: {}", data.getUser());
 
                     client = client.register(new Authenticator(token));
-                    ClientState.user = user;
+                    ClientState.user = data.getUser();
+                    ClientState.game = data.getGame();
 
-                    handler.handle(user);
+                    handler.handle(data);
                 } else {
                     log.info("Token is not valid");
                 }

@@ -1,19 +1,19 @@
 package server.api;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static server.utils.TestHelpers.getUUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import commons.entities.auth.LoginDTO;
 import commons.entities.auth.UserDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
-import commons.entities.utils.Views;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Optional;
@@ -58,8 +58,8 @@ public class UserControllerTests {
     @MockBean
     private SSEManager sseManager;
 
-    User joe;
-    UserDTO joeDTO;
+    private User joe;
+    private UserDTO joeDTO;
     private Game game;
 
     /**
@@ -97,6 +97,10 @@ public class UserControllerTests {
         // Add players
         var joePlayer = new GamePlayer(joe);
         game.add(joePlayer);
+
+        // Login dto
+
+
         when(gameRepository.getPlayersLobbyOrGame(joe.getId())).thenReturn(Optional.of(game));
         when(userRepository.findByEmailIgnoreCase(joe.getEmail())).thenReturn(Optional.of(joe));
         when(userRepository.existsByUsername(joe.getUsername())).thenReturn(true);
@@ -111,9 +115,12 @@ public class UserControllerTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(joeDTO)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(
-                        objectMapper.writerWithView(Views.Private.class).writeValueAsString(joe.getDTO())))
                 .andReturn();
+
+        // Verify that the returned value is correct
+        LoginDTO loginDTO = objectMapper.readValue(res.getResponse().getContentAsString(), LoginDTO.class);
+        assertEquals(game.getDTO(), loginDTO.getGame());
+        assertNull(loginDTO.getUser().getPassword());
     }
 
     @Test
