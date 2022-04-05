@@ -19,6 +19,7 @@ import commons.entities.AnswerDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
+import commons.entities.game.Reaction;
 import commons.entities.messages.SSEMessageType;
 import commons.entities.questions.QuestionDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
@@ -278,6 +279,19 @@ public class GameScreenCtrl implements Initializable, SSESource {
             default:
                 break;
         }
+    }
+
+    /**
+     * Handles the power-up played event.
+     *
+     * @param reaction the reaction that has been sent.
+     */
+    @SSEEventHandler(SSEMessageType.REACTION)
+    public void handleReaction(Reaction reaction) {
+        mainCtrl.showInformationalSnackBar("User sent " + reaction.name());
+        String imageLocation = Objects.requireNonNull(getClass()
+                        .getResource("/client/images/reactions/" + reaction.name() + ".png")).toExternalForm();
+        // TO DO :
     }
 
     /**

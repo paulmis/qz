@@ -87,7 +87,7 @@
                         <Font size="13.0" />
                      </font>
                   </PasswordField>
-                  <CheckBox fx:id="rememberMe" layoutX="47.0" layoutY="329.0" mnemonicParsing="false" onMouseClicked="#rememberMeTick" text="Remember me">
+                  <CheckBox fx:id="rememberUser" layoutX="47.0" layoutY="329.0" mnemonicParsing="false" text="Remember me">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
