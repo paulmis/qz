@@ -222,8 +222,6 @@ public class LobbyController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the lobby host");
         }
 
-        // If the game doesn't start successfully, return 409
-        // If the SSE events are not yet set-up return 425
         gameService.start(lobby);
 
         // Otherwise, return 200
