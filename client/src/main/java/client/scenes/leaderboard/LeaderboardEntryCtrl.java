@@ -3,10 +3,9 @@ package client.scenes.leaderboard;
 import client.utils.FileUtils;
 import client.utils.communication.ServerUtils;
 import commons.entities.auth.UserDTO;
+import commons.entities.game.GamePlayerDTO;
 import java.net.URL;
 import java.util.ResourceBundle;
-
-import commons.entities.game.GamePlayerDTO;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -50,17 +49,22 @@ public class LeaderboardEntryCtrl implements Initializable {
             this.gamesLabel.setVisible(false);
             this.scoreLabel.setText(String.valueOf(gamePlayer.getScore()));
             var tempUrl = "https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg";
-            this.imageView.setImage(new Image(tempUrl, true));
+            String imageUrl = FileUtils.defaultUserPic;
+            if (gamePlayer.getProfilePic() != null) {
+                imageUrl = ServerUtils.getImagePathFromId(gamePlayer.getProfilePic());
+            }
+            this.imageView.setImage(new Image(imageUrl, true));
         } else {
             this.rankLabel.setText(String.valueOf(rank));
             this.nameLabel.setText(user.getUsername());
             this.gamesLabel.setText(String.valueOf(user.getGamesPlayed()));
             this.scoreLabel.setText(String.valueOf(user.getScore()));
-
-        String imageUrl = FileUtils.defaultUserPic;
-        if (user.getProfilePic() != null) {
-            imageUrl = ServerUtils.getImagePathFromId(user.getProfilePic());
+            String imageUrl = FileUtils.defaultUserPic;
+            if (user.getProfilePic() != null) {
+                imageUrl = ServerUtils.getImagePathFromId(user.getProfilePic());
+            }
+            this.imageView.setImage(new Image(imageUrl, true));
         }
-        this.imageView.setImage(new Image(imageUrl, true));
+
     }
 }

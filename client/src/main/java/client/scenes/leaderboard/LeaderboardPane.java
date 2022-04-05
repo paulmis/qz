@@ -1,11 +1,10 @@
 package client.scenes.leaderboard;
 
 import commons.entities.auth.UserDTO;
-import java.util.List;
-
 import commons.entities.game.GamePlayerDTO;
-import javafx.application.Platform;
+import java.util.List;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
@@ -67,5 +66,6 @@ public class LeaderboardPane extends StackPane {
 
     public void resetInGame(List<GamePlayerDTO> leaderboard) {
         controller.resetInGame(leaderboard);
+        this.setPadding(new Insets(50, 0, 0, 0));
     }
 }

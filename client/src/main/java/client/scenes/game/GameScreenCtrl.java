@@ -271,9 +271,9 @@ public class GameScreenCtrl implements Initializable, SSESource {
     }
 
     /**
-     * Updates the leaderboard.
+     * Shows the in game leaderboard.
      *
-     * @param players players of the game.
+     * @param delay integer representing how long to show the leaderboard.
      */
     @SSEEventHandler(SSEMessageType.SHOW_LEADERBOARD)
     public void toLeaderboardStage(Integer delay) {
@@ -283,9 +283,12 @@ public class GameScreenCtrl implements Initializable, SSESource {
                 (leaderboard) -> runLater(() -> {
                     log.debug("Received leaderboard: {}", leaderboard);
                     var leaderboardNode = new LeaderboardPane();
+                    leaderboardNode.setViewOrder(12312);
                     leaderboardNode.resetInGame(leaderboard);
                     this.mainBorderPane.setCenter(leaderboardNode);
-                    startTimer(Duration.ofMillis(delay));
+                    if (delay != null) {
+                        startTimer(Duration.ofMillis(delay));
+                    }
                 }),
                 // Failure
                 () -> runLater(
@@ -416,10 +419,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
         // Clean up the game and kill the connection
         ClientState.game = null;
         ServerUtils.sseHandler.kill();
-
-        // TODO: display final standings instead
         mainCtrl.showInformationalSnackBar("The game has ended");
-        mainCtrl.showLobbyListScreen();
     }
 
     /**
@@ -635,6 +635,15 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @FXML
     private void quitButtonClick(ActionEvent actionEvent) {
+
+        // This makes the button just get you out of the lobby
+        // if it has already finished.
+        if (ClientState.game == null) {
+            mainCtrl.showLobbyListScreen();
+            ServerUtils.sseHandler.kill();
+            return;
+        }
+
         // Open the warning and wait for user action
         mainCtrl.openGameLeaveWarning(
                 // If confirmed, exit the game
