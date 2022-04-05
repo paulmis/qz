@@ -4,6 +4,7 @@ import static javafx.application.Platform.runLater;
 
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
+import client.scenes.leaderboard.LeaderboardPane;
 import client.scenes.questions.QuestionPane;
 import client.scenes.questions.StartGamePane;
 import client.utils.ClientState;
@@ -200,6 +201,25 @@ public class GameScreenCtrl implements Initializable, SSESource {
                 (leaderboard) -> runLater(() -> {
                     log.debug("Received leaderboard: {}", leaderboard);
                     this.showLeaderboard(leaderboard);
+                }),
+                // Failure
+                () -> runLater(
+                        () -> mainCtrl.showErrorSnackBar("Unable to retrieve the leaderboard")
+                )
+        );
+    }
+
+    @SSEEventHandler(SSEMessageType.SHOW_LEADERBOARD)
+    public void toLeaderboardStage(Integer delay) {
+        GameCommunication.updateScoreLeaderboard(
+                ClientState.game.getId(),
+                // Success
+                (leaderboard) -> runLater(() -> {
+                    log.debug("Received leaderboard: {}", leaderboard);
+                    var leaderboardNode = new LeaderboardPane();
+                    leaderboardNode.resetInGame(leaderboard);
+                    this.mainBorderPane.setCenter(leaderboardNode);
+                    startTimer(Duration.ofMillis(delay));
                 }),
                 // Failure
                 () -> runLater(
