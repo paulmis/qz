@@ -1,19 +1,14 @@
 package server.api;
 
 import commons.entities.AnswerDTO;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
@@ -95,6 +90,9 @@ public class AnswerController {
                     currentQuestion.get().getId(), answerData.getQuestionId());
             throw new IllegalArgumentException("Trying to answer the wrong question.");
         }
+
+        // Set the answer timestamp
+        answerData.setAnswerTime(LocalDateTime.now());
 
         // Update the answer
         // XXX: There might be a race condition here?
