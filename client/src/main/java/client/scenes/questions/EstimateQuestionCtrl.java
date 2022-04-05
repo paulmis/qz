@@ -89,7 +89,7 @@ public class EstimateQuestionCtrl extends QuestionCtrl {
         this.questionLabel.setText(question.getText());
 
         // Set question image
-        questionIcon.setImage(new Image(ServerUtils.getImagePathFromId(question.getQuestionIconId())));
+        questionIcon.setImage(new Image(ServerUtils.getImagePathFromId(question.getQuestionIconId()), true));
     }
 
     @Override

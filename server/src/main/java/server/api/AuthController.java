@@ -4,8 +4,11 @@ import com.fasterxml.jackson.annotation.JsonView;
 import commons.entities.auth.LoginDTO;
 import commons.entities.auth.UserDTO;
 import commons.entities.utils.Views;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
+import java.util.UUID;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +18,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import server.api.exceptions.UserAlreadyExistsException;
 import server.database.entities.User;
 import server.database.entities.auth.config.JWTHandler;
 import server.database.entities.game.Game;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
+import server.services.storage.StorageService;
 
 /**
  * Controller that handles authentication requests.
@@ -44,6 +46,9 @@ public class AuthController {
     private GameRepository gameRepository;
 
     @Autowired
+    private StorageService storageService;
+
+    @Autowired
     private JWTHandler handler;
 
     @Autowired
@@ -58,7 +63,9 @@ public class AuthController {
      */
     @PostMapping("register")
     @JsonView(Views.Private.class)
-    public ResponseEntity<LoginDTO> register(@Valid @RequestBody UserDTO userData) {
+    public ResponseEntity<LoginDTO> register(
+            @Valid @RequestPart UserDTO userData,
+            @RequestPart(required = false) MultipartFile image) {
         // If a user with this email or username already exists, return 409
         if (userRepository.existsByEmailIgnoreCaseOrUsername(userData.getEmail(), userData.getUsername())) {
             log.info("Could not create user with email {} and username {}: user already exists",
@@ -77,18 +84,42 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
+        // Store the profile picture, if present
+        if (image != null) {
+            try {
+                // Save the image to the storage
+                UUID imageId = storageService.store(image.getInputStream());
+                log.trace("Stored image '{}' for user '{}'", imageId, userData.getId());
+
+                // Set the image resource ID
+                userData.setProfilePic(imageId);
+
+            } catch (IOException e) {
+                log.error("Failed to store the image for user '{}'", userData.getId(), e);
+            }
+        }
+
         // Persist the user and return 201 with the user data
-        User user = userRepository.save(new User(userData));
+        try {
+            User user = userRepository.save(new User(userData));
+            log.info("Created user with email {} and username {}", user.getEmail(), user.getUsername());
 
-        log.info("Created user with email {} and username {}", user.getEmail(), user.getUsername());
+            return ResponseEntity
+                    .created(URI.create("/api/user/" + user.getId()))
+                    .body(
+                            new LoginDTO(
+                                    handler.generateToken(user.getEmail()),
+                                    null,
+                                    user.getDTO()));
+        } catch (Exception e) {
+            log.error("Failed to create user with email {} and username {}",
+                    userData.getEmail(),
+                    userData.getUsername(),
+                    e);
+            storageService.delete(userData.getProfilePic());
 
-        return ResponseEntity
-                .created(URI.create("/api/user/" + user.getId()))
-                .body(
-                        new LoginDTO(
-                                handler.generateToken(user.getEmail()),
-                                null,
-                                user.getDTO()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     /**

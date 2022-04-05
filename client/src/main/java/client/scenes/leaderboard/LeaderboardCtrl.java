@@ -1,5 +1,7 @@
 package client.scenes.leaderboard;
 
+import client.utils.FileUtils;
+import client.utils.communication.ServerUtils;
 import commons.entities.auth.UserDTO;
 import java.io.IOException;
 import java.net.URL;
@@ -175,9 +177,7 @@ public class LeaderboardCtrl implements Initializable {
             );
         }
 
-        var tempImagePattern =
-                new ImagePattern(
-                        new Image("https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg"));
+        String defaultPic = FileUtils.defaultUserPic;
 
         IntStream.range(0, Math.min(3, leaderboard.size())).forEach(i -> {
             boxes.get(i).setVisible(true);
@@ -186,7 +186,11 @@ public class LeaderboardCtrl implements Initializable {
             texts3D.get(i).setVisible(true);
             boxes.get(i).setMaterial(materials.get(i));
             texts.get(i).setText(leaderboard.get(i).getUsername());
-            images.get(i).setFill(tempImagePattern);
+            String imageUrl = defaultPic;
+            if (leaderboard.get(i).getProfilePic() != null) {
+                imageUrl = ServerUtils.getImagePathFromId(leaderboard.get(i).getProfilePic());
+            }
+            images.get(i).setFill(new ImagePattern(new Image(imageUrl)));
         });
     }
 }

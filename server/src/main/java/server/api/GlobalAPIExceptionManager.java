@@ -88,7 +88,8 @@ public class GlobalAPIExceptionManager {
     @ResponseBody
     @ExceptionHandler({
         UserNotFoundException.class,
-        LobbyNotFoundException.class })
+        LobbyNotFoundException.class,
+        GameNotFoundException.class})
     public ApiError handleNotFoundException(Exception ex) {
         return new ApiError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }

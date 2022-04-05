@@ -55,24 +55,16 @@ public class GameController {
     @PostMapping("/leave")
     ResponseEntity leave() {
         // If the user or the game don't exist, return 404
-        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
-        if (user.isEmpty()) {
-            log.warn("User {} does not exist", AuthContext.get());
-            return ResponseEntity.notFound().build();
-        }
+        User user = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(UserNotFoundException::new);
 
         // If the user isn't in a game, return 404
-        Optional<Game> game = gameRepository.getPlayersGame(user.get().getId());
-        if (game.isEmpty()) {
-            log.trace("User '{}' is not in a game", user.get().getId());
-            return ResponseEntity.notFound().build();
-        }
+        Game game = gameRepository.getPlayersGame(user.getId()).orElseThrow(GameNotFoundException::new);
 
         // Mark the player as abandoned
-        gameService.removePlayer(game.get(), user.get());
-        gameRepository.save(game.get());
+        gameService.removePlayer(game, user);
+        gameRepository.save(game);
 
-        log.debug("User '{}' left game '{}'", user.get().getId(), game.get().getId());
+        log.debug("User '{}' left game '{}'", user.getUsername(), game.getId());
         // Return 200
         return ResponseEntity.ok().build();
     }

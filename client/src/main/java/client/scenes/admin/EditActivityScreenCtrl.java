@@ -139,7 +139,7 @@ public class EditActivityScreenCtrl implements Initializable {
             this.addImageActivityLabel.setVisible(false);
             changedImage = pictureFile;
             this.saveActivityButton.setDisable(false);
-            this.activity.setImage(new Image(pictureFile.getAbsolutePath()));
+            this.activity.setImage(new Image(pictureFile.toURI().toString()));
             this.activityImageView.setImage(this.activity.getImage());
         }
     }

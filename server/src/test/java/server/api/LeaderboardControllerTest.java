@@ -52,6 +52,7 @@ class LeaderboardControllerTest {
         User user = new User("user" + id,
                 "email" + id,
                 "password" + id,
+                getUUID(id),
                 score,
                 gamesPlayed,
                 new HashSet<>());

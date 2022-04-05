@@ -1,5 +1,7 @@
 package client.scenes.leaderboard;
 
+import client.utils.FileUtils;
+import client.utils.communication.ServerUtils;
 import commons.entities.auth.UserDTO;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -39,7 +41,10 @@ public class LeaderboardEntryCtrl implements Initializable {
         this.gamesLabel.setText(String.valueOf(user.getGamesPlayed()));
         this.scoreLabel.setText(String.valueOf(user.getScore()));
 
-        var tempUrl = "https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg";
-        this.imageView.setImage(new Image(tempUrl, true));
+        String imageUrl = FileUtils.defaultUserPic;
+        if (user.getProfilePic() != null) {
+            imageUrl = ServerUtils.getImagePathFromId(user.getProfilePic());
+        }
+        this.imageView.setImage(new Image(imageUrl, true));
     }
 }
