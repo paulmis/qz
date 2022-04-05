@@ -31,7 +31,7 @@ class EstimateQuestionTest {
         Activity a = getActivity(100);
         components.add(a);
         q = new EstimateQuestion();
-        q.setActivities(components);
+        q.setActivities(new HashSet<>(components));
     }
 
     private AnswerDTO getAnswer(long estimate) {
@@ -62,7 +62,7 @@ class EstimateQuestionTest {
         List<Activity> components = new ArrayList<>();
         Activity a = getActivity(costTest);
         components.add(a);
-        myQuestion.setActivities(components);
+        myQuestion.setActivities(new HashSet<>(components));
 
         // Only one correct activity
         assertEquals(1, myQuestion.getRightAnswer().getResponse().size());
@@ -140,9 +140,9 @@ class EstimateQuestionTest {
         List<Activity> activities = new ArrayList<>(List.of(getActivity(0)));
         Question estimateNoArgs = new EstimateQuestion();
         estimateNoArgs.setId(getUUID(0));
-        estimateNoArgs.setActivities(List.copyOf(activities));
+        estimateNoArgs.setActivities(new HashSet<>(List.copyOf(activities)));
         estimateNoArgs.setText(questionText);
-        Question estimateAllArgs = new EstimateQuestion(getUUID(0), activities, questionText);
+        Question estimateAllArgs = new EstimateQuestion(getUUID(0), new HashSet<>(activities), questionText);
 
         // Constructor comparison
         assertEquals(estimateNoArgs.getId(), estimateAllArgs.getId());
@@ -155,7 +155,7 @@ class EstimateQuestionTest {
         // Test setup
         String questionText = "aQuestion";
         List<Activity> activities = new ArrayList<>(List.of(getActivity(0)));
-        Question estimateAllArgs = new EstimateQuestion(getUUID(0), activities, questionText);
+        Question estimateAllArgs = new EstimateQuestion(getUUID(0), new HashSet<>(activities), questionText);
         Question estimateCopy = new EstimateQuestion(estimateAllArgs);
 
         // Constructor comparison
@@ -167,6 +167,7 @@ class EstimateQuestionTest {
     @Test
     void constructorTestMultipleActivities() {
         List<Activity> activities = new ArrayList<>(List.of(getActivity(0), getActivity(1)));
-        assertThrows(IllegalArgumentException.class, () -> new EstimateQuestion(getUUID(0), activities, ""));
+        assertThrows(IllegalArgumentException.class, () -> new EstimateQuestion(getUUID(0),
+                new HashSet<>(activities), ""));
     }
 }

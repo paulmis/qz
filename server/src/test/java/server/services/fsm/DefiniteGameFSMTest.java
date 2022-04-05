@@ -10,6 +10,7 @@ import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -118,9 +119,14 @@ class DefiniteGameFSMTest {
 
     @Test
     void runAnswerToLeaderboard() throws IOException {
+        // Mock the repository
+        when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
+
         // Put the game in a state where leaderboard should be shown
         game.setCurrentQuestionNumber(4);
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
+        fsm.getContext().setGameService(gameService);
+        when(fsm.getContext().getRepository()).thenReturn(gameRepository);
         fsm.setRunning(true);
         fsm.runAnswer();
 

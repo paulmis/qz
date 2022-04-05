@@ -7,6 +7,7 @@ import client.utils.communication.ServerUtils;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
+import commons.entities.game.Reaction;
 import commons.entities.questions.QuestionDTO;
 import commons.entities.utils.ApiError;
 import java.net.URL;
@@ -218,6 +219,39 @@ public class GameCommunication {
         });
     }
 
+
+    /**
+     * Function that causes the user to leave the game.
+     */
+    public void getQuestionNumber(UUID gameId,
+                                  GetQuestionNumberHandlerSuccess handleSuccess,
+                                  GetQuestionNumberHandlerFail handleFail) {
+        Invocation invocation = ServerUtils.getRequestTarget()
+                .path("/api/game/" + gameId + "/questionNumber")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildGet();
+
+        // Perform the query asynchronously
+        invocation.submit(new InvocationCallback<Response>() {
+
+            @Override
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    handleSuccess.handle(response.readEntity(Integer.class));
+                } else {
+                    handleFail.handle(response.readEntity(ApiError.class));
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                handleFail.handle(null);
+                throwable.printStackTrace();
+            }
+        });
+    }
+
     /**
      * Sends a power-up to the game.
      *
@@ -243,6 +277,37 @@ public class GameCommunication {
                 } else {
                     handleFail.handle(response.readEntity(ApiError.class));
                 }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                handleFail.handle(null);
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Function that tells the server the player sent a reaction.
+     *
+     * @param reaction The reaction sent.
+     * @param handleSuccess handler for successful operation.
+     * @param handleFail handler for failed operation.
+     */
+    public void sendReaction(Reaction reaction,
+                             SendReactionHandlerSuccess handleSuccess, SendReactionHandlerFail handleFail) {
+        // Build the query invocation
+        Invocation request = ServerUtils.getRequestTarget()
+                .path("/api/game/reaction")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPost(Entity.entity(reaction, APPLICATION_JSON));
+
+        // Perform the query asynchronously
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                    handleSuccess.handle();
             }
 
             @Override
@@ -327,6 +392,34 @@ public class GameCommunication {
      * Handler for when sending a power-up fails.
      */
     public interface SendPowerUpHandlerFail {
+        void handle(ApiError error);
+    }
+
+    /**
+     * Handler for when getting the question number succeeds.
+     */
+    public interface GetQuestionNumberHandlerSuccess {
+        void handle(Integer questionNumber);
+    }
+
+    /**
+     * Handler for when getting the question number fails.
+     */
+    public interface GetQuestionNumberHandlerFail {
+        void handle(ApiError error);
+    }
+
+    /**
+     * Handler for when sending a reaction succeeds.
+     */
+    public interface SendReactionHandlerSuccess {
+        void handle();
+    }
+
+    /**
+     * Handler for when sending a reaction fails.
+     */
+    public interface SendReactionHandlerFail {
         void handle(ApiError error);
     }
 

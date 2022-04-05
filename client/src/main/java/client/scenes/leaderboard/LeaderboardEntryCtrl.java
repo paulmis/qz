@@ -1,12 +1,9 @@
 package client.scenes.leaderboard;
 
-import client.scenes.MainCtrl;
-import client.utils.ClientState;
-import client.utils.communication.FileUtils;
+import client.utils.FileUtils;
 import client.utils.communication.ServerUtils;
 import commons.entities.auth.UserDTO;
 import java.net.URL;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

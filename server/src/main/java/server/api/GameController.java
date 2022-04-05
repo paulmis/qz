@@ -2,6 +2,7 @@ package server.api;
 
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
+import commons.entities.game.Reaction;
 import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Optional;
@@ -108,6 +109,17 @@ public class GameController {
     }
 
     /**
+     * Get the current question number of the game.
+     *
+     * @param gameId the UUID of the game to get the question number for.
+     * @return the question number.
+     */
+    @GetMapping("/{gameId}/questionNumber")
+    ResponseEntity<Integer> getQuestionNumber(@PathVariable UUID gameId) {
+        return ResponseEntity.ok(gameRepository.getById(gameId).getCurrentQuestionNumber());
+    }
+
+    /**
      * Allow users to use powerups.
      *
      * @param powerUp powerup to use
@@ -143,6 +155,35 @@ public class GameController {
         gameRepository.save(game);
 
         // Return 200
+        return ResponseEntity.ok().build();
+    }
+
+
+    /**
+     * Get the URL of the image for the specified activity.
+     *
+     * @param reaction Reaction to get.
+     * @return URL of the image associated with the activity.
+     */
+    @PostMapping("/reaction")
+    ResponseEntity sendReaction(@RequestBody Reaction reaction) throws SSEFailedException {
+        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(AuthContext.get());
+        if (userOpt.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+
+        // If the user isn't in a game, throw exception
+        Optional<Game> gameOpt = gameRepository.getPlayersGame(userOpt.get().getId());
+        if (gameOpt.isEmpty()) {
+            throw new GameNotFoundException();
+        }
+
+        User user = userOpt.get();
+        Game game = gameOpt.get();
+
+        GamePlayer gamePlayer = (GamePlayer) game.getPlayers().get(user.getId());
+
+        gameService.sendReaction(game, gamePlayer, reaction);
         return ResponseEntity.ok().build();
     }
 }

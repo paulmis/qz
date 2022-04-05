@@ -1,6 +1,6 @@
 package client.scenes.lobby.configuration;
 
-import client.utils.communication.ReflectionUtils;
+import client.utils.ReflectionUtils;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import java.lang.reflect.Field;

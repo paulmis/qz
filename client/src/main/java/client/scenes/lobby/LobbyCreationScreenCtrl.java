@@ -7,6 +7,7 @@ import client.communication.game.LobbyCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import client.utils.ClientState;
+import client.utils.ReflectionUtils;
 import client.utils.communication.*;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
@@ -102,18 +103,6 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
     }
 
     /**
-     * Reacts to the game being started.
-     *
-     * @param preparationDuration Duration of preparation phase
-     */
-    @SSEEventHandler(SSEMessageType.GAME_START)
-    public void startGame(Integer preparationDuration) {
-        mainCtrl.showGameScreen(null);
-        mainCtrl.getGameScreenCtrl().startTimer(Duration.ofMillis(preparationDuration));
-        ClientState.previousScore = Optional.of(0);
-    }
-
-    /**
      * This function resets the controller to a predefined default state.
      */
     public void reset() {
@@ -172,6 +161,18 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
         isPrivateProperty.set(!isPrivateProperty.get());
     }
 
+    /**
+     * Reacts to the game being started.
+     *
+     * @param preparationDuration Duration of preparation phase
+     */
+    @SSEEventHandler(SSEMessageType.GAME_START)
+    public void startGame(Integer preparationDuration) {
+        mainCtrl.showGameScreen(null);
+        mainCtrl.getGameScreenCtrl().startTimer(Duration.ofMillis(preparationDuration));
+        ClientState.previousScore = Optional.of(0);
+    }
+
     @FXML
     private void createLobbyButtonClick() {
         // Start SSE
@@ -181,9 +182,16 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
         // Create lobby
         server.createLobby(
             config,
+            isPrivateProperty.get(),
+            lobbyNameField.getText(),
             // Success
             game -> runLater(() -> {
-                if (game.getStatus() == GameStatus.CREATED) {
+                if (game.isSingleplayer()) {
+                    LobbyCommunication.startGame(game.getId(), response -> {
+                    }, () -> {
+                        runLater(mainCtrl::showLobbyScreen);
+                    });
+                } else {
                     mainCtrl.showLobbyScreen();
                 }
             }),

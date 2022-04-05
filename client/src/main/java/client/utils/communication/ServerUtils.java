@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
@@ -91,10 +92,46 @@ public class ServerUtils {
     }
 
     /**
+     * Function to check if entered email is indeed an email.
+     *
+     * @param email email string entered by user
+     * @return true if it is a valid email, false otherwise
+     */
+    public static boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."
+                + "[a-zA-Z0-9_+&*-]+)*@"
+                + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
+                + "A-Z]{2,7}$";
+
+        Pattern emailPattern = Pattern.compile(emailRegex);
+        if (email == null) {
+            return false;
+        }
+        return emailPattern.matcher(email).matches();
+    }
+
+    /** Gets a list of the leaderboard images from the server.
+     *
+     * @return a list of leaderboard images.
+     */
+    public List<URL> getLeaderBoardImages() {
+        try {
+            return Arrays.asList(
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
+                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"));
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Handler for when the register succeeds.
      */
     public interface RegisterHandler {
-        void handle(Response response, ApiError error);
+        void handle(Response response, LoginDTO dto, ApiError error);
     }
 
     /**
@@ -153,11 +190,11 @@ public class ServerUtils {
                     LoginDTO loginDTO = o.readEntity(LoginDTO.class);
                     client = client.register(new Authenticator(loginDTO.getToken()));
                     ClientState.user = loginDTO.getUser();
-                    registerHandler.handle(o, new ApiError());
+                    registerHandler.handle(o, loginDTO, new ApiError());
                 } else if (o.getStatus() == 400) {
-                    registerHandler.handle(o, o.readEntity(ApiError.class));
+                    registerHandler.handle(o, null, o.readEntity(ApiError.class));
                 } else if (o.getStatus() == 409) {
-                    registerHandler.handle(o, new ApiError());
+                    registerHandler.handle(o, null, new ApiError());
                 }
             }
 
@@ -180,6 +217,47 @@ public class ServerUtils {
      */
     public interface LogInHandlerFail {
         void handle();
+    }
+
+    /**
+     * Handler for when token is valid.
+     */
+    public interface LoginValidHandler {
+        void handle(UserDTO user);
+    }
+
+    /**
+     * Check whether the provided token is valid.
+     *
+     * @param token token to check.
+     * @param handler handler to call if the token is valid.
+     */
+    public void checkTokenValid(String token, LoginValidHandler handler) {
+        log.debug("Checking token validity");
+        client = newClient();
+        Invocation invocation = client.target(SERVER).path("/api/user").request(APPLICATION_JSON)
+                .header("Authorization", "Bearer " + token).buildGet();
+        invocation.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response o) {
+                if (o.getStatus() == 200) {
+                    UserDTO user = o.readEntity(UserDTO.class);
+                    log.info("Token is valid: {}", user);
+
+                    client = client.register(new Authenticator(token));
+                    ClientState.user = user;
+
+                    handler.handle(user);
+                } else {
+                    log.info("Token is not valid");
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                log.info("Token not valid");
+            }
+        });
     }
 
     /**

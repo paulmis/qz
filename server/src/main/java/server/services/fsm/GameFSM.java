@@ -92,4 +92,8 @@ public abstract class GameFSM {
      * Run the finite state machine.
      */
     public abstract void run();
+
+    public void refreshGame() {
+        game = context.getRepository().findById(game.getId()).get();
+    }
 }

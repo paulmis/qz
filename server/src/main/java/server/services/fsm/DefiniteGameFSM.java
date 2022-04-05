@@ -89,6 +89,10 @@ public class DefiniteGameFSM extends GameFSM {
             // Move onto the next question.
             log.debug("[{}] FSM runnable: advancing onto question {}.",
                 getGame().getId(), getGame().getCurrentQuestionNumber());
+
+            // Update the game
+            refreshGame();
+
             getContext().getGameService()
                 .nextQuestion(
                     getGame(),
@@ -116,8 +120,11 @@ public class DefiniteGameFSM extends GameFSM {
         log.trace("[{}] FSM runAnswer called.", getGame().getId());
         setState(FSMState.ANSWER);
 
+        // Update the game
+        refreshGame();
+
         // Update the scores
-        getContext().getGameService().updateScores(getGame());
+        getContext().getGameService().updateScores(this.game);
 
         // Delay before progressing to the next stage
         long delay = getContext().getQuizConfiguration().getTiming().getAnswerTime();
@@ -170,6 +177,9 @@ public class DefiniteGameFSM extends GameFSM {
 
     @SneakyThrows
     void runFinish() {
+        // Update the game
+        refreshGame();
+
         // We are not accepting answers anymore.
         getContext().getGameService().finish(getGame());
 

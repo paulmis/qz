@@ -1,11 +1,14 @@
 package client.scenes.authentication;
 
 
+import static javafx.application.Platform.runLater;
+
 import client.scenes.MainCtrl;
+import client.utils.EncryptionUtils;
+import client.utils.PreferencesManager;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
-import commons.entities.utils.ApiError;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -18,17 +21,19 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import javax.ws.rs.core.Response;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
  * Register Screen controller class.
  */
+@Slf4j
 @Generated
 public class RegisterScreenCtrl implements Initializable {
 
@@ -41,7 +46,7 @@ public class RegisterScreenCtrl implements Initializable {
     @FXML private JFXButton signUpButton;
     @FXML private JFXButton haveAccountButton;
     @FXML private JFXButton usernameSetButton;
-    @FXML private CheckBox rememberMe;
+    @FXML private CheckBox rememberUser;
     @FXML private TextField emailField;
     @FXML private TextField passwordField;
     @FXML private TextField usernameField;
@@ -58,7 +63,6 @@ public class RegisterScreenCtrl implements Initializable {
 
     /**
      * Constructor for the register screen control.
-     *
      */
     @Inject
     public RegisterScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
@@ -66,16 +70,41 @@ public class RegisterScreenCtrl implements Initializable {
         this.server = server;
     }
 
+    static void setCredentialsFromFields(CheckBox rememberUser, TextField emailField, TextField passwordField) {
+        if (rememberUser.isSelected()) {
+            PreferencesManager.preferences.put("email", emailField.getText());
+            PreferencesManager.preferences.put("password", EncryptionUtils.encrypt(passwordField.getText(),
+                    EncryptionUtils.ENCRYPTION_KEY));
+        } else {
+            PreferencesManager.preferences.remove("email");
+            PreferencesManager.preferences.remove("password");
+        }
+    }
+
     /**
      * This function runs after every control has
      * been created and initialized already.
      *
-     * @param location These location parameter.
+     * @param location  These location parameter.
      * @param resources The resource bundle.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.userExists.setVisible(false);
+
+        // On enter, run the login code
+        emailField.setOnKeyPressed(enter -> {
+            if (enter.getCode().equals(KeyCode.ENTER)) {
+                signUpButtonClick();
+            }
+        });
+
+        // On enter, run the login code
+        passwordField.setOnKeyPressed(enter -> {
+            if (enter.getCode().equals(KeyCode.ENTER)) {
+                signUpButtonClick();
+            }
+        });
     }
 
     /**
@@ -85,11 +114,23 @@ public class RegisterScreenCtrl implements Initializable {
     @FXML
     private void setUsername() {
         if (usernameField.getText().length() > 0) {
-            System.out.print(usernameField.getText() + emailText + passwordText);
-            server.register(usernameField.getText(), emailText,  passwordText, userImage,
-                    (response, error) -> javafx.application.Platform.runLater(() -> {
+            setCredentialsFromFields(rememberUser, emailField, passwordField);
+            log.debug("{}: {} [{}]", usernameField.getText(), emailText, userImage.getAbsolutePath());
+            server.register(usernameField.getText(),
+                    emailText,
+                    passwordText,
+                    userImage,
+                    (response, dto, error) -> runLater(() -> {
                         switch (response.getStatus()) {
                             case 201: {
+                                if (rememberUser.isSelected()) {
+                                    PreferencesManager.preferences.put("token",
+                                            EncryptionUtils.encrypt(dto.getToken(),
+                                                    EncryptionUtils.ENCRYPTION_KEY));
+                                } else {
+                                    PreferencesManager.preferences.remove("token");
+                                }
+
                                 mainCtrl.showLobbyListScreen();
                                 mainCtrl.showInformationalSnackBar("Success!");
                                 break;
@@ -110,8 +151,6 @@ public class RegisterScreenCtrl implements Initializable {
                             //If the function fails it triggers the error message.
                         }
                     }));
-        } else {
-            //No username set
         }
     }
 
@@ -141,9 +180,9 @@ public class RegisterScreenCtrl implements Initializable {
      * Function that generates an image filled with a colour
      * based on the 3 rgb values and opacity.
      *
-     * @param red the amount of red
-     * @param green the amount of green
-     * @param blue the amount of blue
+     * @param red     the amount of red
+     * @param green   the amount of green
+     * @param blue    the amount of blue
      * @param opacity the opacity of the image
      * @return a new Image file that is filled with the colour obtained out of the
      *          3 rgb values.
@@ -183,16 +222,24 @@ public class RegisterScreenCtrl implements Initializable {
      */
     @FXML
     private void signUpButtonClick() {
-        passwordText = passwordField.getText();
-        emailText = emailField.getText();
-        pane2.setVisible(false);
-        pane2.setDisable(true);
-        pane2.setMouseTransparent(true);
-        borderPane2.setMouseTransparent(true);
-        pane1.setVisible(true);
-        pane1.setDisable(false);
-        pane1.setMouseTransparent(false);
-        borderPane1.setMouseTransparent(false);
+        if (!emailField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
+            if (ServerUtils.isValidEmail(emailField.getText())) {
+                emailText = emailField.getText();
+                passwordText = passwordField.getText();
+                pane2.setVisible(false);
+                pane2.setDisable(true);
+                pane2.setMouseTransparent(true);
+                borderPane2.setMouseTransparent(true);
+                pane1.setVisible(true);
+                pane1.setDisable(false);
+                pane1.setMouseTransparent(false);
+                borderPane1.setMouseTransparent(false);
+            } else {
+                mainCtrl.showErrorSnackBar("Enter a valid email");
+            }
+        } else {
+            mainCtrl.showErrorSnackBar("Missing email and/or password");
+        }
     }
 
     /**
@@ -210,19 +257,6 @@ public class RegisterScreenCtrl implements Initializable {
     @FXML
     private void resetMessage() {
         this.userExists.setVisible(false);
-    }
-
-    /**
-     * Function that keeps track if user
-     * wants to be remembered locally or not.
-     */
-    @FXML
-    private void rememberMeTick() {
-        if (rememberMe.isSelected()) {
-            System.out.print("User wants to be remembered...\n");
-        } else {
-            System.out.print("User does not want to be remembered...\n");
-        }
     }
 
     /**

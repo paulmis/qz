@@ -1,6 +1,6 @@
 package client.scenes.leaderboard;
 
-import client.utils.communication.FileUtils;
+import client.utils.FileUtils;
 import client.utils.communication.ServerUtils;
 import commons.entities.auth.UserDTO;
 import java.io.IOException;

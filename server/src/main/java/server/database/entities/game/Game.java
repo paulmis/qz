@@ -32,14 +32,20 @@ import server.utils.SaveableRandom;
 @AllArgsConstructor
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
+@Table(indexes = {@Index(name = "gameId", columnList = "gameId")})
 public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * ID of the game shown to the user.
      * Should be randomly generated.
      */
-    // TODO: add a custom generation strategy
     @Column(nullable = false, unique = true)
     protected String gameId;
+
+    /**
+     * The name of the game given by the user.
+     */
+    @Column(nullable = false)
+    protected String gameName;
 
     /**
      * Timestamp of game creation.
@@ -66,7 +72,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Current question number.
      */
-    @Column(nullable = true)
     protected Integer currentQuestionNumber = null;
 
     /**
@@ -74,34 +79,44 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      */
     @JsonIgnore
     protected long seed;
+    /**
+     * A boolean representing if this lobby is private.
+     */
+    @Column(nullable = false)
+    protected Boolean isPrivate;
 
     /**
      * Whether the players are allowed to submit an answer or not.
      */
     protected boolean acceptingAnswers = false;
+
     /**
      * List of players currently in the game mapped by their user IDs.
      */
     @JsonManagedReference
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     protected Map<UUID, GamePlayer> players = new HashMap<>();
+
     /**
      * The head of the lobby - person in charge with special privileges.
      */
     @OneToOne(fetch = FetchType.LAZY)
     protected GamePlayer host;
+
     /**
      * Questions assigned to this game.
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @OrderColumn
     protected List<Question> questions = new ArrayList<>();
+
     /**
      * PRNG.
      */
     @Transient
     private SaveableRandom random = new SaveableRandom(this.seed);
-    
+
+
     /**
      * Creates a new game from a DTO.
      * Only an empty lobby (no players or questions) can be initialized.
@@ -120,6 +135,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         } else {
             this.id = dto.getId();
         }
+        this.isPrivate = dto.getIsPrivate();
         this.gameId = dto.getGameId();
         this.createDate = dto.getCreateDate();
         if (dto.getConfiguration() instanceof NormalGameConfigurationDTO) {
@@ -128,6 +144,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         this.status = dto.getStatus();
         this.currentQuestionNumber = dto.getCurrentQuestionNumber();
         this.gameType = dto.getGameType();
+        this.gameName = dto.getGameName();
     }
 
     /**
@@ -322,7 +339,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         }
         // Sets the game players' score to either the base score if condition is false,
         // or returns the base score * modifier
-        gamePlayer.setScore((int) score * Math.round(this.getCurrentQuestionNumber()
+        gamePlayer.setScore(gamePlayer.getScore() + (int) score * Math.round(this.getCurrentQuestionNumber()
                 .equals(gamePlayer.getUserPowerUps().get(PowerUp.DoublePoints))
                 ? modifier : 1));
     }
@@ -374,6 +391,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         return new GameDTO(
                 this.id,
                 this.gameId,
+                this.gameName,
+                this.isPrivate,
                 this.createDate,
                 this.gameType,
                 this.configuration.getDTO(),

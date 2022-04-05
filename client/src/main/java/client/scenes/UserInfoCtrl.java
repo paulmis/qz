@@ -4,13 +4,11 @@ import static javafx.application.Platform.runLater;
 
 import client.communication.user.UserCommunication;
 import client.utils.ClientState;
-import client.utils.communication.FileUtils;
+import client.utils.FileUtils;
+import client.utils.PreferencesManager;
 import client.utils.communication.ServerUtils;
-import commons.entities.game.GameStatus;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import java.io.File;
 import java.net.URL;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
@@ -18,11 +16,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
  * Control of the user info widget.
  */
+@Slf4j
 public class UserInfoCtrl implements Initializable {
     private final UserCommunication userCommunication;
     private final ServerUtils server;
@@ -82,7 +82,11 @@ public class UserInfoCtrl implements Initializable {
 
     @FXML
     private void signOutButtonClick() {
+        log.info("Signing out");
         server.signOut();
+        PreferencesManager.preferences.remove("email");
+        PreferencesManager.preferences.remove("password");
+        PreferencesManager.preferences.remove("token");
         mainCtrl.showServerConnectScreen();
     }
 

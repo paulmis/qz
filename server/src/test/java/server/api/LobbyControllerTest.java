@@ -104,7 +104,9 @@ class LobbyControllerTest {
         // Create a lobby
         mockLobby = new NormalGame();
         mockLobby.setId(getUUID(3));
+        mockLobby.setIsPrivate(false);
         mockLobby.setStatus(GameStatus.CREATED);
+        mockLobby.setGameId("TUDEFT");
         mockLobbyConfiguration = new NormalGameConfiguration(10, Duration.ofSeconds(10), 2, 2, 2f, 100, 0, 75);
         mockLobby.setConfiguration(mockLobbyConfiguration);
         normalGameConfiguration = new NormalGameConfiguration(4, Duration.ofSeconds(8), 6, 2, 2f, 100, 0, 75);
@@ -199,10 +201,59 @@ class LobbyControllerTest {
     }
 
     @Test
+    public void joinPrivate() throws Exception {
+        // Modify the capacity to allow the player to join
+        mockLobbyConfiguration.setCapacity(3);
+        mockLobby.setIsPrivate(true);
+
+        // Set the context user to a user that isn't in the game
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        sally.getEmail(),
+                        sally.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+
+        // Request
+        this.mockMvc
+                .perform(put("/api/lobby/" + mockLobby.getId() + "/join"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
     public void lobbyNotFoundJoin() throws Exception {
         this.mockMvc
                 .perform(put("/api/lobby/" + getUUID(1) + "/join"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void joinByGameIdOk() throws Exception {
+        // Mock the repo
+        when(gameRepository.findByGameId(mockLobby.getGameId())).thenReturn(Optional.of(mockLobby));
+
+        // Modify the capacity to allow the player to join
+        mockLobbyConfiguration.setCapacity(3);
+
+        // Set the context user to a user that isn't in the game
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        sally.getEmail(),
+                        sally.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+
+        this.mockMvc
+                .perform(put("/api/lobby/join/" + mockLobby.getGameId()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void joinByGameIdNotFound() throws Exception {
+        // Mock the repo
+        when(gameRepository.findByGameId(mockLobby.getGameId())).thenReturn(Optional.of(mockLobby));
+
+        this.mockMvc
+                .perform(put("/api/lobby/join/" + "ZANDY"))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test

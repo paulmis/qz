@@ -19,6 +19,9 @@ public class FSMManager {
     @Autowired
     private SSEManager sseManager;
 
+    @Autowired
+    private GameRepository gameRepository;
+
     private final ConcurrentHashMap<UUID, GameFSM> fsmMap = new ConcurrentHashMap<>();
 
     /**

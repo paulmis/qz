@@ -30,9 +30,9 @@ import server.services.storage.StorageService;
 /**
  * Controller that handles authentication requests.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
-@Slf4j
 public class AuthController {
 
     @Autowired
@@ -67,6 +67,9 @@ public class AuthController {
             @RequestPart(required = false) MultipartFile image) {
         // If a user with this email or username already exists, return 409
         if (userRepository.existsByEmailIgnoreCaseOrUsername(userData.getEmail(), userData.getUsername())) {
+            log.info("Could not create user with email {} and username {}: user already exists",
+                    userData.getEmail(),
+                    userData.getUsername());
             throw new UserAlreadyExistsException();
         }
 
@@ -74,6 +77,9 @@ public class AuthController {
         try {
             userData.setPassword(passwordEncoder.encode(userData.getPassword()));
         } catch (IllegalArgumentException ex) {
+            log.info("Could not create user with email {} and username {}: password is not valid",
+                    userData.getEmail(),
+                    userData.getUsername());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
@@ -94,13 +100,16 @@ public class AuthController {
 
         // Persist the user and return 201 with the user data
         User user = userRepository.save(new User(userData));
+
+        log.info("Created user with email {} and username {}", user.getEmail(), user.getUsername());
+
         return ResponseEntity
-            .created(URI.create("/api/user/" + user.getId()))
-            .body(
-                new LoginDTO(
-                    handler.generateToken(user.getEmail()),
-                    null,
-                    user.getDTO()));
+                .created(URI.create("/api/user/" + user.getId()))
+                .body(
+                        new LoginDTO(
+                                handler.generateToken(user.getEmail()),
+                                null,
+                                user.getDTO()));
     }
 
     /**
@@ -116,7 +125,8 @@ public class AuthController {
         try {
             // TODO: allow authentication with both mail and username
             // Authenticate the user
-            var authToken = new UsernamePasswordAuthenticationToken(userData.getEmail(), userData.getPassword());
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userData.getEmail(),
+                    userData.getPassword());
             org.springframework.security.core.userdetails.User userPrincipal =
                     (org.springframework.security.core.userdetails.User)
                             (authenticationManager.authenticate(authToken)).getPrincipal();
@@ -133,13 +143,16 @@ public class AuthController {
             // Find the current lobby or game
             Optional<Game> game = gameRepository.getPlayersLobbyOrGame(user.get().getId());
 
+            log.info("User {} logged in", user.get().getEmail());
+
             // Return 200 and the user data
             return ResponseEntity.ok(
-                new LoginDTO(
-                    handler.generateToken(user.get().getEmail()),
-                    game.isEmpty() ? null : game.get().getDTO(),
-                    user.get().getDTO()));
+                    new LoginDTO(
+                            handler.generateToken(user.get().getEmail()),
+                            game.isEmpty() ? null : game.get().getDTO(),
+                            user.get().getDTO()));
         } catch (AuthenticationException ex) {
+            log.info("Could not login user with email {}: {}", userData.getEmail(), ex.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }

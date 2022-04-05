@@ -51,7 +51,7 @@ public class GamePlayer extends BaseEntity<GamePlayerDTO> {
      * Maps power-up used to the question number that is was used on.
      * Allows for double point power-up to easily check.
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     protected Map<PowerUp, Integer> userPowerUps = new HashMap<>();
 
     /**

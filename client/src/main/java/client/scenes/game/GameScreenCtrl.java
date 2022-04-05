@@ -7,7 +7,7 @@ import client.scenes.MainCtrl;
 import client.scenes.questions.QuestionPane;
 import client.scenes.questions.StartGamePane;
 import client.utils.ClientState;
-import client.utils.communication.FileUtils;
+import client.utils.FileUtils;
 import client.utils.communication.SSEEventHandler;
 import client.utils.communication.SSEHandler;
 import client.utils.communication.SSESource;
@@ -19,6 +19,8 @@ import com.jfoenix.controls.JFXToggleButton;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
+import commons.entities.game.Reaction;
+import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
 import commons.entities.questions.QuestionDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
@@ -58,46 +60,26 @@ public class GameScreenCtrl implements Initializable, SSESource {
     private final GameCommunication communication;
     private final MainCtrl mainCtrl;
 
-    @FXML
-    private BorderPane mainBorderPane;
-    @FXML
-    private HBox avatarHBox;
-    @FXML
-    private HBox emojiHBox;
-    @FXML
-    private HBox powerUpHBox;
-    @FXML
-    private JFXButton quitButton;
-    @FXML
-    private JFXButton settingsButton;
-    @FXML
-    private Label timerLabel;
-    @FXML
-    private Label questionNumberLabel;
-    @FXML
-    private Button emojiBarButton;
-    @FXML
-    private Button powerUpBarButton;
-    @FXML
-    private ImageView emojiBarIcon;
-    @FXML
-    private ImageView powerUpBarIcon;
-    @FXML
-    private ScrollPane emojiScrollPane;
-    @FXML
-    private ScrollPane powerUpScrollPane;
-    @FXML
-    private Label pointsLabel;
-    @FXML
-    private AnchorPane settingsPanel;
-    @FXML
-    private JFXButton volumeButton;
-    @FXML
-    private JFXSlider volumeSlider;
-    @FXML
-    private JFXToggleButton muteEveryoneToggleButton;
-    @FXML
-    private FontAwesomeIconView volumeIconView;
+    @FXML private BorderPane mainBorderPane;
+    @FXML private HBox avatarHBox;
+    @FXML private HBox emojiHBox;
+    @FXML private HBox powerUpHBox;
+    @FXML private JFXButton quitButton;
+    @FXML private JFXButton settingsButton;
+    @FXML private Label timerLabel;
+    @FXML private Label questionNumberLabel;
+    @FXML private Button emojiBarButton;
+    @FXML private Button powerUpBarButton;
+    @FXML private ImageView emojiBarIcon;
+    @FXML private ImageView powerUpBarIcon;
+    @FXML private ScrollPane emojiScrollPane;
+    @FXML private ScrollPane powerUpScrollPane;
+    @FXML private Label pointsLabel;
+    @FXML private AnchorPane settingsPanel;
+    @FXML private JFXButton volumeButton;
+    @FXML private JFXSlider volumeSlider;
+    @FXML private JFXToggleButton muteEveryoneToggleButton;
+    @FXML private FontAwesomeIconView volumeIconView;
 
     private StackPane centerPane;
 
@@ -142,6 +124,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
         setUpLeaderBoard();
         setUpVolume();
         setUpTimer();
+        questionNumberLabel.setText("");
     }
 
     /**
@@ -157,6 +140,21 @@ public class GameScreenCtrl implements Initializable, SSESource {
     @SSEEventHandler(SSEMessageType.START_QUESTION)
     public void toQuestionStage(Integer delay) {
         log.debug("Question stage handler triggered. Delay: {}", delay);
+
+        communication.getQuestionNumber(ClientState.game.getId(), questionNumber -> runLater(() -> {
+            // Sets the question number
+            Integer qnum = questionNumber + 1;
+            if (ClientState.game.getConfiguration() instanceof NormalGameConfigurationDTO) {
+                questionNumberLabel.setText(
+                        qnum
+                                + " of "
+                                + ((NormalGameConfigurationDTO) ClientState.game.getConfiguration()).getNumQuestions());
+            } else {
+                questionNumberLabel.setText(qnum.toString());
+            }
+        }), error -> runLater(() -> log.error("error occurred: " + error.getDescription())));
+
+
         // Set the current question
         GameCommunication.updateCurrentQuestion(
                 ClientState.game.getId(),
@@ -355,6 +353,19 @@ public class GameScreenCtrl implements Initializable, SSESource {
             default:
                 break;
         }
+    }
+
+    /**
+     * Handles the power-up played event.
+     *
+     * @param reaction the reaction that has been sent.
+     */
+    @SSEEventHandler(SSEMessageType.REACTION)
+    public void handleReaction(Reaction reaction) {
+        mainCtrl.showInformationalSnackBar("User sent " + reaction.name());
+        String imageLocation = Objects.requireNonNull(getClass()
+                        .getResource("/client/images/reactions/" + reaction.name() + ".png")).toExternalForm();
+        // TO DO :
     }
 
     /**

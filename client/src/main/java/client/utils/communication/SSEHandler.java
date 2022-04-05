@@ -3,6 +3,7 @@ package client.utils.communication;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static javafx.application.Platform.runLater;
 
+import client.utils.ReflectionUtils;
 import commons.entities.messages.SSEMessageType;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -75,8 +76,7 @@ public class SSEHandler {
             .target(
                 ServerUtils
                     .getRequestTarget()
-                    .path("/api/sse/open"))
-            .reconnectingEvery(0, MICROSECONDS).build();
+                    .path("/api/sse/open")).build();
 
         // Registers the handling of events, exceptions and completion.
         eventSource.register(
@@ -226,7 +226,7 @@ public class SSEHandler {
     }
 
     public void handleCompletion() {
-        log.error("--[SSE]-- Completed");
+        log.info("--[SSE]-- Completed");
     }
 }
 

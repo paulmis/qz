@@ -42,6 +42,8 @@ public class LobbyListCtrl implements Initializable {
     @FXML private VBox lobbyListVbox;
     @FXML private JFXButton signOutButton;
     @FXML private JFXButton editButton;
+    @FXML private JFXButton joinPrivateLobbyButton;
+    @FXML private TextField privateLobbyTextField;
     private UserInfoPane userInfo;
 
     /**
@@ -59,6 +61,10 @@ public class LobbyListCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Enables/ Disables the button according to the string size inside the textfield.
+        this.privateLobbyTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            this.joinPrivateLobbyButton.setDisable(newValue.length() != 6);
+        });
     }
 
     @FXML
@@ -173,5 +179,11 @@ public class LobbyListCtrl implements Initializable {
         updateLobbyList(searchField.getText());
     }
 
-    //TODO: RE ADD SIGN OUT
+    @FXML
+    private void joinPrivateLobbyButtonClick() {
+        communication.joinPrivateLobby(privateLobbyTextField.getText(), gameDTO -> runLater(() -> {
+            mainCtrl.showInformationalSnackBar("Joined the lobby!");
+            mainCtrl.showLobbyScreen();
+        }), (error) -> runLater(() -> mainCtrl.showErrorSnackBar("Error occurred: " + error.getDescription())));
+    }
 }
