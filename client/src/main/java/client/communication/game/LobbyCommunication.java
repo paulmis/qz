@@ -253,4 +253,55 @@ public class LobbyCommunication {
             }
         });
     }
+
+    /**
+     * Handler for when kicking the player succeeds.
+     */
+    public interface KickPlayerHandlerSuccess {
+        void handle();
+    }
+
+    /**
+     * Handler for when kicking the player fails.
+     */
+    public interface KickPlayerHandlerFail {
+        void handle(ApiError error);
+    }
+
+
+    /**
+     * Function that handles kicking a player from a lobby.
+     *
+     * @param playerId the player id of the user to be kicked.
+     * @param handleSuccess the success handler
+     * @param handleFail the fail handler
+     */
+    public void kickPlayer(UUID playerId,
+                           KickPlayerHandlerSuccess handleSuccess,
+                           KickPlayerHandlerFail handleFail) {
+        // Build the query invocation
+        Invocation request = ServerUtils.getRequestTarget()
+                .path("/api/lobby/kick/" + playerId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildDelete();
+
+        // Perform the query asynchronously
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    handleSuccess.handle();
+                } else {
+                    handleFail.handle(response.readEntity(ApiError.class));
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                handleFail.handle(null);
+                throwable.printStackTrace();
+            }
+        });
+    }
 }

@@ -55,12 +55,13 @@
             </JFXButton>
             <JFXButton fx:id="disbandButton" alignment="CENTER" contentDisplay="TEXT_ONLY" layoutX="21.0" layoutY="447.0" onAction="#disbandButtonClick" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #FF0000#FF0000;" text="DISBAND" textFill="WHITE" />
             <JFXButton fx:id="startButton" alignment="CENTER" contentDisplay="TEXT_ONLY" layoutX="555.0" layoutY="447.0" onAction="#startButtonClick" prefHeight="33.0" prefWidth="63.0" style="-fx-background-color: #8DDC8A;" text="START" textFill="#373838" />
-            <JFXButton fx:id="lobbySettingsButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" layoutX="274.0" layoutY="447.0" onAction="#lobbySettingsButtonClick" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #F1CC48;" text="SETTINGS" textFill="#373838" />
+            <JFXButton fx:id="lobbySettingsButton" alignment="CENTER" contentDisplay="TEXT_ONLY" layoutX="274.0" layoutY="447.0" onAction="#lobbySettingsButtonClick" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #F1CC48;" text="SETTINGS" textFill="#373838" />
             <Label fx:id="gameCapacity" layoutX="73.0" layoutY="27.0" prefHeight="17.0" prefWidth="37.0" text="7/12">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
+            <FontAwesomeIconView fx:id="lockButtonIconView" glyphName="UNLOCK" layoutX="105.0" layoutY="44.0" size="24" />
          </children>
       </AnchorPane>
    </children>

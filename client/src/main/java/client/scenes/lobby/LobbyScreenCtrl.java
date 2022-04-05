@@ -16,12 +16,11 @@ import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.messages.SSEMessageType;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.input.Clipboard;
@@ -43,32 +42,20 @@ public class LobbyScreenCtrl implements SSESource {
     private final MainCtrl mainCtrl;
     private final ServerUtils server;
     
-    @FXML
-    private AnchorPane lobbyMainAnchor;
-    @FXML
-    private Label gameName;
-    @FXML
-    private Label labelGameId;
-    @FXML
-    private Label gameType;
-    @FXML
-    private Label gameCapacity;
-    @FXML
-    private VBox playerList;
-    @FXML
-    private JFXButton disbandButton;
-    @FXML
-    private JFXButton settingsButton;
-    @FXML
-    private JFXButton userButton;
-    @FXML
-    private JFXButton copyLinkButton;
-    @FXML
-    private JFXButton startButton;
-    @FXML
-    private JFXButton lobbySettingsButton;
-    @FXML
-    private JFXButton leaveButton;
+    @FXML private AnchorPane lobbyMainAnchor;
+    @FXML private Label gameName;
+    @FXML private Label labelGameId;
+    @FXML private Label gameType;
+    @FXML private Label gameCapacity;
+    @FXML private VBox playerList;
+    @FXML private JFXButton disbandButton;
+    @FXML private JFXButton settingsButton;
+    @FXML private JFXButton userButton;
+    @FXML private JFXButton copyLinkButton;
+    @FXML private JFXButton startButton;
+    @FXML private JFXButton lobbySettingsButton;
+    @FXML private JFXButton leaveButton;
+    @FXML private FontAwesomeIconView lockButtonIconView;
     
     private UserInfoPane userInfo = null;
 
@@ -149,6 +136,16 @@ public class LobbyScreenCtrl implements SSESource {
      */
     @FXML
     public void startButtonClick() {
+        if (ClientState.game.getConfiguration().getCapacity() > ClientState.game.getPlayers().size()) {
+            mainCtrl.showErrorSnackBar("You need to have "
+                    + ClientState.game.getConfiguration().getCapacity()
+                    + " players to start the game.");
+            return;
+        } else if (ClientState.game.getConfiguration().getCapacity() < ClientState.game.getPlayers().size()) {
+            mainCtrl.showErrorSnackBar("The lobby exceeds the capacity. Kick some people out!");
+            return;
+        }
+
         LobbyCommunication.startGame(
             ClientState.game.getId(),
             // Success
@@ -288,10 +285,13 @@ public class LobbyScreenCtrl implements SSESource {
                 .findFirst()
                 .map(GamePlayerDTO::getNickname)
                 .orElse("N.A.");
-        gameName.setText(hostNickname + "'s game");
+        gameName.setText(gameDTO.getGameName());
 
         // Set game id
         labelGameId.setText(gameDTO.getGameId());
+
+        // Set if lobby is locked or not.
+        lockButtonIconView.setGlyphName((gameDTO.getIsPrivate() ? "LOCK" : "UNLOCK"));
 
         // Set game class
         gameType.setText(gameDTO.getClass().getName()
@@ -327,9 +327,13 @@ public class LobbyScreenCtrl implements SSESource {
                                 ? p1.getJoinDate().compareTo(p2.getJoinDate())
                                 : (gameDTO.getHost().equals(p1.getId()) ? -1 : 1))
                 .map(dto -> {
-                    LobbyPlayerPane elem = new LobbyPlayerPane(dto);
+                    LobbyPlayerPane elem = new LobbyPlayerPane(dto, () -> communication.kickPlayer(dto.getUserId(),
+                            () -> runLater(() -> mainCtrl.showInformationalSnackBar("Kicked user!")),
+                            error -> runLater(() ->
+                                    mainCtrl.showErrorSnackBar("Failed to kick user: " + error.getDescription()))));
+
                     // Show kick-out buttons only to host
-                    elem.showRemovePlayerBtn(isHost);
+                    elem.showRemovePlayerBtn(isHost && (!dto.getUserId().equals(ClientState.user.getId())));
                     // Indicate if the player is the host
                     elem.setPlayerHost(gameDTO.getHost().equals(dto.getId()));
                     return elem;
@@ -346,5 +350,16 @@ public class LobbyScreenCtrl implements SSESource {
         content.putString(labelGameId.getText());
         clipboard.setContent(content);
         mainCtrl.showInformationalSnackBar("Copied!");
+    }
+
+    /**
+     * Event handler for when you get kicked out of a lobby.
+     */
+    @SSEEventHandler(SSEMessageType.YOU_HAVE_BEEN_KICKED)
+    public void kicked() {
+        ClientState.game = null;
+        ServerUtils.sseHandler.kill();
+        mainCtrl.showLobbyListScreen();
+        mainCtrl.showErrorSnackBar("You have been kicked from the lobby!");
     }
 }
