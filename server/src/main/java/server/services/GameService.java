@@ -8,6 +8,7 @@ import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -220,6 +221,7 @@ public class GameService {
 
         // Distribute the event to all players
         log.trace("[{}] FSM runnable: accepting answers disabled.", game.getId());
+
         return sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.STOP_QUESTION, delay));
     }
 
@@ -332,7 +334,7 @@ public class GameService {
      * @param game the game to update the score for.
      */
     public void updateScores(Game game) {
-        updateScores(game, (Question) game.getQuestion().get());
+        updateScores(game, (Question) game.getQuestion().get(), LocalDateTime.now());
     }
 
     /**
@@ -341,7 +343,7 @@ public class GameService {
      * @param game game to update the scores for.
      * @param question question to update the scores for.
      */
-    public void updateScores(Game game, Question question) {
+    public void updateScores(Game game, Question question, LocalDateTime questionEndTime) {
         AnswerCollection answerCollection = getAnswers(game, question);
         if (answerCollection == null) {
             // If there are no answers, there's nothing to do
@@ -363,9 +365,14 @@ public class GameService {
             int score = Optional.ofNullable(scores.get(player.getId())).orElse(0);
             boolean isCorrect = score > game.getConfiguration().getCorrectAnswerThreshold();
 
+            // The answer time stamp
+            LocalDateTime answerTime = answerCollection.getAnswer(player.getId()).getAnswerTime();
+            // Compute score based on the quickness of answering a question
+            int timeBasedScore = game.computeTimeBasedScore(player, score, answerTime, questionEndTime);
+            // Update players' streak
             game.updateStreak(player, isCorrect);
-
-            int streakScore = game.computeStreakScore(player, score);
+            // Calculate the streak score
+            int streakScore = game.computeStreakScore(player, timeBasedScore);
             //Apply double points power up
             game.applyScorePowerUpModifiers(player, streakScore, 2);
             // Persist the score changes
