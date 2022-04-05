@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.api.exceptions.PowerUpDisabledException;
-import server.api.exceptions.SSEFailedException;
 import server.configuration.quiz.QuizConfiguration;
 import server.database.entities.User;
 import server.database.entities.game.DefiniteGame;
@@ -28,6 +28,7 @@ import server.database.entities.game.GamePlayer;
 import server.database.entities.game.exceptions.GameFinishedException;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Question;
+import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.QuestionRepository;
@@ -54,10 +55,16 @@ public class GameService {
 
     @Autowired
     @Getter
+    @Setter
     private GameRepository gameRepository;
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
+
+    @Autowired
+    @Getter
+    @Setter
+    private UserRepository userRepository;
 
     @Autowired
     @Getter
@@ -117,7 +124,7 @@ public class GameService {
      */
     @Transactional
     public Game start(Game game)
-            throws NotImplementedException, IllegalStateException, SSEFailedException {
+            throws NotImplementedException, IllegalStateException {
         // Make sure that the lobby is full and not started
         if (game.getStatus() != GameStatus.CREATED || !game.isFull()) {
             log.debug("[{}] Cannot start game: game is not full or has already started.", game.getId());
@@ -173,23 +180,16 @@ public class GameService {
 
         // Disconnect the player and update clients
         sseManager.unregister(user.getId());
-        try {
-            sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.PLAYER_LEFT, user.getId()));
-        } catch (IOException ex) {
-            // Log failure to update clients
-            log.error("Unable to send removePlayer message to all players", ex);
-        }
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.PLAYER_LEFT, user.getId()));
     }
 
     /**
      * Transitions the game to the next question stage.
      *
      * @param game the game to transition
-     * @throws IOException if an SSE connection send failed.
      */
     @Transactional
-    public void nextQuestion(Game<?> game, Long delay)
-            throws IOException, GameFinishedException {
+    public void nextQuestion(Game<?> game, Long delay) throws GameFinishedException {
         log.debug("[{}] Trying to move to next question", game.getId());
 
         // Check if the game should finish
@@ -212,10 +212,8 @@ public class GameService {
      * Transitions the game to the answer stage.
      *
      * @param game the game to transition
-     * @throws IOException if an SSE connection send failed.
      */
-    public boolean showAnswer(Game<?> game, Long delay)
-            throws IOException {
+    public boolean showAnswer(Game<?> game, Long delay) {
         // Disable answering
         game.setAcceptingAnswers(false);
         game = gameRepository.save(game);
@@ -229,14 +227,28 @@ public class GameService {
      * Finishes the game.
      *
      * @param game the game to transition
-     * @throws IOException if an SSE connection send failed.
      */
-    public void finish(Game<?> game)
-            throws IOException {
+    public void finish(Game<?> game) {
         // Mark the game as finished
         game.setStatus(GameStatus.FINISHED);
         game = gameRepository.save(game);
 
+
+        var leaderboard = game.getPlayers()
+                .entrySet()
+                .stream()
+                .filter(uuidGamePlayerEntry -> !uuidGamePlayerEntry.getValue().isAbandoned())
+                .sorted((o1, o2) -> Integer.compare(o1.getValue().getScore(), o1.getValue().getScore()))
+                .collect(Collectors.toList());
+
+        for (int i = 0; i < leaderboard.size(); i++) {
+            var entry = leaderboard.get(i);
+            User user = userRepository.findById(entry.getKey()).get();
+
+            user.setGamesWon(user.getGamesWon() + (i == 0 ? 1 : 0));
+            user.setScore(Math.max(user.getScore(), entry.getValue().getScore()));
+            userRepository.save(user);
+        }
         // Distribute the event to all players
         log.debug("[{}] Game is finished.", game.getId());
         sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.GAME_END));
@@ -372,9 +384,8 @@ public class GameService {
      * @param game the game.
      * @param player the player that sent the power-up
      * @param powerUp the power-up that is to be applied.
-     * @throws SSEFailedException if it fails to send the messages.
      */
-    public void sendPowerUp(Game game, GamePlayer player, PowerUp powerUp) throws SSEFailedException {
+    public void sendPowerUp(Game game, GamePlayer player, PowerUp powerUp) {
         GameFSM gameFSM = fsmManager.getFSM(game);
         // If the game is in a state other than a question, disallow the use of power ups
         if (gameFSM.getState() != FSMState.QUESTION) {
@@ -406,9 +417,8 @@ public class GameService {
      * @param game the game.
      * @param player the player that sent the power-up
      * @param reaction the reaction that is to be sent to the other players.
-     * @throws SSEFailedException if it fails to send the messages.
      */
-    public void sendReaction(Game game, GamePlayer player, Reaction reaction) throws SSEFailedException {
+    public void sendReaction(Game game, GamePlayer player, Reaction reaction) {
         log.info("Sending reaction" + reaction.name() + " to game: " + game.getGameId());
         sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.REACTION, reaction.name()));
     }

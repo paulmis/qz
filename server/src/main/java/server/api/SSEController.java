@@ -89,9 +89,6 @@ public class SSEController {
             }
             emitter.complete();
             return ResponseEntity.badRequest().body(emitter);
-        } catch (IOException e) {
-            log.debug("Failed to create SSE connection: " + e.getMessage());
-            return ResponseEntity.badRequest().body(emitter);
         }
     }
 }
