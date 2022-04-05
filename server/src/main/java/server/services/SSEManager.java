@@ -160,7 +160,7 @@ public class SSEManager {
             log.debug("Sent message to user {}", userId);
             return true;
         } catch (IOException e) {
-            log.info("Failed to send message to user {}", userId);
+            log.error("Failed to send message to user {}", userId);
             return false;
         }
     }
