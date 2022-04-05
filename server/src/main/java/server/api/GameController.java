@@ -104,8 +104,7 @@ public class GameController {
         // Return the players in the game, sorted by score
         List<GamePlayerDTO> players = gamePlayerRepository
                 .findByGame_IdEqualsAndAbandonedIsFalseOrderByScoreDesc(gameId)
-                .stream().map(gamePlayer -> gamePlayerRepository
-                .getById(gamePlayer.getId())).map(GamePlayer::getDTO).collect(Collectors.toList());
+                .stream().map(GamePlayer::getDTO).collect(Collectors.toList());
         return ResponseEntity.ok(players);
     }
 

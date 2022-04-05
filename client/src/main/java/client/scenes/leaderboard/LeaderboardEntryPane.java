@@ -73,7 +73,8 @@ public class LeaderboardEntryPane extends StackPane {
         try {
             view = fxmlLoader.load();
         } catch (Exception e) {
-            e.printStackTrace();
+            Platform.exit();
+            System.exit(0);
         }
 
         // Adds it to the view of this control(stack pane)

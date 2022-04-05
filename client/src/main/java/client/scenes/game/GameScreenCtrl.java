@@ -284,7 +284,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
                 (leaderboard) -> runLater(() -> {
                     log.debug("Received leaderboard: {}", leaderboard);
                     var leaderboardNode = new LeaderboardPane();
-                    leaderboardNode.setViewOrder(12312);
+                    leaderboardNode.setViewOrder(Integer.MAX_VALUE);
                     leaderboardNode.resetInGame(leaderboard);
                     this.mainBorderPane.setCenter(leaderboardNode);
                     if (delay != null) {

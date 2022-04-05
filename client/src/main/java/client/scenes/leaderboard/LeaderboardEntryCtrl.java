@@ -43,21 +43,22 @@ public class LeaderboardEntryCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        String name = gamePlayer == null ? user.getUsername() : gamePlayer.getNickname();
+        int points = gamePlayer == null ? user.getScore() : gamePlayer.getScore();
+
+        this.rankLabel.setText(String.valueOf(rank));
+        this.nameLabel.setText(name);
+        this.scoreLabel.setText(String.valueOf(points));
+
         if (gamePlayer != null) {
-            this.rankLabel.setText(String.valueOf(rank));
-            this.nameLabel.setText(gamePlayer.getNickname());
             this.gamesLabel.setVisible(false);
-            this.scoreLabel.setText(String.valueOf(gamePlayer.getScore()));
             String imageUrl = FileUtils.defaultUserPic;
             if (gamePlayer.getProfilePic() != null) {
                 imageUrl = ServerUtils.getImagePathFromId(gamePlayer.getProfilePic());
             }
             this.imageView.setImage(new Image(imageUrl, true));
         } else {
-            this.rankLabel.setText(String.valueOf(rank));
-            this.nameLabel.setText(user.getUsername());
             this.gamesLabel.setText(String.valueOf(user.getGamesWon()));
-            this.scoreLabel.setText(String.valueOf(user.getScore()));
             String imageUrl = FileUtils.defaultUserPic;
             if (user.getProfilePic() != null) {
                 imageUrl = ServerUtils.getImagePathFromId(user.getProfilePic());

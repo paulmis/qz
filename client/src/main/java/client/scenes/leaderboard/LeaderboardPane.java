@@ -3,6 +3,7 @@ package client.scenes.leaderboard;
 import commons.entities.auth.UserDTO;
 import commons.entities.game.GamePlayerDTO;
 import java.util.List;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -37,7 +38,8 @@ public class LeaderboardPane extends StackPane {
         try {
             view = fxmlLoader.load();
         } catch (Exception e) {
-            e.printStackTrace();
+            Platform.exit();
+            System.exit(0);
         }
 
         // Adds it to the view of this control(stack pane)
