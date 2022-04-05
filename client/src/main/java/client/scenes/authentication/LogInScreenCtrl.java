@@ -105,6 +105,10 @@ public class LogInScreenCtrl implements Initializable {
      */
     @FXML
     private void logInButtonClick() {
+        if (!emailField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
+            if (server.isValidEmail(emailField.getText())) {
+                if (rememberUser.isSelected()) {
+                    file.saveCredentials(localFile, emailField.getText(), passwordField.getText());
                 } else {
                     localFile.delete();
                 }
