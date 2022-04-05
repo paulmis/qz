@@ -63,7 +63,7 @@ public class LobbyPlayerCtrl implements Initializable {
 
         // Sets the number of won games by the player by getting the user info
         ServerUtils.getUserInfoById(playerDTO.getUserId(), userDTO -> {
-            runLater(() -> playerScore.setText(String.valueOf(userDTO.getGamesPlayed())));
+            runLater(() -> playerScore.setText(String.valueOf(userDTO.getGamesWon())));
         }, error -> log.error("Failed to get user."));
 
         String imageUrl = FileUtils.defaultUserPic;
