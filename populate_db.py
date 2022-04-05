@@ -15,8 +15,6 @@ import urllib.request
 import urllib.parse
 import urllib.error
 
-import create_questions
-
 
 class Response:
     """
@@ -209,23 +207,6 @@ dto_group.add_argument(
     help="Allow negative cost/consumption values. (default: %(default)s)",
     action="store_true",
 )
-questiongen_group = parser.add_argument_group(
-    "Question generation details",
-    "Run automatic question generation after adding activities",
-)
-questiongen_group.add_argument(
-    "-q",
-    "--question-gen",
-    help="Run automatic question generation after adding activities. (default: %(default)s)",
-    action="store_true",
-)
-questiongen_group.add_argument(
-    "-m",
-    "--multiple-choice",
-    help="Number of MC questions to generate. (default: %(default)s)",
-    type=int,
-    default=20,
-)
 args = parser.parse_args()
 
 logging.basicConfig(
@@ -350,9 +331,5 @@ for i in range(0, len(activities), args.chunk_size):
         exit(1)
 
     logging.info(f"Added activities {i} to {i + args.chunk_size}")
-
-if args.question_gen:
-    logging.info("Running automatic question generation...")
-    create_questions.main(args)
 
 logging.info("Done.")
