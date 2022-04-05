@@ -10,6 +10,7 @@ import com.jfoenix.controls.JFXButton;
 import commons.entities.ActivityDTO;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -36,7 +37,7 @@ public class ActivityListScreenCtrl implements Initializable {
     private final MainCtrl mainCtrl;
     private final AdminCommunication server;
 
-    @FXML private TableColumn<ActivityDTO, String> pictureTableColumn;
+    @FXML private TableColumn<ActivityDTO, UUID> pictureTableColumn;
     @FXML private TableColumn<ActivityDTO, String> costTableColumn;
     @FXML private TableColumn<ActivityDTO, String> descriptionTableColumn;
     @FXML private TableColumn<ActivityDTO, String> sourceTableColumn;
@@ -118,13 +119,13 @@ public class ActivityListScreenCtrl implements Initializable {
                 new PropertyValueFactory<>("source")
         );
 
-        pictureTableColumn.setCellValueFactory(new PropertyValueFactory<>("icon"));
+        pictureTableColumn.setCellValueFactory(new PropertyValueFactory<>("iconId"));
 
         pictureTableColumn.setCellFactory(tc -> {
-            TableCell<ActivityDTO, String> cell = new TableCell<ActivityDTO, String>() {
+            TableCell<ActivityDTO, UUID> cell = new TableCell<ActivityDTO, UUID>() {
                 private ImageView imageView = new ImageView();
                 @Override
-                protected void updateItem(String activityId, boolean empty) {
+                protected void updateItem(UUID activityId, boolean empty) {
                     super.updateItem(activityId, empty);
                     if (empty) {
                         setGraphic(null);

@@ -8,10 +8,13 @@ import com.jfoenix.controls.JFXButton;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import lombok.Generated;
 
 /**
@@ -60,6 +63,16 @@ public class ServerConnectScreenCtrl implements Initializable {
             this.serverPath = "http://localhost:8080/";
         }
         urlField.setText(this.serverPath);
+
+        // On enter, run the server connect code
+        urlField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent enter) {
+                if (enter.getCode().equals(KeyCode.ENTER)) {
+                    clickConnectButton();
+                }
+            }
+        });
     }
 
     /**

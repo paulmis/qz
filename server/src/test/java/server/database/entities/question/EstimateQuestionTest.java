@@ -8,7 +8,7 @@ import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
-import commons.entities.questions.QuestionDTO;
+import commons.entities.questions.EstimateQuestionDTO;
 import java.util.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ class EstimateQuestionTest {
 
     @Test
     void testFromDTOConstructor() {
-        QuestionDTO questionDTO = new QuestionDTO();
+        EstimateQuestionDTO questionDTO = new EstimateQuestionDTO();
         questionDTO.setText("Question text");
 
         EstimateQuestion q = new EstimateQuestion(questionDTO);

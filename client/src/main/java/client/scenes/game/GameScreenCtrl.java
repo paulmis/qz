@@ -4,7 +4,6 @@ import static javafx.application.Platform.runLater;
 
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
-import client.scenes.questions.EstimateQuestionPane;
 import client.scenes.questions.QuestionPane;
 import client.scenes.questions.StartGamePane;
 import client.utils.ClientState;
@@ -19,6 +18,7 @@ import com.jfoenix.controls.JFXToggleButton;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
+import commons.entities.game.Reaction;
 import commons.entities.messages.SSEMessageType;
 import commons.entities.questions.QuestionDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
@@ -142,9 +142,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
         setUpTopBarLeaderBoard();
         setUpVolume();
         setUpTimer();
-
-        // This loads the estimate question type.
-        loadMockEstimate();
     }
 
     /**
@@ -280,9 +277,24 @@ public class GameScreenCtrl implements Initializable, SSESource {
             case HalveTime:
                 timeLeft.set(timeLeft.get() / 2);
                 break;
+            case DoublePoints:
+                break;
             default:
                 break;
         }
+    }
+
+    /**
+     * Handles the power-up played event.
+     *
+     * @param reaction the reaction that has been sent.
+     */
+    @SSEEventHandler(SSEMessageType.REACTION)
+    public void handleReaction(Reaction reaction) {
+        mainCtrl.showInformationalSnackBar("User sent " + reaction.name());
+        String imageLocation = Objects.requireNonNull(getClass()
+                        .getResource("/client/images/reactions/" + reaction.name() + ".png")).toExternalForm();
+        // TO DO :
     }
 
     /**
@@ -317,17 +329,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
         // TODO: display final standings instead
         mainCtrl.showInformationalSnackBar("The game has ended");
         mainCtrl.showLobbyListScreen();
-    }
-
-
-    /**
-     * A mock function that loads the estimate control.
-     */
-    private void loadMockEstimate() {
-        this.centerPane = new EstimateQuestionPane(
-                "Short question",
-                log::debug);
-        mainBorderPane.setCenter(this.centerPane);
     }
 
     /**
@@ -618,13 +619,12 @@ public class GameScreenCtrl implements Initializable, SSESource {
             if (question == null) {
                 log.debug("Question is null, showing start game pane");
                 this.centerPane = new StartGamePane(mainCtrl, communication);
-                mainBorderPane.setCenter(this.centerPane);
                 // Otherwise, show a question pane
             } else {
-                log.debug("Showing question pane");
+                log.debug("Showing question pane for type {}", question.getClass().getSimpleName());
                 this.centerPane = new QuestionPane(mainCtrl, communication, question);
-                mainBorderPane.setCenter(this.centerPane);
             }
+            mainBorderPane.setCenter(this.centerPane);
         } catch (IOException e) {
             log.error("Error loading the FXML file");
             e.printStackTrace();

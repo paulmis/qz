@@ -16,8 +16,6 @@
 
 package client.utils.communication;
 
-import static java.util.concurrent.TimeUnit.MICROSECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import client.utils.Authenticator;
@@ -28,17 +26,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import commons.entities.auth.LoginDTO;
 import commons.entities.auth.UserDTO;
-import commons.entities.game.GameDTO;
-import commons.entities.game.GamePlayerDTO;
-import commons.entities.game.NormalGameDTO;
-import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.utils.ApiError;
 import java.net.URL;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
@@ -53,9 +47,9 @@ public class ServerUtils {
 
     private static String SERVER = "http://localhost:8080/";
     public static SSEHandler sseHandler = new SSEHandler();
-    public static Client client = ClientBuilder.newClient();
+    public static Client client = newClient();
 
-    public static String getImagePathFromId(String id) {
+    public static String getImagePathFromId(UUID id) {
         return SERVER + "api/resource/" + id.toString();
     }
 
@@ -74,11 +68,40 @@ public class ServerUtils {
      *
      * @return the new client.
      */
-    private Client newClient() {
+    private static Client newClient() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
         return ClientBuilder.newClient().register(provider);
+    }
+
+    /**
+     * Resets the client.
+     */
+    private void resetClient() {
+        if (client != null) {
+            client.close();
+        }
+        client = newClient();
+    }
+
+    /**
+     * Function to check if entered email is indeed an email.
+     *
+     * @param email email string entered by user
+     * @return true if it is a valid email, false otherwise
+     */
+    public static boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."
+                + "[a-zA-Z0-9_+&*-]+)*@"
+                + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
+                + "A-Z]{2,7}$";
+
+        Pattern emailPattern = Pattern.compile(emailRegex);
+        if (email == null) {
+            return false;
+        }
+        return emailPattern.matcher(email).matches();
     }
 
     /** Gets a list of the leaderboard images from the server.
@@ -99,7 +122,7 @@ public class ServerUtils {
     }
 
     /**
-     * Handler for when the register succeds.
+     * Handler for when the register succeeds.
      */
     public interface RegisterHandler {
         void handle(Response response, ApiError error);
@@ -117,7 +140,7 @@ public class ServerUtils {
      */
     public void register(String username, String email, String password,
                            RegisterHandler registerHandler) {
-        client = this.newClient();
+        resetClient();
         UserDTO user = new UserDTO(username, email, password);
         var invocation = client
                 .target(SERVER).path("/api/auth/register")
@@ -213,7 +236,7 @@ public class ServerUtils {
     public void logIn(String email, String password,
                       LogInHandlerSuccess logInHandlerSuccess, LogInHandlerFail logInHandlerFail) {
 
-        client = this.newClient();
+        resetClient();
         UserDTO user = new UserDTO("", email, password);
         Invocation invocation = client
                 .target(SERVER).path("/api/auth/login")
@@ -266,6 +289,6 @@ public class ServerUtils {
     }
 
     public void signOut() {
-        client = newClient();
+        resetClient();
     }
 }

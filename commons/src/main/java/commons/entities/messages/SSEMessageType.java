@@ -53,4 +53,8 @@ public enum SSEMessageType {
      * Sent when a power-up is played.
      */
     POWER_UP_PLAYED,
+    /**
+     * Sent when an user sends a reaction.
+     */
+    REACTION
 }

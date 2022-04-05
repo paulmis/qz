@@ -3,6 +3,7 @@ package server.services;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.PowerUp;
+import commons.entities.game.Reaction;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
@@ -52,6 +53,7 @@ public class GameService {
     private QuestionRepository questionRepository;
 
     @Autowired
+    @Getter
     private GameRepository gameRepository;
 
     @Autowired
@@ -352,12 +354,12 @@ public class GameService {
             game.updateStreak(player, isCorrect);
 
             int streakScore = game.computeStreakScore(player, score);
-            player.setScore(player.getScore() + streakScore);
-
+            //Apply double points power up
+            game.applyScorePowerUpModifiers(player, streakScore, 2);
             // Persist the score changes
             gamePlayerRepository.save(player);
 
-            log.debug("[{}] player {} now has {} points", game.getId(), player.getId(), score);
+            log.debug("[{}] player {} now has {} points", game.getId(), player.getId(), player.getScore());
         });
 
         log.debug("[{}] Scores updated.", game.getId());
@@ -373,14 +375,14 @@ public class GameService {
      * @throws SSEFailedException if it fails to send the messages.
      */
     public void sendPowerUp(Game game, GamePlayer player, PowerUp powerUp) throws SSEFailedException {
+        GameFSM gameFSM = fsmManager.getFSM(game);
+        // If the game is in a state other than a question, disallow the use of power ups
+        if (gameFSM.getState() != FSMState.QUESTION) {
+            throw new PowerUpDisabledException();
+        }
+        // Actions based on selected power ups
         switch (powerUp) {
             case HalveTime:
-                GameFSM gameFSM = fsmManager.getFSM(game);
-
-                if (gameFSM.getState() != FSMState.QUESTION) {
-                    throw new PowerUpDisabledException();
-                }
-
                 var newDelay = (gameFSM.getFuture().getScheduledDate().getTime() - (new Date()).getTime()) / 2;
 
                 // Doesn't let the user play this power-up if there are only 1 second left
@@ -396,5 +398,18 @@ public class GameService {
 
         log.info("Sending power-up " + powerUp.name() + " to game: " + game.getGameId());
         sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.POWER_UP_PLAYED, powerUp.name()));
+    }
+
+    /**
+     * Sends a reaction to the players in a game.
+     *
+     * @param game the game.
+     * @param player the player that sent the power-up
+     * @param reaction the reaction that is to be sent to the other players.
+     * @throws SSEFailedException if it fails to send the messages.
+     */
+    public void sendReaction(Game game, GamePlayer player, Reaction reaction) throws SSEFailedException {
+        log.info("Sending reaction" + reaction.name() + " to game: " + game.getGameId());
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.REACTION, reaction.name()));
     }
 }

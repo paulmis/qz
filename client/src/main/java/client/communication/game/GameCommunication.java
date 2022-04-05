@@ -7,6 +7,7 @@ import client.utils.communication.ServerUtils;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
+import commons.entities.game.Reaction;
 import commons.entities.questions.QuestionDTO;
 import commons.entities.utils.ApiError;
 import java.net.URL;
@@ -274,6 +275,37 @@ public class GameCommunication {
     }
 
     /**
+     * Function that tells the server the player sent a reaction.
+     *
+     * @param reaction The reaction sent.
+     * @param handleSuccess handler for successful operation.
+     * @param handleFail handler for failed operation.
+     */
+    public void sendReaction(Reaction reaction,
+                             SendReactionHandlerSuccess handleSuccess, SendReactionHandlerFail handleFail) {
+        // Build the query invocation
+        Invocation request = ServerUtils.getRequestTarget()
+                .path("/api/game/reaction")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPost(Entity.entity(reaction, APPLICATION_JSON));
+
+        // Perform the query asynchronously
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                    handleSuccess.handle();
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                handleFail.handle(null);
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
      * Handler for when the quitting game succeeds.
      */
     public interface QuitGameHandler {
@@ -347,6 +379,20 @@ public class GameCommunication {
      * Handler for when sending a power-up fails.
      */
     public interface SendPowerUpHandlerFail {
+        void handle(ApiError error);
+    }
+
+    /**
+     * Handler for when sending a reaction succeeds.
+     */
+    public interface SendReactionHandlerSuccess {
+        void handle();
+    }
+
+    /**
+     * Handler for when sending a reaction fails.
+     */
+    public interface SendReactionHandlerFail {
         void handle(ApiError error);
     }
 

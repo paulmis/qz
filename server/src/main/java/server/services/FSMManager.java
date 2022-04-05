@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.entities.game.Game;
+import server.database.repositories.game.GameRepository;
 import server.services.fsm.GameFSM;
 
 /**
@@ -17,6 +18,9 @@ public class FSMManager {
 
     @Autowired
     private SSEManager sseManager;
+
+    @Autowired
+    private GameRepository gameRepository;
 
     private final ConcurrentHashMap<UUID, GameFSM> fsmMap = new ConcurrentHashMap<>();
 

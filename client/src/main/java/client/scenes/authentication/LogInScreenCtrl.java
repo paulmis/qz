@@ -6,17 +6,23 @@ import client.scenes.MainCtrl;
 import client.utils.ClientState;
 import client.utils.PreferencesManager;
 import client.utils.communication.EncryptionUtils;
+import client.utils.communication.FileUtils;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameStatus;
+import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.animation.TranslateTransition;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 import lombok.Generated;
@@ -29,12 +35,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LogInScreenCtrl implements Initializable {
 
+    private final FileUtils file;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private File localFile;
 
     @FXML private JFXButton logInButton;
     @FXML private JFXButton createAccountButton;
-    @FXML private CheckBox rememberMe;
+    @FXML private CheckBox rememberUser;
     @FXML private TextField emailField;
     @FXML private TextField passwordField;
     @FXML private Pane pane;
@@ -43,9 +51,10 @@ public class LogInScreenCtrl implements Initializable {
      * Constructor for the log in screen control.
      */
     @Inject
-    public LogInScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public LogInScreenCtrl(FileUtils file, ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
+        this.file = file;
     }
 
     /**
@@ -65,6 +74,41 @@ public class LogInScreenCtrl implements Initializable {
         } catch (Exception e) {
             log.error("Error while decrypting token", e);
         }
+
+        // Create a local file in documents to store user credentials
+        this.localFile = new File(System.getProperty("user.home") + "/Documents/quizzzCredentials.txt");
+        // Check if local file has a saved user credentials
+        List<String> credentials = FileUtils.retrieveCredentials(localFile);
+        // Check if credentials are saved
+        if (!credentials.contains(null)) {
+            rememberUser.setSelected(true);
+        } else {
+            credentials.add(0, "");
+            credentials.add(1, "");
+        }
+        // Set saved credentials
+        emailField.setText(credentials.get(0));
+        passwordField.setText(credentials.get(1));
+
+        // On enter, run the login code
+        emailField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent enter) {
+                if (enter.getCode().equals(KeyCode.ENTER)) {
+                    logInButtonClick();
+                }
+            }
+        });
+
+        // On enter, run the login code
+        passwordField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent enter) {
+                if (enter.getCode().equals(KeyCode.ENTER)) {
+                    logInButtonClick();
+                }
+            }
+        });
     }
 
     /**
@@ -73,29 +117,42 @@ public class LogInScreenCtrl implements Initializable {
      */
     @FXML
     private void logInButtonClick() {
-        server.logIn(
-                emailField.getText(), passwordField.getText(),
-                // Success
-                (s) -> runLater(() -> {
-                    // If the user is in a lobby/game, put them in the apposite screen
-                    if (s.getGame() != null) {
-                        ClientState.game = s.getGame();
-                        ServerUtils.sseHandler.subscribe();
-                        if (s.getGame().getStatus() == GameStatus.CREATED) {
-                            mainCtrl.showLobbyScreen();
-                            //ToDo: add `mainCtrl.checkHost();` when ClientState.user is updated on login.
-                        } else {
-                            mainCtrl.showGameScreen(s.getGame().getCurrentQuestion());
-                        }
-                    } else {
-                        mainCtrl.showLobbyListScreen();
-                    }
-                }),
-                // Failure
-                () -> runLater(() -> {
-                    mainCtrl.showErrorSnackBar("Something went wrong while logging you in.");
-                })
-        );
+        if (!emailField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
+            if (ServerUtils.isValidEmail(emailField.getText())) {
+                if (rememberUser.isSelected()) {
+                    FileUtils.saveCredentials(localFile, emailField.getText(), passwordField.getText());
+                } else {
+                    localFile.delete();
+                }
+                server.logIn(
+                        emailField.getText(), passwordField.getText(),
+                        // Success
+                        (s) -> runLater(() -> {
+                            // If the user is in a lobby/game, put them in the apposite screen
+                            if (s.getGame() != null) {
+                                ClientState.game = s.getGame();
+                                ServerUtils.sseHandler.subscribe();
+                                if (s.getGame().getStatus() == GameStatus.CREATED) {
+                                    mainCtrl.showLobbyScreen();
+                                    //ToDo: add `mainCtrl.checkHost();` when ClientState.user is updated on login.
+                                } else {
+                                    mainCtrl.showGameScreen(s.getGame().getCurrentQuestion());
+                                }
+                            } else {
+                                mainCtrl.showLobbyListScreen();
+                            }
+                        }),
+                        // Failure
+                        () -> runLater(() -> {
+                            mainCtrl.showErrorSnackBar("Something went wrong while logging you in.");
+                        })
+                );
+            } else {
+                mainCtrl.showErrorSnackBar("Enter a valid email");
+            }
+        } else {
+            mainCtrl.showErrorSnackBar("Missing email and/or password");
+        }
     }
 
     /**
@@ -105,15 +162,6 @@ public class LogInScreenCtrl implements Initializable {
     @FXML
     private void createAccountButtonClick() {
         panelTransition();
-    }
-
-    /**
-     * Function that keeps track if user
-     * wants to be remembered locally or not.
-     */
-    @FXML
-    private void rememberMeTick() {
-        rememberMe.getUserData();
     }
 
     /**
