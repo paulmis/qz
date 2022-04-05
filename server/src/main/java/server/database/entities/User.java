@@ -40,11 +40,6 @@ import server.database.entities.utils.BaseEntity;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class User extends BaseEntity<UserDTO> {
     /**
-     * User's nickname.
-     */
-    protected String nickname;
-
-    /**
      * User's name.
      */
     @Size(min = 3, max = 20)
@@ -90,7 +85,6 @@ public class User extends BaseEntity<UserDTO> {
      */
     public User(UserDTO dto) {
         this(dto.getUsername(), dto.getEmail(), dto.getPassword());
-        this.nickname = dto.getNickname();
     }
 
     @Override

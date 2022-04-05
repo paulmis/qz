@@ -99,7 +99,7 @@ public class AnswerController {
         // Update the answer
         // XXX: There might be a race condition here?
         if (gameService.addAnswer(game, gamePlayer, answerData)) {
-            log.trace("[{}] Answer added to game (question {}).", gameId, currentQuestion.get().getId());
+            log.debug("[{}] Answer added to game (question {}).", gameId, currentQuestion.get().getId());
             // Answer has been received successfully.
             return ResponseEntity.ok().build();
         } else {

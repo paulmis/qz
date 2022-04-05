@@ -27,7 +27,6 @@ public class LobbyListItemCtrl implements Initializable {
     @FXML private JFXButton joinLobbyButton;
     @FXML private AnchorPane topLevelAnchorPane;
     @FXML private FontAwesomeIconView expandIcon;
-
     private GameDTO game;
     private JoinHandler joinHandler;
 

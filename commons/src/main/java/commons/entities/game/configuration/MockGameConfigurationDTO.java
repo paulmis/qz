@@ -8,6 +8,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Data transfer object for the survival-mode game configuration.`
@@ -15,6 +16,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
+@ToString(callSuper = true)
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 @JsonView(Views.Public.class)
 public class MockGameConfigurationDTO extends GameConfigurationDTO {
@@ -31,7 +33,7 @@ public class MockGameConfigurationDTO extends GameConfigurationDTO {
      * @param pointsWrong the number of points per incorrect answer.
      * @param correctAnswerThreshold the correct answer threshold.
      */
-    public MockGameConfigurationDTO(UUID id, Duration answerTime, Integer capacity, Float speedModifier,
+    public MockGameConfigurationDTO(UUID id, Integer answerTime, Integer capacity, Float speedModifier,
                                     Integer streakSize,
                                     Float streakMultiplier,
                                     Integer pointsCorrect,

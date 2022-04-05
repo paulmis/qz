@@ -46,6 +46,11 @@ public class DefiniteGameFSM extends GameFSM {
         // At the beginning of the game, give users a few seconds to prepare.
         if (getState() == FSMState.IDLE) {
             log.debug("[{}] FSM is in PREPARING state.", getGame().getId());
+
+            // Distribute the start event to all players
+            getContext().getSseManager().send(getGame().getUserIds(), new SSEMessage(SSEMessageType.GAME_START,
+                    getContext().getQuizConfiguration().getTiming().getPreparationTime()));
+
             setState(FSMState.PREPARING);
             scheduleTask(this::run,
                     Duration.ofMillis(getContext().getQuizConfiguration().getTiming().getPreparationTime()));
@@ -84,6 +89,10 @@ public class DefiniteGameFSM extends GameFSM {
             // Move onto the next question.
             log.debug("[{}] FSM runnable: advancing onto question {}.",
                 getGame().getId(), getGame().getCurrentQuestionNumber());
+
+            // Update the game
+            refreshGame();
+
             getContext().getGameService()
                 .nextQuestion(
                     getGame(),
@@ -110,6 +119,12 @@ public class DefiniteGameFSM extends GameFSM {
 
         log.trace("[{}] FSM runAnswer called.", getGame().getId());
         setState(FSMState.ANSWER);
+
+        // Update the game
+        refreshGame();
+
+        // Update the scores
+        getContext().getGameService().updateScores(this.game);
 
         // Delay before progressing to the next stage
         long delay = getContext().getQuizConfiguration().getTiming().getAnswerTime();
@@ -146,7 +161,7 @@ public class DefiniteGameFSM extends GameFSM {
         int delay = getContext().getQuizConfiguration().getTiming().getLeaderboardTime();
 
         // Notify all players to show the leaderboard.
-        getContext().getSseManager().send(getGame().getPlayerIds(),
+        getContext().getSseManager().send(getGame().getUserIds(),
             new SSEMessage(SSEMessageType.SHOW_LEADERBOARD, delay));
         log.trace("[{}] Leaderboard shown.", getGame().getId());
 
@@ -156,12 +171,15 @@ public class DefiniteGameFSM extends GameFSM {
         setFuture(
             new FSMFuture(
                 Optional.of(getContext().getTaskScheduler().schedule(this::runQuestion, executionTime)),
-                executionTime)
+                executionTime, this::runQuestion)
         );
     }
 
     @SneakyThrows
     void runFinish() {
+        // Update the game
+        refreshGame();
+
         // We are not accepting answers anymore.
         getContext().getGameService().finish(getGame());
 

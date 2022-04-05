@@ -20,4 +20,6 @@ public class FSMFuture {
      * The time at which the task was scheduled.
      */
     @NonNull private Date scheduledDate;
+
+    @NonNull private Runnable runnable;
 }

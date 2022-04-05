@@ -26,7 +26,7 @@ public abstract class Question extends BaseEntity<QuestionDTO> {
     /**
      * List of activities used to generate the question.
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "activities_asked",
             joinColumns = @JoinColumn(name = "question_id"),
@@ -76,7 +76,8 @@ public abstract class Question extends BaseEntity<QuestionDTO> {
         return new QuestionDTO(
                 this.id,
                 this.activities.stream().map(Activity::getDTO).collect(Collectors.toList()),
-                this.text
+                this.text,
+                null
         );
     }
 }

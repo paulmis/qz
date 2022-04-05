@@ -10,6 +10,7 @@ import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ class DefiniteGameFSMTest {
     private ThreadPoolTaskScheduler taskScheduler;
     @Mock
     private QuizConfiguration quizConfiguration;
-    @InjectMocks
+    @Mock
     private GameService gameService;
 
     private FSMContext context;
@@ -68,6 +69,11 @@ class DefiniteGameFSMTest {
 
         context = new FSMContext(gameService);
 
+        lenient().when(gameService.getQuizConfiguration()).thenReturn(quizConfiguration);
+        lenient().doNothing().when(gameService).updateScores(any());
+        lenient().when(quizConfiguration.getLeaderboardInterval()).thenReturn(5);
+        lenient().when(gameService.getTaskScheduler()).thenReturn(taskScheduler);
+        lenient().when(gameService.getSseManager()).thenReturn(sseManager);
         lenient().when(gameRepository.save(any(Game.class))).thenReturn(game);
         lenient().when(sseManager.send(any(UUID.class), any(SSEMessage.class))).thenReturn(true);
         lenient().when(taskScheduler.schedule(any(), any(Date.class))).thenReturn(new FSMHelpers.MockFuture<>());
@@ -114,9 +120,14 @@ class DefiniteGameFSMTest {
 
     @Test
     void runAnswerToLeaderboard() throws IOException {
+        // Mock the repository
+        when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
+
         // Put the game in a state where leaderboard should be shown
         game.setCurrentQuestionNumber(4);
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
+        fsm.getContext().setGameService(gameService);
+        when(fsm.getContext().getRepository()).thenReturn(gameRepository);
         fsm.setRunning(true);
         fsm.runAnswer();
 
@@ -124,8 +135,8 @@ class DefiniteGameFSMTest {
         verify(taskScheduler, times(1)).schedule(runnableCaptor.capture(), any(Date.class));
         runnableCaptor.getValue().run();
 
-        // Verify that the leaderboard notification is sent (and the "STOP_QUESTION" event)
-        verify(sseManager, times(2)).send(any(Iterable.class), sseMessageCaptor.capture());
+        // Verify that the leaderboard notification is sent
+        verify(sseManager, times(1)).send(any(Iterable.class), sseMessageCaptor.capture());
         assertEquals(SSEMessageType.SHOW_LEADERBOARD, sseMessageCaptor.getValue().getType());
     }
 

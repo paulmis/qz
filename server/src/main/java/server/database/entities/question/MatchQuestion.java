@@ -130,6 +130,7 @@ public class MatchQuestion extends Question {
     @Override
     public AnswerDTO getRightAnswer() {
         AnswerDTO rightAnswer = new AnswerDTO();
+        rightAnswer.setQuestionId(this.getId());
         rightAnswer.setResponse(getActivities().stream()
                 .map(Activity::getDTO).collect(Collectors.toList()));
         return rightAnswer;

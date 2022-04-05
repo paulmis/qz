@@ -147,6 +147,7 @@ public class OrderQuestion extends Question {
     @Override
     public AnswerDTO getRightAnswer() {
         AnswerDTO rightAnswer = new AnswerDTO();
+        rightAnswer.setQuestionId(this.getId());
         rightAnswer.setResponse(getActivities().stream()
                 .map(Activity::getDTO)
                 .sorted((o1, o2) -> increasing

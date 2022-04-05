@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.communication.user.UserCommunication;
 import client.utils.communication.ServerUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -20,14 +21,15 @@ public class UserInfoPane extends StackPane {
     /**
      * Constructor of the pane.
      *
-     * @param server   Reference to communication utilities object.
+     * @param server   Reference to server utilities object.
+     * @param userCommunication   Reference to communication utilities object.
      * @param mainCtrl Reference to the main controller.
      */
-    public UserInfoPane(ServerUtils server, MainCtrl mainCtrl) {
+    public UserInfoPane(ServerUtils server, UserCommunication userCommunication, MainCtrl mainCtrl) {
         FXMLLoader fxmlLoader =
                 new FXMLLoader(getClass().getResource("/client/scenes/UserInfo.fxml"));
         fxmlLoader.setControllerFactory(param ->
-                controller = new UserInfoCtrl(server, mainCtrl));
+                controller = new UserInfoCtrl(server, userCommunication, mainCtrl));
         try {
             view = fxmlLoader.load();
         } catch (Exception e) {

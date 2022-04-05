@@ -1,5 +1,6 @@
 package server.services;
 
+import static commons.entities.game.PowerUp.DoublePoints;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -37,6 +38,7 @@ import server.database.entities.question.Question;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.QuestionRepository;
+import server.services.fsm.GameFSM;
 
 /**
  * Tests for GameService class.
@@ -44,7 +46,7 @@ import server.database.repositories.question.QuestionRepository;
 @ExtendWith(MockitoExtension.class)
 public class GameServiceTest {
     @Mock
-    SSEManager sseManager;
+    private SSEManager sseManager;
 
     @Mock
     private QuestionRepository questionRepository;
@@ -177,11 +179,13 @@ public class GameServiceTest {
     void startNormal() throws IOException {
         // ToDo: fix QuestionRepository::findByIdNotIn
         // Mock the repository
+
+        when(gameRepository.save(any(Game.class))).thenReturn(game);
         //when(questionRepository.findByIdNotIn(new ArrayList<>()))
         //        .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
 
         // Start the game
-        gameService.startGame(game);
+        gameService.start(game);
 
         // Check that the questions have been generated and the status was changed
         assertEquals(3, game.getQuestions().size());
@@ -193,8 +197,9 @@ public class GameServiceTest {
         // ToDo: fix QuestionRepository::findByIdNotIn
         //verify(questionRepository).findByIdNotIn(new ArrayList<>());
         verify(questionRepository).findAll();
-        verify(sseManager, times(1)).send(any(Iterable.class), any(SSEMessage.class));
-        verifyNoMoreInteractions(questionRepository, sseManager);
+        verify(fsmManager, times(1)).addFSM(any(Game.class), any(GameFSM.class));
+        verify(fsmManager, times(1)).startFSM(any(UUID.class));
+        verifyNoMoreInteractions(questionRepository, fsmManager);
     }
 
     @Test
@@ -203,7 +208,7 @@ public class GameServiceTest {
         game.setStatus(GameStatus.ONGOING);
 
         // Start the game
-        assertThrows(IllegalStateException.class, () -> gameService.startGame(game));
+        assertThrows(IllegalStateException.class, () -> gameService.start(game));
 
         // Verify interactions
         verifyNoMoreInteractions(questionRepository);
@@ -215,7 +220,7 @@ public class GameServiceTest {
         game.remove(susanne.getId());
 
         // Start the game
-        assertThrows(IllegalStateException.class, () -> gameService.startGame(game));
+        assertThrows(IllegalStateException.class, () -> gameService.start(game));
 
         // Verify interactions
         verifyNoMoreInteractions(questionRepository);
@@ -232,7 +237,7 @@ public class GameServiceTest {
         mockGame.add(joePlayer);
 
         // Call the service function
-        assertThrows(NotImplementedException.class, () -> gameService.startGame(mockGame));
+        assertThrows(NotImplementedException.class, () -> gameService.start(mockGame));
 
         // Verify that the game hasn't been started
         assertEquals(GameStatus.CREATED, game.getStatus());
@@ -380,12 +385,35 @@ public class GameServiceTest {
 
         assertEquals(100, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
-        assertEquals(1, joePlayer.getPowerUpPoints());
 
         assertEquals(100, susannePlayer.getScore());
         assertEquals(1, susannePlayer.getStreak());
-        assertEquals(1, susannePlayer.getPowerUpPoints());
+    }
 
+    @Test
+    void updateDoublePointsScoresCorrect() {
+        game.addQuestions(List.of(questionA, questionB));
+        game.setCurrentQuestionNumber(0);
+
+        AnswerDTO answerA = new AnswerDTO();
+        answerA.setResponse(List.of(questionA.getAnswer().getDTO()));
+        answerA.setQuestionId(questionA.getId());
+        gameService.addAnswer(game, joePlayer, answerA);
+
+        AnswerDTO answerB = new AnswerDTO();
+        answerB.setResponse(List.of(questionA.getAnswer().getDTO()));
+        answerB.setQuestionId(questionA.getId());
+        gameService.addAnswer(game, susannePlayer, answerB);
+
+        susannePlayer.getUserPowerUps().put(DoublePoints, game.getCurrentQuestionNumber());
+
+        gameService.updateScores(game);
+
+        assertEquals(100, joePlayer.getScore());
+        assertEquals(1, joePlayer.getStreak());
+
+        assertEquals(200, susannePlayer.getScore());
+        assertEquals(1, susannePlayer.getStreak());
     }
 
     @Test
@@ -406,11 +434,9 @@ public class GameServiceTest {
         gameService.updateScores(game);
         assertEquals(100, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
-        assertEquals(1, joePlayer.getPowerUpPoints());
 
         assertEquals(-10, susannePlayer.getScore());
         assertEquals(0, susannePlayer.getStreak());
-        assertEquals(0, susannePlayer.getPowerUpPoints());
     }
 
     @Test
@@ -436,10 +462,8 @@ public class GameServiceTest {
 
         assertEquals(-10, joePlayer.getScore());
         assertEquals(0, joePlayer.getStreak());
-        assertEquals(0, joePlayer.getPowerUpPoints());
 
         assertEquals(-10, susannePlayer.getScore());
         assertEquals(0, susannePlayer.getStreak());
-        assertEquals(0, susannePlayer.getPowerUpPoints());
     }
 }

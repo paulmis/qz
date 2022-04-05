@@ -20,7 +20,8 @@ import lombok.*;
 @ToString(callSuper = true)
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = MCQuestionDTO.class, name = "MCQuestionDTO")
+    @JsonSubTypes.Type(value = MCQuestionDTO.class, name = "MCQuestionDTO"),
+    @JsonSubTypes.Type(value = EstimateQuestionDTO.class, name = "EstimateQuestionDTO")
 })
 @JsonView(Views.Public.class)
 public class QuestionDTO implements DTO {
@@ -40,6 +41,12 @@ public class QuestionDTO implements DTO {
     protected String text;
 
     /**
+     * ID of the icon corresponding to the question.
+     * Nullable, as some questions don't need it.
+     */
+    protected UUID questionIconId = null;
+
+    /**
      * Copy constructor.
      *
      * @param questionDTO the question DTO to copy
@@ -48,5 +55,6 @@ public class QuestionDTO implements DTO {
         this.id = questionDTO.id;
         this.activities = questionDTO.activities;
         this.text = questionDTO.text;
+        this.questionIconId = questionDTO.questionIconId;
     }
 }
