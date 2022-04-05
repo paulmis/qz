@@ -62,6 +62,8 @@ public class GameService {
     private GamePlayerRepository gamePlayerRepository;
 
     @Autowired
+    @Getter
+    @Setter
     private UserRepository userRepository;
 
     @Autowired

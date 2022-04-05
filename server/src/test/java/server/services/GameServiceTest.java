@@ -35,6 +35,7 @@ import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Activity;
 import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
+import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.database.repositories.question.QuestionRepository;
@@ -53,6 +54,9 @@ public class GameServiceTest {
 
     @Mock
     private GameRepository gameRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @Mock
     private GamePlayerRepository gamePlayerRepository;
@@ -351,6 +355,9 @@ public class GameServiceTest {
         // Set the game to be started and mock the repository
         game.setStatus(GameStatus.ONGOING);
         when(gameRepository.save(game)).thenReturn(game);
+        gameService.setUserRepository(userRepository);
+        when(userRepository.findById(joe.getId())).thenReturn(Optional.ofNullable(joe));
+        when(userRepository.findById(susanne.getId())).thenReturn(Optional.ofNullable(susanne));
 
         // Call the service
         gameService.finish(game);

@@ -132,6 +132,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     public void reset() {
         setUpPowerUps();
+        pointsLabel.setText("0");
     }
 
     /**
