@@ -20,6 +20,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import client.utils.Authenticator;
 import client.utils.ClientState;
+import client.utils.EncryptionUtils;
 import client.utils.PreferencesManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -37,7 +38,6 @@ import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 
 /**
  * Utilities for communicating with the server.
@@ -125,7 +125,7 @@ public class ServerUtils {
      * Handler for when the register succeeds.
      */
     public interface RegisterHandler {
-        void handle(Response response, ApiError error);
+        void handle(Response response, LoginDTO dto, ApiError error);
     }
 
     /**
@@ -153,15 +153,13 @@ public class ServerUtils {
             public void completed(Response o) {
                 if (o.getStatus() == 201) {
                     LoginDTO loginDTO = o.readEntity(LoginDTO.class);
-                    PreferencesManager.preferences.put("token",
-                            EncryptionUtils.encrypt(loginDTO.getToken(), EncryptionUtils.ENCRYPTION_KEY));
                     client = client.register(new Authenticator(loginDTO.getToken()));
                     ClientState.user = loginDTO.getUser();
-                    registerHandler.handle(o, new ApiError());
+                    registerHandler.handle(o, loginDTO, new ApiError());
                 } else if (o.getStatus() == 400) {
-                    registerHandler.handle(o, o.readEntity(ApiError.class));
+                    registerHandler.handle(o, null, o.readEntity(ApiError.class));
                 } else if (o.getStatus() == 409) {
-                    registerHandler.handle(o, new ApiError());
+                    registerHandler.handle(o, null, new ApiError());
                 }
             }
 
@@ -201,7 +199,7 @@ public class ServerUtils {
      */
     public void checkTokenValid(String token, LoginValidHandler handler) {
         log.debug("Checking token validity");
-        client = this.newClient();
+        client = newClient();
         Invocation invocation = client.target(SERVER).path("/api/user").request(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + token).buildGet();
         invocation.submit(new InvocationCallback<Response>() {
@@ -248,8 +246,6 @@ public class ServerUtils {
             @Override
             public void completed(LoginDTO loginDTO) {
                 log.info("Logged in: " + loginDTO.getUser());
-                PreferencesManager.preferences.put("token",
-                        EncryptionUtils.encrypt(loginDTO.getToken(), EncryptionUtils.ENCRYPTION_KEY));
                 client = client.register(new Authenticator(loginDTO.getToken()));
                 ClientState.user = loginDTO.getUser();
                 logInHandlerSuccess.handle(loginDTO);
@@ -269,7 +265,7 @@ public class ServerUtils {
      * @param serverPath the server path to connect to
      */
     public void connect(String serverPath) {
-        this.SERVER = serverPath;
+        SERVER = serverPath;
     }
 
     /**

@@ -1,4 +1,4 @@
-package client.utils.communication;
+package client.utils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

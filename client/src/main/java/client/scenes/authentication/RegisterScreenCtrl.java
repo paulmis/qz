@@ -1,16 +1,18 @@
 package client.scenes.authentication;
 
 
+import static javafx.application.Platform.runLater;
+
 import client.scenes.MainCtrl;
-import client.utils.communication.FileUtils;
+import client.utils.EncryptionUtils;
+import client.utils.PreferencesManager;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
-import commons.entities.utils.ApiError;
+import commons.entities.auth.LoginDTO;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
@@ -21,27 +23,25 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import javax.ws.rs.core.Response;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
  * Register Screen controller class.
  */
+@Slf4j
 @Generated
 public class RegisterScreenCtrl implements Initializable {
 
-    private final FileUtils file;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private String emailText;
     private String passwordText;
-    private File localFile;
 
     @FXML private JFXButton signUpButton;
     @FXML private JFXButton haveAccountButton;
@@ -66,10 +66,9 @@ public class RegisterScreenCtrl implements Initializable {
      *
      */
     @Inject
-    public RegisterScreenCtrl(FileUtils file, ServerUtils server, MainCtrl mainCtrl) {
+    public RegisterScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
-        this.file = file;
     }
 
     /**
@@ -82,26 +81,18 @@ public class RegisterScreenCtrl implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.userExists.setVisible(false);
-        // Create a local file in documents to store user credentials
-        this.localFile = new File(System.getProperty("user.home") + "/Documents/quizzzCredentials.txt");
 
         // On enter, run the login code
-        emailField.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent enter) {
-                if (enter.getCode().equals(KeyCode.ENTER)) {
-                    signUpButtonClick();
-                }
+        emailField.setOnKeyPressed(enter -> {
+            if (enter.getCode().equals(KeyCode.ENTER)) {
+                signUpButtonClick();
             }
         });
 
         // On enter, run the login code
-        passwordField.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent enter) {
-                if (enter.getCode().equals(KeyCode.ENTER)) {
-                    signUpButtonClick();
-                }
+        passwordField.setOnKeyPressed(enter -> {
+            if (enter.getCode().equals(KeyCode.ENTER)) {
+                signUpButtonClick();
             }
         });
     }
@@ -113,16 +104,22 @@ public class RegisterScreenCtrl implements Initializable {
     @FXML
     private void setUsername() {
         if (usernameField.getText().length() > 0) {
-            if (rememberUser.isSelected()) {
-                file.saveCredentials(localFile, emailField.getText(), passwordField.getText());
-            }
-            System.out.print(usernameField.getText() + emailText + passwordText);
-            server.register(usernameField.getText(), emailText,  passwordText, new ServerUtils.RegisterHandler() {
-                @Override
-                public void handle(Response response, ApiError error) {
-                    javafx.application.Platform.runLater(() -> {
+            setCredentialsFromFields(rememberUser, emailField, passwordField);
+            log.debug("{}: {}", usernameField.getText(), emailText);
+            server.register(usernameField.getText(),
+                    emailText,
+                    passwordText,
+                    (response, dto, error) -> runLater(() -> {
                         switch (response.getStatus()) {
                             case 201: {
+                                if (rememberUser.isSelected()) {
+                                    PreferencesManager.preferences.put("token",
+                                            EncryptionUtils.encrypt(dto.getToken(),
+                                                    EncryptionUtils.ENCRYPTION_KEY));
+                                } else {
+                                    PreferencesManager.preferences.remove("token");
+                                }
+
                                 mainCtrl.showLobbyListScreen();
                                 mainCtrl.showInformationalSnackBar("Success!");
                                 break;
@@ -142,11 +139,18 @@ public class RegisterScreenCtrl implements Initializable {
                             }
                             //If the function fails it triggers the error message.
                         }
-                    });
-                }
-            });
+                    }));
+        }
+    }
+
+    static void setCredentialsFromFields(CheckBox rememberUser, TextField emailField, TextField passwordField) {
+        if (rememberUser.isSelected()) {
+            PreferencesManager.preferences.put("email", emailField.getText());
+            PreferencesManager.preferences.put("password", EncryptionUtils.encrypt(passwordField.getText(),
+                    EncryptionUtils.ENCRYPTION_KEY));
         } else {
-            //No username set
+            PreferencesManager.preferences.remove("email");
+            PreferencesManager.preferences.remove("password");
         }
     }
 
@@ -217,7 +221,7 @@ public class RegisterScreenCtrl implements Initializable {
     @FXML
     private void signUpButtonClick() {
         if (!emailField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
-            if (server.isValidEmail(emailField.getText())) {
+            if (ServerUtils.isValidEmail(emailField.getText())) {
                 emailText = emailField.getText();
                 passwordText = passwordField.getText();
                 pane2.setVisible(false);

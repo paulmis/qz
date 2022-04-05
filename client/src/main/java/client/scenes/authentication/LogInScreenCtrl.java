@@ -4,16 +4,13 @@ import static javafx.application.Platform.runLater;
 
 import client.scenes.MainCtrl;
 import client.utils.ClientState;
+import client.utils.EncryptionUtils;
 import client.utils.PreferencesManager;
-import client.utils.communication.EncryptionUtils;
-import client.utils.communication.FileUtils;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameStatus;
-import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 import javafx.animation.TranslateTransition;
 import javafx.event.EventHandler;
@@ -35,10 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LogInScreenCtrl implements Initializable {
 
-    private final FileUtils file;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
-    private File localFile;
 
     @FXML private JFXButton logInButton;
     @FXML private JFXButton createAccountButton;
@@ -51,10 +46,9 @@ public class LogInScreenCtrl implements Initializable {
      * Constructor for the log in screen control.
      */
     @Inject
-    public LogInScreenCtrl(FileUtils file, ServerUtils server, MainCtrl mainCtrl) {
+    public LogInScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
-        this.file = file;
     }
 
     /**
@@ -75,20 +69,25 @@ public class LogInScreenCtrl implements Initializable {
             log.error("Error while decrypting token", e);
         }
 
-        // Create a local file in documents to store user credentials
-        this.localFile = new File(System.getProperty("user.home") + "/Documents/quizzzCredentials.txt");
-        // Check if local file has a saved user credentials
-        List<String> credentials = FileUtils.retrieveCredentials(localFile);
-        // Check if credentials are saved
-        if (!credentials.contains(null)) {
-            rememberUser.setSelected(true);
-        } else {
-            credentials.add(0, "");
-            credentials.add(1, "");
+        // Check if preferences contain user credentials
+        String email = PreferencesManager.preferences.get("email", null);
+        String password = PreferencesManager.preferences.get("password", null);
+        if (password != null) {
+            // Decrypt the password
+            password = EncryptionUtils.decrypt(password, EncryptionUtils.ENCRYPTION_KEY);
         }
-        // Set saved credentials
-        emailField.setText(credentials.get(0));
-        passwordField.setText(credentials.get(1));
+
+        // If preferences contain user credentials,
+        if (email == null || password == null) {
+            rememberUser.setSelected(false);
+            emailField.setText("");
+            passwordField.setText("");
+        } else {
+            // Set saved credentials
+            rememberUser.setSelected(true);
+            emailField.setText(email);
+            passwordField.setText(password);
+        }
 
         // On enter, run the login code
         emailField.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -119,15 +118,18 @@ public class LogInScreenCtrl implements Initializable {
     private void logInButtonClick() {
         if (!emailField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
             if (ServerUtils.isValidEmail(emailField.getText())) {
-                if (rememberUser.isSelected()) {
-                    FileUtils.saveCredentials(localFile, emailField.getText(), passwordField.getText());
-                } else {
-                    localFile.delete();
-                }
+                RegisterScreenCtrl.setCredentialsFromFields(rememberUser, emailField, passwordField);
                 server.logIn(
                         emailField.getText(), passwordField.getText(),
                         // Success
                         (s) -> runLater(() -> {
+                            if (rememberUser.isSelected()) {
+                                PreferencesManager.preferences.put("token",
+                                        EncryptionUtils.encrypt(s.getToken(), EncryptionUtils.ENCRYPTION_KEY));
+                            } else {
+                                PreferencesManager.preferences.remove("token");
+                            }
+
                             // If the user is in a lobby/game, put them in the apposite screen
                             if (s.getGame() != null) {
                                 ClientState.game = s.getGame();
