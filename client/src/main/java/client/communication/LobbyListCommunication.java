@@ -38,13 +38,15 @@ public class LobbyListCommunication {
     /**
      * This function makes a call to create a new lobby.
      *
-     * @param createLobbyHandlerSuccess The function that will be called if the request is successful.
-     * @param createLobbyHandlerFail The function that will be called if the request is unsuccessful.
+     * @param handleSuccess The function that will be called if the request is successful.
+     * @param handleFail The function that will be called if the request is unsuccessful.
      */
-    public void createLobby(GameConfigurationDTO config, CreateLobbyHandlerSuccess createLobbyHandlerSuccess,
-                            CreateLobbyHandlerFail createLobbyHandlerFail) {
+    public void createLobby(GameConfigurationDTO config,
+                            boolean isPrivate, CreateLobbyHandlerSuccess handleSuccess,
+                            CreateLobbyHandlerFail handleFail) {
         var game = new NormalGameDTO();
         game.setConfiguration(config);
+        game.setIsPrivate(isPrivate);
 
         Invocation invocation = ServerUtils.getRequestTarget()
                 .path("/api/lobby")
@@ -58,11 +60,11 @@ public class LobbyListCommunication {
             public void completed(Response response) {
                 if (response.getStatus() == 201) {
                     ClientState.game = response.readEntity(GameDTO.class);
-                    createLobbyHandlerSuccess.handle(ClientState.game);
+                    handleSuccess.handle(ClientState.game);
                 } else {
                     ServerUtils.sseHandler.kill();
                     ApiError error = response.readEntity(ApiError.class);
-                    createLobbyHandlerFail.handle(error);
+                    handleFail.handle(error);
                 }
             }
 
@@ -70,7 +72,7 @@ public class LobbyListCommunication {
             public void failed(Throwable throwable) {
                 throwable.printStackTrace();
                 ServerUtils.sseHandler.kill();
-                createLobbyHandlerFail.handle(null);
+                handleFail.handle(null);
             }
         });
     }
@@ -161,6 +163,57 @@ public class LobbyListCommunication {
             public void failed(Throwable throwable) {
                 joinLobbyHandlerFail.handle();
                 throwable.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Handler for when joining a private lobby succeeds.
+     */
+    public interface JoinPrivateLobbyHandlerSuccess {
+        void handle(GameDTO gameDTO);
+    }
+
+    /**
+     * Handler if the joining of the private lobby fails.
+     */
+    public interface JoinPrivateLobbyHandlerFail {
+        void handle(ApiError error);
+    }
+
+    /**
+     * This function handles a user joining a lobby.
+     *
+     * @param gameId The human readable id of the game.
+     * @param handleSuccess The function that will be called if the request is successful.
+     * @param handleFail The function that will be called if the request is unsuccessful.
+     */
+    public void joinPrivateLobby(String gameId, JoinPrivateLobbyHandlerSuccess handleSuccess,
+                          JoinPrivateLobbyHandlerFail handleFail) {
+        Invocation invocation = ServerUtils.getRequestTarget()
+                .path("/api/lobby/join/" + gameId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildPut(Entity.entity("", APPLICATION_JSON));
+
+        invocation.submit(new InvocationCallback<Response>() {
+
+            @Override
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    ClientState.game = response.readEntity(GameDTO.class);
+                    ServerUtils.sseHandler.subscribe();
+                    handleSuccess.handle(ClientState.game);
+                } else {
+                    ApiError error = response.readEntity(ApiError.class);
+                    handleFail.handle(error);
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                throwable.printStackTrace();
+                handleFail.handle(null);
             }
         });
     }
