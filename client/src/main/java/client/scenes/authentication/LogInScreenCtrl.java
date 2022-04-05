@@ -21,7 +21,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.util.Duration;
 import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,7 +62,7 @@ public class LogInScreenCtrl implements Initializable {
         String tkn = PreferencesManager.preferences.get("token", null);
         try {
             if (tkn != null && (tkn = EncryptionUtils.decrypt(tkn, EncryptionUtils.ENCRYPTION_KEY)) != null) {
-                server.checkTokenValid(tkn, (s) -> runLater(() -> autoLoginHandler(s)));
+                server.checkTokenValid(tkn, (s) -> runLater(() -> loginHandler(s)));
             }
         } catch (Exception e) {
             log.error("Error while decrypting token", e);
@@ -122,7 +121,7 @@ public class LogInScreenCtrl implements Initializable {
                 server.logIn(
                         emailField.getText(), passwordField.getText(),
                         // Success
-                        (s) -> runLater(() -> autoLoginHandler(s)),
+                        (s) -> runLater(() -> loginHandler(s)),
                         // Failure
                         () -> runLater(() -> {
                             mainCtrl.showErrorSnackBar("Something went wrong while logging you in.");
@@ -141,12 +140,15 @@ public class LogInScreenCtrl implements Initializable {
      *
      * @param data data from the endpoint call
      */
-    private void autoLoginHandler(LoginDTO data) {
-        if (rememberUser.isSelected()) {
-            PreferencesManager.preferences.put("token",
-                    EncryptionUtils.encrypt(data.getToken(), EncryptionUtils.ENCRYPTION_KEY));
-        } else {
-            PreferencesManager.preferences.remove("token");
+    private void loginHandler(LoginDTO data) {
+        if (!data.getToken().isEmpty()) {
+            // Take care of storing/deleting the token only if the token is valid
+            if (rememberUser.isSelected()) {
+                PreferencesManager.preferences.put("token",
+                        EncryptionUtils.encrypt(data.getToken(), EncryptionUtils.ENCRYPTION_KEY));
+            } else {
+                PreferencesManager.preferences.remove("token");
+            }
         }
 
         // If the user is in a lobby/game, put them in the apposite screen

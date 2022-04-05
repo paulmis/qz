@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import server.configuration.Config;
 import server.database.entities.question.Activity;
 import server.database.entities.question.EstimateQuestion;
 import server.database.entities.question.MCQuestion;
@@ -39,9 +40,6 @@ public class QuestionService {
         // Init
         List<Question> questions = new ArrayList<>();
 
-        // Number of question types that the application can generate
-        final int questionTypes = 4;
-
         // Retrieve the acceptable activities
         List<Activity> activities = activityRepository.findQuestionAcceptable();
 
@@ -51,48 +49,52 @@ public class QuestionService {
             throw new IllegalStateException("Not enough activities in the database.");
         }
 
+        // Create a provider of random numbers
+        Random myRandom = new Random();
+
         int failedAttempts = 0;
-        // Generate a pool of "count" questions of each kind
-        // This allows the selection of questions for the game to be
-        // generally uniform between question types, but not hard coded
-        for (int idx = 0; idx < count * questionTypes; idx++) {
+        for (int idx = 0; idx < count; idx++) {
             // Check failed attempts, otherwise the for might run forever
-            if (failedAttempts >= 1000) {
+            // Allow for "count" failed attempts before giving up
+            if (failedAttempts >= count) {
                 log.error("Could not provide any question: not enough activities in the database.");
                 throw new IllegalStateException("Not enough activities in the database.");
             }
 
             // Select an answer
-            Activity answer = activities.get(new Random().nextInt(activities.size()));
+            Activity answer = activities.get(myRandom.nextInt(activities.size()));
 
             // Sanitize the description
             String answerDescription = sanitizeDescription(answer.getDescription());
 
             // Generate question
             Question newQuestion;
-            if (idx % questionTypes < 3) { // Three kinds of MC questions
+            // Randomly choose the question type
+            Class nextQuestionClass = Config
+                    .enabledQuestionTypes[myRandom.nextInt(Config.enabledQuestionTypes.length)];
+            if (nextQuestionClass.equals(MCQuestion.class)) {
                 // MC questions
-                MCType type;
                 Activity correctOption;
                 String questionText;
-                switch (idx % questionTypes) {
-                    case 0: {
+
+                // Randomly choose the MC question type
+                MCType type = MCType.values()[myRandom.nextInt(MCType.values().length)];
+
+                switch (type) {
+                    case GUESS_COST: {
                         // Guess the cost questions
-                        type = MCType.GUESS_COST;
                         questionText = "What is the energetic cost of " + answerDescription + "?";
                         correctOption = answer;
                         break;
                     }
-                    case 1: {
+                    case GUESS_ACTIVITY: {
                         // Guess the activity questions
-                        type = MCType.GUESS_ACTIVITY;
                         questionText = "Which of these activities costs " + answer.getCost() + "Wh?";
                         correctOption = answer;
                         break;
                     }
-                    case 2: {
+                    case INSTEAD_OF: {
                         // Instead-of questions
-                        type = MCType.INSTEAD_OF;
                         questionText = "Instead of " + answerDescription + ", you could be...";
                         correctOption = activities.stream()
                                 .filter(act -> act.getCost() != answer.getCost())
@@ -131,7 +133,7 @@ public class QuestionService {
                     idx--;
                     continue;
                 }
-            } else if (idx % questionTypes == 3) { // fourth kind: estimate question
+            } else if (nextQuestionClass.equals(EstimateQuestion.class)) {
                 // Estimate questions
                 newQuestion = new EstimateQuestion();
 
@@ -152,9 +154,6 @@ public class QuestionService {
 
         // Randomize the pool of generated questions
         Collections.shuffle(questions);
-
-        // Select only the needed questions
-        questions = questions.subList(0, count);
 
         // Save the new questions
         questions = questions.stream()

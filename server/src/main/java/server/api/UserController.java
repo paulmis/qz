@@ -13,6 +13,7 @@ import javax.validation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 import server.api.exceptions.UserNotFoundException;
 import server.api.exceptions.UsernameInUseException;
@@ -40,9 +41,6 @@ public class UserController {
     @Autowired
     SSEManager sseManager;
 
-    @Autowired
-    private JWTHandler handler;
-
     /**
      * Shows details of the currently logged-in user.
      *
@@ -55,7 +53,7 @@ public class UserController {
         User user = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(UserNotFoundException::new);
         Game game = gameRepository.getPlayersLobbyOrGame(user.getId()).orElse(null);
         return ResponseEntity.ok(new LoginDTO(
-                handler.generateToken(user.getEmail()),
+                "",
                 game == null ? null : game.getDTO(),
                 user.getDTO()));
     }

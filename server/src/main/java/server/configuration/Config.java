@@ -21,6 +21,8 @@ import lombok.Generated;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import server.database.entities.question.EstimateQuestion;
+import server.database.entities.question.MCQuestion;
 
 /**
  * Configuration of the quiz application.
@@ -51,4 +53,14 @@ public class Config {
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         return scheduler;
     }
+
+    /**
+     * List of enabled question types.
+     */
+    public static final Class<?>[] enabledQuestionTypes = {
+        MCQuestion.class,
+        MCQuestion.class,
+        MCQuestion.class,
+        EstimateQuestion.class
+    };
 }
