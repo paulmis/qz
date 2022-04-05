@@ -27,7 +27,7 @@ public class DefiniteGameFSM extends GameFSM {
     public DefiniteGameFSM(DefiniteGame<?> game, FSMContext context) {
         super(game, context);
         if (game.getStatus() != GameStatus.ONGOING) {
-            log.warn("[{}] Attempt to construct a FSM on a " + game.getStatus() + " game", game.getId());
+            log.warn("[{}] Attempt to construct a FSM on a " + game.getStatus() + " game", getGame().getId());
             throw new IllegalStateException("Attempt to construct a FSM on a " + game.getStatus() + " game");
         }
         log.debug("[{}] DefiniteFSM created.", game.getId());

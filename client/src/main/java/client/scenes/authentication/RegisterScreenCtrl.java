@@ -9,7 +9,6 @@ import client.utils.PreferencesManager;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
-import commons.entities.auth.LoginDTO;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -42,6 +41,7 @@ public class RegisterScreenCtrl implements Initializable {
     private final MainCtrl mainCtrl;
     private String emailText;
     private String passwordText;
+    private File userImage = null;
 
     @FXML private JFXButton signUpButton;
     @FXML private JFXButton haveAccountButton;
@@ -63,7 +63,6 @@ public class RegisterScreenCtrl implements Initializable {
 
     /**
      * Constructor for the register screen control.
-     *
      */
     @Inject
     public RegisterScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
@@ -75,7 +74,7 @@ public class RegisterScreenCtrl implements Initializable {
      * This function runs after every control has
      * been created and initialized already.
      *
-     * @param location These location parameter.
+     * @param location  These location parameter.
      * @param resources The resource bundle.
      */
     @Override
@@ -105,10 +104,11 @@ public class RegisterScreenCtrl implements Initializable {
     private void setUsername() {
         if (usernameField.getText().length() > 0) {
             setCredentialsFromFields(rememberUser, emailField, passwordField);
-            log.debug("{}: {}", usernameField.getText(), emailText);
+            log.debug("{}: {} [{}]", usernameField.getText(), emailText, userImage.getAbsolutePath());
             server.register(usernameField.getText(),
                     emailText,
                     passwordText,
+                    userImage,
                     (response, dto, error) -> runLater(() -> {
                         switch (response.getStatus()) {
                             case 201: {
@@ -166,11 +166,13 @@ public class RegisterScreenCtrl implements Initializable {
         selectFile.getExtensionFilters().add(imageFilter);
         // Filter that allows user to only select image files of types jpg png
         File pictureFile = selectFile.showOpenDialog(mainCtrl.getPrimaryStage());
+
         // Opens up a dialogue that lets user select a file
         if (pictureFile != null) {  // Every user needs to select a picture
             usernameSetButton.setDisable(false);
             uploadImage.setVisible(false);
-            profilePicture.setImage(new Image(pictureFile.getAbsolutePath()));
+            profilePicture.setImage(new Image(pictureFile.toURI().toString()));
+            userImage = pictureFile;
         }
     }
 
@@ -178,9 +180,9 @@ public class RegisterScreenCtrl implements Initializable {
      * Function that generates an image filled with a colour
      * based on the 3 rgb values and opacity.
      *
-     * @param red the amount of red
-     * @param green the amount of green
-     * @param blue the amount of blue
+     * @param red     the amount of red
+     * @param green   the amount of green
+     * @param blue    the amount of blue
      * @param opacity the opacity of the image
      * @return a new Image file that is filled with the colour obtained out of the
      *          3 rgb values.

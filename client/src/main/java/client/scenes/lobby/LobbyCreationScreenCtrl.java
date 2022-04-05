@@ -103,18 +103,6 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
     }
 
     /**
-     * Reacts to the game being started.
-     *
-     * @param preparationDuration Duration of preparation phase
-     */
-    @SSEEventHandler(SSEMessageType.GAME_START)
-    public void startGame(Integer preparationDuration) {
-        mainCtrl.showGameScreen(null);
-        mainCtrl.getGameScreenCtrl().startTimer(Duration.ofMillis(preparationDuration));
-        ClientState.previousScore = Optional.of(0);
-    }
-
-    /**
      * This function resets the controller to a predefined default state.
      */
     public void reset() {
@@ -173,6 +161,18 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
         isPrivateProperty.set(!isPrivateProperty.get());
     }
 
+    /**
+     * Reacts to the game being started.
+     *
+     * @param preparationDuration Duration of preparation phase
+     */
+    @SSEEventHandler(SSEMessageType.GAME_START)
+    public void startGame(Integer preparationDuration) {
+        mainCtrl.showGameScreen(null);
+        mainCtrl.getGameScreenCtrl().startTimer(Duration.ofMillis(preparationDuration));
+        ClientState.previousScore = Optional.of(0);
+    }
+
     @FXML
     private void createLobbyButtonClick() {
         // Start SSE
@@ -186,7 +186,12 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
             lobbyNameField.getText(),
             // Success
             game -> runLater(() -> {
-                if (game.getStatus() == GameStatus.CREATED) {
+                if (game.isSingleplayer()) {
+                    LobbyCommunication.startGame(game.getId(), response -> {
+                    }, () -> {
+                        runLater(mainCtrl::showLobbyScreen);
+                    });
+                } else {
                     mainCtrl.showLobbyScreen();
                 }
             }),

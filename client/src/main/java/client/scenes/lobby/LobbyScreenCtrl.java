@@ -248,7 +248,7 @@ public class LobbyScreenCtrl implements SSESource {
             runLater(() -> userInfo.setupPosition(userButton, mainAnchor));
         } else {
             // Toggle visibility
-            userInfo.setVisible(!userInfo.isVisible());
+            userInfo.setVisibility(!userInfo.isVisible());
         }
     }
 
