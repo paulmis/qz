@@ -46,6 +46,7 @@ public class UserController {
     @GetMapping
     @JsonView(value = Views.Private.class)
     public ResponseEntity<UserDTO> get() {
+        log.trace("Getting user details");
         Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (user.isEmpty()) {
             return ResponseEntity.notFound().build();

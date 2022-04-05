@@ -111,9 +111,9 @@ public class LobbyController {
      */
     @GetMapping("/available")
     ResponseEntity<List<GameDTO>> availableLobbies() {
-        // It returns games with status Created
+        // It returns games with status Created and public only.
         List<GameDTO> lobbies = gameRepository
-                .findAllByStatus(GameStatus.CREATED)
+                .findAllByStatusAndIsPrivateIsFalse(GameStatus.CREATED)
                 .stream()
                 .map(Game::getDTO)
                 .collect(Collectors.toList());
@@ -172,8 +172,8 @@ public class LobbyController {
      * Endpoint to allow a user to join a game.
      *
      * @param lobbyId UUID of the lobby to join.
-     * @return 404 if the lobby doesn't exist, 409 if the player is already in the lobby or the lobby has started,
-     *      200 and the lobby otherwise.
+     * @return 404 if the lobby doesn't exist, 409 if the player is already in the lobby, the lobby has started or the
+     *         lobby is private, 200 and the lobby otherwise.
      */
     @PutMapping("/{lobbyId}/join")
     ResponseEntity join(@PathVariable UUID lobbyId) {
@@ -188,7 +188,7 @@ public class LobbyController {
 
         // Check that the game hasn't started yet and add the player
         GamePlayer player = new GamePlayer(user);
-        if (lobby.getStatus() != GameStatus.CREATED || !lobby.add(player)) {
+        if (lobby.getStatus() != GameStatus.CREATED || lobby.getIsPrivate() || !lobby.add(player)) {
             throw new GameAlreadyStartedException(user, lobby);
         }
 
@@ -326,5 +326,46 @@ public class LobbyController {
         // Return 200
         log.debug("Deleted lobby {}", lobby.getId());
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Endpoint to allow a user to join a private game.
+     *
+     * @param gameId human readable form of the id.
+     * @return 404 if the lobby doesn't exist, 409 if the player is already in the lobby or the lobby has started,
+     *      200 and the lobby otherwise.
+     */
+    @PutMapping("/join/{link}")
+    ResponseEntity joinPrivate(@PathVariable("link") String gameId) {
+        // If the user or the game doesn't exist, throw exception
+        User user = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(UserNotFoundException::new);
+        Game<?> lobby = gameRepository.findByGameId(gameId).orElseThrow(LobbyNotFoundException::new);
+
+        // Check that the player is not already in a lobby or a game
+        if (gameRepository.getPlayersLobbyOrGame(user.getId()).isPresent()) {
+            log.error("Player tried to join a lobby while being already in one.");
+            throw new PlayerAlreadyInLobbyOrGameException();
+        }
+
+        // Check that the game hasn't started yet and add the player
+        GamePlayer player = new GamePlayer(user);
+        if (lobby.getStatus() != GameStatus.CREATED || !lobby.add(player)) {
+            log.error("Player tried to join a started game.");
+            throw new GameAlreadyStartedException(user, lobby);
+        }
+
+        // Save the lobby
+        lobby = gameRepository.save(lobby);
+        log.debug("User {} joined game {}", user.getId(), lobby.getId());
+
+        // Distribute the notifications to all players in the lobby
+        try {
+            sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
+        } catch (IOException ex) {
+            log.error("Failed to notify players about the new player", ex);
+        }
+
+        // Return 200
+        return ResponseEntity.ok(lobby.getDTO());
     }
 }

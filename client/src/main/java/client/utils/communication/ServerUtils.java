@@ -20,6 +20,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import client.utils.Authenticator;
 import client.utils.ClientState;
+import client.utils.PreferencesManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -31,10 +32,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 
 /**
  * Utilities for communicating with the server.
@@ -80,6 +83,25 @@ public class ServerUtils {
             client.close();
         }
         client = newClient();
+    }
+
+    /**
+     * Function to check if entered email is indeed an email.
+     *
+     * @param email email string entered by user
+     * @return true if it is a valid email, false otherwise
+     */
+    public static boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."
+                + "[a-zA-Z0-9_+&*-]+)*@"
+                + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
+                + "A-Z]{2,7}$";
+
+        Pattern emailPattern = Pattern.compile(emailRegex);
+        if (email == null) {
+            return false;
+        }
+        return emailPattern.matcher(email).matches();
     }
 
     /** Gets a list of the leaderboard images from the server.
@@ -131,6 +153,8 @@ public class ServerUtils {
             public void completed(Response o) {
                 if (o.getStatus() == 201) {
                     LoginDTO loginDTO = o.readEntity(LoginDTO.class);
+                    PreferencesManager.preferences.put("token",
+                            EncryptionUtils.encrypt(loginDTO.getToken(), EncryptionUtils.ENCRYPTION_KEY));
                     client = client.register(new Authenticator(loginDTO.getToken()));
                     ClientState.user = loginDTO.getUser();
                     registerHandler.handle(o, new ApiError());
@@ -163,6 +187,47 @@ public class ServerUtils {
     }
 
     /**
+     * Handler for when token is valid.
+     */
+    public interface LoginValidHandler {
+        void handle(UserDTO user);
+    }
+
+    /**
+     * Check whether the provided token is valid.
+     *
+     * @param token token to check.
+     * @param handler handler to call if the token is valid.
+     */
+    public void checkTokenValid(String token, LoginValidHandler handler) {
+        log.debug("Checking token validity");
+        client = this.newClient();
+        Invocation invocation = client.target(SERVER).path("/api/user").request(APPLICATION_JSON)
+                .header("Authorization", "Bearer " + token).buildGet();
+        invocation.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response o) {
+                if (o.getStatus() == 200) {
+                    UserDTO user = o.readEntity(UserDTO.class);
+                    log.info("Token is valid: {}", user);
+
+                    client = client.register(new Authenticator(token));
+                    ClientState.user = user;
+
+                    handler.handle(user);
+                } else {
+                    log.info("Token is not valid");
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                log.info("Token not valid");
+            }
+        });
+    }
+
+    /**
      * Logs the user in, granting access to the API.
      *
      * @param email string representing the email of the user.
@@ -183,6 +248,8 @@ public class ServerUtils {
             @Override
             public void completed(LoginDTO loginDTO) {
                 log.info("Logged in: " + loginDTO.getUser());
+                PreferencesManager.preferences.put("token",
+                        EncryptionUtils.encrypt(loginDTO.getToken(), EncryptionUtils.ENCRYPTION_KEY));
                 client = client.register(new Authenticator(loginDTO.getToken()));
                 ClientState.user = loginDTO.getUser();
                 logInHandlerSuccess.handle(loginDTO);

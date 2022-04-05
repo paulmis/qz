@@ -22,6 +22,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import lombok.Generated;
@@ -44,7 +46,7 @@ public class LobbyScreenCtrl implements SSESource {
     @FXML
     private Label gameName;
     @FXML
-    private Label gameId;
+    private Label labelGameId;
     @FXML
     private Label gameType;
     @FXML
@@ -288,7 +290,7 @@ public class LobbyScreenCtrl implements SSESource {
         gameName.setText(hostNickname + "'s game");
 
         // Set game id
-        gameId.setText(gameDTO.getGameId());
+        labelGameId.setText(gameDTO.getGameId());
 
         // Set game class
         gameType.setText(gameDTO.getClass().getName()
@@ -334,5 +336,14 @@ public class LobbyScreenCtrl implements SSESource {
                 .collect(Collectors.toList());
 
         playerList.getChildren().addAll(playerElements);
+    }
+
+    @FXML
+    private void copyLinkButtonClick() {
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        content.putString(labelGameId.getText());
+        clipboard.setContent(content);
+        mainCtrl.showInformationalSnackBar("Copied!");
     }
 }

@@ -57,4 +57,8 @@ public enum SSEMessageType {
      * Periodic keep-alive message.
      */
     KEEPALIVE,
+    /**
+     * Sent when a user sends a reaction.
+     */
+    REACTION
 }
