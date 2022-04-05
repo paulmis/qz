@@ -21,6 +21,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM;
 
 import client.utils.Authenticator;
 import client.utils.ClientState;
+import client.utils.EncryptionUtils;
+import client.utils.PreferencesManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;

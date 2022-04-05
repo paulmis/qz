@@ -70,17 +70,6 @@ public class RegisterScreenCtrl implements Initializable {
         this.server = server;
     }
 
-    static void setCredentialsFromFields(CheckBox rememberUser, TextField emailField, TextField passwordField) {
-        if (rememberUser.isSelected()) {
-            PreferencesManager.preferences.put("email", emailField.getText());
-            PreferencesManager.preferences.put("password", EncryptionUtils.encrypt(passwordField.getText(),
-                    EncryptionUtils.ENCRYPTION_KEY));
-        } else {
-            PreferencesManager.preferences.remove("email");
-            PreferencesManager.preferences.remove("password");
-        }
-    }
-
     /**
      * This function runs after every control has
      * been created and initialized already.
@@ -151,6 +140,17 @@ public class RegisterScreenCtrl implements Initializable {
                             //If the function fails it triggers the error message.
                         }
                     }));
+        }
+    }
+
+    static void setCredentialsFromFields(CheckBox rememberUser, TextField emailField, TextField passwordField) {
+        if (rememberUser.isSelected()) {
+            PreferencesManager.preferences.put("email", emailField.getText());
+            PreferencesManager.preferences.put("password", EncryptionUtils.encrypt(passwordField.getText(),
+                    EncryptionUtils.ENCRYPTION_KEY));
+        } else {
+            PreferencesManager.preferences.remove("email");
+            PreferencesManager.preferences.remove("password");
         }
     }
 
