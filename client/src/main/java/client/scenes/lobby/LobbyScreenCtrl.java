@@ -306,6 +306,7 @@ public class LobbyScreenCtrl implements SSESource {
                 .anyMatch(dto -> gameDTO.getHost().equals(dto.getId()));
         lobbySettingsButton.setDisable(!isHost);
         startButton.setDisable(!isHost);
+        disbandButton.setVisible(isHost);
 
         // Show list of participants
         updatePlayerList(gameDTO, isHost);
