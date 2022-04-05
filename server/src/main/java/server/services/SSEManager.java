@@ -1,12 +1,16 @@
 package server.services;
 
 import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.persistence.ElementCollection;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import server.api.exceptions.SSEFailedException;
@@ -18,11 +22,37 @@ import server.utils.SSE;
 @Slf4j
 @Service
 public class SSEManager {
+    @Autowired
+    private ThreadPoolTaskScheduler taskScheduler;
+
     /**
      * The Map which maps user IDs to SSE emitters.
      * As this class can be called from different threads, we need to use a concurrent map.
      */
     private final Map<UUID, SseEmitter> emitters = new ConcurrentHashMap<>();
+
+    /**
+     * Initialization routine for the SSE manager.
+     */
+    @PostConstruct
+    public void init() {
+        taskScheduler.scheduleAtFixedRate(this::sendKeepAlive, Duration.ofSeconds(45));
+        log.info("Initialized SSE manager");
+    }
+
+    /**
+     * Send a keep alive message to all registered SSE emitters.
+     */
+    public void sendKeepAlive() {
+        emitters.forEach((userId, emitter) -> {
+            try {
+                emitter.send(new SSEMessage(SSEMessageType.KEEPALIVE));
+                log.trace("Sent keep alive to user {}", userId);
+            } catch (IOException e) {
+                log.error("Failed to send keep alive message to user {}", userId, e);
+            }
+        });
+    }
 
     /**
      * Get the number of registered SSE emitters.

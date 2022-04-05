@@ -76,8 +76,7 @@ public class SSEHandler {
             .target(
                 ServerUtils
                     .getRequestTarget()
-                    .path("/api/sse/open"))
-            .reconnectingEvery(0, MICROSECONDS).build();
+                    .path("/api/sse/open")).build();
 
         // Registers the handling of events, exceptions and completion.
         eventSource.register(
@@ -227,7 +226,7 @@ public class SSEHandler {
     }
 
     public void handleCompletion() {
-        log.error("--[SSE]-- Completed");
+        log.info("--[SSE]-- Completed");
     }
 }
 
