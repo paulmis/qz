@@ -46,5 +46,5 @@ public interface UserRepository extends PagingAndSortingRepository<User, UUID> {
      * @param pageable the pageable object
      * @return a list of all users ordered by the number of games played.
      */
-    List<User> findAllByOrderByGamesPlayedDesc(Pageable pageable);
+    List<User> findAllByOrderByGamesWonDesc(Pageable pageable);
 }

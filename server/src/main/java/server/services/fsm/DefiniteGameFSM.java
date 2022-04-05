@@ -47,6 +47,9 @@ public class DefiniteGameFSM extends GameFSM {
         if (getState() == FSMState.IDLE) {
             log.debug("[{}] FSM is in PREPARING state.", getGame().getId());
 
+            // Update the game
+            refreshGame();
+
             // Distribute the start event to all players
             getContext().getSseManager().send(getGame().getUserIds(), new SSEMessage(SSEMessageType.GAME_START,
                     getContext().getQuizConfiguration().getTiming().getPreparationTime()));
@@ -159,6 +162,9 @@ public class DefiniteGameFSM extends GameFSM {
 
         // Delay before progressing to the next stage.
         int delay = getContext().getQuizConfiguration().getTiming().getLeaderboardTime();
+
+        // Update the game
+        refreshGame();
 
         // Notify all players to show the leaderboard.
         getContext().getSseManager().send(getGame().getUserIds(),

@@ -48,7 +48,6 @@ public class LeaderboardEntryCtrl implements Initializable {
             this.nameLabel.setText(gamePlayer.getNickname());
             this.gamesLabel.setVisible(false);
             this.scoreLabel.setText(String.valueOf(gamePlayer.getScore()));
-            var tempUrl = "https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg";
             String imageUrl = FileUtils.defaultUserPic;
             if (gamePlayer.getProfilePic() != null) {
                 imageUrl = ServerUtils.getImagePathFromId(gamePlayer.getProfilePic());
@@ -57,7 +56,7 @@ public class LeaderboardEntryCtrl implements Initializable {
         } else {
             this.rankLabel.setText(String.valueOf(rank));
             this.nameLabel.setText(user.getUsername());
-            this.gamesLabel.setText(String.valueOf(user.getGamesPlayed()));
+            this.gamesLabel.setText(String.valueOf(user.getGamesWon()));
             this.scoreLabel.setText(String.valueOf(user.getScore()));
             String imageUrl = FileUtils.defaultUserPic;
             if (user.getProfilePic() != null) {
