@@ -324,7 +324,8 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
                                      LocalDateTime answerTime, LocalDateTime questionEndTime) {
         // Calculate answer time  - question answer time config
         Duration timeLeft = Duration.between(answerTime, questionEndTime);
-        double timeLeftAsPercentage = (double) timeLeft.getSeconds()/ (double) configuration.getAnswerTime().getSeconds();
+        double timeLeftAsPercentage =
+                (double) timeLeft.getSeconds() / (double) configuration.getAnswerTime().getSeconds();
         // Calculate the score based on time.
         // 120% of the score if answered immediately, 80% if answered at the last second
         // newScore = (timeLeft/timeToAnswer) * (120% of baseScore - 80% of baseScore) + (80% of baseScore)

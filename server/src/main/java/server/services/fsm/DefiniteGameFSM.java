@@ -128,7 +128,7 @@ public class DefiniteGameFSM extends GameFSM {
         refreshGame();
 
         // Update the scores
-        getContext().getGameService().updateScores(this.game, LocalDateTime.now());
+        getContext().getGameService().updateScores(this.game);
 
         // Delay before progressing to the next stage
         long delay = getContext().getQuizConfiguration().getTiming().getAnswerTime();

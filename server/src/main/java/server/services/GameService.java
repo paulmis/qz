@@ -333,8 +333,8 @@ public class GameService {
      *
      * @param game the game to update the score for.
      */
-    public void updateScores(Game game, LocalDateTime questionEndTime) {
-        updateScores(game, (Question) game.getQuestion().get(), questionEndTime);
+    public void updateScores(Game game) {
+        updateScores(game, (Question) game.getQuestion().get(), LocalDateTime.now());
     }
 
     /**
