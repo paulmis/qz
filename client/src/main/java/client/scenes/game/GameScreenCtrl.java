@@ -132,6 +132,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     public void reset() {
         setUpPowerUps();
+        pointsLabel.setText("0");
     }
 
     /**
@@ -400,6 +401,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
         // TODO: display final standings instead
         mainCtrl.showInformationalSnackBar("The game has ended");
         mainCtrl.showLobbyListScreen();
+        this.timer.cancel();
     }
 
     /**
@@ -626,6 +628,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
                                     case 200:
                                         System.out.println("User successfully removed from game");
                                         mainCtrl.showLobbyListScreen();
+                                        this.timer.cancel();
                                         ClientState.game = null;
                                         ServerUtils.sseHandler.kill();
                                         break;

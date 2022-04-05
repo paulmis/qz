@@ -12,7 +12,6 @@ import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameStatus;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.animation.TranslateTransition;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -163,22 +162,7 @@ public class LogInScreenCtrl implements Initializable {
      */
     @FXML
     private void createAccountButtonClick() {
-        panelTransition();
-    }
-
-    /**
-     * Function that translates the panel to the right
-     * for the register screen.
-     */
-    private void panelTransition() {
-        TranslateTransition panelTranslate = new TranslateTransition();
-        panelTranslate.setByX(mainCtrl.getPrimaryStage().getScene().getWidth() - pane.getWidth());
-        panelTranslate.setNode(pane);
-        panelTranslate.setDuration(Duration.millis(1000));
-        panelTranslate.setCycleCount(1);
-        panelTranslate.setAutoReverse(false);
-        panelTranslate.setOnFinished(e -> mainCtrl.showRegisterScreen());
-        panelTranslate.play();
+        mainCtrl.showRegisterScreen();
     }
 
     @FXML
