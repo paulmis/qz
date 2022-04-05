@@ -40,7 +40,7 @@ public class QuestionService {
         List<Question> questions = new ArrayList<>();
         final int questionTypes = 4;
 
-        // Filter the acceptable activities
+        // Retrieve the acceptable activities
         List<Activity> activities = activityRepository.findQuestionAcceptable();
 
         // Check that there are enough activities
@@ -49,7 +49,14 @@ public class QuestionService {
             throw new IllegalStateException("Not enough activities in the database.");
         }
 
+        int failedAttempts = 0;
         for (int idx = 0; idx < count * questionTypes; idx++) {
+            // Check failed attempts
+            if (failedAttempts >= 1000) {
+                log.error("Could not provide any question: not enough activities in the database.");
+                throw new IllegalStateException("Not enough activities in the database.");
+            }
+
             // Select an answer
             Activity answer = activities.get(new Random().nextInt(activities.size()));
 
@@ -100,6 +107,7 @@ public class QuestionService {
                 }
                 if (correctOption == null) {
                     // Retry with a different answer
+                    failedAttempts++;
                     idx--;
                     continue;
                 }
@@ -114,6 +122,7 @@ public class QuestionService {
                     newQuestion.setActivities(getMCOptions(activities, correctOption, 4));
                 } catch (IOException e) {
                     // Retry with a different answer
+                    failedAttempts++;
                     idx--;
                     continue;
                 }
