@@ -15,10 +15,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * ServerConnectScreen controller class.
  */
+@Slf4j
 @Generated
 public class ServerConnectScreenCtrl implements Initializable {
 
@@ -80,8 +82,14 @@ public class ServerConnectScreenCtrl implements Initializable {
         } else {
             PreferencesManager.preferences.remove("serverPath");
         }
-        server.connect(this.serverPath);
-        System.out.print("Connecting to server....\n");
-        mainCtrl.showLogInScreen();
+
+        log.debug("Connecting to server {}", this.serverPath);
+        if (server.connect(this.serverPath)) {
+            mainCtrl.setup();
+            mainCtrl.showLogInScreen();
+        } else {
+            log.error("Could not connect to server {}", this.serverPath);
+            mainCtrl.showErrorSnackBar("Could not connect to server");
+        }
     }
 }

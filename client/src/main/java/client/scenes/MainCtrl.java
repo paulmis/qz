@@ -143,6 +143,13 @@ public class MainCtrl {
         showServerConnectScreen();
     }
 
+    /**
+     * Setup that is ran after the client has connected to the server.
+     */
+    public void setup() {
+        gameScreenCtrl.setup();
+    }
+
     private void showScreenLetterBox(Parent parent, StageScalingStrategy strategy) {
         if (primaryStage.getScene() == null) {
             primaryStage.setScene(new Scene(new Group(new StackPane(parent))));

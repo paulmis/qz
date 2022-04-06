@@ -123,6 +123,7 @@ public class ActivityController {
      */
     @GetMapping
     ResponseEntity<List<ActivityDTO>> getInUse() {
+        log.trace("Returning all activities in use");
         List<ActivityDTO> activities = activityRepository.findByAbandonedIsFalse()
                 .stream()
                 .map(Activity::getDTO)

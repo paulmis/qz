@@ -1,0 +1,44 @@
+{
+    "reactions": [
+        {
+            "name": "CLOWN",
+            "image": "clown.png"
+        },
+        {
+            "name": "ANGRY",
+            "image": "angry.png"
+        },
+        {
+            "name": "SAD",
+            "image": "sad.png"
+        },
+        {
+            "name": "DUCK",
+            "image": "duck.png"
+        },
+        {
+            "name": "HAPPY",
+            "image": "happy.png"
+        },
+        {
+            "name": "SKULL",
+            "image": "skull.png"
+        },
+        {
+            "name": "OK",
+            "image": "ok.png"
+        },
+        {
+            "name": "THINKING",
+            "image": "thinking.png"
+        },
+        {
+            "name": "SUNGLASSES",
+            "image": "sunglasses.png"
+        },
+        {
+            "name": "MOYAI",
+            "image": "moyai.png"
+        }
+    ]
+}

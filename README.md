@@ -65,9 +65,11 @@ The Quizzz app consists of three components: the database, server, and client. E
 
 #### Server:
 
-1. Run the `Main` java file in the `/server/src/main/java` directory
+1. Populate the database (see the section)
+2. Populate emoji list (see the section)
+3. Run the `Main` java file in the `/server/src/main/java` directory
    * This may take a few minutes during the initial build/run
-2. The server has launched successfully if the log ends with `Started Main in ... seconds (JVM running for ...)`
+4. The server has launched successfully if the log ends with `Started Main in ... seconds (JVM running for ...)`
     * if you are getting a `PSQLException` when running the server or the tests, then the database connection is failing
 
 #### Client:
@@ -76,6 +78,14 @@ The Quizzz app consists of three components: the database, server, and client. E
     * Add `--module-path="<LIB PATH IN JAVAFX FOLDER WHICH WAS DOWNLOADED>"--add-modules=javafx.controls,javafx.fxml` to `VM options/arguments`
 2. Execute `gradle run` (`./gradlew run` on MacOS and Linux) or run `Main` in `/client` to launch the client 
    * the client will spawn in the background
+
+### Populating the emoji list
+
+To populate the emoji list, run the `upload_reactions.py` script. A sample set of emojis is provided in `reactions/`, but you can use your own set.
+
+The script can be run by typing `python upload_reactions.py reactions/` into your terminal. You will need `requests` library installed.
+
+To see all available options, run `python upload_reactions.py --help`.
 
 ### Populating the database
 
