@@ -303,11 +303,15 @@ public class ServerUtils {
      * @return whether the connection was successful or not
      */
     public boolean connect(String serverPath) {
-        Response r = client.target(serverPath).path("/api/misc/ping").request().get();
-        if (r.getStatus() == Response.Status.OK.getStatusCode()) {
-            SERVER = serverPath;
-            return true;
-        } else {
+        try {
+            Response r = client.target(serverPath).path("/api/misc/ping").request().get();
+            if (r.getStatus() == Response.Status.OK.getStatusCode()) {
+                SERVER = serverPath;
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
             return false;
         }
     }

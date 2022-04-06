@@ -113,10 +113,7 @@ public class ActivityController {
             HttpHeaders headers = new HttpHeaders();
             headers.setLocation(storageService.getURI(icon));
             return new ResponseEntity<>(headers, HttpStatus.FOUND);
-        }).orElseGet(() -> {
-            log.warn("Failed to find activity '{}'", activityId);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        });
+        }).orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
     }
     
     /**

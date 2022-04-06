@@ -332,9 +332,12 @@ public class GameScreenCtrl implements Initializable, SSESource {
 
             Circle circle;
             if (this.userCircles.containsKey(player.getUserId())) {
+                // If we already have a circle instance, reuse it
                 circle = this.userCircles.get(player.getUserId());
                 Tooltip.uninstall(circle, null);
             } else {
+                // Otherwise, create a new circle
+
                 // Fill of the circle to the image pattern
                 String imageUrl = FileUtils.defaultUserPic;
                 if (player.getProfilePic() != null) {
@@ -435,12 +438,15 @@ public class GameScreenCtrl implements Initializable, SSESource {
             return;
         }
 
+        // Get the image circle
         Circle userImageCircle = this.userCircles.get(reaction.getUserId());
         if (userImageCircle == null) {
             log.error("Received a reaction from a user that is not in the leaderboard");
             return;
         }
 
+        // If there is already a timeline registered for this particular user picture,
+        // we need to remove it
         if (this.userProfileTimelines.get(reaction.getUserId()) != null) {
             try {
                 this.userProfileTimelines.get(reaction.getUserId()).stop();
@@ -476,6 +482,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
         });
 
         final Timeline timeline = new Timeline(kf1, kf2);
+        // Run and register the timeline
         userProfileTimelines.put(reaction.getUserId(), timeline);
         runLater(timeline::play);
     }
