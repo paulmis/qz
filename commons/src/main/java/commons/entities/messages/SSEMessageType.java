@@ -60,5 +60,9 @@ public enum SSEMessageType {
     /**
      * Sent when a user sends a reaction.
      */
-    REACTION
+    REACTION,
+    /**
+     * Sent when the receiver has been kicked from a game.
+     */
+    YOU_HAVE_BEEN_KICKED,
 }
