@@ -694,7 +694,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
                 jfxButton.setGraphic(image);
 
                 jfxButton.setOnAction(event -> {
-                    powerUpHBox.setVisible(false);
+                    powerUpScrollPane.setVisible(false);
                     communication.sendPowerUp(powerUp,
                             () -> runLater(() -> jfxButton.setDisable(true)),
                             error -> runLater(() ->
