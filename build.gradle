@@ -36,8 +36,9 @@ subprojects {
 
 	test {
 		testLogging {
-			exceptionFormat 'full'
+			exceptionFormat = 'full'
 		}
+        	maxParallelForks = Runtime.runtime.availableProcessors()
 	}
 
 	jacocoTestReport {
