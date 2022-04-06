@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
+import server.configuration.QuestionGenerationConfiguration;
 import server.database.entities.question.Activity;
 import server.database.entities.question.EstimateQuestion;
 import server.database.entities.question.MCQuestion;
@@ -26,6 +27,9 @@ import server.database.repositories.question.QuestionRepository;
  */
 @ExtendWith(MockitoExtension.class)
 class QuestionServiceTest {
+    @Mock
+    private QuestionGenerationConfiguration questionGenerationConfiguration;
+
     @Mock
     private QuestionRepository questionRepository;
 
@@ -51,6 +55,10 @@ class QuestionServiceTest {
     void init() {
         lenient().when(questionRepository.saveAll(any(List.class)))
                 .thenAnswer((Answer<List<Question>>) invocation -> invocation.getArgument(0));
+        lenient().when(questionGenerationConfiguration.getNumberEnabledQuestionTypes()).thenReturn(4);
+        lenient().when(questionGenerationConfiguration.getQuestionGenerationAttempts()).thenReturn(1000);
+        lenient().when(questionGenerationConfiguration.getEnabledQuestionTypes())
+                .thenReturn(new QuestionGenerationConfiguration().getEnabledQuestionTypes());
     }
 
     @Test

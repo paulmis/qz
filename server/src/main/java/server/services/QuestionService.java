@@ -24,6 +24,9 @@ import server.utils.QuestionType;
 @Slf4j
 public class QuestionService {
     @Autowired
+    private QuestionGenerationConfiguration config;
+
+    @Autowired
     private ActivityRepository activityRepository;
 
     @Autowired
@@ -56,16 +59,16 @@ public class QuestionService {
         // We need to generate a pool of questions containing an equal amount of each kind
         // Therefore the size of the pool must be a multiple of Config.enabledQuestionTypes.length
         int poolSize = count;
-        if (poolSize % QuestionGenerationConfiguration.enabledQuestionTypes.length != 0) {
-            poolSize += QuestionGenerationConfiguration.enabledQuestionTypes.length
-                    - (count % QuestionGenerationConfiguration.enabledQuestionTypes.length);
+        if (poolSize % config.getNumberEnabledQuestionTypes() != 0) {
+            poolSize += config.getNumberEnabledQuestionTypes()
+                    - (count % config.getNumberEnabledQuestionTypes());
         }
 
         int failedAttempts = 0;
         for (int idx = 0; idx < poolSize; idx++) {
             // Check failed attempts, otherwise the loop might run forever
             // Allow for a certain amount of failed attempts before giving up
-            if (failedAttempts >= QuestionGenerationConfiguration.questionGenerationAttempts) {
+            if (failedAttempts >= config.getQuestionGenerationAttempts()) {
                 log.error("Could not provide any question: not enough activities in the database.");
                 throw new IllegalStateException("Not enough activities in the database.");
             }
@@ -77,8 +80,8 @@ public class QuestionService {
             String answerDescription = sanitizeDescription(answer.getDescription());
 
             // Select the question type
-            QuestionType questionKind = QuestionGenerationConfiguration
-                            .enabledQuestionTypes[idx % QuestionGenerationConfiguration.enabledQuestionTypes.length];
+            QuestionType questionKind = config
+                    .getEnabledQuestionTypes()[idx % config.getNumberEnabledQuestionTypes()];
 
             // Generate question
             Question newQuestion;
