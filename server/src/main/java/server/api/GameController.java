@@ -2,7 +2,6 @@ package server.api;
 
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
-import commons.entities.game.Reaction;
 import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.api.exceptions.GameNotFoundException;
 import server.api.exceptions.PowerUpAlreadyUsedException;
-import server.api.exceptions.SSEFailedException;
 import server.api.exceptions.UserNotFoundException;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;

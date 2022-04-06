@@ -2,6 +2,7 @@ package server.services;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -9,6 +10,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import server.database.entities.game.Reaction;
+import server.database.repositories.game.ReactionRepository;
 import server.services.storage.StorageService;
 
 /**
@@ -17,11 +20,11 @@ import server.services.storage.StorageService;
 @Slf4j
 @Service
 public class ReactionService {
-    @Getter
-    private final Map<String, UUID> reactions = new HashMap<>();
-
     @Autowired
     private StorageService storageService;
+
+    @Autowired
+    private ReactionRepository reactionRepository;
 
     /**
      * Add a reaction to the map.
@@ -31,7 +34,7 @@ public class ReactionService {
      */
     public void addReaction(String reaction, UUID resourceId) {
         log.debug("Adding reaction {}", reaction);
-        reactions.put(reaction, resourceId);
+        reactionRepository.save(new Reaction(reaction, resourceId));
     }
 
     /**
@@ -42,7 +45,17 @@ public class ReactionService {
      */
     public boolean removeReaction(String reaction) {
         log.debug("Removing reaction {}", reaction);
-        return reactions.remove(reaction) != null;
+        return reactionRepository.deleteByNameEquals(reaction) > 0L;
+    }
+
+    /**
+     * Get all saved reactions.
+     *
+     * @return all reactions.
+     */
+    public List<Reaction> getReactions() {
+        log.trace("Getting reactions");
+        return reactionRepository.findAll();
     }
 
     /**
@@ -51,10 +64,10 @@ public class ReactionService {
      * @return map of reactions and corresponding image URLs.
      */
     public Map<String, URI> getReactionURLs() {
-        log.trace("Getting reaction URLs");
-        return reactions.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                e -> storageService.getURI(e.getValue())
+        log.debug("Getting reaction URLs");
+        return getReactions().stream().collect(Collectors.toMap(
+                Reaction::getName,
+                e -> storageService.getURI(e.getImageId())
         ));
     }
 }

@@ -7,7 +7,6 @@ import client.utils.communication.ServerUtils;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
-import commons.entities.game.Reaction;
 import commons.entities.game.ReactionDTO;
 import commons.entities.questions.QuestionDTO;
 import commons.entities.utils.ApiError;
