@@ -14,7 +14,6 @@ import server.api.exceptions.UserNotFoundException;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
-import server.database.entities.game.GamePlayer;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
@@ -75,6 +74,22 @@ public class ReactionController {
         } catch (Exception e) {
             log.error("Could not store image: {}", e.getMessage());
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * Remove a reaction.
+     *
+     * @param reactionType reaction type to remove.
+     * @return response.
+     */
+    @DeleteMapping
+    public ResponseEntity<Void> deleteReaction(
+            @RequestParam("reactionType") String reactionType) {
+        if (reactionService.removeReaction(reactionType)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
