@@ -10,11 +10,13 @@ import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The leaderboard pane class wrapper.
  * This is done so the class can be initialized in code.
  */
+@Slf4j
 @Generated
 public class LeaderboardPane extends StackPane {
 
@@ -38,6 +40,7 @@ public class LeaderboardPane extends StackPane {
         try {
             view = fxmlLoader.load();
         } catch (Exception e) {
+            log.error("Could not load leaderboard fxml", e);
             Platform.exit();
             System.exit(0);
         }
