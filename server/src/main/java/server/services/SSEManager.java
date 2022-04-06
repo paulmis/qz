@@ -200,7 +200,7 @@ public class SSEManager {
      * @return Whether the message was sent to all specified users or not.
      */
     public boolean send(Iterable<UUID> users, SSEMessage message) {
-        log.error(String.valueOf(message));
+        log.trace(String.valueOf(message));
         return send(users, SSE.createEvent(message));
     }
 
