@@ -409,7 +409,7 @@ public class GameService {
         }
 
         log.info("Sending power-up " + powerUp.name() + " to game: " + game.getGameId());
-        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.POWER_UP_PLAYED, powerUp.name()));
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.POWER_UP_PLAYED, powerUp));
     }
 
     /**
