@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import server.configuration.FileSystemStorageConfiguration;
+import server.configuration.QuestionGenerationConfiguration;
 import server.configuration.ResourceConfiguration;
 import server.configuration.quiz.QuizConfiguration;
 import server.services.storage.StorageService;
@@ -36,7 +37,8 @@ import server.services.storage.StorageService;
 @EntityScan(basePackages = {"commons", "server"})
 @EnableConfigurationProperties({FileSystemStorageConfiguration.class,
                                 ResourceConfiguration.class,
-                                QuizConfiguration.class})
+                                QuizConfiguration.class,
+                                QuestionGenerationConfiguration.class})
 public class Main {
 
     public static void main(String[] args) {

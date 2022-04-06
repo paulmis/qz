@@ -3,6 +3,7 @@ package server.database.entities.question;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import commons.entities.AnswerDTO;
 import commons.entities.questions.MCQuestionDTO;
+import commons.entities.questions.MCType;
 import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class MCQuestion extends Question {
      * Boolean to indicate if the user has to guess the energy consumption
      * or the corresponding activity.
      */
-    protected boolean guessConsumption = true;
+    protected MCType questionType = MCType.GUESS_COST;
 
     /**
      * Construct a new entity from a DTO.
@@ -58,14 +59,13 @@ public class MCQuestion extends Question {
      * @param activities       the list of activities that compose the question.
      * @param text             the description of the question.
      * @param answer           the Activity that corresponds to the correct answer.
-     * @param guessConsumption if the user has to guess the energy consumption of the activity
-     *                         or the activity with a given consumption.
+     * @param type             the type of MC question.
      */
-    public MCQuestion(UUID id, Set<Activity> activities, String text, Activity answer, boolean guessConsumption) {
+    public MCQuestion(UUID id, Set<Activity> activities, String text, Activity answer, MCType type) {
         super(activities, text);
         this.setId(id);
         this.answer = answer;
-        this.guessConsumption = guessConsumption;
+        this.questionType = type;
     }
 
     /**
@@ -73,13 +73,12 @@ public class MCQuestion extends Question {
      *
      * @param q                an instance of Question to copy.
      * @param answer           the Activity that corresponds to the correct answer.
-     * @param guessConsumption if the user has to guess the energy consumption of the activity
-     *                         or the activity with a given consumption.
+     * @param type             the type of MC question.
      */
-    public MCQuestion(Question q, Activity answer, boolean guessConsumption) {
+    public MCQuestion(Question q, Activity answer, MCType type) {
         super(q);
         this.answer = answer;
-        this.guessConsumption = guessConsumption;
+        this.questionType = type;
     }
 
     /**
@@ -152,11 +151,11 @@ public class MCQuestion extends Question {
     @Override
     public MCQuestionDTO getDTO() {
         UUID iconId = null;
-        if (guessConsumption && answer != null && answer.getIconId() != null) {
+        if (questionType != MCType.GUESS_ACTIVITY && answer != null && answer.getIconId() != null) {
             iconId = answer.getIconId();
         }
         QuestionDTO baseDTO = super.toDTO();
         baseDTO.setQuestionIconId(iconId);
-        return new MCQuestionDTO(baseDTO, guessConsumption);
+        return new MCQuestionDTO(baseDTO, questionType);
     }
 }

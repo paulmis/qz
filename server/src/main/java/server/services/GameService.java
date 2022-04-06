@@ -6,11 +6,13 @@ import commons.entities.game.PowerUp;
 import commons.entities.game.Reaction;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
+import commons.entities.questions.MCType;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,10 +30,14 @@ import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.exceptions.GameFinishedException;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
+import server.database.entities.question.Activity;
+import server.database.entities.question.EstimateQuestion;
+import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
+import server.database.repositories.question.ActivityRepository;
 import server.database.repositories.question.QuestionRepository;
 import server.services.answer.AnswerCollection;
 import server.services.fsm.DefiniteGameFSM;
@@ -40,7 +46,7 @@ import server.services.fsm.FSMState;
 import server.services.fsm.GameFSM;
 
 /**
- * Get the questions for a specific game.
+ * Handles a specific game.
  */
 @Service
 @Slf4j
@@ -52,15 +58,15 @@ public class GameService {
     private QuizConfiguration quizConfiguration;
 
     @Autowired
-    private QuestionRepository questionRepository;
-
-    @Autowired
     @Getter
     @Setter
     private GameRepository gameRepository;
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
+
+    @Autowired
+    private QuestionService questionService;
 
     @Autowired
     @Getter
@@ -77,43 +83,6 @@ public class GameService {
     @Autowired
     @Getter
     private ThreadPoolTaskScheduler taskScheduler;
-
-    /**
-     * Provides the specified amount of questions, excluding the specified questions.
-     *
-     * @param count         The amount of questions to return.
-     * @param usedQuestions The questions to exclude.
-     * @return Randomly chosen questions.
-     * @throws IllegalStateException If the amount of questions to return is greater than the amount of
-     *                               questions in the database.
-     */
-    public List<Question> provideQuestions(int count, List<Question> usedQuestions) throws IllegalStateException {
-        // Check that there are enough questions
-        if (questionRepository.count() < count + usedQuestions.size()) {
-            log.error("Could not provide {} questions: not enough questions in the database.", count);
-            throw new IllegalStateException("Not enough questions in the database.");
-        }
-
-        // Create a list of all the available questions
-        /*
-        List<Question> questions =
-                questionRepository
-                    .findByIdNotIn(
-                            usedQuestions
-                                    .stream()
-                                    .map(Question::getId)
-                                    .collect(Collectors.toList()));
-         */
-        // ToDo: fix QuestionRepository::findByIdNotIn
-        List<UUID> usedIds = usedQuestions.stream().map(Question::getId).collect(Collectors.toList());
-        List<Question> questions = questionRepository.findAll()
-                .stream().filter(q -> !usedIds.contains(q.getId()))
-                .collect(Collectors.toList());
-
-        // Randomize the list and return the requested amount of questions
-        Collections.shuffle(questions);
-        return questions.subList(0, count);
-    }
 
     /**
      * Starts a new game, by verifying the starting conditions and creating a questions set.
@@ -141,7 +110,7 @@ public class GameService {
         // Initialize the game
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;
-            definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
+            definiteGame.addQuestions(questionService.provideQuestions(definiteGame.getQuestionsCount()));
             definiteGame = gameRepository.save(definiteGame);
 
             // Create and start a finite state machine for the game.
@@ -259,9 +228,9 @@ public class GameService {
     /**
      * Add an answer to a game.
      *
-     * @param game the game to add the answer to.
+     * @param game       the game to add the answer to.
      * @param gamePlayer the player who submitted the answer.
-     * @param answer the answer to add.
+     * @param answer     the answer to add.
      * @return whether the answer was added properly.
      */
     public boolean addAnswer(Game game, GamePlayer gamePlayer, AnswerDTO answer) {
@@ -316,7 +285,7 @@ public class GameService {
     /**
      * Get answers for a specific question of a specific game.
      *
-     * @param game Game to get the answers for.
+     * @param game     Game to get the answers for.
      * @param question Question to get the answers for.
      * @return The answers for the given game and question.
      */
@@ -340,7 +309,7 @@ public class GameService {
     /**
      * Update the game score to account for a specific question.
      *
-     * @param game game to update the scores for.
+     * @param game     game to update the scores for.
      * @param question question to update the scores for.
      */
     public void updateScores(Game game, Question question, LocalDateTime questionEndTime) {
@@ -388,8 +357,8 @@ public class GameService {
     /**
      * Applies a power-up to a game.
      *
-     * @param game the game.
-     * @param player the player that sent the power-up
+     * @param game    the game.
+     * @param player  the player that sent the power-up
      * @param powerUp the power-up that is to be applied.
      */
     public void sendPowerUp(Game game, GamePlayer player, PowerUp powerUp) {
@@ -421,8 +390,8 @@ public class GameService {
     /**
      * Sends a reaction to the players in a game.
      *
-     * @param game the game.
-     * @param player the player that sent the power-up
+     * @param game     the game.
+     * @param player   the player that sent the power-up
      * @param reaction the reaction that is to be sent to the other players.
      */
     public void sendReaction(Game game, GamePlayer player, Reaction reaction) {

@@ -1,6 +1,7 @@
 package server.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import commons.entities.auth.LoginDTO;
 import commons.entities.auth.UserDTO;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
@@ -12,11 +13,13 @@ import javax.validation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 import server.api.exceptions.UserNotFoundException;
 import server.api.exceptions.UsernameInUseException;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
+import server.database.entities.auth.config.JWTHandler;
 import server.database.entities.game.Game;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
@@ -39,19 +42,20 @@ public class UserController {
     SSEManager sseManager;
 
     /**
-     * Shows details of the currently logged in user.
+     * Shows details of the currently logged-in user.
      *
-     * @return details of the currently logged in user
+     * @return details of the currently logged-in user
      */
     @GetMapping
     @JsonView(value = Views.Private.class)
-    public ResponseEntity<UserDTO> get() {
+    public ResponseEntity<LoginDTO> getUserInfo() {
         log.trace("Getting user details");
-        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
-        if (user.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(user.get().getDTO());
+        User user = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(UserNotFoundException::new);
+        Game game = gameRepository.getPlayersLobbyOrGame(user.getId()).orElse(null);
+        return ResponseEntity.ok(new LoginDTO(
+                "",
+                game == null ? null : game.getDTO(),
+                user.getDTO()));
     }
 
     /**
@@ -75,8 +79,6 @@ public class UserController {
         if (userRepository.existsByUsername(newUsername)) {
             throw new UsernameInUseException("Username is already in use.");
         }
-
-
 
         // Set the new username
         user.setUsername(newUsername);

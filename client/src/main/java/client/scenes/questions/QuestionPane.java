@@ -44,14 +44,22 @@ public class QuestionPane extends StackPane {
             // Multiple choice question
             MCQuestionDTO mcQuestion = (MCQuestionDTO) question;
 
-            if (mcQuestion.isGuessConsumption()) {
-                loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionCost.fxml"));
-                loader.setControllerFactory(param ->
-                        controller = new MCQuestionCostCtrl(mainCtrl, gameCommunication, mcQuestion));
-            } else {
-                loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionActivity.fxml"));
-                loader.setControllerFactory(param ->
-                        controller = new MCQuestionActivityCtrl(mainCtrl, gameCommunication, mcQuestion));
+            switch (mcQuestion.getQuestionType()) {
+                case GUESS_COST: {
+                    loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionCost.fxml"));
+                    loader.setControllerFactory(param ->
+                            controller = new MCQuestionCostCtrl(mainCtrl, gameCommunication, mcQuestion));
+                    break;
+                }
+                case GUESS_ACTIVITY:
+                case INSTEAD_OF: {
+                    loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionActivity.fxml"));
+                    loader.setControllerFactory(param ->
+                            controller = new MCQuestionActivityCtrl(mainCtrl, gameCommunication, mcQuestion));
+                    break;
+                }
+                default:
+                    throw new NotImplementedException(mcQuestion.getQuestionType() + " questions type not implemented");
             }
         } else if (question instanceof EstimateQuestionDTO) {
             // Estimate question
