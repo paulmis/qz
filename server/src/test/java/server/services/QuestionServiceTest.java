@@ -3,15 +3,20 @@ package server.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import commons.entities.questions.MCType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 import server.database.entities.question.Activity;
 import server.database.entities.question.EstimateQuestion;
+import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
 import server.database.repositories.question.ActivityRepository;
 import server.database.repositories.question.QuestionRepository;
@@ -42,6 +47,12 @@ class QuestionServiceTest {
         return a;
     }
 
+    @BeforeEach
+    void init() {
+        lenient().when(questionRepository.saveAll(any(List.class)))
+                .thenAnswer((Answer<List<Question>>) invocation -> invocation.getArgument(0));
+    }
+
     @Test
     void provideQuestionsOk() {
         // Mock the service
@@ -60,7 +71,7 @@ class QuestionServiceTest {
 
         // Verify interactions
         verify(activityRepository).findQuestionAcceptable();
-        verify(questionRepository, times(2)).save(any());
+        verify(questionRepository).saveAll(any());
         verifyNoMoreInteractions(activityRepository, questionRepository);
     }
 
@@ -97,10 +108,41 @@ class QuestionServiceTest {
 
         // Expect a throw
         assertThrows(IllegalStateException.class,
-                () -> questionService.provideQuestions(100));
+                () -> questionService.provideQuestions(1));
 
         // Verify interactions
         verify(activityRepository).findQuestionAcceptable();
+        verifyNoMoreInteractions(activityRepository, questionRepository);
+    }
+
+    @Test
+    void oneOfEachKind() {
+        // Mock the service
+        // Generate activities that can be grouped in questions
+        List<Activity> available = new ArrayList<>();
+        for (int orderIdx = 1; orderIdx < 5; orderIdx++) {
+            for (int idx = 0; idx < 5; idx++) {
+                available.add(getActivity(idx, orderIdx));
+            }
+        }
+        when(activityRepository.findQuestionAcceptable()).thenReturn(available);
+
+        // Provide the questions
+        List<Question> questions = questionService.provideQuestions(4);
+        assertEquals(4, questions.size());
+        assertTrue(questions.stream().anyMatch(q -> q instanceof EstimateQuestion));
+        List<MCQuestion> mcQuestions = questions.stream()
+                .filter(q -> q instanceof MCQuestion)
+                .map(q -> (MCQuestion) q)
+                .collect(Collectors.toList());
+        assertEquals(3, mcQuestions.size());
+        assertTrue(mcQuestions.stream().anyMatch(q -> q.getQuestionType() == MCType.GUESS_COST));
+        assertTrue(mcQuestions.stream().anyMatch(q -> q.getQuestionType() == MCType.GUESS_ACTIVITY));
+        assertTrue(mcQuestions.stream().anyMatch(q -> q.getQuestionType() == MCType.INSTEAD_OF));
+
+        // Verify interactions
+        verify(activityRepository).findQuestionAcceptable();
+        verify(questionRepository).saveAll(any());
         verifyNoMoreInteractions(activityRepository, questionRepository);
     }
 }

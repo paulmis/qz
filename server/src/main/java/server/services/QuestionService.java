@@ -52,11 +52,18 @@ public class QuestionService {
         // Create a provider of random numbers
         Random myRandom = new Random();
 
+        // We need to generate a pool of questions containing an equal amount of each kind
+        // Therefore the size of the pool must be a multiple of Config.enabledQuestionTypes.length
+        int poolSize = count;
+        if (poolSize % Config.enabledQuestionTypes.length != 0) {
+            poolSize += Config.enabledQuestionTypes.length - (count % Config.enabledQuestionTypes.length);
+        }
+
         int failedAttempts = 0;
-        for (int idx = 0; idx < count; idx++) {
-            // Check failed attempts, otherwise the for might run forever
-            // Allow for "count" failed attempts before giving up
-            if (failedAttempts >= count) {
+        for (int idx = 0; idx < poolSize; idx++) {
+            // Check failed attempts, otherwise the loop might run forever
+            // Allow for a certain amount of failed attempts before giving up
+            if (failedAttempts >= Config.questionGenerationAttempts) {
                 log.error("Could not provide any question: not enough activities in the database.");
                 throw new IllegalStateException("Not enough activities in the database.");
             }
@@ -69,16 +76,15 @@ public class QuestionService {
 
             // Generate question
             Question newQuestion;
-            // Randomly choose the question type
-            Class nextQuestionClass = Config
-                    .enabledQuestionTypes[myRandom.nextInt(Config.enabledQuestionTypes.length)];
-            if (nextQuestionClass.equals(MCQuestion.class)) {
+            // Select the question type
+            Config.QuestionType questionKind = Config.enabledQuestionTypes[idx % Config.enabledQuestionTypes.length];
+            if (questionKind.questionType.equals(MCQuestion.class)) {
                 // MC questions
                 Activity correctOption;
                 String questionText;
 
-                // Randomly choose the MC question type
-                MCType type = MCType.values()[myRandom.nextInt(MCType.values().length)];
+                // Select the MC question type
+                MCType type = (MCType) questionKind.questionSubtype;
 
                 switch (type) {
                     case GUESS_COST: {
@@ -133,7 +139,7 @@ public class QuestionService {
                     idx--;
                     continue;
                 }
-            } else if (nextQuestionClass.equals(EstimateQuestion.class)) {
+            } else if (questionKind.questionType.equals(EstimateQuestion.class)) {
                 // Estimate questions
                 newQuestion = new EstimateQuestion();
 
@@ -155,15 +161,16 @@ public class QuestionService {
         // Randomize the pool of generated questions
         Collections.shuffle(questions);
 
+        // Select only the questions needed
+        questions = questions.subList(0, count);
+
         // Save the new questions
-        questions = questions.stream()
-                .map(quest -> quest = questionRepository.save(quest))
-                .collect(Collectors.toList());
+        questions = questionRepository.saveAll(questions);
         return questions;
     }
 
     /**
-     * Returns a set of activities fit for a MC question.
+     * Returns a set of activities fit for a multiple-choice question.
      * The set includes the correct answer.
      *
      * @param pool   pool of activities to choose from.

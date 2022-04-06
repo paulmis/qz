@@ -16,6 +16,7 @@
 
 package server.configuration;
 
+import commons.entities.questions.MCType;
 import java.util.Random;
 import lombok.Generated;
 import org.springframework.context.annotation.Bean;
@@ -55,12 +56,34 @@ public class Config {
     }
 
     /**
-     * List of enabled question types.
+     * Structure representing a question class and its subtypes.
      */
-    public static final Class<?>[] enabledQuestionTypes = {
-        MCQuestion.class,
-        MCQuestion.class,
-        MCQuestion.class,
-        EstimateQuestion.class
+    public static class QuestionType {
+        public Class questionType;
+        public Enum questionSubtype;
+
+        public QuestionType(Class type, Enum subtype) {
+            this.questionType = type;
+            this.questionSubtype = subtype;
+        }
+
+        public QuestionType(Class type) {
+            this(type, null);
+        }
+    }
+
+    /**
+     * Array of enabled question types.
+     */
+    public static final QuestionType[] enabledQuestionTypes = {
+        new QuestionType(MCQuestion.class, MCType.GUESS_COST),
+        new QuestionType(MCQuestion.class, MCType.GUESS_ACTIVITY),
+        new QuestionType(MCQuestion.class, MCType.INSTEAD_OF),
+        new QuestionType(EstimateQuestion.class),
     };
+
+    /**
+     * Number of attempts in generating a question from the activities before giving up.
+     */
+    public static final int questionGenerationAttempts = 1000;
 }
