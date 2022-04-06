@@ -596,7 +596,12 @@ public class GameScreenCtrl implements Initializable, SSESource {
                 jfxButton.setGraphic(image);
 
                 jfxButton.setOnAction(event -> communication.sendPowerUp(powerUp,
-                        () -> runLater(() -> jfxButton.setDisable(true)),
+                        (activity) -> runLater(() -> {
+                            jfxButton.setDisable(true);
+                            if (powerUp.name().equals("IncorrectAnswer") && activity.isPresent()){
+
+                            }
+                        }),
                         error -> runLater(() ->
                                 mainCtrl.showErrorSnackBar("Error occured: " + error.getDescription()))));
 

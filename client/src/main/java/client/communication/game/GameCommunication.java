@@ -4,6 +4,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import client.utils.ClientState;
 import client.utils.communication.ServerUtils;
+import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
@@ -260,7 +261,7 @@ public class GameCommunication {
      * @param handleFail the fail handler.
      */
     public void sendPowerUp(PowerUp powerUp, SendPowerUpHandlerSuccess handleSuccess,
-                            SendPowerUpHandlerFail handleFail) {
+                                             SendPowerUpHandlerFail handleFail) {
         // Build the query invocation
         Invocation request = ServerUtils.getRequestTarget()
                 .path("/api/game/powerUp")
@@ -273,7 +274,7 @@ public class GameCommunication {
             @Override
             public void completed(Response response) {
                 if (response.getStatus() == 200) {
-                    handleSuccess.handle();
+                    handleSuccess.handle(response.readEntity(new GenericType<Optional<ActivityDTO>>(){}));
                 } else {
                     handleFail.handle(response.readEntity(ApiError.class));
                 }
@@ -385,7 +386,7 @@ public class GameCommunication {
      * Handler for when sending a power-up succeeds.
      */
     public interface SendPowerUpHandlerSuccess {
-        void handle();
+        void handle(Optional<ActivityDTO> activity);
     }
 
     /**

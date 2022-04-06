@@ -38,6 +38,10 @@ public enum SSEMessageType {
      */
     STOP_QUESTION,
     /**
+     * Send to user an incorrect answer
+     */
+    INCORRECT_ANSWER,
+    /**
      * Sent when the client should show the in-game leaderboard.
      */
     SHOW_LEADERBOARD,

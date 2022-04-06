@@ -1,11 +1,14 @@
 package server.api;
 
+import commons.entities.ActivityDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
 import commons.entities.game.Reaction;
+import commons.entities.questions.MCQuestionDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +24,14 @@ import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
+import server.database.entities.question.Activity;
+import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
+import server.services.fsm.GameFSM;
 
 
 /**
@@ -127,7 +133,7 @@ public class GameController {
      * @throws SSEFailedException if the powerup failed to use
      */
     @PostMapping("/powerUp")
-    ResponseEntity sendPowerUp(@RequestBody PowerUp powerUp) throws SSEFailedException {
+    ResponseEntity<Optional<ActivityDTO>> sendPowerUp(@RequestBody PowerUp powerUp) throws SSEFailedException {
         // If the user or the game don't exist, throw exception
         Optional<User> userOpt = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (userOpt.isEmpty()) {
@@ -149,11 +155,19 @@ public class GameController {
         if (gamePlayer.getUserPowerUps().keySet().contains(powerUp)) {
             throw new PowerUpAlreadyUsedException();
         }
-
         gameService.sendPowerUp(game, gamePlayer, powerUp);
         gamePlayer.getUserPowerUps().put(powerUp, game.getCurrentQuestionNumber());
         gameRepository.save(game);
 
+        if (powerUp.name().equals("IncorrectAnswer") && game.getQuestion().get() instanceof MCQuestion) {
+            MCQuestion question = (MCQuestion) game.getQuestion().get();
+            Set<Activity> activityList =  question.getActivities();
+            for (Activity activ : activityList)
+                if (!activ.getDTO().equals((question.getRightAnswer().getResponse().get(0)))) {
+                    // Get the first activity doesn't have the right answer
+                    return ResponseEntity.ok(Optional.of(activ.getDTO()));
+                }
+        }
         // Return 200
         return ResponseEntity.ok().build();
     }
