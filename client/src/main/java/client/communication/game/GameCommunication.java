@@ -180,8 +180,6 @@ public class GameCommunication {
 
     /**
      * Gets a list of all the emoji urls from the backend.
-     *
-     * @return List of emoji urls
      */
     public void getReactions(GetReactionsHandlerSuccess handlerSuccess, GetReactionsHandlerFail handlerFail) {
         Invocation request = ServerUtils.getRequestTarget()

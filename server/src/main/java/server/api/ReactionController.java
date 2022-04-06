@@ -53,6 +53,13 @@ public class ReactionController {
         return ResponseEntity.ok(reactionService.getReactionURLs());
     }
 
+    /**
+     * Create a new reaction with an image.
+     *
+     * @param reaction reaction to create.
+     * @param image image of the reaction.
+     * @return response.
+     */
     @PostMapping
     public ResponseEntity<Void> createReaction(
             @RequestPart("reaction") ReactionDTO reaction,
