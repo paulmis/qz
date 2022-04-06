@@ -328,16 +328,20 @@ public class GameService {
             GamePlayer player = (GamePlayer) p;
 
             int score = Optional.ofNullable(scores.get(player.getId())).orElse(0);
-            boolean isCorrect = score > game.getConfiguration().getCorrectAnswerThreshold();
 
-            // The answer time stamp
-            LocalDateTime answerTime = answerCollection.getAnswer(player.getId()).getAnswerTime();
-            // Compute score based on the quickness of answering a question
-            int timeBasedScore = game.computeTimeBasedScore(player, score, answerTime, questionEndTime);
+            // Verify that the player has given an answer
+            if (answerCollection.getAnswer(player.getId()) != null) {
+                // The answer time stamp
+                LocalDateTime answerTime = answerCollection.getAnswer(player.getId()).getAnswerTime();
+                // Compute score based on the quickness of answering a question
+                score = game.computeTimeBasedScore(score, answerTime, questionEndTime);
+            }
+
+            boolean isCorrect = score > game.getConfiguration().getCorrectAnswerThreshold();
             // Update players' streak
             game.updateStreak(player, isCorrect);
             // Calculate the streak score
-            int streakScore = game.computeStreakScore(player, timeBasedScore);
+            int streakScore = game.computeStreakScore(player, score);
             //Apply double points power up
             game.applyScorePowerUpModifiers(player, streakScore, 2);
             // Persist the score changes
