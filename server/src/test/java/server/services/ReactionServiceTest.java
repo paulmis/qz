@@ -32,9 +32,7 @@ class ReactionServiceTest {
 
     @Test
     void addReaction() {
-        when(reactionRepository.save(any(Reaction.class))).thenReturn(new Reaction(getUUID(1),
-                "test",
-                getUUID(3)));
+        when(reactionRepository.save(any(Reaction.class))).thenReturn(new Reaction("test", getUUID(3)));
 
         reactionService.addReaction("test", getUUID(3));
         verify(reactionRepository, times(1)).save(any(Reaction.class));
@@ -42,9 +40,7 @@ class ReactionServiceTest {
 
     @Test
     void removeReaction() {
-        when(reactionRepository.save(any(Reaction.class))).thenReturn(new Reaction(getUUID(1),
-                "test",
-                getUUID(3)));
+        when(reactionRepository.save(any(Reaction.class))).thenReturn(new Reaction("test", getUUID(3)));
         when(reactionRepository.deleteByNameEquals(any(String.class))).thenReturn(1L);
 
         reactionService.addReaction("test", getUUID(3));
@@ -63,9 +59,7 @@ class ReactionServiceTest {
         when(storageService.getURI(any(UUID.class)))
                 .thenReturn(URI.create("https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
         when(reactionRepository.findAll()).thenReturn(List.of(new Reaction("test", getUUID(3))));
-        when(reactionRepository.save(any(Reaction.class))).thenReturn(new Reaction(getUUID(1),
-                "test",
-                getUUID(3)));
+        when(reactionRepository.save(any(Reaction.class))).thenReturn(new Reaction("test", getUUID(3)));
 
         reactionService.addReaction("test", getUUID(3));
         Map<String, URI> urls = reactionService.getReactionURLs();

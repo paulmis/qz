@@ -1,12 +1,10 @@
 package server.services;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,10 +29,11 @@ public class ReactionService {
      *
      * @param reaction   The reaction to add.
      * @param resourceId The resource id.
+     * @return Name of the saved reaction.
      */
-    public void addReaction(String reaction, UUID resourceId) {
+    public String addReaction(String reaction, UUID resourceId) {
         log.debug("Adding reaction {}", reaction);
-        reactionRepository.save(new Reaction(reaction, resourceId));
+        return reactionRepository.save(new Reaction(reaction, resourceId)).getName();
     }
 
     /**

@@ -7,27 +7,19 @@ import lombok.*;
 /**
  * Entity for saved reactions.
  */
+@Entity
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "Reaction", indexes = {
-        @Index(name = "idx_reaction_name_unq", columnList = "name", unique = true)
-})
 public class Reaction {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id private UUID id;
-
     /**
      * Name of the reaction.
      */
-    @Column(nullable = false, unique = true)
-    @NonNull private String name;
+    @Id private String name;
 
     /**
      * UUID of the reaction image (resource ID).
      */
     @Column(nullable = false)
-    @NonNull private UUID imageId;
+    private UUID imageId;
 }

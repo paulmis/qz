@@ -415,9 +415,10 @@ public class GameService {
      *
      * @param game the game.
      * @param reaction the reaction that is to be sent to the other players.
+     * @return whether the reaction was sent successfully.
      */
-    public void sendReaction(Game game, ReactionDTO reaction) {
+    public boolean sendReaction(Game game, ReactionDTO reaction) {
         log.debug("Sending reaction {} to game {}", reaction.getReactionType(), game.getGameId());
-        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.REACTION, reaction));
+        return sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.REACTION, reaction));
     }
 }
