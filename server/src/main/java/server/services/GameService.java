@@ -318,32 +318,33 @@ public class GameService {
 
         log.debug("[{}] Updating scores for question {}.", game.getId(), question.getId());
 
-        Map<UUID, Integer> scores = question.checkAnswer(answerCollection).entrySet().stream().collect(
-                Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> game.computeBaseScore(e.getValue())
-                ));
+        // Update game score
+        question.checkAnswer(answerCollection).entrySet().forEach(entry -> {
+            Optional<GamePlayer> gamePlayer = game.getPlayers().values().stream()
+                    .filter(p -> ((GamePlayer) p).getId().equals(entry.getKey())).findFirst();
+            if (gamePlayer.isEmpty()) {
+                return;
+            }
 
-        game.getPlayers().values().forEach(p -> {
-            GamePlayer player = (GamePlayer) p;
-
-            int score = Optional.ofNullable(scores.get(player.getId())).orElse(0);
+            int score = game.computeBaseScore(entry.getValue());
             boolean isCorrect = score > game.getConfiguration().getCorrectAnswerThreshold();
 
             // The answer time stamp
-            LocalDateTime answerTime = answerCollection.getAnswer(player.getId()).getAnswerTime();
+            LocalDateTime answerTime = answerCollection.getAnswer(entry.getKey()).getAnswerTime();
             // Compute score based on the quickness of answering a question
-            int timeBasedScore = game.computeTimeBasedScore(player, score, answerTime, questionEndTime);
-            // Update players' streak
-            game.updateStreak(player, isCorrect);
-            // Calculate the streak score
-            int streakScore = game.computeStreakScore(player, timeBasedScore);
-            //Apply double points power up
-            game.applyScorePowerUpModifiers(player, streakScore, 2);
-            // Persist the score changes
-            gamePlayerRepository.save(player);
+            score = game.computeTimeBasedScore(score, answerTime, questionEndTime);
 
-            log.debug("[{}] player {} now has {} points", game.getId(), player.getId(), player.getScore());
+            // Update players' streak
+            game.updateStreak(gamePlayer.get(), isCorrect);
+            // Calculate the streak score
+            int streakScore = game.computeStreakScore(gamePlayer.get(), score);
+
+            //Apply double points power up
+            game.applyScorePowerUpModifiers(gamePlayer.get(), streakScore, 2);
+            // Persist the score changes
+            gamePlayerRepository.save(gamePlayer.get());
+
+            log.debug("[{}] player {} now has {} points", game.getId(), entry.getKey(), gamePlayer.get().getScore());
         });
 
         log.debug("[{}] Scores updated.", game.getId());

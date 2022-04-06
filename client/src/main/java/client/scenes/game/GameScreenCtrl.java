@@ -822,8 +822,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
             mainBorderPane.setCenter(this.centerPane);
             updateInGame();
         } catch (IOException e) {
-            log.error("Error loading the FXML file");
-            e.printStackTrace();
+            log.error("Error loading the FXML file", e);
             Platform.exit();
             System.exit(0);
         }

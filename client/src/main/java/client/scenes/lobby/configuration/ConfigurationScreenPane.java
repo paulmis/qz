@@ -7,12 +7,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The class that encompasses the ConfigurationScreen.
  * The purpose of this class is to allow the
  * initialization of the control inside code.
  */
+@Slf4j
 @Generated
 public class ConfigurationScreenPane extends StackPane {
 
@@ -29,6 +31,7 @@ public class ConfigurationScreenPane extends StackPane {
         try {
             view = (Node) fxmlLoader.load();
         } catch (Exception e) {
+            log.error("Could not load configuration screen FXML", e);
             Platform.exit();
             System.exit(0);
         }
