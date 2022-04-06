@@ -33,6 +33,7 @@ import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.Optional;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
@@ -396,6 +397,39 @@ public class MainCtrl {
     public void closeLobbyDisbandWarning() {
         lobbyDisbandPopUp.hide();
         lobbyDisbandPopUp.getContent().clear();
+    }
+
+    /**
+     * Open warning pop-up before closing the application.
+     */
+    public void openAppCloseWarning() {
+        gameLeavePopUp.setOnShown(e -> {
+            gameLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - gameLeavePopUp.getWidth() / 2);
+
+            gameLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - gameLeavePopUp.getHeight() / 2);
+        });
+
+        var gameLeavePane = new PopupPane(new GameLeaveScreenCtrl(
+                () -> Platform.runLater(() -> {
+                    Platform.exit();
+                    System.exit(0);
+                }),
+                () -> Platform.runLater(() -> {
+                    closeAppCloseWarning();
+                })),
+                "GameLeaveScreen");
+        gameLeavePopUp.getContent().add(gameLeavePane);
+        gameLeavePopUp.show(primaryStage);
+    }
+
+    /**
+     * Close the application leave pop-up.
+     */
+    public void closeAppCloseWarning() {
+        gameLeavePopUp.hide();
+        gameLeavePopUp.getContent().clear();
     }
 
     /**
