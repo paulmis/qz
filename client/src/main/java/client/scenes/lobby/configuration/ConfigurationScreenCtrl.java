@@ -135,7 +135,7 @@ public class ConfigurationScreenCtrl implements Initializable {
      */
     @FXML
     private void saveConfig() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         saveHandler.handle(this.gameConfig);
     }
 

@@ -113,7 +113,7 @@ public class LogInScreenCtrl implements Initializable {
      */
     @FXML
     private void logInButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         if (!emailField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
             if (ServerUtils.isValidEmail(emailField.getText())) {
                 RegisterScreenCtrl.setCredentialsFromFields(rememberUser, emailField, passwordField);
@@ -171,13 +171,13 @@ public class LogInScreenCtrl implements Initializable {
      */
     @FXML
     private void createAccountButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showRegisterScreen();
     }
 
     @FXML
     private void adminPanelButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showActivityListScreen();
     }
 }

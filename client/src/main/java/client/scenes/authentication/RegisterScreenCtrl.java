@@ -104,7 +104,7 @@ public class RegisterScreenCtrl implements Initializable {
      */
     @FXML
     private void setUsername() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         if (usernameField.getText().length() > 0) {
             setCredentialsFromFields(rememberUser, emailField, passwordField);
             log.debug("{}: {} [{}]", usernameField.getText(), emailText, userImage.getAbsolutePath());
@@ -163,7 +163,7 @@ public class RegisterScreenCtrl implements Initializable {
      */
     @FXML
     private void uploadPicture() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         selectFile = new FileChooser();
         FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.png");
         selectFile.setTitle("Select your Profile Picture");
@@ -226,7 +226,7 @@ public class RegisterScreenCtrl implements Initializable {
      */
     @FXML
     private void signUpButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         if (!emailField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
             if (ServerUtils.isValidEmail(emailField.getText())) {
                 emailText = emailField.getText();
@@ -253,7 +253,7 @@ public class RegisterScreenCtrl implements Initializable {
      */
     @FXML
     private void haveAccountButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showLogInScreen();
     }
 
@@ -270,7 +270,7 @@ public class RegisterScreenCtrl implements Initializable {
      */
     @FXML
     private void adminPanelButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showActivityListScreen();
     }
 }

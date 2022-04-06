@@ -149,7 +149,7 @@ public class ActivityListScreenCtrl implements Initializable {
      */
     @FXML
     private void addActivityButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         this.openEditActivity(null, (activity, image) -> server.updateActivity(activity, image,
                         () -> runLater(() -> {
                             mainCtrl.showInformationalSnackBar("Activity has been added.");
@@ -165,7 +165,7 @@ public class ActivityListScreenCtrl implements Initializable {
      */
     @FXML
     private void editActivityButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         this.openEditActivity(new ActivityView(activityTable.getSelectionModel().getSelectedItem()),
                 (activity, image) -> server.updateActivity(activity, image,
                         () -> runLater(() -> {
@@ -182,7 +182,7 @@ public class ActivityListScreenCtrl implements Initializable {
      */
     @FXML
     private void deleteActivityButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         var selectedActivity = activityTable.getSelectionModel().getSelectedItem();
         server.deleteActivity(selectedActivity.getId(),
                 () -> runLater(() -> {

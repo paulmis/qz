@@ -61,7 +61,7 @@ public class LobbyLeaveScreenCtrl implements Initializable {
      */
     @FXML
     private void cancelLeaveLobby() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         cancelHandler.handle();
     }
 
@@ -70,7 +70,7 @@ public class LobbyLeaveScreenCtrl implements Initializable {
      */
     @FXML
     private void leaveLobby() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         leaveHandler.handle();
     }
 

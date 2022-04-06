@@ -68,7 +68,7 @@ public abstract class MCQuestionCtrl extends QuestionCtrl {
             // Add the callback
             button
                 .setOnAction((actionEvent) -> {
-                    SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+                    SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
                     if (button != chosenAnswer) {
                         // Send the answer
                         GameCommunication.putAnswer(

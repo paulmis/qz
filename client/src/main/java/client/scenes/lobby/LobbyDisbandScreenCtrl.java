@@ -61,7 +61,7 @@ public class LobbyDisbandScreenCtrl implements Initializable {
      */
     @FXML
     private void cancelDisbandLobby() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         cancelHandler.handle();
     }
 
@@ -70,7 +70,7 @@ public class LobbyDisbandScreenCtrl implements Initializable {
      */
     @FXML
     private void disbandLobby() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         disbandHandler.handle();
     }
 

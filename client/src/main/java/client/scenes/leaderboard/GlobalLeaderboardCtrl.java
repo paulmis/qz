@@ -87,7 +87,7 @@ public class GlobalLeaderboardCtrl implements Initializable {
 
     @FXML
     private void goBackToLobbies() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showLobbyListScreen();
         leaderboardPane.stop();
     }

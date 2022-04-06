@@ -3,12 +3,10 @@ package client.scenes.lobby;
 import static javafx.application.Platform.runLater;
 
 import client.communication.LobbyListCommunication;
-import client.communication.game.LobbyCommunication;
 import client.communication.user.UserCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.UserInfoPane;
 import client.utils.AlgorithmicUtils;
-import client.utils.ClientState;
 import client.utils.SoundEffect;
 import client.utils.SoundManager;
 import client.utils.communication.ServerUtils;
@@ -71,18 +69,18 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void leaderboardButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showGlobalLeaderboardScreen();
     }
 
     @FXML
     private void settingsButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
     }
 
     @FXML
     private void userButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         if (userInfo == null) {
             // Create userInfo
             userInfo = new UserInfoPane(new ServerUtils(), new UserCommunication(), mainCtrl);
@@ -97,7 +95,7 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void createLobbyButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         createLobby();
     }
 
@@ -107,7 +105,7 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void searchButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         updateLobbyList(searchField.getText());
     }
 
@@ -152,7 +150,7 @@ public class LobbyListCtrl implements Initializable {
      */
     @FXML
     private void joinRandomLobby() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         communication.getLobbies(
                 games -> {
                     // Gets a random available lobby and joins it
@@ -178,13 +176,13 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void fetchButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         updateLobbyList(searchField.getText());
     }
 
     @FXML
     private void joinPrivateLobbyButtonClick() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         communication.joinPrivateLobby(privateLobbyTextField.getText(), gameDTO -> runLater(() -> {
             mainCtrl.showInformationalSnackBar("Joined the lobby!");
             mainCtrl.showLobbyScreen();

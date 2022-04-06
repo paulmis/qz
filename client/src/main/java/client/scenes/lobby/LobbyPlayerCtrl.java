@@ -80,7 +80,7 @@ public class LobbyPlayerCtrl implements Initializable {
 
     @FXML
     private void kickOutPlayer() {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         kickAction.handle();
     }
 }

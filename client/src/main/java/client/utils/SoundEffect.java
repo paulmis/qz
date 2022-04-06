@@ -1,5 +1,8 @@
 package client.utils;
 
+/**
+ * The predefined types of sound effects the app can use.
+ */
 public enum SoundEffect {
     INCORRECT_ANSWER,
     CORRECT_ANSWER,

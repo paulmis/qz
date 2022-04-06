@@ -162,7 +162,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @SSEEventHandler(SSEMessageType.START_QUESTION)
     public void toQuestionStage(Integer delay) {
-        SoundManager.PlayMusic(SoundEffect.QUESTION_START, getClass());
+        SoundManager.playMusic(SoundEffect.QUESTION_START, getClass());
         log.debug("Question stage handler triggered. Delay: {}", delay);
 
         communication.getQuestionNumber(ClientState.game.getId(), questionNumber -> runLater(() -> {
@@ -378,12 +378,12 @@ public class GameScreenCtrl implements Initializable, SSESource {
 
         if (ClientState.previousScore.isPresent()) {
             if (ClientState.previousScore.get() < player.getScore()) {
-                SoundManager.PlayMusic(SoundEffect.CORRECT_ANSWER, getClass());
+                SoundManager.playMusic(SoundEffect.CORRECT_ANSWER, getClass());
                 mainCtrl.showInformationalSnackBar("You have gained "
                                 + (player.getScore() - ClientState.previousScore.get()) + " points!",
                         javafx.util.Duration.seconds(2));
             } else {
-                SoundManager.PlayMusic(SoundEffect.INCORRECT_ANSWER, getClass());
+                SoundManager.playMusic(SoundEffect.INCORRECT_ANSWER, getClass());
                 mainCtrl.showErrorSnackBar("You have lost "
                                 + (ClientState.previousScore.get() - player.getScore()) + " points!",
                         javafx.util.Duration.seconds(2));
@@ -400,7 +400,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
     @SSEEventHandler(SSEMessageType.POWER_UP_PLAYED)
     public void handlePowerUP(PowerUp powerUp) {
         mainCtrl.showInformationalSnackBar("A " + powerUp.name() + " Power-Up has been played!");
-        SoundManager.PlayMusic(SoundEffect.POWER_UP, getClass());
+        SoundManager.playMusic(SoundEffect.POWER_UP, getClass());
 
         switch (powerUp) {
             case HalveTime:
@@ -436,7 +436,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
             return;
         }
 
-        SoundManager.PlayMusic(SoundEffect.EMOJI, getClass());
+        SoundManager.playMusic(SoundEffect.EMOJI, getClass());
 
         // Verify that we have the reaction URI
         URI reactionUrl = this.reactions.get(reaction.getReactionType());
@@ -719,7 +719,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @FXML
     private void emojiBarButtonClick(ActionEvent actionEvent) {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         emojiScrollPane.setVisible(!emojiScrollPane.isVisible());
     }
 
@@ -731,7 +731,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @FXML
     private void powerUpBarButtonClick(ActionEvent actionEvent) {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         powerUpScrollPane.setVisible(!powerUpScrollPane.isVisible());
     }
 
@@ -743,7 +743,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @FXML
     private void quitButtonClick(ActionEvent actionEvent) {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         // This makes the button just get you out of the lobby
         // if it has already finished.
         if (ClientState.game == null) {
@@ -793,7 +793,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @FXML
     private void settingButtonClick(ActionEvent actionEvent) {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         settingsPanel.setVisible(!settingsPanel.isVisible());
     }
 
@@ -805,7 +805,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @FXML
     private void volumeButtonClick(ActionEvent actionEvent) {
-        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         SoundManager.volume.setValue(SoundManager.volume.getValue() == 0 ? 100 : 0);
     }
 
