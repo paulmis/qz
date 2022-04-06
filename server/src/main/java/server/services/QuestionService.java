@@ -151,7 +151,7 @@ public class QuestionService {
                 newQuestion = new EstimateQuestion();
 
                 // Set the question
-                newQuestion.setText("How much does " + answerDescription + " costs approximately?");
+                newQuestion.setText("How much does " + answerDescription + " cost approximately?");
 
                 // Set the activity
                 newQuestion.setActivities(Set.of(answer));
@@ -213,6 +213,7 @@ public class QuestionService {
                 .collect(Collectors.toList());
         Collections.shuffle(options);
         if (options.size() < size - 1) {
+            log.error("Not enough activities fulfill the filter");
             throw new IOException("Not enough activities to generate the question");
         }
 
@@ -237,6 +238,7 @@ public class QuestionService {
 
         // 5. check if enough options were selected
         if (chosen.size() < size) {
+            log.error("Not enough distinct activities available");
             throw new IOException("Not enough activities to generate the question");
         }
 
