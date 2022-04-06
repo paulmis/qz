@@ -7,14 +7,13 @@ import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
-import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -23,13 +22,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 class SSEManagerTest {
     private SSEManager sseManager;
 
-    @Mock
-    private MeterRegistry meterRegistry;
-
     @BeforeEach
     void setUp() {
         // We want a new SSEManager for each test run.
-        sseManager = new SSEManager(meterRegistry);
+        sseManager = new SSEManager(new SimpleMeterRegistry());
     }
 
     /**
