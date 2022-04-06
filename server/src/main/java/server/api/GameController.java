@@ -76,16 +76,12 @@ public class GameController {
     @GetMapping("/{gameId}/question")
     ResponseEntity<QuestionDTO> currentQuestion(@PathVariable UUID gameId) {
         // Check if game exists.
-        Optional<Game> game = gameRepository.findById(gameId);
-        if (game.isEmpty()) {
-            log.warn("Game {} does not exist", AuthContext.get());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Game game = gameRepository.findById(gameId).orElseThrow(GameNotFoundException::new);
 
-        Optional<Question> question = game.get().getQuestion();
+        Optional<Question> question = game.getQuestion();
         // Check if question is not empty;
         if (question.isEmpty()) {
-            log.warn("Question does not exist on game {}", game.get().getId());
+            log.warn("Question does not exist on game {}", game.getId());
             throw new IllegalStateException("Question is empty");
         }
         // Send 200 status and payload if question exists.
@@ -127,16 +123,10 @@ public class GameController {
      */
     @PostMapping("/powerUp")
     ResponseEntity sendPowerUp(@RequestBody PowerUp powerUp) {
-        User user = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(() -> {
-            log.error("User not found: {}", AuthContext.get());
-            return new UserNotFoundException();
-        });
+        User user = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(UserNotFoundException::new);
 
         // If the user isn't in a game, throw exception
-        Game game = gameRepository.getPlayersGame(user.getId()).orElseThrow(() -> {
-            log.error("User not in game: {}", AuthContext.get());
-            return new GameNotFoundException();
-        });
+        Game game = gameRepository.getPlayersGame(user.getId()).orElseThrow(GameNotFoundException::new);
 
         GamePlayer gamePlayer = (GamePlayer) game.getPlayers().get(user.getId());
 

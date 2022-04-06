@@ -94,6 +94,7 @@ public class GlobalAPIExceptionManager {
         LobbyNotFoundException.class,
         GameNotFoundException.class})
     public ApiError handleNotFoundException(Exception ex) {
+        log.warn("Not found exception ({}): {}", ex.getClass().getSimpleName(), ex.getMessage());
         return new ApiError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 
