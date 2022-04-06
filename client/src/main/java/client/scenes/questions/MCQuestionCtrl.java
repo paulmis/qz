@@ -133,9 +133,8 @@ public abstract class MCQuestionCtrl extends QuestionCtrl {
         for (int i = 0; i < getButtons().size(); ++i) {
             JFXButton button = getButtons().get(i);
             if (question.getActivities().get(i).getId().equals(answerActivity)) {
-                // If this is the answer we want to remove
-                button.setVisible(true);
-                button.setDisable(true);
+                button.getStyleClass().add("incorrect-answer-powerup");
+                button.setMouseTransparent(true);
                 return;
             }
         }
