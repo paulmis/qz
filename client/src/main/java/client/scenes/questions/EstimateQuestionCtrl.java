@@ -123,4 +123,9 @@ public class EstimateQuestionCtrl extends QuestionCtrl {
                 ? "correct-answer"
                 : "incorrect-answer");
     }
+
+    @Override
+    protected void removeAnswer(AnswerDTO answer) {
+        // Had error if I didn't do this.
+    }
 }

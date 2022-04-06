@@ -133,7 +133,7 @@ public class GameController {
      * @throws SSEFailedException if the powerup failed to use
      */
     @PostMapping("/powerUp")
-    ResponseEntity<Optional<ActivityDTO>> sendPowerUp(@RequestBody PowerUp powerUp) throws SSEFailedException {
+    ResponseEntity<ActivityDTO> sendPowerUp(@RequestBody PowerUp powerUp) throws SSEFailedException {
         // If the user or the game don't exist, throw exception
         Optional<User> userOpt = userRepository.findByEmailIgnoreCase(AuthContext.get());
         if (userOpt.isEmpty()) {
@@ -162,11 +162,12 @@ public class GameController {
         if (powerUp.name().equals("IncorrectAnswer") && game.getQuestion().get() instanceof MCQuestion) {
             MCQuestion question = (MCQuestion) game.getQuestion().get();
             Set<Activity> activityList =  question.getActivities();
-            for (Activity activ : activityList)
+            for (Activity activ : activityList) {
                 if (!activ.getDTO().equals((question.getRightAnswer().getResponse().get(0)))) {
                     // Get the first activity doesn't have the right answer
-                    return ResponseEntity.ok(Optional.of(activ.getDTO()));
+                    return ResponseEntity.ok(activ.getDTO());
                 }
+            }
         }
         // Return 200
         return ResponseEntity.ok().build();

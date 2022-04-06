@@ -274,7 +274,7 @@ public class GameCommunication {
             @Override
             public void completed(Response response) {
                 if (response.getStatus() == 200) {
-                    handleSuccess.handle(response.readEntity(new GenericType<Optional<ActivityDTO>>(){}));
+                    handleSuccess.handle(response.readEntity(ActivityDTO.class));
                 } else {
                     handleFail.handle(response.readEntity(ApiError.class));
                 }
@@ -386,7 +386,7 @@ public class GameCommunication {
      * Handler for when sending a power-up succeeds.
      */
     public interface SendPowerUpHandlerSuccess {
-        void handle(Optional<ActivityDTO> activity);
+        void handle(ActivityDTO activity);
     }
 
     /**
