@@ -83,9 +83,11 @@ The Quizzz app consists of three components: the database, server, and client. E
 
 In order to populate the database, a helper script is provided: `populate_db.py`. To run it, you will need the activity bank (included in `./activities` directory), as well as an emoji bank (provided in `./reactions/`).
 
-Then, run: `python populate_db.py -c 100 ./activities/ ./reactions/`. The script will import all activities (images included) and reactions. Uploading images requires the `requests` [Python library](https://docs.python-requests.org/en/latest/).
+Then, run: `python populate_db.py -c 100 -u "<url of the server>" ./activities/ ./reactions/`. The script will import all activities (images included) and reactions. Uploading images requires the `requests` [Python library](https://docs.python-requests.org/en/latest/).
 
-For more configuration options run `python populate_db.py --help`.
+If you're running the server locally, the URL will most likely be: `http://localhost:8080/`. If you host the server elsewhere, adjust the URL accordingly.
+
+This script supports more configuration options; for a list and a brief description of the functionality run `python populate_db.py --help`.
 
 ## How to contribute to it
 `<TBA>`
