@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,9 @@ import server.services.storage.StorageService;
 @Slf4j
 @Service
 public class ReactionService {
+    @Getter
     private final Map<String, UUID> reactions = new HashMap<>();
+
     @Autowired
     private StorageService storageService;
 
