@@ -316,12 +316,12 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Computes the time based score given a base score.
      *
-     * @param gamePlayer the game player that has the streak.
      * @param baseScore  the base score.
+     * @param answerTime time at which the answer was given.
+     * @param questionEndTime time at which the question ended.
      * @return the new time based score.
      */
-    public int computeTimeBasedScore(GamePlayer gamePlayer, int baseScore,
-                                     LocalDateTime answerTime, LocalDateTime questionEndTime) {
+    public int computeTimeBasedScore(int baseScore, LocalDateTime answerTime, LocalDateTime questionEndTime) {
         // Calculate answer time  - question answer time config
         Duration timeLeft = Duration.between(answerTime, questionEndTime);
         double timeLeftAsPercentage =

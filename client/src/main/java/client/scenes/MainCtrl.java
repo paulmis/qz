@@ -51,10 +51,12 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import lombok.Generated;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Main controller for the client application.
  */
+@Slf4j
 @Generated
 public class MainCtrl {
 
@@ -420,6 +422,7 @@ public class MainCtrl {
 
         var gameLeavePane = new PopupPane(new GameLeaveScreenCtrl(
                 () -> Platform.runLater(() -> {
+                    log.info("Exit requested, closing application.");
                     Platform.exit();
                     System.exit(0);
                 }),

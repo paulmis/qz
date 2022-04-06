@@ -7,12 +7,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The leaderboard entry pane.
  * This is created only to make the
  * entry creatable inside code.
  */
+@Slf4j
 @Generated
 public class LeaderboardEntryPane extends StackPane {
 
@@ -42,6 +44,7 @@ public class LeaderboardEntryPane extends StackPane {
         try {
             view = fxmlLoader.load();
         } catch (Exception e) {
+            log.error("Error loading leaderboard entry fxml", e);
             Platform.exit();
             System.exit(0);
         }
@@ -73,6 +76,7 @@ public class LeaderboardEntryPane extends StackPane {
         try {
             view = fxmlLoader.load();
         } catch (Exception e) {
+            log.error("Error loading leaderboard entry fxml", e);
             Platform.exit();
             System.exit(0);
         }

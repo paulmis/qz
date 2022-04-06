@@ -9,11 +9,13 @@ import javafx.scene.layout.StackPane;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The player item pane.
  * It is used as a wrapper for a lobby player item.
  */
+@Slf4j
 @Generated
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -37,8 +39,9 @@ public class LobbyPlayerPane extends StackPane {
 
         // This loads the fxml
         try {
-            view = (Node) fxmlLoader.load();
+            view = fxmlLoader.load();
         } catch (Exception e) {
+            log.error("Error loading lobby player pane fxml", e);
             Platform.exit();
             System.exit(0);
         }
