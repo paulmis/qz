@@ -7,6 +7,8 @@ import client.communication.user.UserCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.UserInfoPane;
 import client.utils.ClientState;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import client.utils.communication.SSEEventHandler;
 import client.utils.communication.SSEHandler;
 import client.utils.communication.SSESource;
@@ -115,6 +117,7 @@ public class LobbyScreenCtrl implements SSESource {
      */
     @SSEEventHandler(SSEMessageType.GAME_START)
     public void gameStarted(Integer preparationDuration) {
+        SoundManager.PlayMusic(SoundEffect.GAME_START, getClass());
         mainCtrl.showGameScreen(ClientState.game.getCurrentQuestion());
         mainCtrl.getGameScreenCtrl().startTimer(Duration.ofMillis(preparationDuration));
         ClientState.previousScore = Optional.of(0);
@@ -136,6 +139,7 @@ public class LobbyScreenCtrl implements SSESource {
      */
     @FXML
     public void startButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         if (ClientState.game.getConfiguration().getCapacity() > ClientState.game.getPlayers().size()) {
             mainCtrl.showErrorSnackBar("You need to have "
                     + ClientState.game.getConfiguration().getCapacity()
@@ -178,6 +182,7 @@ public class LobbyScreenCtrl implements SSESource {
      */
     @FXML
     private void leaveButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         // Open the warning and wait for user action
         mainCtrl.openLobbyLeaveWarning(
             // If confirmed, exit the lobby
@@ -211,6 +216,7 @@ public class LobbyScreenCtrl implements SSESource {
      * Fired when the disband button is clicked.
      */
     public void disbandButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.openLobbyDisbandWarning(() -> {
             mainCtrl.closeLobbyDisbandWarning();
             this.communication.disbandLobby(response -> runLater(() -> {
@@ -239,6 +245,7 @@ public class LobbyScreenCtrl implements SSESource {
      * Fired when the user button is pressed.
      */
     public void showUserInfo() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         if (userInfo == null) {
             // Create userInfo
             userInfo = new UserInfoPane(server, new UserCommunication(), mainCtrl);
@@ -256,6 +263,7 @@ public class LobbyScreenCtrl implements SSESource {
      */
     @FXML
     public void lobbySettingsButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.openLobbySettings(ClientState.game.getConfiguration(), (conf) -> {
             // Close pop-up
             mainCtrl.closeLobbySettings();
@@ -279,12 +287,6 @@ public class LobbyScreenCtrl implements SSESource {
     public void updateView() {
         GameDTO gameDTO = ClientState.game;
 
-        // Set game's name as "host's game"
-        String hostNickname = gameDTO.getPlayers().stream()
-                .filter(player -> player.getId().equals(gameDTO.getHost()))
-                .findFirst()
-                .map(GamePlayerDTO::getNickname)
-                .orElse("N.A.");
         gameName.setText(gameDTO.getGameName());
 
         // Set game id
@@ -320,7 +322,6 @@ public class LobbyScreenCtrl implements SSESource {
      */
     private void updatePlayerList(GameDTO gameDTO, boolean isHost) {
         playerList.getChildren().clear();
-
         List<LobbyPlayerPane> playerElements = gameDTO.getPlayers().stream()
                 .sorted((p1, p2) ->
                         // Sort by join date, host always first
@@ -346,6 +347,7 @@ public class LobbyScreenCtrl implements SSESource {
 
     @FXML
     private void copyLinkButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
         content.putString(labelGameId.getText());

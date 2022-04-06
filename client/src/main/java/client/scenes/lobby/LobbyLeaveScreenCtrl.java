@@ -1,5 +1,7 @@
 package client.scenes.lobby;
 
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import com.jfoenix.controls.JFXButton;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -59,6 +61,7 @@ public class LobbyLeaveScreenCtrl implements Initializable {
      */
     @FXML
     private void cancelLeaveLobby() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         cancelHandler.handle();
     }
 
@@ -67,6 +70,7 @@ public class LobbyLeaveScreenCtrl implements Initializable {
      */
     @FXML
     private void leaveLobby() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         leaveHandler.handle();
     }
 

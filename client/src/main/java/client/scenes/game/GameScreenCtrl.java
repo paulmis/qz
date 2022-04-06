@@ -9,6 +9,8 @@ import client.scenes.questions.QuestionPane;
 import client.scenes.questions.StartGamePane;
 import client.utils.ClientState;
 import client.utils.FileUtils;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import client.utils.communication.SSEEventHandler;
 import client.utils.communication.SSEHandler;
 import client.utils.communication.SSESource;
@@ -90,7 +92,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
 
     private StackPane centerPane;
 
-    private SimpleIntegerProperty volume;
     private List<FontAwesomeIcon> volumeIconList;
 
     private SimpleIntegerProperty timeLeft;
@@ -161,6 +162,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @SSEEventHandler(SSEMessageType.START_QUESTION)
     public void toQuestionStage(Integer delay) {
+        SoundManager.PlayMusic(SoundEffect.QUESTION_START, getClass());
         log.debug("Question stage handler triggered. Delay: {}", delay);
 
         communication.getQuestionNumber(ClientState.game.getId(), questionNumber -> runLater(() -> {
@@ -376,10 +378,12 @@ public class GameScreenCtrl implements Initializable, SSESource {
 
         if (ClientState.previousScore.isPresent()) {
             if (ClientState.previousScore.get() < player.getScore()) {
+                SoundManager.PlayMusic(SoundEffect.CORRECT_ANSWER, getClass());
                 mainCtrl.showInformationalSnackBar("You have gained "
                                 + (player.getScore() - ClientState.previousScore.get()) + " points!",
                         javafx.util.Duration.seconds(2));
             } else {
+                SoundManager.PlayMusic(SoundEffect.INCORRECT_ANSWER, getClass());
                 mainCtrl.showErrorSnackBar("You have lost "
                                 + (ClientState.previousScore.get() - player.getScore()) + " points!",
                         javafx.util.Duration.seconds(2));
@@ -396,6 +400,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
     @SSEEventHandler(SSEMessageType.POWER_UP_PLAYED)
     public void handlePowerUP(PowerUp powerUp) {
         mainCtrl.showInformationalSnackBar("A " + powerUp.name() + " Power-Up has been played!");
+        SoundManager.PlayMusic(SoundEffect.POWER_UP, getClass());
 
         switch (powerUp) {
             case HalveTime:
@@ -416,6 +421,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @SSEEventHandler(SSEMessageType.REACTION)
     public void handleReaction(ReactionDTO reaction) {
+
         // Verify that all fields are populated
         if (reaction.getUserId() == null || reaction.getReactionType() == null) {
             log.error("Received a reaction with null values");
@@ -429,6 +435,8 @@ public class GameScreenCtrl implements Initializable, SSESource {
             log.debug("Not showing the reaction as they are muted");
             return;
         }
+
+        SoundManager.PlayMusic(SoundEffect.EMOJI, getClass());
 
         // Verify that we have the reaction URI
         URI reactionUrl = this.reactions.get(reaction.getReactionType());
@@ -592,12 +600,6 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     private void setUpVolume() {
 
-        // Initializes the volume property
-        // The point of this property would be that in
-        // further issues we can bind it to a "global"
-        // settings object or something like that.
-        volume = new SimpleIntegerProperty(100);
-
         // A list of icons so we can have a swift transition
         // between them when changing the volume
         volumeIconList = Arrays.asList(
@@ -609,11 +611,11 @@ public class GameScreenCtrl implements Initializable, SSESource {
         // property. This is to ensure we can report changes
         // instantly to the ui if the volume changes from
         // outside of our control.
-        volumeSlider.valueProperty().bindBidirectional(volume);
+        volumeSlider.valueProperty().bindBidirectional(SoundManager.volume);
 
         // a listener on the volume to change the icon
         // of the volume.
-        volume.addListener((observable, oldValue, newValue) -> {
+        SoundManager.volume.addListener((observable, oldValue, newValue) -> {
 
             // Sets the glyph name of the iconView directly
             volumeIconView.setGlyphName(volumeIconList.get(
@@ -717,6 +719,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @FXML
     private void emojiBarButtonClick(ActionEvent actionEvent) {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         emojiScrollPane.setVisible(!emojiScrollPane.isVisible());
     }
 
@@ -728,6 +731,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @FXML
     private void powerUpBarButtonClick(ActionEvent actionEvent) {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         powerUpScrollPane.setVisible(!powerUpScrollPane.isVisible());
     }
 
@@ -739,7 +743,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @FXML
     private void quitButtonClick(ActionEvent actionEvent) {
-
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         // This makes the button just get you out of the lobby
         // if it has already finished.
         if (ClientState.game == null) {
@@ -789,6 +793,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @FXML
     private void settingButtonClick(ActionEvent actionEvent) {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         settingsPanel.setVisible(!settingsPanel.isVisible());
     }
 
@@ -800,7 +805,8 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @FXML
     private void volumeButtonClick(ActionEvent actionEvent) {
-        volume.setValue(volume.getValue() == 0 ? 100 : 0);
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.volume.setValue(SoundManager.volume.getValue() == 0 ? 100 : 0);
     }
 
     /**

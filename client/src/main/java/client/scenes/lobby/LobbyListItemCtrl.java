@@ -1,6 +1,8 @@
 package client.scenes.lobby;
 
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GameDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
@@ -84,11 +86,13 @@ public class LobbyListItemCtrl implements Initializable {
 
     @FXML
     private void joinLobbyButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         this.joinHandler.handle(this.game.getId());
     }
 
     @FXML
     private void showLobbyInfoButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         this.lobbyInfoPane.setVisible(!this.lobbyInfoPane.isVisible());
     }
 }

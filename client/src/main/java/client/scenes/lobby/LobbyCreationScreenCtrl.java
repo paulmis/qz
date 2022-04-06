@@ -8,6 +8,8 @@ import client.scenes.MainCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import client.utils.ClientState;
 import client.utils.ReflectionUtils;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import client.utils.communication.*;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
@@ -153,11 +155,13 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
 
     @FXML
     private void goBackToLobbies() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showLobbyListScreen();
     }
 
     @FXML
     private void lockButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         isPrivateProperty.set(!isPrivateProperty.get());
     }
 
@@ -175,6 +179,7 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
 
     @FXML
     private void createLobbyButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         // Start SSE
         ServerUtils.sseHandler.subscribe();
         bindHandler(ServerUtils.sseHandler);
@@ -204,6 +209,7 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
 
     @FXML
     private void standardGameConfigurationButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         config = new NormalGameConfigurationDTO();
         isMultiplayer.setValue(isMultiplayer.getValue());
         setUpConfigScreen();
@@ -214,6 +220,7 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
 
     @FXML
     private void survivalGameConfigurationButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         config = new SurvivalGameConfigurationDTO();
         isMultiplayer.setValue(isMultiplayer.getValue());
         setUpConfigScreen();
@@ -224,11 +231,13 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
 
     @FXML
     private void singleplayerGameButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         isMultiplayer.setValue(false);
     }
 
     @FXML
     private void multiplayerGameButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         isMultiplayer.setValue(true);
     }
 }

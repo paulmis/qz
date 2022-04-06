@@ -9,6 +9,8 @@ import client.scenes.MainCtrl;
 import client.scenes.UserInfoPane;
 import client.utils.AlgorithmicUtils;
 import client.utils.ClientState;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
@@ -69,16 +71,18 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void leaderboardButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showGlobalLeaderboardScreen();
     }
 
     @FXML
     private void settingsButtonClick() {
-        System.out.println("Settings");
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
     }
 
     @FXML
     private void userButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         if (userInfo == null) {
             // Create userInfo
             userInfo = new UserInfoPane(new ServerUtils(), new UserCommunication(), mainCtrl);
@@ -93,11 +97,17 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void createLobbyButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
+        createLobby();
+    }
+
+    private void createLobby() {
         mainCtrl.showLobbyCreationScreen();
     }
 
     @FXML
     private void searchButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         updateLobbyList(searchField.getText());
     }
 
@@ -118,7 +128,7 @@ public class LobbyListCtrl implements Initializable {
                     lobbyListVbox.getChildren().clear();
 
                     Comparator<GameDTO> comparator = Comparator.comparing(gameDTO ->
-                            AlgorithmicUtils.levenshteinDistance(filter, createSearchableString(gameDTO)));
+                            AlgorithmicUtils.levenshteinDistance(filter, gameDTO.getGameName()));
 
                     var sortedLobbies = games.stream().sorted(comparator);
 
@@ -142,12 +152,13 @@ public class LobbyListCtrl implements Initializable {
      */
     @FXML
     private void joinRandomLobby() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         communication.getLobbies(
                 games -> {
                     // Gets a random available lobby and joins it
                     games.removeIf(game -> (game.getConfiguration().getCapacity() <= game.getPlayers().size()));
                     if (games.isEmpty()) {
-                        this.createLobbyButtonClick();
+                        this.createLobby();
                     } else {
                         var game = games.get(new Random().nextInt(games.size()));
                         communication.joinLobby(game.getId(), gameDTO -> {
@@ -161,26 +172,19 @@ public class LobbyListCtrl implements Initializable {
                 },
                 () -> {
                     // If there are no available games, the user creates a new lobby
-                    runLater(() -> {
-                        this.createLobbyButtonClick();
-                    });
+                    runLater(this::createLobby);
                 });
-    }
-
-
-
-    private String createSearchableString(GameDTO game) {
-        return game.getPlayers().stream().filter(gamePlayerDTO -> gamePlayerDTO.getId().equals(game.getHost()))
-                .findFirst().get().getNickname();
     }
 
     @FXML
     private void fetchButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         updateLobbyList(searchField.getText());
     }
 
     @FXML
     private void joinPrivateLobbyButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         communication.joinPrivateLobby(privateLobbyTextField.getText(), gameDTO -> runLater(() -> {
             mainCtrl.showInformationalSnackBar("Joined the lobby!");
             mainCtrl.showLobbyScreen();

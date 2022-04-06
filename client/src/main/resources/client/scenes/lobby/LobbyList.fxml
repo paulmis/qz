@@ -19,14 +19,9 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <JFXButton fx:id="leaderboardButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="870.0" layoutY="3.0" onAction="#leaderboardButtonClick" prefHeight="40.0" prefWidth="40.0" text="Leaderboard" textFill="WHITE">
+            <JFXButton fx:id="leaderboardButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="912.0" layoutY="3.0" onAction="#leaderboardButtonClick" prefHeight="40.0" prefWidth="40.0" text="Leaderboard" textFill="WHITE">
                <graphic>
                   <FontAwesomeIconView glyphName="TROPHY" size="36" />
-               </graphic>
-            </JFXButton>
-            <JFXButton fx:id="settingsButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="920.0" layoutY="3.0" onAction="#settingsButtonClick" prefHeight="40.0" prefWidth="40.0" text="Settings" textFill="WHITE">
-               <graphic>
-                  <FontAwesomeIconView glyphName="COG" size="36" />
                </graphic>
             </JFXButton>
             <JFXButton fx:id="userButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="968.0" layoutY="3.0" onAction="#userButtonClick" prefHeight="40.0" prefWidth="40.0" text="User" textFill="WHITE">

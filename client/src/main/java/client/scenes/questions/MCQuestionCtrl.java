@@ -5,6 +5,8 @@ import static javafx.application.Platform.runLater;
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
 import client.utils.ClientState;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.AnswerDTO;
 import commons.entities.questions.MCQuestionDTO;
@@ -66,6 +68,7 @@ public abstract class MCQuestionCtrl extends QuestionCtrl {
             // Add the callback
             button
                 .setOnAction((actionEvent) -> {
+                    SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
                     if (button != chosenAnswer) {
                         // Send the answer
                         GameCommunication.putAnswer(

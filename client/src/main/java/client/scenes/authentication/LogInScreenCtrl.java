@@ -3,9 +3,7 @@ package client.scenes.authentication;
 import static javafx.application.Platform.runLater;
 
 import client.scenes.MainCtrl;
-import client.utils.ClientState;
-import client.utils.EncryptionUtils;
-import client.utils.PreferencesManager;
+import client.utils.*;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
@@ -115,6 +113,7 @@ public class LogInScreenCtrl implements Initializable {
      */
     @FXML
     private void logInButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         if (!emailField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
             if (ServerUtils.isValidEmail(emailField.getText())) {
                 RegisterScreenCtrl.setCredentialsFromFields(rememberUser, emailField, passwordField);
@@ -172,11 +171,13 @@ public class LogInScreenCtrl implements Initializable {
      */
     @FXML
     private void createAccountButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showRegisterScreen();
     }
 
     @FXML
     private void adminPanelButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showActivityListScreen();
     }
 }

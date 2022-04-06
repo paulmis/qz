@@ -68,6 +68,7 @@ public class GameLeaveScreenCtrl implements Initializable {
      */
     @FXML
     private void leaveGame() {
+
         leaveHandler.handle();
     }
 

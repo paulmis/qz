@@ -3,9 +3,7 @@ package client.scenes;
 import static javafx.application.Platform.runLater;
 
 import client.communication.user.UserCommunication;
-import client.utils.ClientState;
-import client.utils.FileUtils;
-import client.utils.PreferencesManager;
+import client.utils.*;
 import client.utils.communication.ServerUtils;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
@@ -61,6 +59,7 @@ public class UserInfoCtrl implements Initializable {
 
     @FXML
     private void editButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         usernameField.setEditable(!this.usernameField.isEditable());
         if (!usernameField.isEditable() && !ClientState.user.getUsername().equals(usernameField.getText())) {
             // Send update to server
@@ -82,6 +81,7 @@ public class UserInfoCtrl implements Initializable {
 
     @FXML
     private void signOutButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         log.info("Signing out");
         server.signOut();
         PreferencesManager.preferences.remove("email");

@@ -1,6 +1,8 @@
 package client.scenes.admin;
 
 import client.scenes.MainCtrl;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import com.ctc.wstx.util.URLUtil;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextArea;
@@ -116,6 +118,7 @@ public class EditActivityScreenCtrl implements Initializable {
 
     @FXML
     private void saveActivityButtonClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         try {
             URL url = new URL(activitySourceTextArea.getText());
             url.toURI();
@@ -127,6 +130,7 @@ public class EditActivityScreenCtrl implements Initializable {
 
     @FXML
     private void changeImageClick() {
+        SoundManager.PlayMusic(SoundEffect.BUTTON_CLICK, getClass());
         var fileSelector = new FileChooser();
         FileChooser.ExtensionFilter imageFilter =
                 new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.jpeg", "*.png");
