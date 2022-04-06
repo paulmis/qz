@@ -9,28 +9,9 @@ import json
 import logging
 import io
 import os
-from typing import Any
 
 import requests
 import urllib.parse
-
-import create_questions
-
-
-class Response:
-    """
-    Wrapper for response from post_data()
-    """
-
-    def __init__(self, resp_data: bytes, status_code: int):
-        """Initialize a new Response object
-
-        Args:
-            resp_data (bytes): response data
-            status_code (int): response status code
-        """
-        self.content: bytes = resp_data
-        self.status_code: int = status_code
 
 
 def status_is_ok(status_code: int) -> bool:
@@ -138,12 +119,6 @@ auth_group.add_argument(
     action="store_true",
 )
 auth_group.add_argument(
-    "-r",
-    "--register",
-    help="Register the user instead of trying to log in. (default: %(default)s)",
-    action="store_true",
-)
-auth_group.add_argument(
     "-e",
     "--email",
     help="E-mail to use for authentication. (default: %(default)s)",
@@ -210,34 +185,24 @@ HEADERS = {}
 if args.auth_enabled:
     logging.info("Authentication enabled")
 
-    # Obtain the JWT token to access the protected endpoint
-    data = json.dumps(
-        {"email": args.email, "username": args.email, "password": args.password}
-    )
-    # Check if we need to login or register
-    if args.register:
-        AUTH_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/auth/register")
-        logging.debug(f'Registering user "{args.email}"...')
-    else:
-        AUTH_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/auth/login")
-        logging.debug(f'Logging in user "{args.email}"...')
+    AUTH_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/auth/login")
+    logging.debug(f'Logging in user "{args.email}"...')
 
     # Perform the request to the correct endpoint
-    result = post(AUTH_ENDPOINT, data)
+    result = requests.post(
+        AUTH_ENDPOINT,
+        json={"email": args.email, "username": args.email, "password": args.password},
+    )
     # If the request failed, exit with an error
     if not status_is_ok(result.status_code):
-        logging.error(
-            f"Failed to {'register' if args.register else 'login'} user \"{args.email}\"."
-        )
+        logging.error(f'Failed to login user "{args.email}".')
         logging.error(f"Status code: {result.status_code}")
-        logging.error(f'Response: "{result.data.decode()}"')
+        logging.error(f'Response: "{result.text}"')
         exit(1)
 
     # If the request succeeded, load the JWT token
-    logging.debug(
-        f"Successfully {'registered' if args.register else 'logged in'} user \"{args.email}\"."
-    )
-    token = result.data.decode()
+    logging.debug(f'Successfully logged in user "{args.email}".')
+    token = result.text
     HEADERS["Authorization"] = f"Bearer {token}"
 else:
     logging.info("Authentication disabled")
@@ -296,7 +261,7 @@ for i in range(0, len(activities), args.chunk_size):
     if not status_is_ok(resp.status_code):
         logging.error(f"Failed to add activities {i} to {i + args.chunk_size}")
         logging.error(f"Status code: {resp.status_code}")
-        logging.error(f'Response: "{resp.content.decode()}"')
+        logging.error(f'Response: "{resp.text}"')
         exit(1)
 
     logging.info(f"Added activities {i} to {i + args.chunk_size}")
@@ -306,7 +271,7 @@ logging.info("Uploading reactions")
 API_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/reaction")
 
 with open(os.path.join(args.reactions_dir, "reactions.json"), "r") as reactions_file:
-        reactions = json.load(reactions_file)["reactions"]
+    reactions = json.load(reactions_file)["reactions"]
 logging.info(f"Loaded {len(reactions)} reactions.")
 
 for reaction in reactions:
@@ -316,6 +281,7 @@ for reaction in reactions:
 
     response = requests.post(
         API_ENDPOINT,
+        headers=HEADERS,
         files=[
             (
                 "reaction",
@@ -341,6 +307,5 @@ for reaction in reactions:
         exit(1)
 
     logging.info(f"Successfully added reaction {reaction['name']}.")
->>>>>>> 26524e49 (feat(qol): Merge reaction and activities scripts)
 
 logging.info("Done.")
