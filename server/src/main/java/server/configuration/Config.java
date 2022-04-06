@@ -16,14 +16,11 @@
 
 package server.configuration;
 
-import commons.entities.questions.MCType;
 import java.util.Random;
 import lombok.Generated;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import server.database.entities.question.EstimateQuestion;
-import server.database.entities.question.MCQuestion;
 
 /**
  * Configuration of the quiz application.
@@ -54,36 +51,4 @@ public class Config {
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         return scheduler;
     }
-
-    /**
-     * Structure representing a question class and its subtypes.
-     */
-    public static class QuestionType {
-        public Class questionType;
-        public Enum questionSubtype;
-
-        public QuestionType(Class type, Enum subtype) {
-            this.questionType = type;
-            this.questionSubtype = subtype;
-        }
-
-        public QuestionType(Class type) {
-            this(type, null);
-        }
-    }
-
-    /**
-     * Array of enabled question types.
-     */
-    public static final QuestionType[] enabledQuestionTypes = {
-        new QuestionType(MCQuestion.class, MCType.GUESS_COST),
-        new QuestionType(MCQuestion.class, MCType.GUESS_ACTIVITY),
-        new QuestionType(MCQuestion.class, MCType.INSTEAD_OF),
-        new QuestionType(EstimateQuestion.class),
-    };
-
-    /**
-     * Number of attempts in generating a question from the activities before giving up.
-     */
-    public static final int questionGenerationAttempts = 1000;
 }

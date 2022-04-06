@@ -8,13 +8,14 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import server.configuration.Config;
+import server.configuration.QuestionGenerationConfiguration;
 import server.database.entities.question.Activity;
 import server.database.entities.question.EstimateQuestion;
 import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
 import server.database.repositories.question.ActivityRepository;
 import server.database.repositories.question.QuestionRepository;
+import server.utils.QuestionType;
 
 /**
  * Generate question.
@@ -55,15 +56,16 @@ public class QuestionService {
         // We need to generate a pool of questions containing an equal amount of each kind
         // Therefore the size of the pool must be a multiple of Config.enabledQuestionTypes.length
         int poolSize = count;
-        if (poolSize % Config.enabledQuestionTypes.length != 0) {
-            poolSize += Config.enabledQuestionTypes.length - (count % Config.enabledQuestionTypes.length);
+        if (poolSize % QuestionGenerationConfiguration.enabledQuestionTypes.length != 0) {
+            poolSize += QuestionGenerationConfiguration.enabledQuestionTypes.length
+                    - (count % QuestionGenerationConfiguration.enabledQuestionTypes.length);
         }
 
         int failedAttempts = 0;
         for (int idx = 0; idx < poolSize; idx++) {
             // Check failed attempts, otherwise the loop might run forever
             // Allow for a certain amount of failed attempts before giving up
-            if (failedAttempts >= Config.questionGenerationAttempts) {
+            if (failedAttempts >= QuestionGenerationConfiguration.questionGenerationAttempts) {
                 log.error("Could not provide any question: not enough activities in the database.");
                 throw new IllegalStateException("Not enough activities in the database.");
             }
@@ -74,10 +76,12 @@ public class QuestionService {
             // Sanitize the description
             String answerDescription = sanitizeDescription(answer.getDescription());
 
+            // Select the question type
+            QuestionType questionKind = QuestionGenerationConfiguration
+                            .enabledQuestionTypes[idx % QuestionGenerationConfiguration.enabledQuestionTypes.length];
+
             // Generate question
             Question newQuestion;
-            // Select the question type
-            Config.QuestionType questionKind = Config.enabledQuestionTypes[idx % Config.enabledQuestionTypes.length];
             if (questionKind.questionType.equals(MCQuestion.class)) {
                 // MC questions
                 Activity correctOption;
