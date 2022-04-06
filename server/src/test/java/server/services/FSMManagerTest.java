@@ -40,10 +40,10 @@ class FSMManagerTest {
     private ThreadPoolTaskScheduler taskScheduler;
     @Mock
     private QuizConfiguration quizConfiguration;
-    @InjectMocks
-    private GameService gameService;
     @Mock
     private GameRepository gameRepository;
+    @InjectMocks
+    private GameService gameService;
 
     private FSMContext context;
 
@@ -133,7 +133,6 @@ class FSMManagerTest {
     void startFSMAlreadyStarted() {
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
         fsm.getContext().setGameService(gameService);
-        fsm.getContext().getGameService().setGameRepository(gameRepository);
         when(gameRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(game));
 
         // Add a new FSM

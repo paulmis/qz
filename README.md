@@ -65,9 +65,11 @@ The Quizzz app consists of three components: the database, server, and client. E
 
 #### Server:
 
-1. Run the `Main` java file in the `/server/src/main/java` directory
+1. Populate the database (see the section)
+2. Populate emoji list (see the section)
+3. Run the `Main` java file in the `/server/src/main/java` directory
    * This may take a few minutes during the initial build/run
-2. The server has launched successfully if the log ends with `Started Main in ... seconds (JVM running for ...)`
+4. The server has launched successfully if the log ends with `Started Main in ... seconds (JVM running for ...)`
     * if you are getting a `PSQLException` when running the server or the tests, then the database connection is failing
 
 #### Client:
@@ -79,9 +81,9 @@ The Quizzz app consists of three components: the database, server, and client. E
 
 ### Populating the database
 
-In order to populate the database, a helper script is provided: `populate_db.py`. To run it, you will need the activity bank (included in `./activities` directory).
+In order to populate the database, a helper script is provided: `populate_db.py`. To run it, you will need the activity bank (included in `./activities` directory), as well as an emoji bank (provided in `./reactions/`).
 
-Then, run: `python populate_db.py ./activities/ -c 100 -q -m 100`. The script will import all activities (images included) and generate 100 multiple choice questions. Uploading images requires the `requests` python library. If you don't want to install the library, you can use the script without uploading pictures, by specifying the `-i` command line switch.
+Then, run: `python populate_db.py -c 100 ./activities/ ./reactions/`. The script will import all activities (images included) and reactions. Uploading images requires the `requests` [Python library](https://docs.python-requests.org/en/latest/).
 
 For more configuration options run `python populate_db.py --help`.
 

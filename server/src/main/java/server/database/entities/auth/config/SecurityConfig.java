@@ -37,8 +37,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeHttpRequests()
                     .antMatchers("/api/auth/**").permitAll()
+                    .antMatchers("/api/misc/ping").permitAll()
                     .antMatchers("/api/leaderboard/**").permitAll()
                     // TODO: proper access control here
+                    .antMatchers("/api/reaction").permitAll()
                     .antMatchers("/api/activity/**").permitAll()
                     .antMatchers("/api/resource/**").permitAll()
                     .antMatchers("/api/question/**").permitAll()

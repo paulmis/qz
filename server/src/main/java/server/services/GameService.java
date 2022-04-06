@@ -3,19 +3,19 @@ package server.services;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.PowerUp;
-import commons.entities.game.Reaction;
+import commons.entities.game.ReactionDTO;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
-import commons.entities.questions.MCType;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +30,10 @@ import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.exceptions.GameFinishedException;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
-import server.database.entities.question.Activity;
-import server.database.entities.question.EstimateQuestion;
-import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
-import server.database.repositories.question.ActivityRepository;
-import server.database.repositories.question.QuestionRepository;
 import server.services.answer.AnswerCollection;
 import server.services.fsm.DefiniteGameFSM;
 import server.services.fsm.FSMContext;
@@ -59,7 +54,6 @@ public class GameService {
 
     @Autowired
     @Getter
-    @Setter
     private GameRepository gameRepository;
 
     @Autowired
@@ -70,7 +64,6 @@ public class GameService {
 
     @Autowired
     @Getter
-    @Setter
     private UserRepository userRepository;
 
     @Autowired
@@ -83,6 +76,9 @@ public class GameService {
     @Autowired
     @Getter
     private ThreadPoolTaskScheduler taskScheduler;
+
+    @Autowired
+    private ReactionService reactionService;
 
     /**
      * Starts a new game, by verifying the starting conditions and creating a questions set.
@@ -384,18 +380,18 @@ public class GameService {
         }
 
         log.info("Sending power-up " + powerUp.name() + " to game: " + game.getGameId());
-        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.POWER_UP_PLAYED, powerUp.name()));
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.POWER_UP_PLAYED, powerUp));
     }
 
     /**
      * Sends a reaction to the players in a game.
      *
-     * @param game     the game.
-     * @param player   the player that sent the power-up
+     * @param game the game.
      * @param reaction the reaction that is to be sent to the other players.
+     * @return whether the reaction was sent successfully.
      */
-    public void sendReaction(Game game, GamePlayer player, Reaction reaction) {
-        log.info("Sending reaction" + reaction.name() + " to game: " + game.getGameId());
-        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.REACTION, reaction.name()));
+    public boolean sendReaction(Game game, ReactionDTO reaction) {
+        log.debug("Sending reaction {} to game {}", reaction.getReactionType(), game.getGameId());
+        return sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.REACTION, reaction));
     }
 }

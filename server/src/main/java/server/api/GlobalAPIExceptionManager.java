@@ -4,6 +4,7 @@ import commons.entities.utils.ApiError;
 import java.util.List;
 import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import server.exceptions.ResourceNotFoundException;
 /**
  * Provides global API exception handling.
  */
+@Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class GlobalAPIExceptionManager {
@@ -81,6 +83,7 @@ public class GlobalAPIExceptionManager {
     @ResponseBody
     @ExceptionHandler(ResourceNotFoundException.class)
     public ApiError handleResourceNotFoundException(ResourceNotFoundException ex) {
+        log.warn("Resource not found: {}", ex.getMessage());
         return new ApiError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 
@@ -91,6 +94,7 @@ public class GlobalAPIExceptionManager {
         LobbyNotFoundException.class,
         GameNotFoundException.class})
     public ApiError handleNotFoundException(Exception ex) {
+        log.warn("Not found exception ({}): {}", ex.getClass().getSimpleName(), ex.getMessage());
         return new ApiError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 
