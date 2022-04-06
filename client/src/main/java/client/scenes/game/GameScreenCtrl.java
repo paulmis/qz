@@ -53,6 +53,7 @@ import javafx.scene.shape.Circle;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.cxf.common.util.StringUtils;
 
 
 /**
@@ -640,6 +641,8 @@ public class GameScreenCtrl implements Initializable, SSESource {
                     this.communication.sendReaction(reaction,
                             () -> log.debug("Reaction sent successfully"),
                             (error) -> this.mainCtrl.showErrorSnackBar("Failed to send reaction"));
+
+                    jfxButton.setTooltip(new Tooltip(StringUtils.capitalize(entry.getValue().toString())));
                 });
                 return jfxButton;
             }).collect(Collectors.toList()));
