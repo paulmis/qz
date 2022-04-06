@@ -421,6 +421,12 @@ public class GameScreenCtrl implements Initializable, SSESource {
 
         log.debug("Received reaction {} from user {}", reaction.getReactionType(), reaction.getUserId());
 
+        // Check if the reactions are muted
+        if (muteEveryoneToggleButton.isSelected()) {
+            log.debug("Not showing the reaction as they are muted");
+            return;
+        }
+
         // Verify that we have the reaction URI
         URI reactionUrl = this.reactions.get(reaction.getReactionType());
         String userImageUrl = this.userProfilePictures.get(reaction.getUserId());
