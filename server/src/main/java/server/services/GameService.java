@@ -321,7 +321,7 @@ public class GameService {
         // Update game score
         question.checkAnswer(answerCollection).entrySet().forEach(entry -> {
             Optional<GamePlayer> gamePlayer = game.getPlayers().values().stream()
-                    .filter(p -> ((GamePlayer)p).getId().equals(entry.getKey())).findFirst();
+                    .filter(p -> ((GamePlayer) p).getId().equals(entry.getKey())).findFirst();
             if (gamePlayer.isEmpty()) {
                 return;
             }
