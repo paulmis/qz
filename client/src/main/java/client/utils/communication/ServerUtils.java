@@ -19,6 +19,7 @@ package client.utils.communication;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM;
 
+import client.communication.admin.AdminCommunication;
 import client.utils.Authenticator;
 import client.utils.ClientState;
 import client.utils.EncryptionUtils;
@@ -26,6 +27,7 @@ import client.utils.PreferencesManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import commons.entities.ActivityDTO;
 import commons.entities.auth.LoginDTO;
 import commons.entities.auth.UserDTO;
 import commons.entities.utils.ApiError;
@@ -110,23 +112,6 @@ public class ServerUtils {
             return false;
         }
         return emailPattern.matcher(email).matches();
-    }
-
-    /** Gets a list of the leaderboard images from the server.
-     *
-     * @return a list of leaderboard images.
-     */
-    public List<URL> getLeaderBoardImages() {
-        try {
-            return Arrays.asList(
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"));
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
     }
 
     /**
@@ -332,6 +317,57 @@ public class ServerUtils {
             });
         }
         return new ArrayList<>();
+    }
+
+    /**
+     * The get user info handler success.
+     */
+    public interface GetUserInfoHandlerSuccess {
+        void handle(UserDTO userDTO);
+    }
+
+    /**
+     * The get user info handler fail.
+     */
+    public interface GetUserInfoHandlerFail {
+        void handle(ApiError error);
+    }
+
+    /**
+     * Gets information about a user by their id.
+     *
+     * @param userId the id of the user
+     * @param handleSuccess the function to call on a successful request.
+     * @param handleFail the function to call on a failed request.
+     */
+    public static void getUserInfoById(UUID userId,
+                                GetUserInfoHandlerSuccess handleSuccess,
+                                GetUserInfoHandlerFail handleFail) {
+        // Build the query invocation
+        Invocation request = ServerUtils.getRequestTarget()
+                .path("/api/user/" + userId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildGet();
+
+        // Perform the query asynchronously
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    handleSuccess.handle(response.readEntity(UserDTO.class));
+                } else {
+                    ApiError error = response.readEntity(ApiError.class);
+                    handleFail.handle(error);
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                throwable.printStackTrace();
+                handleFail.handle(null);
+            }
+        });
     }
 
     public void signOut() {

@@ -9,6 +9,7 @@ import commons.entities.utils.Views;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import javax.validation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,21 @@ public class UserController {
                 "",
                 game == null ? null : game.getDTO(),
                 user.getDTO()));
+    }
+
+    /**
+     * Gets the details of an arbitrary user.
+     *
+     * @return details of the requested user.
+     */
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserDTO> getById(@PathVariable UUID userId) {
+        log.trace("Getting user details");
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+        return ResponseEntity.ok(user.get().getDTO());
     }
 
     /**

@@ -27,7 +27,7 @@ public class LobbyPlayerPane extends StackPane {
     /**
      * The constructor of the class. Initializes the view, adds it to the stack pane and creates a controller.
      */
-    public LobbyPlayerPane(GamePlayerDTO playerDTO) {
+    public LobbyPlayerPane(GamePlayerDTO playerDTO, LobbyPlayerCtrl.KickOutPlayer kickAction) {
 
         // We create the loader for the fxml of the lobby list item
         FXMLLoader fxmlLoader =
@@ -35,7 +35,7 @@ public class LobbyPlayerPane extends StackPane {
 
         // We set the controller of the fxml to our newly created controller and add the two required arguments.
         fxmlLoader.setControllerFactory(param ->
-                controller = new LobbyPlayerCtrl(playerDTO));
+                controller = new LobbyPlayerCtrl(playerDTO, kickAction));
 
         // This loads the fxml
         try {
