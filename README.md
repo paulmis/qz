@@ -79,19 +79,11 @@ The Quizzz app consists of three components: the database, server, and client. E
 2. Execute `gradle run` (`./gradlew run` on MacOS and Linux) or run `Main` in `/client` to launch the client 
    * the client will spawn in the background
 
-### Populating the emoji list
-
-To populate the emoji list, run the `upload_reactions.py` script. A sample set of emojis is provided in `reactions/`, but you can use your own set.
-
-The script can be run by typing `python upload_reactions.py reactions/` into your terminal. You will need `requests` library installed.
-
-To see all available options, run `python upload_reactions.py --help`.
-
 ### Populating the database
 
-In order to populate the database, a helper script is provided: `populate_db.py`. To run it, you will need the activity bank (included in `./activities` directory).
+In order to populate the database, a helper script is provided: `populate_db.py`. To run it, you will need the activity bank (included in `./activities` directory), as well as an emoji bank (provided in `./reactions/`).
 
-Then, run: `python populate_db.py ./activities/ -c 100 -q -m 100`. The script will import all activities (images included) and generate 100 multiple choice questions. Uploading images requires the `requests` python library. If you don't want to install the library, you can use the script without uploading pictures, by specifying the `-i` command line switch.
+Then, run: `python populate_db.py -c 100 ./activities/ ./reactions/`. The script will import all activities (images included) and reactions. Uploading images requires the `requests` [Python library](https://docs.python-requests.org/en/latest/).
 
 For more configuration options run `python populate_db.py --help`.
 
