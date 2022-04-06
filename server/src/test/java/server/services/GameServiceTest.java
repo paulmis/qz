@@ -355,7 +355,6 @@ public class GameServiceTest {
         // Set the game to be started and mock the repository
         game.setStatus(GameStatus.ONGOING);
         when(gameRepository.save(game)).thenReturn(game);
-        gameService.setUserRepository(userRepository);
         when(userRepository.findById(joe.getId())).thenReturn(Optional.ofNullable(joe));
         when(userRepository.findById(susanne.getId())).thenReturn(Optional.ofNullable(susanne));
 

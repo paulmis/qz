@@ -113,7 +113,10 @@ public class ActivityController {
             HttpHeaders headers = new HttpHeaders();
             headers.setLocation(storageService.getURI(icon));
             return new ResponseEntity<>(headers, HttpStatus.FOUND);
-        }).orElseThrow(() -> new ResourceNotFoundException("Activity not found"));
+        }).orElseGet(() -> {
+            log.warn("Failed to find activity '{}'", activityId);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        });
     }
     
     /**
@@ -123,6 +126,7 @@ public class ActivityController {
      */
     @GetMapping
     ResponseEntity<List<ActivityDTO>> getInUse() {
+        log.trace("Returning all activities in use");
         List<ActivityDTO> activities = activityRepository.findByAbandonedIsFalse()
                 .stream()
                 .map(Activity::getDTO)

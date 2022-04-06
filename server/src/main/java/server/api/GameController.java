@@ -80,9 +80,10 @@ public class GameController {
         // Check if game exists.
         Optional<Game> game = gameRepository.findById(gameId);
         if (game.isEmpty()) {
-            log.warn("User {} does not exist", AuthContext.get());
+            log.warn("Game {} does not exist", AuthContext.get());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
         Optional<Question> question = game.get().getQuestion();
         // Check if question is not empty;
         if (question.isEmpty()) {
@@ -101,6 +102,7 @@ public class GameController {
      */
     @GetMapping("/{gameId}/leaderboard")
     ResponseEntity<List<GamePlayerDTO>> getGameLeaderboard(@PathVariable UUID gameId) {
+        log.debug("Getting leaderboard for game {}", gameId);
         // Return the players in the game, sorted by score
         List<GamePlayerDTO> players = gamePlayerRepository
                 .findByGame_IdEqualsAndAbandonedIsFalseOrderByScoreDesc(gameId)
@@ -124,24 +126,19 @@ public class GameController {
      *
      * @param powerUp powerup to use
      * @return 200 if the powerup was used successfully, 404 if the powerup was not found,
-     * @throws SSEFailedException if the powerup failed to use
      */
     @PostMapping("/powerUp")
-    ResponseEntity sendPowerUp(@RequestBody PowerUp powerUp) throws SSEFailedException {
-        // If the user or the game don't exist, throw exception
-        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(AuthContext.get());
-        if (userOpt.isEmpty()) {
-            throw new UserNotFoundException();
-        }
+    ResponseEntity sendPowerUp(@RequestBody PowerUp powerUp) {
+        User user = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(() -> {
+            log.error("User not found: {}", AuthContext.get());
+            return new UserNotFoundException();
+        });
 
         // If the user isn't in a game, throw exception
-        Optional<Game> gameOpt = gameRepository.getPlayersGame(userOpt.get().getId());
-        if (gameOpt.isEmpty()) {
-            throw new GameNotFoundException();
-        }
-
-        User user = userOpt.get();
-        Game game = gameOpt.get();
+        Game game = gameRepository.getPlayersGame(user.getId()).orElseThrow(() -> {
+            log.error("User not in game: {}", AuthContext.get());
+            return new GameNotFoundException();
+        });
 
         GamePlayer gamePlayer = (GamePlayer) game.getPlayers().get(user.getId());
 
@@ -150,40 +147,13 @@ public class GameController {
             throw new PowerUpAlreadyUsedException();
         }
 
+        log.debug("Sending power-up to game {}", game.getId());
+
         gameService.sendPowerUp(game, gamePlayer, powerUp);
         gamePlayer.getUserPowerUps().put(powerUp, game.getCurrentQuestionNumber());
         gameRepository.save(game);
 
         // Return 200
-        return ResponseEntity.ok().build();
-    }
-
-
-    /**
-     * Get the URL of the image for the specified activity.
-     *
-     * @param reaction Reaction to get.
-     * @return URL of the image associated with the activity.
-     */
-    @PostMapping("/reaction")
-    ResponseEntity sendReaction(@RequestBody Reaction reaction) throws SSEFailedException {
-        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(AuthContext.get());
-        if (userOpt.isEmpty()) {
-            throw new UserNotFoundException();
-        }
-
-        // If the user isn't in a game, throw exception
-        Optional<Game> gameOpt = gameRepository.getPlayersGame(userOpt.get().getId());
-        if (gameOpt.isEmpty()) {
-            throw new GameNotFoundException();
-        }
-
-        User user = userOpt.get();
-        Game game = gameOpt.get();
-
-        GamePlayer gamePlayer = (GamePlayer) game.getPlayers().get(user.getId());
-
-        gameService.sendReaction(game, gamePlayer, reaction);
         return ResponseEntity.ok().build();
     }
 }

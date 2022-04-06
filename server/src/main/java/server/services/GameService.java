@@ -4,6 +4,7 @@ import commons.entities.AnswerDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.PowerUp;
 import commons.entities.game.Reaction;
+import commons.entities.game.ReactionDTO;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
@@ -55,15 +56,12 @@ public class GameService {
 
     @Autowired
     @Getter
-    @Setter
     private GameRepository gameRepository;
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
 
     @Autowired
-    @Getter
-    @Setter
     private UserRepository userRepository;
 
     @Autowired
@@ -76,6 +74,9 @@ public class GameService {
     @Autowired
     @Getter
     private ThreadPoolTaskScheduler taskScheduler;
+
+    @Autowired
+    private ReactionService reactionService;
 
     /**
      * Provides the specified amount of questions, excluding the specified questions.
@@ -415,11 +416,10 @@ public class GameService {
      * Sends a reaction to the players in a game.
      *
      * @param game the game.
-     * @param player the player that sent the power-up
      * @param reaction the reaction that is to be sent to the other players.
      */
-    public void sendReaction(Game game, GamePlayer player, Reaction reaction) {
-        log.info("Sending reaction" + reaction.name() + " to game: " + game.getGameId());
-        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.REACTION, reaction.name()));
+    public void sendReaction(Game game, ReactionDTO reaction) {
+        log.debug("Sending reaction {} to game {}", reaction.getReactionType(), game.getGameId());
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.REACTION, reaction));
     }
 }

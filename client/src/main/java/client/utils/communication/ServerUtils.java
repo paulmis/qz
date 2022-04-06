@@ -300,9 +300,16 @@ public class ServerUtils {
      * Function to connect to the server and sets the server path.
      *
      * @param serverPath the server path to connect to
+     * @return whether the connection was successful or not
      */
-    public void connect(String serverPath) {
-        SERVER = serverPath;
+    public boolean connect(String serverPath) {
+        Response r = client.target(serverPath).path("/api/misc/ping").request().get();
+        if (r.getStatus() == Response.Status.OK.getStatusCode()) {
+            SERVER = serverPath;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
