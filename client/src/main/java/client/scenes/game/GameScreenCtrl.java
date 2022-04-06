@@ -622,7 +622,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
                 // Construct the button
                 JFXButton jfxButton = new JFXButton();
                 jfxButton.setPadding(Insets.EMPTY);
-                jfxButton.setRipplerFill(Color.WHITESMOKE);
+                jfxButton.setRipplerFill(Color.ORANGE);
 
                 jfxButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 
@@ -658,7 +658,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
         powerUpHBox.getChildren().clear();
 
 
-        var powerUps = Arrays.stream(PowerUp.values()).collect(Collectors.toList());
+        List<PowerUp> powerUps = Arrays.stream(PowerUp.values()).collect(Collectors.toList());
 
         try {
             powerUps.forEach(powerUp -> {
@@ -680,10 +680,13 @@ public class GameScreenCtrl implements Initializable, SSESource {
 
                 jfxButton.setGraphic(image);
 
-                jfxButton.setOnAction(event -> communication.sendPowerUp(powerUp,
-                        () -> runLater(() -> jfxButton.setDisable(true)),
-                        error -> runLater(() ->
-                                mainCtrl.showErrorSnackBar("Error occured: " + error.getDescription()))));
+                jfxButton.setOnAction(event -> {
+                    powerUpHBox.setVisible(false);
+                    communication.sendPowerUp(powerUp,
+                            () -> runLater(() -> jfxButton.setDisable(true)),
+                            error -> runLater(() ->
+                                    mainCtrl.showErrorSnackBar("Error occurred: " + error.getDescription())));
+                });
 
                 powerUpHBox.getChildren().add(jfxButton);
             });
