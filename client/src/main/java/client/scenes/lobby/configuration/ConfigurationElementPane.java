@@ -6,12 +6,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The class that encompasses the ConfigurationElement.
  * The purpose of this class is to allow the
  * initialization of the control inside code.
  */
+@Slf4j
 @Generated
 public class ConfigurationElementPane extends StackPane {
     private Node view;
@@ -41,8 +43,9 @@ public class ConfigurationElementPane extends StackPane {
 
         // Loads the fxml
         try {
-            view = (Node) fxmlLoader.load();
+            view = fxmlLoader.load();
         } catch (Exception e) {
+            log.error("Failed to load the fxml file for the ConfigurationElementPane.", e);
             Platform.exit();
             System.exit(0);
         }

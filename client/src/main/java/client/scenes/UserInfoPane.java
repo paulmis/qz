@@ -9,10 +9,12 @@ import javafx.scene.control.Control;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Pane wrapper for the User Info widget.
  */
+@Slf4j
 @Generated
 public class UserInfoPane extends StackPane {
     private Node view;
@@ -33,6 +35,7 @@ public class UserInfoPane extends StackPane {
         try {
             view = fxmlLoader.load();
         } catch (Exception e) {
+            log.error("Error loading UserInfo.fxml", e);
             Platform.exit();
             System.exit(0);
         }

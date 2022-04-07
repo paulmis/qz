@@ -4,17 +4,20 @@ import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.PowerUp;
-import commons.entities.game.Reaction;
+import commons.entities.game.ReactionDTO;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import commons.entities.questions.QuestionDTO;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +38,6 @@ import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
-import server.database.repositories.question.QuestionRepository;
 import server.services.answer.AnswerCollection;
 import server.services.fsm.DefiniteGameFSM;
 import server.services.fsm.FSMContext;
@@ -43,7 +45,7 @@ import server.services.fsm.FSMState;
 import server.services.fsm.GameFSM;
 
 /**
- * Get the questions for a specific game.
+ * Handles a specific game.
  */
 @Service
 @Slf4j
@@ -55,19 +57,17 @@ public class GameService {
     private QuizConfiguration quizConfiguration;
 
     @Autowired
-    private QuestionRepository questionRepository;
-
-    @Autowired
     @Getter
-    @Setter
     private GameRepository gameRepository;
 
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
 
     @Autowired
+    private QuestionService questionService;
+
+    @Autowired
     @Getter
-    @Setter
     private UserRepository userRepository;
 
     @Autowired
@@ -81,42 +81,8 @@ public class GameService {
     @Getter
     private ThreadPoolTaskScheduler taskScheduler;
 
-    /**
-     * Provides the specified amount of questions, excluding the specified questions.
-     *
-     * @param count         The amount of questions to return.
-     * @param usedQuestions The questions to exclude.
-     * @return Randomly chosen questions.
-     * @throws IllegalStateException If the amount of questions to return is greater than the amount of
-     *                               questions in the database.
-     */
-    public List<Question> provideQuestions(int count, List<Question> usedQuestions) throws IllegalStateException {
-        // Check that there are enough questions
-        if (questionRepository.count() < count + usedQuestions.size()) {
-            log.error("Could not provide {} questions: not enough questions in the database.", count);
-            throw new IllegalStateException("Not enough questions in the database.");
-        }
-
-        // Create a list of all the available questions
-        /*
-        List<Question> questions =
-                questionRepository
-                    .findByIdNotIn(
-                            usedQuestions
-                                    .stream()
-                                    .map(Question::getId)
-                                    .collect(Collectors.toList()));
-         */
-        // ToDo: fix QuestionRepository::findByIdNotIn
-        List<UUID> usedIds = usedQuestions.stream().map(Question::getId).collect(Collectors.toList());
-        List<Question> questions = questionRepository.findAll()
-                .stream().filter(q -> !usedIds.contains(q.getId()))
-                .collect(Collectors.toList());
-
-        // Randomize the list and return the requested amount of questions
-        Collections.shuffle(questions);
-        return questions.subList(0, count);
-    }
+    @Autowired
+    private ReactionService reactionService;
 
     /**
      * Starts a new game, by verifying the starting conditions and creating a questions set.
@@ -144,7 +110,7 @@ public class GameService {
         // Initialize the game
         if (game instanceof DefiniteGame) {
             DefiniteGame definiteGame = (DefiniteGame) game;
-            definiteGame.addQuestions(provideQuestions(definiteGame.getQuestionsCount(), new ArrayList<>()));
+            definiteGame.addQuestions(questionService.provideQuestions(definiteGame.getQuestionsCount()));
             definiteGame = gameRepository.save(definiteGame);
 
             // Create and start a finite state machine for the game.
@@ -224,6 +190,7 @@ public class GameService {
 
         // Distribute the event to all players
         log.trace("[{}] FSM runnable: accepting answers disabled.", game.getId());
+
         return sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.STOP_QUESTION, delay));
     }
 
@@ -261,9 +228,9 @@ public class GameService {
     /**
      * Add an answer to a game.
      *
-     * @param game the game to add the answer to.
+     * @param game       the game to add the answer to.
      * @param gamePlayer the player who submitted the answer.
-     * @param answer the answer to add.
+     * @param answer     the answer to add.
      * @return whether the answer was added properly.
      */
     public boolean addAnswer(Game game, GamePlayer gamePlayer, AnswerDTO answer) {
@@ -318,7 +285,7 @@ public class GameService {
     /**
      * Get answers for a specific question of a specific game.
      *
-     * @param game Game to get the answers for.
+     * @param game     Game to get the answers for.
      * @param question Question to get the answers for.
      * @return The answers for the given game and question.
      */
@@ -336,16 +303,16 @@ public class GameService {
      * @param game the game to update the score for.
      */
     public void updateScores(Game game) {
-        updateScores(game, (Question) game.getQuestion().get());
+        updateScores(game, (Question) game.getQuestion().get(), LocalDateTime.now());
     }
 
     /**
      * Update the game score to account for a specific question.
      *
-     * @param game game to update the scores for.
+     * @param game     game to update the scores for.
      * @param question question to update the scores for.
      */
-    public void updateScores(Game game, Question question) {
+    public void updateScores(Game game, Question question, LocalDateTime questionEndTime) {
         AnswerCollection answerCollection = getAnswers(game, question);
         if (answerCollection == null) {
             // If there are no answers, there's nothing to do
@@ -355,27 +322,33 @@ public class GameService {
 
         log.debug("[{}] Updating scores for question {}.", game.getId(), question.getId());
 
-        Map<UUID, Integer> scores = question.checkAnswer(answerCollection).entrySet().stream().collect(
-                Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> game.computeBaseScore(e.getValue())
-                ));
+        // Update game score
+        question.checkAnswer(answerCollection).entrySet().forEach(entry -> {
+            Optional<GamePlayer> gamePlayer = game.getPlayers().values().stream()
+                    .filter(p -> ((GamePlayer) p).getId().equals(entry.getKey())).findFirst();
+            if (gamePlayer.isEmpty()) {
+                return;
+            }
 
-        game.getPlayers().values().forEach(p -> {
-            GamePlayer player = (GamePlayer) p;
-
-            int score = Optional.ofNullable(scores.get(player.getId())).orElse(0);
+            int score = game.computeBaseScore(entry.getValue());
             boolean isCorrect = score > game.getConfiguration().getCorrectAnswerThreshold();
 
-            game.updateStreak(player, isCorrect);
+            // The answer time stamp
+            LocalDateTime answerTime = answerCollection.getAnswer(entry.getKey()).getAnswerTime();
+            // Compute score based on the quickness of answering a question
+            score = game.computeTimeBasedScore(score, answerTime, questionEndTime);
 
-            int streakScore = game.computeStreakScore(player, score);
+            // Update players' streak
+            game.updateStreak(gamePlayer.get(), isCorrect);
+            // Calculate the streak score
+            int streakScore = game.computeStreakScore(gamePlayer.get(), score);
+
             //Apply double points power up
-            game.applyScorePowerUpModifiers(player, streakScore, 2);
+            game.applyScorePowerUpModifiers(gamePlayer.get(), streakScore, 2);
             // Persist the score changes
-            gamePlayerRepository.save(player);
+            gamePlayerRepository.save(gamePlayer.get());
 
-            log.debug("[{}] player {} now has {} points", game.getId(), player.getId(), player.getScore());
+            log.debug("[{}] player {} now has {} points", game.getId(), entry.getKey(), gamePlayer.get().getScore());
         });
 
         log.debug("[{}] Scores updated.", game.getId());
@@ -385,8 +358,8 @@ public class GameService {
     /**
      * Applies a power-up to a game.
      *
-     * @param game the game.
-     * @param player the player that sent the power-up
+     * @param game    the game.
+     * @param player  the player that sent the power-up
      * @param powerUp the power-up that is to be applied.
      */
     public void sendPowerUp(Game game, GamePlayer player, PowerUp powerUp) {
@@ -411,18 +384,18 @@ public class GameService {
                 break;
         }
         log.info("Sending power-up " + powerUp.name() + " to game: " + game.getGameId());
-        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.POWER_UP_PLAYED, powerUp.name()));
+        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.POWER_UP_PLAYED, powerUp));
     }
 
     /**
      * Sends a reaction to the players in a game.
      *
      * @param game the game.
-     * @param player the player that sent the power-up
      * @param reaction the reaction that is to be sent to the other players.
+     * @return whether the reaction was sent successfully.
      */
-    public void sendReaction(Game game, GamePlayer player, Reaction reaction) {
-        log.info("Sending reaction" + reaction.name() + " to game: " + game.getGameId());
-        sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.REACTION, reaction.name()));
+    public boolean sendReaction(Game game, ReactionDTO reaction) {
+        log.debug("Sending reaction {} to game {}", reaction.getReactionType(), game.getGameId());
+        return sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.REACTION, reaction));
     }
 }

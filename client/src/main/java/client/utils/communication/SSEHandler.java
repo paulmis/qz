@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.sse.InboundSseEvent;
 import javax.ws.rs.sse.SseEventSource;
 import lombok.Generated;
@@ -59,6 +60,7 @@ public class SSEHandler {
      * @param handlerSource the handler source object. This is the source of the events handlers.
      */
     public SSEHandler(Object handlerSource) {
+        super();
         initialize(handlerSource);
     }
 
@@ -149,7 +151,7 @@ public class SSEHandler {
                     });
                 } else {
                     // Reads the object with the extracted type.
-                    Object obj = inboundSseEvent.readData(types[0]);
+                    Object obj = inboundSseEvent.readData(types[0], MediaType.APPLICATION_JSON_TYPE);
 
                     // This invokes the function with the object and the source inside a run later so
                     // javafx components can have their state changed.

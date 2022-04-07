@@ -291,6 +291,41 @@ public class LobbyController {
         return ResponseEntity.ok().build();
     }
 
+
+    @DeleteMapping("/kick/{userId}")
+    ResponseEntity kick(@PathVariable UUID userId) {
+        User executingUser
+                = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(UserNotFoundException::new);
+
+        // Check that the user is in a lobby
+        Game<?> lobby
+                = gameRepository.getPlayersLobby(executingUser.getId()).orElseThrow(PlayerNotInLobbyException::new);
+
+        // Throw error if user is not host.
+        if (!lobby.getHost().getUser().getId().equals(executingUser.getId())) {
+            throw new UserNotHostException();
+        }
+
+        User targetUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Game<?> targetLobby
+                = gameRepository.getPlayersLobby(executingUser.getId()).orElseThrow(PlayerNotInLobbyException::new);
+
+        // Throw exception if user is not in this game.
+        if (!targetLobby.getId().equals(lobby.getId())) {
+            throw new UserNotFoundException();
+        }
+
+        // Remove the player and return 200
+        lobbyService.removePlayer(lobby, targetUser);
+
+        try {
+            sseManager.send(userId, new SSEMessage(SSEMessageType.YOU_HAVE_BEEN_KICKED));
+        } catch (Exception e) {
+            log.error("Error occured while kicking out user: " + e.getMessage());
+        }
+        return ResponseEntity.ok().build();
+    }
+
     /**
      * Endpoint to delete a lobby. Only the host player can perform such action.
      *

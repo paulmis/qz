@@ -8,11 +8,13 @@ import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
-import commons.entities.game.Reaction;
+import commons.entities.game.ReactionDTO;
 import commons.entities.questions.QuestionDTO;
 import commons.entities.utils.ApiError;
-import java.net.URL;
-import java.util.*;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
@@ -178,23 +180,32 @@ public class GameCommunication {
 
     /**
      * Gets a list of all the emoji urls from the backend.
-     *
-     * @return List of emoji urls
      */
-    public List<URL> getEmojis() {
-        try {
-            return Arrays.asList(
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"),
-                    new URL("https://emoji.gg/assets/emoji/8434-epic-awesome.png"));
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
+    public void getReactions(GetReactionsHandlerSuccess handlerSuccess, GetReactionsHandlerFail handlerFail) {
+        Invocation request = ServerUtils.getRequestTarget()
+                .path("/api/reaction")
+                .request(APPLICATION_JSON)
+                .buildGet();
+
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    Map<String, URI> urls = response.readEntity(new GenericType<>() {
+                    });
+                    handlerSuccess.handle(urls);
+                } else {
+                    log.error("Failed to get the reactions: status code {}", response.getStatus());
+                    handlerFail.handle();
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                log.error("Failed to get the reactions", throwable);
+                handlerFail.handle();
+            }
+        });
     }
 
     /**
@@ -204,7 +215,6 @@ public class GameCommunication {
         Invocation request = ServerUtils.getRequestTarget()
                 .path("/api/game/leave")
                 .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
                 .buildPost(Entity.json(""));
 
         request.submit(new InvocationCallback<Response>() {
@@ -230,7 +240,6 @@ public class GameCommunication {
         Invocation invocation = ServerUtils.getRequestTarget()
                 .path("/api/game/" + gameId + "/questionNumber")
                 .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
                 .buildGet();
 
         // Perform the query asynchronously
@@ -266,7 +275,6 @@ public class GameCommunication {
         Invocation request = ServerUtils.getRequestTarget()
                 .path("/api/game/powerUp")
                 .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
                 .buildPost(Entity.entity(powerUp, APPLICATION_JSON));
 
         // Perform the query asynchronously
@@ -295,26 +303,28 @@ public class GameCommunication {
      * @param handleSuccess handler for successful operation.
      * @param handleFail handler for failed operation.
      */
-    public void sendReaction(Reaction reaction,
+    public void sendReaction(ReactionDTO reaction,
                              SendReactionHandlerSuccess handleSuccess, SendReactionHandlerFail handleFail) {
+        log.debug("Sending reaction: {}", reaction.getReactionType());
+
         // Build the query invocation
         Invocation request = ServerUtils.getRequestTarget()
-                .path("/api/game/reaction")
+                .path("/api/reaction/send")
                 .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
                 .buildPost(Entity.entity(reaction, APPLICATION_JSON));
 
         // Perform the query asynchronously
         request.submit(new InvocationCallback<Response>() {
             @Override
             public void completed(Response response) {
-                    handleSuccess.handle();
+                log.debug("Reaction sent response: {}", response.getStatus());
+                handleSuccess.handle();
             }
 
             @Override
             public void failed(Throwable throwable) {
                 handleFail.handle(null);
-                throwable.printStackTrace();
+                log.error("Could not send reaction: {}", throwable.getMessage());
             }
         });
     }
@@ -379,6 +389,20 @@ public class GameCommunication {
      * Handler for when sending answer to the current question fails.
      */
     public interface PutAnswerHandlerFail {
+        void handle();
+    }
+
+    /**
+     * Handler for when getting emojis succeeds.
+     */
+    public interface GetReactionsHandlerSuccess {
+        void handle(Map<String, URI> emojis);
+    }
+
+    /**
+     * Handler for when getting emojis fails.
+     */
+    public interface GetReactionsHandlerFail {
         void handle();
     }
 

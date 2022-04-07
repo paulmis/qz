@@ -23,17 +23,20 @@ import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
-import commons.entities.game.Reaction;
+import commons.entities.game.ReactionDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.messages.SSEMessageType;
 import commons.entities.questions.QuestionDTO;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
@@ -51,7 +54,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import lombok.Generated;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.cxf.common.util.StringUtils;
 
 
 /**
@@ -65,6 +70,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
     private final MainCtrl mainCtrl;
 
     @FXML private BorderPane mainBorderPane;
+    @Getter
     @FXML private HBox avatarHBox;
     @FXML private HBox emojiHBox;
     @FXML private HBox powerUpHBox;
@@ -93,6 +99,14 @@ public class GameScreenCtrl implements Initializable, SSESource {
     private SimpleIntegerProperty timeLeft;
     private Timer timer;
     private TimerTask timerTask;
+
+    private Map<String, URI> reactions;
+    // Allows us to cancel profile picture update tasks
+    private final Map<UUID, Timeline> userProfileTimelines = new HashMap<>();
+    // Allows us to persist pictures throughout stages
+    private final Map<UUID, Circle> userCircles = new HashMap<>();
+    // Allows us to restore pictures back to original state
+    private final Map<UUID, String> userProfilePictures = new HashMap<>();
 
 
     /**
@@ -123,12 +137,18 @@ public class GameScreenCtrl implements Initializable, SSESource {
     public void initialize(URL location, ResourceBundle resources) {
         // The following function calls handle
         // the set-up of the emojis, powerUps, leaderBoard and volume controls.
-        setUpEmojis();
         setUpPowerUps();
         setUpLeaderBoard();
         setUpVolume();
         setUpTimer();
         questionNumberLabel.setText("");
+    }
+
+    /**
+     * Setup that is run after the server has connected.
+     */
+    public void setup() {
+        setUpEmojis();
     }
 
     /**
@@ -210,9 +230,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
                     Optional<GamePlayerDTO> myPlayer = leaderboard.stream()
                             .filter(player -> player.getUserId().equals(ClientState.user.getId()))
                             .findFirst();
-                    if (myPlayer.isPresent()) {
-                        this.showScore(myPlayer.get());
-                    }
+                    myPlayer.ifPresent(this::showScore);
                 }),
                 // Failure
                 () -> runLater(
@@ -304,6 +322,9 @@ public class GameScreenCtrl implements Initializable, SSESource {
     private void showLeaderboard(List<GamePlayerDTO> players) {
         log.info("Showing leaderboard");
 
+        // Clears the avatars from the leaderboard
+        this.userCircles.clear();
+        this.userProfilePictures.clear();
         // Clear the in-game leaderboard
         avatarHBox.getChildren().clear();
 
@@ -312,30 +333,39 @@ public class GameScreenCtrl implements Initializable, SSESource {
             GamePlayerDTO player = players.get(i);
             log.debug("Adding player {} to leaderboard", player.getId());
 
-            // Fill of the circle to the image pattern
-            String imageUrl = FileUtils.defaultUserPic;
-            if (player.getProfilePic() != null) {
-                imageUrl = ServerUtils.getImagePathFromId(player.getProfilePic());
+            Circle circle;
+            if (this.userCircles.containsKey(player.getUserId())) {
+                // If we already have a circle instance, reuse it
+                circle = this.userCircles.get(player.getUserId());
+                Tooltip.uninstall(circle, null);
+            } else {
+                // Otherwise, create a new circle
+
+                // Fill of the circle to the image pattern
+                String imageUrl = FileUtils.defaultUserPic;
+                if (player.getProfilePic() != null) {
+                    imageUrl = ServerUtils.getImagePathFromId(player.getProfilePic());
+                }
+
+                circle = new Circle(19);
+                circle.setFill(new ImagePattern(new Image(imageUrl,
+                        40,
+                        40,
+                        false,
+                        true)));
+
+                this.userCircles.put(player.getUserId(), circle);
+                this.userProfilePictures.put(player.getUserId(), imageUrl);
             }
-            Circle imageCircle = new Circle(19);
-            imageCircle.setId("Rank" + i);
-            imageCircle.setFill(new ImagePattern(new Image(imageUrl,
-                    40,
-                    40,
-                    false,
-                    true)));
+            circle.setId("Rank" + i);
 
             // Adding the image to the HBox
-            avatarHBox.getChildren().add(imageCircle);
+            this.avatarHBox.getChildren().add(circle);
 
             // Create the tooltip
             Tooltip tooltip = new Tooltip();
             tooltip.setText(player.getNickname() + ": " + player.getScore());
-            Tooltip.install(imageCircle, tooltip);
-
-            if (player.getUserId().equals(ClientState.user.getId())) {
-                // Set up points of the logged in player
-            }
+            Tooltip.install(circle, tooltip);
         }
     }
 
@@ -388,11 +418,76 @@ public class GameScreenCtrl implements Initializable, SSESource {
      * @param reaction the reaction that has been sent.
      */
     @SSEEventHandler(SSEMessageType.REACTION)
-    public void handleReaction(Reaction reaction) {
-        mainCtrl.showInformationalSnackBar("User sent " + reaction.name());
-        String imageLocation = Objects.requireNonNull(getClass()
-                        .getResource("/client/images/reactions/" + reaction.name() + ".png")).toExternalForm();
-        // TO DO :
+    public void handleReaction(ReactionDTO reaction) {
+        // Verify that all fields are populated
+        if (reaction.getUserId() == null || reaction.getReactionType() == null) {
+            log.error("Received a reaction with null values");
+            return;
+        }
+
+        log.debug("Received reaction {} from user {}", reaction.getReactionType(), reaction.getUserId());
+
+        // Check if the reactions are muted
+        if (muteEveryoneToggleButton.isSelected()) {
+            log.debug("Not showing the reaction as they are muted");
+            return;
+        }
+
+        // Verify that we have the reaction URI
+        URI reactionUrl = this.reactions.get(reaction.getReactionType());
+        String userImageUrl = this.userProfilePictures.get(reaction.getUserId());
+        if (reactionUrl == null || userImageUrl == null) {
+            log.error("Received an unsupported reaction or an unknown user");
+            return;
+        }
+
+        // Get the image circle
+        Circle userImageCircle = this.userCircles.get(reaction.getUserId());
+        if (userImageCircle == null) {
+            log.error("Received a reaction from a user that is not in the leaderboard");
+            return;
+        }
+
+        // If there is already a timeline registered for this particular user picture,
+        // we need to remove it
+        if (this.userProfileTimelines.get(reaction.getUserId()) != null) {
+            try {
+                this.userProfileTimelines.get(reaction.getUserId()).stop();
+            } catch (Exception e) {
+                log.debug("Could not properly stop timeline for user {}", reaction.getUserId());
+            }
+        }
+
+        final KeyFrame kf1 = new KeyFrame(javafx.util.Duration.seconds(0), e -> {
+            log.debug("Setting the reaction image to {}", reactionUrl);
+            try {
+                userImageCircle.setFill(new ImagePattern(new Image(reactionUrl.toString(),
+                        40,
+                        40,
+                        false,
+                        true)));
+            } catch (Exception ex) {
+                log.error("Failed to set reaction image", ex);
+            }
+        });
+
+        final KeyFrame kf2 = new KeyFrame(javafx.util.Duration.seconds(5), e -> {
+            log.debug("Restoring the user image to {}", userImageUrl);
+            try {
+                userImageCircle.setFill(new ImagePattern(new Image(userImageUrl,
+                        40,
+                        40,
+                        false,
+                        true)));
+            } catch (Exception ex) {
+                log.error("Failed to restore user image", ex);
+            }
+        });
+
+        final Timeline timeline = new Timeline(kf1, kf2);
+        // Run and register the timeline
+        userProfileTimelines.put(reaction.getUserId(), timeline);
+        runLater(timeline::play);
     }
 
     /**
@@ -534,37 +629,40 @@ public class GameScreenCtrl implements Initializable, SSESource {
      * Sets up the emoji bar.
      */
     private void setUpEmojis() {
+        communication.getReactions((reactions) -> {
+            // Update global reaction map
+            this.reactions = reactions;
 
-        // Clears the emoji bar of items.
-        emojiHBox.getChildren().clear();
+            // For each reaction, add a button to the emoji bar.
+            this.emojiHBox.getChildren().setAll(reactions.entrySet().stream().map((entry) -> {
+                // Construct the button
+                JFXButton jfxButton = new JFXButton();
+                jfxButton.setPadding(Insets.EMPTY);
+                jfxButton.setRipplerFill(Color.ORANGE);
 
-        // Gets the emojis from the server.
-        List<URL> emojiUrls = communication.getEmojis();
+                jfxButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 
-        try {
-            // Iterates over the emojis
-            emojiHBox.getChildren().addAll(
-                    emojiUrls.stream().map(emojiUrl -> {
-                        JFXButton jfxButton = new JFXButton();
-                        jfxButton.setPadding(Insets.EMPTY);
-                        jfxButton.setRipplerFill(Color.WHITESMOKE);
+                // Set reaction image
+                ImageView image = new ImageView();
+                image.setImage(new Image(entry.getValue().toString(), 35, 35, false, true));
+                jfxButton.setGraphic(image);
 
-                        jfxButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                jfxButton.setOnMouseClicked((event) -> {
+                    // Hide the emoji bar
+                    emojiScrollPane.setVisible(false);
 
-                        ImageView image = new ImageView();
-                        image.setImage(new Image(String.valueOf(emojiUrl),
-                                35,
-                                35,
-                                false,
-                                true));
-                        jfxButton.setGraphic(image);
+                    // Construct a new reaction
+                    ReactionDTO reaction = new ReactionDTO(ClientState.game.getId(), entry.getKey());
+                    // Send the reaction to the server
+                    this.communication.sendReaction(reaction,
+                            () -> log.debug("Reaction sent successfully"),
+                            (error) -> this.mainCtrl.showErrorSnackBar("Failed to send reaction"));
 
-                        return jfxButton;
-                    }).collect(Collectors.toList())
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                    jfxButton.setTooltip(new Tooltip(StringUtils.capitalize(entry.getValue().toString())));
+                });
+                return jfxButton;
+            }).collect(Collectors.toList()));
+        }, () -> this.mainCtrl.showErrorSnackBar("Unable to load reactions"));
     }
 
     /**
@@ -576,7 +674,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
         powerUpHBox.getChildren().clear();
 
 
-        var powerUps = Arrays.stream(PowerUp.values()).collect(Collectors.toList());
+        List<PowerUp> powerUps = Arrays.stream(PowerUp.values()).collect(Collectors.toList());
 
         try {
             powerUps.forEach(powerUp -> {
@@ -587,7 +685,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
                 ImageView image = new ImageView();
 
                 String imageLocation = Objects.requireNonNull(getClass()
-                        .getResource("/client/images/powerups/" + powerUp.name() + ".png"))
+                                .getResource("/client/images/powerups/" + powerUp.name() + ".png"))
                         .toExternalForm();
 
                 image.setImage(new Image(imageLocation,
@@ -734,8 +832,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
             mainBorderPane.setCenter(this.centerPane);
             updateInGame();
         } catch (IOException e) {
-            log.error("Error loading the FXML file");
-            e.printStackTrace();
+            log.error("Error loading the FXML file", e);
             Platform.exit();
             System.exit(0);
         }
