@@ -622,6 +622,8 @@ public class GameScreenCtrl implements Initializable, SSESource {
                     Math.round(newValue.floatValue() / 100 * (volumeIconList.size() - 1))
             ).name());
         });
+
+        SoundManager.everyoneMuted.bindBidirectional(muteEveryoneToggleButton.selectedProperty());
     }
 
     /**

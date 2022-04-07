@@ -1,6 +1,8 @@
 package client.utils;
 
 import java.util.Objects;
+
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -11,6 +13,7 @@ import javafx.scene.media.MediaPlayer;
  */
 public class SoundManager {
     public static SimpleIntegerProperty volume = new SimpleIntegerProperty(100);
+    public static SimpleBooleanProperty everyoneMuted = new SimpleBooleanProperty(false);
 
     /**
      * Plays a sound effect.

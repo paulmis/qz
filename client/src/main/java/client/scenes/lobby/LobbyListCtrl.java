@@ -12,10 +12,16 @@ import client.utils.SoundManager;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXSlider;
+import com.jfoenix.controls.JFXToggleButton;
 import commons.entities.game.GameDTO;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
@@ -44,6 +50,13 @@ public class LobbyListCtrl implements Initializable {
     @FXML private JFXButton editButton;
     @FXML private JFXButton joinPrivateLobbyButton;
     @FXML private TextField privateLobbyTextField;
+    @FXML private AnchorPane settingsPanel;
+    @FXML private JFXButton volumeButton;
+    @FXML private JFXSlider volumeSlider;
+    @FXML private JFXToggleButton muteEveryoneToggleButton;
+    @FXML private FontAwesomeIconView volumeIconView;
+
+    private List<FontAwesomeIcon> volumeIconList;
     private UserInfoPane userInfo;
 
     /**
@@ -65,6 +78,7 @@ public class LobbyListCtrl implements Initializable {
         this.privateLobbyTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             this.joinPrivateLobbyButton.setDisable(newValue.length() != 6);
         });
+        setUpVolume();
     }
 
     @FXML
@@ -76,11 +90,49 @@ public class LobbyListCtrl implements Initializable {
     @FXML
     private void settingsButtonClick() {
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
+        if (userInfo != null) {
+            userInfo.setVisible(false);
+        }
+        settingsPanel.setVisible(!settingsPanel.isVisible());
+    }
+
+    @FXML
+    private void volumeButtonClick(ActionEvent actionEvent) {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.volume.setValue(SoundManager.volume.getValue() == 0 ? 100 : 0);
+    }
+
+    private void setUpVolume() {
+
+        // A list of icons so we can have a swift transition
+        // between them when changing the volume
+        volumeIconList = Arrays.asList(
+                FontAwesomeIcon.VOLUME_OFF,
+                FontAwesomeIcon.VOLUME_DOWN,
+                FontAwesomeIcon.VOLUME_UP);
+
+        // Bidirectional binding of the volume with the volume
+        // property. This is to ensure we can report changes
+        // instantly to the ui if the volume changes from
+        // outside of our control.
+        volumeSlider.valueProperty().bindBidirectional(SoundManager.volume);
+
+        // a listener on the volume to change the icon
+        // of the volume.
+        SoundManager.volume.addListener((observable, oldValue, newValue) -> {
+
+            // Sets the glyph name of the iconView directly
+            volumeIconView.setGlyphName(volumeIconList.get(
+                    Math.round(newValue.floatValue() / 100 * (volumeIconList.size() - 1))
+            ).name());
+        });
+        SoundManager.everyoneMuted.bindBidirectional(muteEveryoneToggleButton.selectedProperty());
     }
 
     @FXML
     private void userButtonClick() {
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
+        settingsPanel.setVisible(false);
         if (userInfo == null) {
             // Create userInfo
             userInfo = new UserInfoPane(new ServerUtils(), new UserCommunication(), mainCtrl);
@@ -118,6 +170,7 @@ public class LobbyListCtrl implements Initializable {
             userInfo.setVisible(false);
         }
         this.searchField.setText("");
+        setUpVolume();
     }
 
     private void updateLobbyList(String filter) {

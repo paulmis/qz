@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXSlider?>
+<?import com.jfoenix.controls.JFXToggleButton?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -19,7 +25,7 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <JFXButton fx:id="leaderboardButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="912.0" layoutY="3.0" onAction="#leaderboardButtonClick" prefHeight="40.0" prefWidth="40.0" text="Leaderboard" textFill="WHITE">
+            <JFXButton fx:id="leaderboardButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="868.0" layoutY="3.0" onAction="#leaderboardButtonClick" prefHeight="40.0" prefWidth="40.0" text="Leaderboard" textFill="WHITE">
                <graphic>
                   <FontAwesomeIconView glyphName="TROPHY" size="36" />
                </graphic>
@@ -27,6 +33,11 @@
             <JFXButton fx:id="userButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="968.0" layoutY="3.0" onAction="#userButtonClick" prefHeight="40.0" prefWidth="40.0" text="User" textFill="WHITE">
                <graphic>
                   <FontAwesomeIconView glyphName="USER" size="36" />
+               </graphic>
+            </JFXButton>
+            <JFXButton fx:id="settingsButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" layoutX="918.0" layoutY="3.0" onAction="#settingsButtonClick" prefHeight="40.0" prefWidth="40.0" text="Leaderboard" textFill="WHITE">
+               <graphic>
+                  <FontAwesomeIconView glyphName="COG" size="36" />
                </graphic>
             </JFXButton>
          </children>
@@ -97,6 +108,62 @@
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="settingsPanel" layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0" visible="false" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="45.0">
+         <children>
+            <GridPane fx:id="settingsPanelGrid" maxWidth="200.0" prefHeight="100.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+               <columnConstraints>
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="75.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <GridPane fx:id="settingsPanelSliderAreaGrid" prefHeight="30.0" prefWidth="150.0">
+                     <columnConstraints>
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="75.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="70.0" prefWidth="75.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <JFXSlider fx:id="volumeSlider" GridPane.columnIndex="1" />
+                        <JFXButton fx:id="volumeButton" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" maxWidth="30.0" minWidth="40.0" onAction="#volumeButtonClick" prefWidth="30.0">
+                           <graphic>
+                              <FontAwesomeIconView fx:id="volumeIconView" glyphName="VOLUME_UP" size="25" text="" />
+                           </graphic>
+                        </JFXButton>
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </GridPane>
+                  <GridPane fx:id="settingsPanelCheckAreaGrid" prefHeight="30.0" prefWidth="150.0" GridPane.rowIndex="1">
+                     <columnConstraints>
+                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="75.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <children>
+                        <JFXToggleButton fx:id="muteEveryoneToggleButton" text="Mute Everybody">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </JFXToggleButton>
+                     </children>
+                  </GridPane>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </GridPane>
          </children>
       </AnchorPane>
    </children>
