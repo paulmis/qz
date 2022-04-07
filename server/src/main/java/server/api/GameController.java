@@ -3,6 +3,7 @@ package server.api;
 import commons.entities.ActivityDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
+import commons.entities.questions.EstimateQuestionDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Optional;
@@ -10,19 +11,18 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.api.exceptions.GameNotFoundException;
-import server.api.exceptions.PowerUpAlreadyUsedException;
-import server.api.exceptions.SSEFailedException;
-import server.api.exceptions.UserNotFoundException;
+import server.api.exceptions.*;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.question.Activity;
+import server.database.entities.question.EstimateQuestion;
 import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
@@ -157,6 +157,10 @@ public class GameController {
                     return ResponseEntity.ok(activ.getDTO());
                 }
             }
+        }
+        // Disable powerup for estimate question
+        if (powerUp.name().equals("IncorrectAnswer") && game.getQuestion().get() instanceof EstimateQuestion) {
+            throw new PowerUpDisabledException();
         }
         // Return 200
         return ResponseEntity.ok().build();
