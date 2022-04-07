@@ -4,6 +4,8 @@ import static javafx.application.Platform.runLater;
 
 import client.communication.admin.AdminCommunication;
 import client.scenes.MainCtrl;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
@@ -147,6 +149,7 @@ public class ActivityListScreenCtrl implements Initializable {
      */
     @FXML
     private void addActivityButtonClick() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         this.openEditActivity(null, (activity, image) -> server.updateActivity(activity, image,
                         () -> runLater(() -> {
                             mainCtrl.showInformationalSnackBar("Activity has been added.");
@@ -162,6 +165,7 @@ public class ActivityListScreenCtrl implements Initializable {
      */
     @FXML
     private void editActivityButtonClick() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         this.openEditActivity(new ActivityView(activityTable.getSelectionModel().getSelectedItem()),
                 (activity, image) -> server.updateActivity(activity, image,
                         () -> runLater(() -> {
@@ -178,6 +182,7 @@ public class ActivityListScreenCtrl implements Initializable {
      */
     @FXML
     private void deleteActivityButtonClick() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         var selectedActivity = activityTable.getSelectionModel().getSelectedItem();
         server.deleteActivity(selectedActivity.getId(),
                 () -> runLater(() -> {

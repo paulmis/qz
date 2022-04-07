@@ -2,6 +2,8 @@ package client.scenes.authentication;
 
 import client.scenes.MainCtrl;
 import client.utils.PreferencesManager;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
@@ -76,6 +78,7 @@ public class ServerConnectScreenCtrl implements Initializable {
      */
     @FXML
     private void clickConnectButton() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         this.serverPath = urlField.getText().isEmpty() ? "http://localhost:8080/" : urlField.getText();
         if (rememberServer.isSelected()) {
             PreferencesManager.preferences.put("serverPath", this.serverPath);
