@@ -695,11 +695,11 @@ public class GameScreenCtrl implements Initializable, SSESource {
                         true));
 
                 jfxButton.setGraphic(image);
-
                 jfxButton.setOnAction(event -> communication.sendPowerUp(powerUp,
                         (activity) -> runLater(() -> {
+                            powerUpScrollPane.setVisible(false);
                             jfxButton.setDisable(true);
-                            if (powerUp.name().equals("IncorrectAnswer")
+                            if (powerUp == PowerUp.IncorrectAnswer
                                     && activity != null && centerPane instanceof QuestionPane) {
                                 log.warn("Eliminating answer {}", activity.toString());
                                 List<ActivityDTO> activities = new ArrayList<ActivityDTO>();

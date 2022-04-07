@@ -130,11 +130,8 @@ public class GameController {
     @PostMapping("/powerUp")
     ResponseEntity<ActivityDTO> sendPowerUp(@RequestBody PowerUp powerUp) throws SSEFailedException {
         // If the user or the game don't exist, throw exception
-        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(AuthContext.get());
-        if (userOpt.isEmpty()) {
-            throw new UserNotFoundException();
-        }
-        User user = userOpt.get();
+        User user = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(UserNotFoundException::new);
+
         // If the user isn't in a game, throw exception
         Game game = gameRepository.getPlayersGame(user.getId()).orElseThrow(GameNotFoundException::new);
 
