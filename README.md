@@ -5,13 +5,13 @@ This project is a quizzz app. The quizzz app is a singleplayer and multiplayer g
 ## Group members
 
 | Picture                                                                               | Name                       | Email                             |
-| --------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------- |
+| --------------------------------------------------------------------------------------------- | -------------------------- |-----------------------------------|
 | ![](https://avatars.githubusercontent.com/u/34619913?v=4&size=50)                             | David Dinucu-Jianu         | D.Dinucu-Jianu@student.tudelft.nl |
 | ![](https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50) | Rok Štular                 | R.Stular@student.tudelft.nl       |
 | ![](https://avatars.githubusercontent.com/u/45182027?v=4&size=50)                             | Paul Misterka              | P.M.Misterka@student.tudelft.nl   |
 | ![](https://secure.gravatar.com/avatar/065ab34531af46f9d554ea8c2067a07d?s=50&d=identicon)     | Alexandru-Gabriel Cojocaru | A.G.Cojocaru-2@student.tudelft.nl |
 | ![](https://avatars.githubusercontent.com/u/99262358?size=50)                                 | Giacomo Pezzali            | G.Pezzali@student.tudelft.nl      |
-| ![](https://secure.gravatar.com/avatar/fabe2c215ecceecd352547f2c5fbbef7?s=50&d=identicon)     | Aakanksh Singh             | A.singh-27@student.tudelft.nl     |
+| ![](https://secure.gravatar.com/avatar/fabe2c215ecceecd352547f2c5fbbef7?s=50&d=identicon)     | Aakanksh Singh             | A.Singh-27@student.tudelft.nl     |
 
 <!-- Instructions (remove once assignment has been completed -->
 <!-- - Add (only!) your own name to the table above (use Markdown formatting) -->
@@ -91,7 +91,7 @@ For more configuration options run `python populate_db.py --help`.
 `<TBA>`
 
 ## Copyright / License
-Apache License 2.0:
+####Apache License 2.0:
 * [Apache Commons](https://www.apache.org/licenses/LICENSE-2.0.txt) (frontend)
 * [AssertJ](https://github.com/assertj/assertj-core) (backend)
 * [Awaitility](https://github.com/awaitility/awaitility) (backend)
@@ -99,13 +99,13 @@ Apache License 2.0:
 * [Jackson](https://github.com/FasterXML/jackson) (backend)
 * [ModelMapper](https://github.com/modelmapper/modelmapper) (backend)
 * [Spring](https://github.com/spring-projects/spring-boot) (backend)
-Eclipse Public License 2.0:
+#####Eclipse Public License 2.0:
 * [JUnit 5](https://github.com/junit-team/junit5) (backend)
-GNU General Public License:
+####GNU General Public License:
 * [OpenJavaFX](https://github.com/openjdk/jfx) (frontend)
 * [Spring Boot](https://github.com/spring-projects/spring-boot) (backend)
-MIT License:
+####MIT License:
 * [Auth0](https://github.com/auth0/java-jwt) (backend)
 * [Mockito](https://github.com/mockito/mockito) (backend)
-Other:
+####Other:
 * [Lombok](https://github.com/projectlombok/lombok) (frontend + backend)
