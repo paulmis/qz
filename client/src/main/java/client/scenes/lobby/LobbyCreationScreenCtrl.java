@@ -220,12 +220,15 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
     @FXML
     private void survivalGameConfigurationButtonClick() {
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
+        mainCtrl.showErrorSnackBar("This gamemode is not yet available.");
+        /*
         config = new SurvivalGameConfigurationDTO();
         isMultiplayer.setValue(isMultiplayer.getValue());
         setUpConfigScreen();
         setUpGameType();
         standardGameConfigurationButton.setButtonType(JFXButton.ButtonType.FLAT);
         survivalGameConfigurationButton.setButtonType(JFXButton.ButtonType.RAISED);
+         */
     }
 
     @FXML
