@@ -2,6 +2,9 @@ package server.services;
 
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
@@ -22,8 +25,26 @@ import server.utils.SSE;
 @Slf4j
 @Service
 public class SSEManager {
+    private final Counter sseMessageCounter;
+
     @Autowired
     private ThreadPoolTaskScheduler taskScheduler;
+
+    /**
+     * Create a new SSE manager.
+     *
+     * @param registry Metrics registry.
+     */
+    @Autowired
+    public SSEManager(MeterRegistry registry) {
+        sseMessageCounter = Counter.builder("quiz_sse_messages")
+                .tag("type", "sent")
+                .description("Number of sent SSE messages")
+                .register(registry);
+        Gauge.builder("quiz_sse_emitters", this, SSEManager::size)
+                .description("Number of registered SSE emitters")
+                .register(registry);
+    }
 
     /**
      * The Map which maps user IDs to SSE emitters.
@@ -153,10 +174,10 @@ public class SSEManager {
             return false;
         }
 
-
         // Send the message
         try {
             emitters.get(userId).send(message);
+            sseMessageCounter.increment();
             log.debug("Sent message to user {}", userId);
             return true;
         } catch (IOException e) {

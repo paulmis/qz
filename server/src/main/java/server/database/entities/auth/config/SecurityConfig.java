@@ -36,6 +36,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors().and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeHttpRequests()
+                    // Actuator is bound to localhost (and a different port), we can allow everyone to query it
+                    .antMatchers("/actuator/**").permitAll()
                     .antMatchers("/api/auth/**").permitAll()
                     .antMatchers("/api/misc/ping").permitAll()
                     .antMatchers("/api/leaderboard/**").permitAll()

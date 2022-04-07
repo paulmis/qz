@@ -16,13 +16,17 @@
 
 package server;
 
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Generated;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import server.configuration.FileSystemStorageConfiguration;
 import server.configuration.QuestionGenerationConfiguration;
 import server.configuration.ResourceConfiguration;
@@ -45,10 +49,27 @@ public class Main {
         SpringApplication.run(Main.class, args);
     }
 
+    @Autowired
+    private MeterRegistry registry;
+
+    @Autowired
+    private ThreadPoolTaskScheduler threadPoolTaskScheduler;
+
     @Bean
     CommandLineRunner init(StorageService storageService) {
-        return args -> {
-            storageService.init();
-        };
+        Gauge.builder("quiz_threadpool_threads",
+                        threadPoolTaskScheduler,
+                        ThreadPoolTaskScheduler::getPoolSize)
+                .tag("type", "all")
+                .description("Size of the Quizzz scheduling thread pool")
+                .register(registry);
+        Gauge.builder("quiz_threadpool_threads",
+                        threadPoolTaskScheduler,
+                        ThreadPoolTaskScheduler::getActiveCount)
+                .tag("type", "active")
+                .description("Number of active threads in the Quizzz scheduling thread pool")
+                .register(registry);
+
+        return args -> storageService.init();
     }
 }
