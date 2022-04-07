@@ -92,7 +92,7 @@ For more configuration options run `python populate_db.py --help`.
 
 ## Copyright / License
 
-####Apache License 2.0:
+#### Apache License 2.0:
 * [Apache Commons](https://www.apache.org/licenses/LICENSE-2.0.txt) (frontend)
 * [AssertJ](https://github.com/assertj/assertj-core) (backend)
 * [Awaitility](https://github.com/awaitility/awaitility) (backend)
@@ -101,16 +101,16 @@ For more configuration options run `python populate_db.py --help`.
 * [ModelMapper](https://github.com/modelmapper/modelmapper) (backend)
 * [Spring](https://github.com/spring-projects/spring-boot) (backend)
 
-#####Eclipse Public License 2.0:
+##### Eclipse Public License 2.0:
 * [JUnit 5](https://github.com/junit-team/junit5) (backend)
 
-####GNU General Public License:
+#### GNU General Public License:
 * [OpenJavaFX](https://github.com/openjdk/jfx) (frontend)
 * [Spring Boot](https://github.com/spring-projects/spring-boot) (backend)
 
-####MIT License:
+#### MIT License:
 * [Auth0](https://github.com/auth0/java-jwt) (backend)
 * [Mockito](https://github.com/mockito/mockito) (backend)
 
-####Other:
+#### Other:
 * [Lombok](https://github.com/projectlombok/lombok) (frontend + backend)
