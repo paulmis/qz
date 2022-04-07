@@ -21,7 +21,6 @@ import commons.entities.game.GameDTO;
 import commons.entities.messages.SSEMessageType;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-
 import java.net.URL;
 import java.time.Duration;
 import java.util.Arrays;
@@ -29,7 +28,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

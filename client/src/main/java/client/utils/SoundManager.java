@@ -1,12 +1,10 @@
 package client.utils;
 
 import java.util.Objects;
-
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-
 
 /**
  * The sound manager. Manages all sound effects in the app.
