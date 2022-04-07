@@ -3,8 +3,6 @@ package server.api;
 import commons.entities.ActivityDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
-import commons.entities.game.Reaction;
-import commons.entities.questions.MCQuestionDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.api.exceptions.GameNotFoundException;
 import server.api.exceptions.PowerUpAlreadyUsedException;
+import server.api.exceptions.SSEFailedException;
 import server.api.exceptions.UserNotFoundException;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
@@ -135,7 +134,7 @@ public class GameController {
         if (userOpt.isEmpty()) {
             throw new UserNotFoundException();
         }
-
+        User user = userOpt.get();
         // If the user isn't in a game, throw exception
         Game game = gameRepository.getPlayersGame(user.getId()).orElseThrow(GameNotFoundException::new);
 
