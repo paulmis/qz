@@ -96,7 +96,7 @@ For more configuration options run `python populate_db.py --help`.
 * [Apache Commons](https://www.apache.org/licenses/LICENSE-2.0.txt) (frontend)
 * [AssertJ](https://github.com/assertj/assertj-core) (backend)
 * [Awaitility](https://github.com/awaitility/awaitility) (backend)
-* [Guava](https://github.com/google/guava) (?)
+* [Guava](https://github.com/google/guava) (frontend + backend)
 * [Jackson](https://github.com/FasterXML/jackson) (backend)
 * [ModelMapper](https://github.com/modelmapper/modelmapper) (backend)
 * [Spring](https://github.com/spring-projects/spring-boot) (backend)
