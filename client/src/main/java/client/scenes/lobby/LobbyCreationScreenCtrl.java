@@ -8,10 +8,11 @@ import client.scenes.MainCtrl;
 import client.scenes.lobby.configuration.ConfigurationScreenPane;
 import client.utils.ClientState;
 import client.utils.ReflectionUtils;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import client.utils.communication.*;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
-import commons.entities.game.GameStatus;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.game.configuration.NormalGameConfigurationDTO;
 import commons.entities.game.configuration.SurvivalGameConfigurationDTO;
@@ -153,11 +154,13 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
 
     @FXML
     private void goBackToLobbies() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showLobbyListScreen();
     }
 
     @FXML
     private void lockButtonClick() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         isPrivateProperty.set(!isPrivateProperty.get());
     }
 
@@ -175,6 +178,7 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
 
     @FXML
     private void createLobbyButtonClick() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         // Start SSE
         ServerUtils.sseHandler.subscribe();
         bindHandler(ServerUtils.sseHandler);
@@ -204,6 +208,7 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
 
     @FXML
     private void standardGameConfigurationButtonClick() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         config = new NormalGameConfigurationDTO();
         isMultiplayer.setValue(isMultiplayer.getValue());
         setUpConfigScreen();
@@ -214,21 +219,27 @@ public class LobbyCreationScreenCtrl implements Initializable, SSESource {
 
     @FXML
     private void survivalGameConfigurationButtonClick() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
+        mainCtrl.showErrorSnackBar("This gamemode is not yet available.");
+        /*
         config = new SurvivalGameConfigurationDTO();
         isMultiplayer.setValue(isMultiplayer.getValue());
         setUpConfigScreen();
         setUpGameType();
         standardGameConfigurationButton.setButtonType(JFXButton.ButtonType.FLAT);
         survivalGameConfigurationButton.setButtonType(JFXButton.ButtonType.RAISED);
+         */
     }
 
     @FXML
     private void singleplayerGameButtonClick() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         isMultiplayer.setValue(false);
     }
 
     @FXML
     private void multiplayerGameButtonClick() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         isMultiplayer.setValue(true);
     }
 }

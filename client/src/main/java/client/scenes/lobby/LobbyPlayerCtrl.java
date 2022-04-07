@@ -3,6 +3,8 @@ package client.scenes.lobby;
 import static javafx.application.Platform.runLater;
 
 import client.utils.FileUtils;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import client.utils.communication.ServerUtils;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.GamePlayerDTO;
@@ -78,6 +80,7 @@ public class LobbyPlayerCtrl implements Initializable {
 
     @FXML
     private void kickOutPlayer() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         kickAction.handle();
     }
 }
