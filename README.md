@@ -2,7 +2,7 @@
 This project is a quizzzz app. The quizzzz app is a single and multiplayer game which quizzes players to increase energy awareness.
 This project is made using the Spring BOOT REST API for the backend and OpenJavaFX for the frontend.
 Many design and feature choices were made to make this project intuitive and unique.\
-The following details gives an overview of our choices:
+Here is an overview of our choices:
 <ul>
     <li> Registration support, all the user's information are safely stored and easily retrieved from the database. </li>
     <li> Private games, to play only with people you know. </li>
