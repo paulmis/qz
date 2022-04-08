@@ -192,6 +192,6 @@ public class DefiniteGameFSM extends GameFSM {
 
         // Stop the FSM
         setState(FSMState.FINISHED);
-        setRunning(false);
+        stop();
     }
 }

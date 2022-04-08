@@ -779,7 +779,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
                             (response) -> runLater(() -> {
                                 switch (response.getStatus()) {
                                     case 200:
-                                        System.out.println("User successfully removed from game");
+                                        log.debug("User successfully removed from game");
                                         mainCtrl.showLobbyListScreen();
                                         this.timer.cancel();
                                         ClientState.game = null;
