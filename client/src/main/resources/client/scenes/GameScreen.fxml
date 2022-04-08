@@ -3,10 +3,10 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXSlider?>
 <?import com.jfoenix.controls.JFXToggleButton?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -89,7 +89,7 @@
                               <Insets left="100.0" right="15.0" />
                            </GridPane.margin>
                         </ScrollPane>
-                        <ScrollPane fx:id="powerUpScrollPane" hbarPolicy="NEVER" maxWidth="400.0" pannable="true" prefHeight="50.0" prefWidth="200.0" vbarPolicy="NEVER" visible="false" GridPane.columnIndex="1">
+                        <ScrollPane fx:id="powerUpScrollPane" hbarPolicy="NEVER" maxWidth="155.0" pannable="true" prefHeight="50.0" prefWidth="200.0" vbarPolicy="NEVER" visible="false" GridPane.columnIndex="1">
                            <content>
                               <HBox fx:id="powerUpHBox" maxHeight="40.0" prefHeight="40.0" spacing="10.0">
                                  <padding>

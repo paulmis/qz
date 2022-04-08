@@ -82,6 +82,7 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void leaderboardButtonClick() {
+        settingsPanel.setVisible(false);
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showGlobalLeaderboardScreen();
     }
@@ -146,6 +147,7 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void createLobbyButtonClick() {
+        settingsPanel.setVisible(false);
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         createLobby();
     }
@@ -202,9 +204,10 @@ public class LobbyListCtrl implements Initializable {
      */
     @FXML
     private void joinRandomLobby() {
+        settingsPanel.setVisible(false);
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         communication.getLobbies(
-                games -> {
+                games -> runLater(() -> {
                     // Gets a random available lobby and joins it
                     games.removeIf(game -> (game.getConfiguration().getCapacity() <= game.getPlayers().size()));
                     if (games.isEmpty()) {
@@ -219,7 +222,7 @@ public class LobbyListCtrl implements Initializable {
                             });
                         });
                     }
-                },
+                }),
                 () -> {
                     // If there are no available games, the user creates a new lobby
                     runLater(this::createLobby);
@@ -234,6 +237,7 @@ public class LobbyListCtrl implements Initializable {
 
     @FXML
     private void joinPrivateLobbyButtonClick() {
+        settingsPanel.setVisible(false);
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         communication.joinPrivateLobby(privateLobbyTextField.getText(), gameDTO -> runLater(() -> {
             mainCtrl.showInformationalSnackBar("Joined the lobby!");
