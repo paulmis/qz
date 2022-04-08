@@ -44,7 +44,7 @@
       </AnchorPane>
       <AnchorPane fx:id="lobbyListItemsAnchorPane" layoutX="212.0" layoutY="69.0" prefHeight="507.0" prefWidth="605.0">
          <children>
-            <TextField fx:id="searchField" layoutX="72.0" layoutY="21.0" prefHeight="46.0" prefWidth="298.0" promptText="Search by game name, type or username">
+            <TextField fx:id="searchField" layoutX="72.0" layoutY="21.0" prefHeight="46.0" prefWidth="298.0" promptText="Search by game name">
                <font>
                   <Font size="18.0" />
                </font>
