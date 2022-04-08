@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import server.database.entities.game.Game;
 import server.database.repositories.game.GameRepository;
@@ -23,6 +24,11 @@ public class FSMManager {
     private GameRepository gameRepository;
 
     private final ConcurrentHashMap<UUID, GameFSM> fsmMap = new ConcurrentHashMap<>();
+
+    @Scheduled(fixedRate = 1000, initialDelay = 1000)
+    void cleanUp() {
+        fsmMap.entrySet().removeIf(entry -> !entry.getValue().isRunning());
+    }
 
     /**
      * Adds a new finite state machine to the manager.

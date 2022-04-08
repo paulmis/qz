@@ -79,7 +79,9 @@ public class ServerConnectScreenCtrl implements Initializable {
     @FXML
     private void clickConnectButton() {
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
-        this.serverPath = urlField.getText().isEmpty() ? "http://localhost:8080/" : urlField.getText();
+        this.serverPath = urlField.getText().isEmpty() ? "http://localhost:8080/" : (urlField.getText().endsWith("/")
+                ? urlField.getText()
+                : urlField.getText() + "/");
         if (rememberServer.isSelected()) {
             PreferencesManager.preferences.put("serverPath", this.serverPath);
         } else {
