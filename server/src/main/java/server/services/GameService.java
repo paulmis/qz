@@ -1,11 +1,13 @@
 package server.services;
 
+import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GameStatus;
 import commons.entities.game.PowerUp;
 import commons.entities.game.ReactionDTO;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
+import commons.entities.questions.QuestionDTO;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -30,6 +32,8 @@ import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
 import server.database.entities.game.exceptions.GameFinishedException;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
+import server.database.entities.question.Activity;
+import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
@@ -379,7 +383,6 @@ public class GameService {
             default:
                 break;
         }
-
         log.info("Sending power-up " + powerUp.name() + " to game: " + game.getGameId());
         sseManager.send(game.getUserIds(), new SSEMessage(SSEMessageType.POWER_UP_PLAYED, powerUp));
     }

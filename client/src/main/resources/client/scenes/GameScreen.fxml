@@ -3,10 +3,10 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXSlider?>
 <?import com.jfoenix.controls.JFXToggleButton?>
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -71,7 +71,7 @@
                   <GridPane prefHeight="50.0">
                     <columnConstraints>
                       <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
-                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
+                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="50.0" minWidth="10.0" percentWidth="50.0" prefWidth="50.0" />
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -89,7 +89,7 @@
                               <Insets left="100.0" right="15.0" />
                            </GridPane.margin>
                         </ScrollPane>
-                        <ScrollPane fx:id="powerUpScrollPane" hbarPolicy="NEVER" maxWidth="400.0" pannable="true" prefHeight="50.0" prefWidth="400.0" vbarPolicy="NEVER" visible="false" GridPane.columnIndex="1">
+                        <ScrollPane fx:id="powerUpScrollPane" hbarPolicy="NEVER" maxWidth="400.0" pannable="true" prefHeight="50.0" prefWidth="200.0" vbarPolicy="NEVER" visible="false" GridPane.columnIndex="1">
                            <content>
                               <HBox fx:id="powerUpHBox" maxHeight="40.0" prefHeight="40.0" spacing="10.0">
                                  <padding>

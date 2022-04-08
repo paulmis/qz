@@ -1,29 +1,35 @@
 package server.api;
 
+import commons.entities.ActivityDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
+import commons.entities.questions.EstimateQuestionDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.api.exceptions.GameNotFoundException;
-import server.api.exceptions.PowerUpAlreadyUsedException;
-import server.api.exceptions.UserNotFoundException;
+import server.api.exceptions.*;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
 import server.database.entities.game.Game;
 import server.database.entities.game.GamePlayer;
+import server.database.entities.question.Activity;
+import server.database.entities.question.EstimateQuestion;
+import server.database.entities.question.MCQuestion;
 import server.database.entities.question.Question;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
 import server.services.GameService;
+import server.services.fsm.GameFSM;
 
 
 /**
@@ -122,7 +128,8 @@ public class GameController {
      * @return 200 if the powerup was used successfully, 404 if the powerup was not found,
      */
     @PostMapping("/powerUp")
-    ResponseEntity sendPowerUp(@RequestBody PowerUp powerUp) {
+    ResponseEntity<ActivityDTO> sendPowerUp(@RequestBody PowerUp powerUp) throws SSEFailedException {
+        // If the user or the game don't exist, throw exception
         User user = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(UserNotFoundException::new);
 
         // If the user isn't in a game, throw exception
@@ -137,10 +144,24 @@ public class GameController {
 
         log.debug("Sending power-up to game {}", game.getId());
 
+        // Disable powerup for estimate question
+        if (powerUp.name().equals("IncorrectAnswer") && game.getQuestion().get() instanceof EstimateQuestion) {
+            throw new PowerUpDisabledException();
+        }
         gameService.sendPowerUp(game, gamePlayer, powerUp);
         gamePlayer.getUserPowerUps().put(powerUp, game.getCurrentQuestionNumber());
         gameRepository.save(game);
 
+        if (powerUp.name().equals("IncorrectAnswer") && game.getQuestion().get() instanceof MCQuestion) {
+            MCQuestion question = (MCQuestion) game.getQuestion().get();
+            Set<Activity> activityList =  question.getActivities();
+            for (Activity activ : activityList) {
+                if (!activ.getDTO().equals((question.getRightAnswer().getResponse().get(0)))) {
+                    // Get the first activity doesn't have the right answer
+                    return ResponseEntity.ok(activ.getDTO());
+                }
+            }
+        }
         // Return 200
         return ResponseEntity.ok().build();
     }

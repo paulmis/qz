@@ -5,6 +5,8 @@ import static javafx.application.Platform.runLater;
 import client.communication.game.GameCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.leaderboard.LeaderboardPane;
+import client.scenes.questions.MCQuestionCtrl;
+import client.scenes.questions.QuestionCtrl;
 import client.scenes.questions.QuestionPane;
 import client.scenes.questions.StartGamePane;
 import client.utils.ClientState;
@@ -19,6 +21,7 @@ import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
+import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.PowerUp;
@@ -696,14 +699,20 @@ public class GameScreenCtrl implements Initializable, SSESource {
                         true));
 
                 jfxButton.setGraphic(image);
-
-                jfxButton.setOnAction(event -> {
-                    powerUpScrollPane.setVisible(false);
-                    communication.sendPowerUp(powerUp,
-                            () -> runLater(() -> jfxButton.setDisable(true)),
-                            error -> runLater(() ->
-                                    mainCtrl.showErrorSnackBar("Error occurred: " + error.getDescription())));
-                });
+                jfxButton.setOnAction(event -> communication.sendPowerUp(powerUp,
+                        (activity) -> runLater(() -> {
+                            powerUpScrollPane.setVisible(false);
+                            jfxButton.setDisable(true);
+                            if (powerUp == PowerUp.IncorrectAnswer
+                                    && activity != null && centerPane instanceof QuestionPane) {
+                                log.warn("Eliminating answer {}", activity.toString());
+                                List<ActivityDTO> activities = List.of(activity);
+                                ((QuestionPane) centerPane).removeAnswer(
+                                        new AnswerDTO(ClientState.game.getCurrentQuestion().getId(), activities));
+                            }
+                        }),
+                        error -> runLater(() ->
+                                mainCtrl.showErrorSnackBar("Error occured: " + error.getDescription()))));
 
                 powerUpHBox.getChildren().add(jfxButton);
             });
