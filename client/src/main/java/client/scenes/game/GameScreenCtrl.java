@@ -520,6 +520,10 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @SSEEventHandler(SSEMessageType.GAME_END)
     public void toFinishStage() {
+        settingsPanel.setVisible(false);
+        emojiScrollPane.setVisible(false);
+        powerUpScrollPane.setVisible(false);
+
         // Clean up the game and kill the connection
         ClientState.game = null;
         ServerUtils.sseHandler.kill();
@@ -745,6 +749,9 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @FXML
     private void quitButtonClick(ActionEvent actionEvent) {
+        settingsPanel.setVisible(false);
+        emojiScrollPane.setVisible(false);
+        powerUpScrollPane.setVisible(false);
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         // This makes the button just get you out of the lobby
         // if it has already finished.
