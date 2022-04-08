@@ -123,7 +123,7 @@ public class LogInScreenCtrl implements Initializable {
                         (s) -> runLater(() -> loginHandler(s)),
                         // Failure
                         () -> runLater(() -> {
-                            mainCtrl.showErrorSnackBar("Something went wrong while logging you in.");
+                            mainCtrl.showErrorSnackBar("Invalid credentials.");
                         })
                 );
             } else {
