@@ -116,7 +116,8 @@ Each of these must be run one after another:
 ### Populating the database
 
 In order to populate the database, a helper script is provided: `populate_db.py`.
-To run it, you will need the activity bank (included in `./activities` directory), as well as an emoji bank (provided in `./reactions/`).
+To run it, you will need the activity bank (included in `./activities` directory),
+as well as an emoji bank (provided in `./reactions`).
 
 1. Open a new command window.
 2. `cd` to the repository directory.
@@ -124,9 +125,6 @@ To run it, you will need the activity bank (included in `./activities` directory
 4. Run `python populate_db.py -c 100 ./activities ./reactions`. The script will import all activities (images included) and reactions.
 
 This script supports more configuration options; for a list and a brief description of the functionality run `python populate_db.py --help`.
-
-## How to contribute to it
-`<TBA>`
 
 ## Copyright / License
 
