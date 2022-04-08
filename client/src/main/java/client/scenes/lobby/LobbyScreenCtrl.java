@@ -199,40 +199,44 @@ public class LobbyScreenCtrl implements SSESource, Initializable {
     public void startButtonClick() {
         settingsPanel.setVisible(false);
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
-        if (ClientState.game.getConfiguration().getCapacity() > ClientState.game.getPlayers().size()) {
-            mainCtrl.showErrorSnackBar("You need to have "
-                    + ClientState.game.getConfiguration().getCapacity()
-                    + " players to start the game.");
-            return;
-        } else if (ClientState.game.getConfiguration().getCapacity() < ClientState.game.getPlayers().size()) {
-            mainCtrl.showErrorSnackBar("The lobby exceeds the capacity. Kick some people out!");
-            return;
-        }
+        //ToDo: Move/Delete below code that check lobby capacity
+//        if (ClientState.game.getConfiguration().getCapacity() > ClientState.game.getPlayers().size()) {
+//            mainCtrl.showErrorSnackBar("You need to have "
+//                    + ClientState.game.getConfiguration().getCapacity()
+//                    + " players to start the game.");
+//            return;
+//        } else if (ClientState.game.getConfiguration().getCapacity() < ClientState.game.getPlayers().size()) {
+//            mainCtrl.showErrorSnackBar("The lobby exceeds the capacity. Kick some people out!");
+//            return;
+//        }
 
-        LobbyCommunication.startGame(
-            ClientState.game.getId(),
-            // Success
-            (response) -> runLater(() -> {
-                switch (response.getStatus()) {
-                    case 403:
-                        mainCtrl.showErrorSnackBar("Starting the game failed! You are not the host.");
-                        break;
-                    case 409:
-                        mainCtrl.showErrorSnackBar("Something went wrong while starting the game.");
-                        break;
-                    case 425:
-                        mainCtrl.showErrorSnackBar("Try again after a second.");
-                        break;
-                    case 200:
-                        mainCtrl.showInformationalSnackBar("Game started!");
-                        break;
-                    default:
-                        mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");
-                        break;
-                }
-            }),
-            // Failure
-            () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to start game.")));
+        mainCtrl.openStartGameWarning(() -> {
+            mainCtrl.closeStartGameWarning();
+            LobbyCommunication.startGame(
+                    ClientState.game.getId(),
+                    // Success
+                    (response) -> runLater(() -> {
+                        switch (response.getStatus()) {
+                            case 403:
+                                mainCtrl.showErrorSnackBar("Starting the game failed! You are not the host.");
+                                break;
+                            case 409:
+                                mainCtrl.showErrorSnackBar("Something went wrong while starting the game.");
+                                break;
+                            case 425:
+                                mainCtrl.showErrorSnackBar("Try again after a second.");
+                                break;
+                            case 200:
+                                mainCtrl.showInformationalSnackBar("Game started!");
+                                break;
+                            default:
+                                mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");
+                                break;
+                        }
+                    }),
+                    // Failure
+                    () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to start game.")));
+        }, () -> runLater(mainCtrl::closeStartGameWarning));
     }
     
     /**

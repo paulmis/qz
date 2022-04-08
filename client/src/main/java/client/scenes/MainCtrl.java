@@ -91,6 +91,7 @@ public class MainCtrl {
     private Popup lobbyLeavePopUp;
     private Popup gameLeavePopUp;
     private Popup lobbyDisbandPopUp;
+    private Popup startGamePopUp;
     private Parent activeScreen;
 
     /**
@@ -143,6 +144,7 @@ public class MainCtrl {
         lobbyLeavePopUp = new Popup();
         gameLeavePopUp = new Popup();
         lobbyDisbandPopUp = new Popup();
+        startGamePopUp = new Popup();
         showServerConnectScreen();
     }
 
@@ -406,6 +408,37 @@ public class MainCtrl {
     public void closeLobbyDisbandWarning() {
         lobbyDisbandPopUp.hide();
         lobbyDisbandPopUp.getContent().clear();
+    }
+
+    /**
+     * This function opens a popup with
+     * a start warning for starting the game.
+     *
+     * @param startHandler the action that is to be performed when the host starts the game.
+     * @param cancelHandler  the action that is to be performed when the host cancels starting the game.
+     */
+    public void openStartGameWarning(GameStartScreenCtrl.StartHandler startHandler,
+                                        GameStartScreenCtrl.CancelHandler cancelHandler) {
+        startGamePopUp.setOnShown(e -> {
+            startGamePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - startGamePopUp.getWidth() / 2);
+
+            startGamePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - startGamePopUp.getHeight() / 2);
+        });
+
+        var startGamePane = new PopupPane(new GameStartScreenCtrl(startHandler, cancelHandler),
+                "/lobby/GameStartScreen");
+        startGamePopUp.getContent().add(startGamePane);
+        startGamePopUp.show(primaryStage);
+    }
+
+    /**
+     * This function closes the start game popUp.
+     */
+    public void closeStartGameWarning() {
+        startGamePopUp.hide();
+        startGamePopUp.getContent().clear();
     }
 
     /**
