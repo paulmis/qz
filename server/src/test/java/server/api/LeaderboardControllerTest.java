@@ -52,6 +52,7 @@ class LeaderboardControllerTest {
         User user = new User("user" + id,
                 "email" + id,
                 "password" + id,
+                getUUID(id),
                 score,
                 gamesPlayed,
                 new HashSet<>());
@@ -120,7 +121,7 @@ class LeaderboardControllerTest {
     @Test
     public void testRequiredFieldsPresentGamesPlayed() throws Exception {
         List<User> users = List.of(getUser(1, 2, 3));
-        when(userRepository.findAllByOrderByGamesPlayedDesc(any(Pageable.class))).thenReturn(users);
+        when(userRepository.findAllByOrderByGamesWonDesc(any(Pageable.class))).thenReturn(users);
 
         this.mockMvc.perform(get("/api/leaderboard/games"))
                 .andExpect(status().isOk())
@@ -168,7 +169,7 @@ class LeaderboardControllerTest {
                 getUser(2, 4, 6),
                 getUser(1, 2, 3));
 
-        when(userRepository.findAllByOrderByGamesPlayedDesc(any(Pageable.class))).thenReturn(users);
+        when(userRepository.findAllByOrderByGamesWonDesc(any(Pageable.class))).thenReturn(users);
 
         String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(
                 users.stream().map(BaseEntity::getDTO).collect(Collectors.toList()));
@@ -186,7 +187,7 @@ class LeaderboardControllerTest {
      */
     @Test
     public void testNoPlayersGamesPlayed() throws Exception {
-        when(userRepository.findAllByOrderByGamesPlayedDesc(any(Pageable.class))).thenReturn(new ArrayList<>());
+        when(userRepository.findAllByOrderByGamesWonDesc(any(Pageable.class))).thenReturn(new ArrayList<>());
 
         String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(new ArrayList<>());
 
@@ -203,7 +204,7 @@ class LeaderboardControllerTest {
      */
     @Test
     public void testNoPlayersScore() throws Exception {
-        when(userRepository.findAllByOrderByGamesPlayedDesc(any())).thenReturn(new ArrayList<>());
+        when(userRepository.findAllByOrderByGamesWonDesc(any())).thenReturn(new ArrayList<>());
 
         String expectedResponse = objectMapper.writerWithView(Views.Public.class).writeValueAsString(new ArrayList<>());
 

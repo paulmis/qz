@@ -53,7 +53,7 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </JFXButton>
-            <JFXButton fx:id="survivalGameConfigurationButton" layoutX="325.0" layoutY="174.0" onAction="#survivalGameConfigurationButtonClick" prefHeight="35.0" prefWidth="85.0" style="-fx-background-color: red;" text="Survival" textFill="WHITE">
+            <JFXButton fx:id="survivalGameConfigurationButton" layoutX="325.0" layoutY="174.0" onAction="#survivalGameConfigurationButtonClick" prefHeight="35.0" prefWidth="85.0" style="-fx-background-color: gray;" text="Survival" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>

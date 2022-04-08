@@ -80,22 +80,22 @@ public class LobbyController {
         User founder = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(UserNotFoundException::new);
 
         // Check that the user isn't in another game
-        if (gamePlayerRepository.existsByUserIdAndGameStatusNot(founder.getId(), GameStatus.FINISHED)) {
+        if (gamePlayerRepository
+                .existsByUserIdAndGameStatusNotAndAbandonedIsFalse(founder.getId(), GameStatus.FINISHED)) {
             throw new PlayerAlreadyInLobbyOrGameException();
         }
 
         NormalGame lobby = new NormalGame(gameDTO);
         lobby.setGameId(RandomStringUtils.random(6, true, true));
         lobby.setStatus(GameStatus.CREATED);
+        if (lobby.getGameName() == null || lobby.getGameName().equals("")) {
+            lobby.setGameName(founder.getUsername());
+        }
+
         lobby.add(new GamePlayer(founder));
 
         // Save the game with the added host and player
-        // If the game is singleplayer, start it
-        if (lobby.isSingleplayer()) {
-            lobby = (NormalGame) gameService.start(lobby);
-        } else {
-            lobby = gameRepository.save(lobby);
-        }
+        lobby = gameRepository.save(lobby);
 
         log.debug("Created a new game with id {}", lobby.getGameId());
         // Return 201
@@ -197,11 +197,7 @@ public class LobbyController {
         log.debug("User {} joined game {}", user.getId(), lobby.getId());
 
         // Distribute the notifications to all players in the lobby
-        try {
-            sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
-        } catch (IOException ex) {
-            log.error("Failed to notify players about the new player", ex);
-        }
+        sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
 
         // Return 200
         return ResponseEntity.ok(lobby.getDTO());
@@ -226,14 +222,7 @@ public class LobbyController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the lobby host");
         }
 
-        // If the game doesn't start successfully, return 409
-        // If the SSE events are not yet set-up return 425
-        try {
-            gameService.start(lobby);
-        } catch (IOException ex) {
-            log.error("Could not start game", ex);
-            return ResponseEntity.status(HttpStatus.TOO_EARLY).body(ex.getMessage());
-        }
+        gameService.start(lobby);
 
         // Otherwise, return 200
         log.debug("Started game {}", lobby.getId());
@@ -279,11 +268,7 @@ public class LobbyController {
         log.info("Updated lobby {} configuration", lobby.getId());
 
         // Distribute the notifications to all players in the lobby
-        try {
-            sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
-        } catch (IOException ex) {
-            log.error("Failed to notify players about the new configuration", ex);
-        }
+        sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
 
         // Return 200
         return new ResponseEntity<>(HttpStatus.OK);
@@ -303,6 +288,41 @@ public class LobbyController {
 
         // Remove the player and return 200
         lobbyService.removePlayer(lobby, user);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @DeleteMapping("/kick/{userId}")
+    ResponseEntity kick(@PathVariable UUID userId) {
+        User executingUser
+                = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(UserNotFoundException::new);
+
+        // Check that the user is in a lobby
+        Game<?> lobby
+                = gameRepository.getPlayersLobby(executingUser.getId()).orElseThrow(PlayerNotInLobbyException::new);
+
+        // Throw error if user is not host.
+        if (!lobby.getHost().getUser().getId().equals(executingUser.getId())) {
+            throw new UserNotHostException();
+        }
+
+        User targetUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Game<?> targetLobby
+                = gameRepository.getPlayersLobby(executingUser.getId()).orElseThrow(PlayerNotInLobbyException::new);
+
+        // Throw exception if user is not in this game.
+        if (!targetLobby.getId().equals(lobby.getId())) {
+            throw new UserNotFoundException();
+        }
+
+        // Remove the player and return 200
+        lobbyService.removePlayer(lobby, targetUser);
+
+        try {
+            sseManager.send(userId, new SSEMessage(SSEMessageType.YOU_HAVE_BEEN_KICKED));
+        } catch (Exception e) {
+            log.error("Error occured while kicking out user: " + e.getMessage());
+        }
         return ResponseEntity.ok().build();
     }
 
@@ -359,11 +379,7 @@ public class LobbyController {
         log.debug("User {} joined game {}", user.getId(), lobby.getId());
 
         // Distribute the notifications to all players in the lobby
-        try {
-            sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
-        } catch (IOException ex) {
-            log.error("Failed to notify players about the new player", ex);
-        }
+        sseManager.send(lobby.getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
 
         // Return 200
         return ResponseEntity.ok(lobby.getDTO());

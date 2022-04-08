@@ -80,22 +80,7 @@ public class Main extends Application {
 
         primaryStage.setOnCloseRequest(e -> {
             e.consume();
-            exitButtonClicked();
+            mainCtrl.openAppCloseWarning();
         });
-    }
-
-    /**
-     * Function that fires when exiting the application. Shows a alert to confirm leaving.
-     */
-    public void exitButtonClicked() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                        "Are you sure you want to exit Quizzz?",
-                        ButtonType.YES,
-                        ButtonType.NO);
-        Optional<ButtonType> confirmExit = alert.showAndWait();
-        if (confirmExit.isPresent() && confirmExit.get() == ButtonType.YES) {
-            Platform.exit();
-            System.exit(0);
-        }
     }
 }

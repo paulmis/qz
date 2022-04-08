@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 
 
@@ -22,6 +23,7 @@ import org.apache.commons.lang3.NotImplementedException;
  * The purpose of this class is to allow the
  * generation of the control inside code.
  */
+@Slf4j
 @Generated
 public class QuestionPane extends StackPane {
 
@@ -44,14 +46,22 @@ public class QuestionPane extends StackPane {
             // Multiple choice question
             MCQuestionDTO mcQuestion = (MCQuestionDTO) question;
 
-            if (mcQuestion.isGuessConsumption()) {
-                loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionCost.fxml"));
-                loader.setControllerFactory(param ->
-                        controller = new MCQuestionCostCtrl(mainCtrl, gameCommunication, mcQuestion));
-            } else {
-                loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionActivity.fxml"));
-                loader.setControllerFactory(param ->
-                        controller = new MCQuestionActivityCtrl(mainCtrl, gameCommunication, mcQuestion));
+            switch (mcQuestion.getQuestionType()) {
+                case GUESS_COST: {
+                    loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionCost.fxml"));
+                    loader.setControllerFactory(param ->
+                            controller = new MCQuestionCostCtrl(mainCtrl, gameCommunication, mcQuestion));
+                    break;
+                }
+                case GUESS_ACTIVITY:
+                case INSTEAD_OF: {
+                    loader = new FXMLLoader(getClass().getResource("/client/scenes/questions/MCQuestionActivity.fxml"));
+                    loader.setControllerFactory(param ->
+                            controller = new MCQuestionActivityCtrl(mainCtrl, gameCommunication, mcQuestion));
+                    break;
+                }
+                default:
+                    throw new NotImplementedException(mcQuestion.getQuestionType() + " questions type not implemented");
             }
         } else if (question instanceof EstimateQuestionDTO) {
             // Estimate question
@@ -68,6 +78,7 @@ public class QuestionPane extends StackPane {
         try {
             view = loader.load();
         } catch (IOException e) {
+            log.error("Could not load the question pane FXML file", e);
             Platform.exit();
             System.exit(0);
         }
@@ -81,5 +92,14 @@ public class QuestionPane extends StackPane {
      */
     public void showAnswer(AnswerDTO answer) {
         controller.showAnswer(answer);
+    }
+
+    /**
+     * Remove the answer.
+     *
+     * @param answer the answer to be removed.
+     */
+    public void removeAnswer(AnswerDTO answer) {
+        controller.removeAnswer(answer);
     }
 }

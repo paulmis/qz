@@ -1,6 +1,18 @@
 jwt:
   secret: L4IbsorCm0RZQy5Fokc9leeK4tMWhm2Isw1oMLVV
 
+management:
+  server:
+    address: "127.0.0.1"
+    port: 11004
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - prometheus
+
 spring:
   application:
     name: quizzz

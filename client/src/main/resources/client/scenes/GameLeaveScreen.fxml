@@ -22,7 +22,7 @@
             </Label>
             <HBox alignment="CENTER" prefHeight="50.0" prefWidth="250.0" spacing="50.0">
                <children>
-                  <JFXButton fx:id="cancelLeaveGameButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#cancelLeaveGame" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #B2B0B0#B2B0B0;" text="CANCEL" textFill="WHITE">
+                  <JFXButton fx:id="cancelLeaveGameButton" alignment="CENTER" contentDisplay="TEXT_ONLY" onAction="#cancelLeaveGame" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #B2B0B0#B2B0B0;" text="CANCEL" textFill="WHITE">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
@@ -30,7 +30,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
                   </JFXButton>
-                  <JFXButton fx:id="leaveGameButton" alignment="CENTER" buttonType="RAISED" contentDisplay="TEXT_ONLY" onAction="#leaveGame" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #FF6969;" text="LEAVE" textFill="WHITE">
+                  <JFXButton fx:id="leaveGameButton" alignment="CENTER" contentDisplay="TEXT_ONLY" onAction="#leaveGame" prefHeight="33.0" prefWidth="90.0" style="-fx-background-color: #FF6969;" text="LEAVE" textFill="WHITE">
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>

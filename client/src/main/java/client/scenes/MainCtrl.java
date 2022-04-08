@@ -33,6 +33,7 @@ import commons.entities.game.GamePlayerDTO;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import commons.entities.questions.QuestionDTO;
 import java.util.Optional;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
@@ -50,10 +51,12 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import lombok.Generated;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Main controller for the client application.
  */
+@Slf4j
 @Generated
 public class MainCtrl {
 
@@ -88,6 +91,7 @@ public class MainCtrl {
     private Popup lobbyLeavePopUp;
     private Popup gameLeavePopUp;
     private Popup lobbyDisbandPopUp;
+    private Popup startGamePopUp;
     private Parent activeScreen;
 
     /**
@@ -140,7 +144,15 @@ public class MainCtrl {
         lobbyLeavePopUp = new Popup();
         gameLeavePopUp = new Popup();
         lobbyDisbandPopUp = new Popup();
+        startGamePopUp = new Popup();
         showServerConnectScreen();
+    }
+
+    /**
+     * Setup that is ran after the client has connected to the server.
+     */
+    public void setup() {
+        gameScreenCtrl.setup();
     }
 
     private void showScreenLetterBox(Parent parent, StageScalingStrategy strategy) {
@@ -399,6 +411,71 @@ public class MainCtrl {
     }
 
     /**
+     * This function opens a popup with
+     * a start warning for starting the game.
+     *
+     * @param startHandler the action that is to be performed when the host starts the game.
+     * @param cancelHandler  the action that is to be performed when the host cancels starting the game.
+     */
+    public void openStartGameWarning(GameStartScreenCtrl.StartHandler startHandler,
+                                        GameStartScreenCtrl.CancelHandler cancelHandler) {
+        startGamePopUp.setOnShown(e -> {
+            startGamePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - startGamePopUp.getWidth() / 2);
+
+            startGamePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - startGamePopUp.getHeight() / 2);
+        });
+
+        var startGamePane = new PopupPane(new GameStartScreenCtrl(startHandler, cancelHandler),
+                "/lobby/GameStartScreen");
+        startGamePopUp.getContent().add(startGamePane);
+        startGamePopUp.show(primaryStage);
+    }
+
+    /**
+     * This function closes the start game popUp.
+     */
+    public void closeStartGameWarning() {
+        startGamePopUp.hide();
+        startGamePopUp.getContent().clear();
+    }
+
+    /**
+     * Open warning pop-up before closing the application.
+     */
+    public void openAppCloseWarning() {
+        gameLeavePopUp.setOnShown(e -> {
+            gameLeavePopUp.setX(primaryStage.getX() + primaryStage.getWidth() / 2
+                    - gameLeavePopUp.getWidth() / 2);
+
+            gameLeavePopUp.setY(primaryStage.getY() + primaryStage.getHeight() / 2
+                    - gameLeavePopUp.getHeight() / 2);
+        });
+
+        var gameLeavePane = new PopupPane(new GameLeaveScreenCtrl(
+                () -> Platform.runLater(() -> {
+                    log.info("Exit requested, closing application.");
+                    Platform.exit();
+                    System.exit(0);
+                }),
+                () -> Platform.runLater(() -> {
+                    closeAppCloseWarning();
+                })),
+                "GameLeaveScreen");
+        gameLeavePopUp.getContent().add(gameLeavePane);
+        gameLeavePopUp.show(primaryStage);
+    }
+
+    /**
+     * Close the application leave pop-up.
+     */
+    public void closeAppCloseWarning() {
+        gameLeavePopUp.hide();
+        gameLeavePopUp.getContent().clear();
+    }
+
+    /**
      * This function checks if the player is the host of the lobby.
      */
     public void checkHost() {
@@ -539,21 +616,6 @@ public class MainCtrl {
             default:
                 break;
 
-        }
-    }
-
-    /**
-     * Initializes the game scene based on the current stage of the game.
-     */
-    void joinGame() {
-        switch (ClientState.gameStage) {
-            case QUESTION:
-                showGameScreen(null);
-                break;
-            case ANSWER:
-                break;
-            default:
-                throw new IllegalArgumentException();
         }
     }
 

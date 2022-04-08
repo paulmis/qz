@@ -7,6 +7,7 @@ import static server.utils.TestHelpers.getUUID;
 import commons.entities.ActivityDTO;
 import commons.entities.AnswerDTO;
 import commons.entities.questions.MCQuestionDTO;
+import commons.entities.questions.MCType;
 import java.util.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -32,13 +33,13 @@ class MCQuestionTest {
             components.add(a);
         }
         q = new MCQuestion();
-        q.setActivities(components);
+        q.setActivities(new HashSet<>(components));
         ((MCQuestion) q).setAnswer(components.get(1));
     }
 
     @Test
     void testFromDTOConstructor() {
-        MCQuestionDTO questionDTO = new MCQuestionDTO(false);
+        MCQuestionDTO questionDTO = new MCQuestionDTO(MCType.GUESS_ACTIVITY);
         questionDTO.setText("Question text");
 
         MCQuestion q = new MCQuestion(questionDTO);
@@ -48,9 +49,10 @@ class MCQuestionTest {
     @Test
     void getRightAnswerTest() {
         int rightAnswerIdx = 2;
-        ((MCQuestion) q).setAnswer(q.getActivities().get(rightAnswerIdx));
+        ((MCQuestion) q).setAnswer(new ArrayList<>(q.getActivities()).get(rightAnswerIdx));
         AnswerDTO rightAnswer = new AnswerDTO();
-        rightAnswer.setResponse(new ArrayList<>(List.of(q.getActivities().get(rightAnswerIdx).getDTO())));
+        rightAnswer.setResponse(
+                new ArrayList<>(List.of(new ArrayList<>(q.getActivities()).get(rightAnswerIdx).getDTO())));
         assertEquals(rightAnswer, q.getRightAnswer());
     }
 
@@ -119,21 +121,22 @@ class MCQuestionTest {
         mcNoArgs.setId(getUUID(0));
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
-        mcNoArgs.setActivities(List.copyOf(activities));
+        mcNoArgs.setActivities(new HashSet<>(List.copyOf(activities)));
         String questionText = "aQuestion";
         mcNoArgs.setText(questionText);
         Activity answer = getActivity(2);
         ((MCQuestion) mcNoArgs).setAnswer(answer);
-        boolean guessConsumption = true;
-        ((MCQuestion) mcNoArgs).setGuessConsumption(guessConsumption);
-        Question mcAllArgs = new MCQuestion(getUUID(0), activities, questionText, answer, guessConsumption);
+        MCType type = MCType.GUESS_COST;
+        ((MCQuestion) mcNoArgs).setQuestionType(type);
+        Question mcAllArgs = new MCQuestion(getUUID(0),
+                new HashSet<>(activities), questionText, answer, type);
 
         // Constructor comparison
         assertEquals(mcNoArgs.getId(), mcAllArgs.getId());
         assertEquals(mcNoArgs.getActivities(), mcAllArgs.getActivities());
         assertEquals(mcNoArgs.getText(), mcAllArgs.getText());
         assertEquals(((MCQuestion) mcNoArgs).getAnswer(), ((MCQuestion) mcAllArgs).getAnswer());
-        assertEquals(((MCQuestion) mcNoArgs).isGuessConsumption(), ((MCQuestion) mcAllArgs).isGuessConsumption());
+        assertEquals(((MCQuestion) mcNoArgs).getQuestionType(), ((MCQuestion) mcAllArgs).getQuestionType());
     }
 
     @Test
@@ -143,15 +146,16 @@ class MCQuestionTest {
         List<Activity> activities = new ArrayList<>(List.of(
                 getActivity(0), getActivity(1), getActivity(2), getActivity(3)));
         Activity answer = getActivity(2);
-        boolean guessConsumption = true;
-        Question mcAllArgs = new MCQuestion(getUUID(0), activities, questionText, answer, guessConsumption);
-        Question mcCopy = new MCQuestion(mcAllArgs, answer, guessConsumption);
+        MCType type = MCType.GUESS_COST;
+        Question mcAllArgs = new MCQuestion(getUUID(0),
+                new HashSet<>(activities), questionText, answer, type);
+        Question mcCopy = new MCQuestion(mcAllArgs, answer, type);
 
         // Constructor comparison
         assertEquals(mcAllArgs.getId(), mcCopy.getId());
         assertEquals(mcAllArgs.getActivities(), mcCopy.getActivities());
         assertEquals(mcAllArgs.getText(), mcCopy.getText());
         assertEquals(((MCQuestion) mcAllArgs).getAnswer(), ((MCQuestion) mcCopy).getAnswer());
-        assertEquals(((MCQuestion) mcAllArgs).isGuessConsumption(), ((MCQuestion) mcCopy).isGuessConsumption());
+        assertEquals(((MCQuestion) mcAllArgs).getQuestionType(), ((MCQuestion) mcCopy).getQuestionType());
     }
 }

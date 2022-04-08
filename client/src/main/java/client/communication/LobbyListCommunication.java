@@ -42,11 +42,14 @@ public class LobbyListCommunication {
      * @param handleFail The function that will be called if the request is unsuccessful.
      */
     public void createLobby(GameConfigurationDTO config,
-                            boolean isPrivate, CreateLobbyHandlerSuccess handleSuccess,
+                            boolean isPrivate,
+                            String nameOfLobby,
+                            CreateLobbyHandlerSuccess handleSuccess,
                             CreateLobbyHandlerFail handleFail) {
         var game = new NormalGameDTO();
         game.setConfiguration(config);
         game.setIsPrivate(isPrivate);
+        game.setGameName(nameOfLobby);
 
         Invocation invocation = ServerUtils.getRequestTarget()
                 .path("/api/lobby")

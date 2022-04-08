@@ -42,6 +42,12 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     protected String gameId;
 
     /**
+     * The name of the game given by the user.
+     */
+    @Column(nullable = false)
+    protected String gameName;
+
+    /**
      * Timestamp of game creation.
      */
     @Column(columnDefinition = "TIMESTAMP")
@@ -66,7 +72,6 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     /**
      * Current question number.
      */
-    @Column(nullable = true)
     protected Integer currentQuestionNumber = null;
 
     /**
@@ -84,23 +89,27 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * Whether the players are allowed to submit an answer or not.
      */
     protected boolean acceptingAnswers = false;
+
     /**
      * List of players currently in the game mapped by their user IDs.
      */
     @JsonManagedReference
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     protected Map<UUID, GamePlayer> players = new HashMap<>();
+
     /**
      * The head of the lobby - person in charge with special privileges.
      */
     @OneToOne(fetch = FetchType.LAZY)
     protected GamePlayer host;
+
     /**
      * Questions assigned to this game.
      */
     @ManyToMany(fetch = FetchType.EAGER)
     @OrderColumn
     protected List<Question> questions = new ArrayList<>();
+
     /**
      * PRNG.
      */
@@ -135,6 +144,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         this.status = dto.getStatus();
         this.currentQuestionNumber = dto.getCurrentQuestionNumber();
         this.gameType = dto.getGameType();
+        this.gameName = dto.getGameName();
     }
 
     /**
@@ -161,7 +171,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
      * @return set of UUIDs of all players in the game.
      */
     public Set<UUID> getUserIds() {
-        return players.keySet();
+        return players.keySet().stream().filter(uuid -> !players.get(uuid).isAbandoned()).collect(Collectors.toSet());
     }
 
     /**
@@ -304,6 +314,32 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
     }
 
     /**
+     * Computes the time based score given a base score.
+     *
+     * @param baseScore  the base score.
+     * @param answerTime time at which the answer was given.
+     * @param questionEndTime time at which the question ended.
+     * @return the new time based score.
+     */
+    public int computeTimeBasedScore(int baseScore, LocalDateTime answerTime, LocalDateTime questionEndTime) {
+        // Calculate answer time  - question answer time config
+        Duration timeLeft = Duration.between(answerTime, questionEndTime);
+        double timeLeftAsPercentage =
+                (double) timeLeft.getSeconds() / (double) configuration.getAnswerTime().getSeconds();
+        // Calculate the score based on time.
+        // 120% of the score if answered immediately, 80% if answered at the last second
+        // newScore = (timeLeft/timeToAnswer) * (120% of baseScore - 80% of baseScore) + (80% of baseScore)
+        // Time based score only to be computer on correct answers
+        if (baseScore >= 0) {
+            return (int) Math.round(timeLeftAsPercentage
+                    * (0.4 * baseScore) + (0.8 * baseScore));
+        } else {
+            return baseScore;
+        }
+
+    }
+
+    /**
      * Computes the streak score given a base score.
      *
      * @param gamePlayer the game player that has the streak.
@@ -381,6 +417,7 @@ public abstract class Game<T extends GameDTO> extends BaseEntity<T> {
         return new GameDTO(
                 this.id,
                 this.gameId,
+                this.gameName,
                 this.isPrivate,
                 this.createDate,
                 this.gameType,

@@ -13,7 +13,11 @@ variables:
   POSTGRES_HOST_AUTH_METHOD: trust
 
 services:
-  - postgres
+  - name: postgres
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=400"
 
 stages:
   - build

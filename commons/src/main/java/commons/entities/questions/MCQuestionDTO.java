@@ -21,15 +21,15 @@ public class MCQuestionDTO extends QuestionDTO {
      * Boolean to indicate if the user has to guess the energy consumption
      * or the corresponding activity.
      */
-    protected boolean guessConsumption = true;
+    protected MCType questionType = MCType.GUESS_COST;
 
     /**
      * Copy constructor.
      *
      * @param questionDTO the question to copy
      */
-    public MCQuestionDTO(QuestionDTO questionDTO, boolean guessConsumption) {
+    public MCQuestionDTO(QuestionDTO questionDTO, MCType type) {
         super(questionDTO);
-        this.guessConsumption = guessConsumption;
+        this.questionType = type;
     }
 }

@@ -89,7 +89,7 @@ public class EstimateQuestionCtrl extends QuestionCtrl {
         this.questionLabel.setText(question.getText());
 
         // Set question image
-        questionIcon.setImage(new Image(ServerUtils.getImagePathFromId(question.getQuestionIconId())));
+        questionIcon.setImage(new Image(ServerUtils.getImagePathFromId(question.getQuestionIconId()), true));
     }
 
     @Override
@@ -122,5 +122,10 @@ public class EstimateQuestionCtrl extends QuestionCtrl {
         guessField.getStyleClass().add(correctAnswer
                 ? "correct-answer"
                 : "incorrect-answer");
+    }
+
+    @Override
+    protected void removeAnswer(AnswerDTO answer) {
+        // Had error if I didn't do this.
     }
 }

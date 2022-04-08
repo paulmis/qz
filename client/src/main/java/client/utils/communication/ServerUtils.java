@@ -17,24 +17,37 @@
 package client.utils.communication;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM;
 
+import client.communication.admin.AdminCommunication;
 import client.utils.Authenticator;
 import client.utils.ClientState;
+import client.utils.EncryptionUtils;
+import client.utils.PreferencesManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import commons.entities.ActivityDTO;
 import commons.entities.auth.LoginDTO;
 import commons.entities.auth.UserDTO;
 import commons.entities.utils.ApiError;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.AttachmentBuilder;
+import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 
 /**
  * Utilities for communicating with the server.
@@ -82,49 +95,80 @@ public class ServerUtils {
         client = newClient();
     }
 
-    /** Gets a list of the leaderboard images from the server.
+    /**
+     * Function to check if entered email is indeed an email.
      *
-     * @return a list of leaderboard images.
+     * @param email email string entered by user
+     * @return true if it is a valid email, false otherwise
      */
-    public List<URL> getLeaderBoardImages() {
-        try {
-            return Arrays.asList(
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"),
-                    new URL("https://en.gravatar.com/userimage/215919617/deb21f77ed0ec5c42d75b0dae551b912.png?size=50"));
-        } catch (Exception e) {
-            return new ArrayList<>();
+    public static boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."
+                + "[a-zA-Z0-9_+&*-]+)*@"
+                + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
+                + "A-Z]{2,7}$";
+
+        Pattern emailPattern = Pattern.compile(emailRegex);
+        if (email == null) {
+            return false;
         }
+        return emailPattern.matcher(email).matches();
     }
 
     /**
      * Handler for when the register succeeds.
      */
     public interface RegisterHandler {
-        void handle(Response response, ApiError error);
+        void handle(Response response, LoginDTO dto, ApiError error);
     }
 
     /**
      * Function that registers a new user.
      *
-     * @param username string representing
-     *              the email of the user.
-     * @param email string representing
-     *              the email of the user.
-     * @param password string representing
-     *                 the password of the user.
+     * @param username        string representing the name of the user.
+     * @param email           string representing the email of the user.
+     * @param password        string representing the password of the user.
+     * @param image           the file of the user profile pic.
+     * @param registerHandler handler called when a response is received.
      */
     public void register(String username, String email, String password,
-                           RegisterHandler registerHandler) {
+                           File image, RegisterHandler registerHandler) {
         resetClient();
+
+        // The list of attachments
+        List<Attachment> attachments = new ArrayList<>();
+
+        // Add the user dto as an attachment.
         UserDTO user = new UserDTO(username, email, password);
+        attachments.add((new AttachmentBuilder())
+                .mediaType(APPLICATION_JSON)
+                .object(user)
+                .contentDisposition(new ContentDisposition("form-data;name=\"userData\""))
+                .build());
+
+        // If the image is not null add it to the attachments.
+        if (image != null) {
+            try {
+                attachments.add((new AttachmentBuilder())
+                        .mediaType(APPLICATION_OCTET_STREAM)
+                        .object(new FileInputStream(image))
+                        .contentDisposition(new ContentDisposition("form-data;name=\"image\";filename=\"image\""))
+                        .build());
+            } catch (FileNotFoundException e) {
+                log.error("Couldn't create input stream.");
+                e.printStackTrace();
+            }
+        }
+
+        // Create the multipart body that holds all attachments.
+        var multiPartBody = new MultipartBody(attachments);
+
         var invocation = client
-                .target(SERVER).path("/api/auth/register")
+                .target(SERVER)
+                .register(new org.apache.cxf.jaxrs.provider.MultipartProvider())
+                .path("/api/auth/register")
                 .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .buildPost(Entity.entity(user, APPLICATION_JSON));
+                .header("Content-Type", "multipart/form-data")
+                .buildPost(Entity.entity(multiPartBody, "multipart/mixed"));
 
         invocation.submit(new InvocationCallback<Response>() {
             @Override
@@ -133,11 +177,11 @@ public class ServerUtils {
                     LoginDTO loginDTO = o.readEntity(LoginDTO.class);
                     client = client.register(new Authenticator(loginDTO.getToken()));
                     ClientState.user = loginDTO.getUser();
-                    registerHandler.handle(o, new ApiError());
+                    registerHandler.handle(o, loginDTO, new ApiError());
                 } else if (o.getStatus() == 400) {
-                    registerHandler.handle(o, o.readEntity(ApiError.class));
+                    registerHandler.handle(o, null, o.readEntity(ApiError.class));
                 } else if (o.getStatus() == 409) {
-                    registerHandler.handle(o, new ApiError());
+                    registerHandler.handle(o, null, new ApiError());
                 }
             }
 
@@ -163,9 +207,51 @@ public class ServerUtils {
     }
 
     /**
+     * Handler for when token is valid.
+     */
+    public interface LoginValidHandler {
+        void handle(LoginDTO data);
+    }
+
+    /**
+     * Check whether the provided token is valid.
+     *
+     * @param token token to check.
+     * @param handler handler to call if the token is valid.
+     */
+    public void checkTokenValid(String token, LoginValidHandler handler) {
+        log.debug("Checking token validity");
+        client = newClient();
+        Invocation invocation = client.target(SERVER).path("/api/user").request(APPLICATION_JSON)
+                .header("Authorization", "Bearer " + token).buildGet();
+        invocation.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response o) {
+                if (o.getStatus() == 200) {
+                    LoginDTO data = o.readEntity(LoginDTO.class);
+                    log.info("Token is valid: {}", data.getUser());
+
+                    client = client.register(new Authenticator(token));
+                    ClientState.user = data.getUser();
+                    ClientState.game = data.getGame();
+
+                    handler.handle(data);
+                } else {
+                    log.info("Token is not valid");
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                log.info("Token not valid");
+            }
+        });
+    }
+
+    /**
      * Logs the user in, granting access to the API.
      *
-     * @param email string representing the email of the user.
+     * @param email    string representing the email of the user.
      * @param password string representing the password of the user.
      */
     public void logIn(String email, String password,
@@ -200,9 +286,20 @@ public class ServerUtils {
      * Function to connect to the server and sets the server path.
      *
      * @param serverPath the server path to connect to
+     * @return whether the connection was successful or not
      */
-    public void connect(String serverPath) {
-        this.SERVER = serverPath;
+    public boolean connect(String serverPath) {
+        try {
+            Response r = client.target(serverPath).path("/api/misc/ping").request().get();
+            if (r.getStatus() == Response.Status.OK.getStatusCode()) {
+                SERVER = serverPath;
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
@@ -216,9 +313,61 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON)
                 .get();
         if (r.getStatus() == Response.Status.OK.getStatusCode()) {
-            return r.readEntity(new GenericType<List<UserDTO>>() {});
+            return r.readEntity(new GenericType<>() {
+            });
         }
         return new ArrayList<>();
+    }
+
+    /**
+     * The get user info handler success.
+     */
+    public interface GetUserInfoHandlerSuccess {
+        void handle(UserDTO userDTO);
+    }
+
+    /**
+     * The get user info handler fail.
+     */
+    public interface GetUserInfoHandlerFail {
+        void handle(ApiError error);
+    }
+
+    /**
+     * Gets information about a user by their id.
+     *
+     * @param userId the id of the user
+     * @param handleSuccess the function to call on a successful request.
+     * @param handleFail the function to call on a failed request.
+     */
+    public static void getUserInfoById(UUID userId,
+                                GetUserInfoHandlerSuccess handleSuccess,
+                                GetUserInfoHandlerFail handleFail) {
+        // Build the query invocation
+        Invocation request = ServerUtils.getRequestTarget()
+                .path("/api/user/" + userId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .buildGet();
+
+        // Perform the query asynchronously
+        request.submit(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                if (response.getStatus() == 200) {
+                    handleSuccess.handle(response.readEntity(UserDTO.class));
+                } else {
+                    ApiError error = response.readEntity(ApiError.class);
+                    handleFail.handle(error);
+                }
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                throwable.printStackTrace();
+                handleFail.handle(null);
+            }
+        });
     }
 
     public void signOut() {

@@ -4,10 +4,13 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.game.GameStatus;
 import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +23,7 @@ import server.configuration.quiz.QuizConfiguration;
 import server.configuration.quiz.QuizTimingConfiguration;
 import server.database.entities.game.NormalGame;
 import server.database.entities.game.configuration.NormalGameConfiguration;
+import server.database.repositories.game.GameRepository;
 import server.services.fsm.DefiniteGameFSM;
 import server.services.fsm.FSMContext;
 import server.utils.FSMHelpers;
@@ -36,6 +40,8 @@ class FSMManagerTest {
     private ThreadPoolTaskScheduler taskScheduler;
     @Mock
     private QuizConfiguration quizConfiguration;
+    @Mock
+    private GameRepository gameRepository;
     @InjectMocks
     private GameService gameService;
 
@@ -126,6 +132,8 @@ class FSMManagerTest {
     @Test
     void startFSMAlreadyStarted() {
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
+        fsm.getContext().setGameService(gameService);
+        when(gameRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(game));
 
         // Add a new FSM
         fsmManager.addFSM(game, fsm);

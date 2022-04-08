@@ -148,6 +148,30 @@ public class FileSystemStorageService implements StorageService {
     }
 
     /**
+     * Delete a resource.
+     *
+     * @param resourceId resource ID.
+     * @return true if the resource was deleted, false otherwise.
+     */
+    @Override
+    public boolean delete(UUID resourceId) {
+        Path destinationFile = this.fsConfiguration.getUploadDirPath().resolve(
+                        Paths.get(resourceId.toString()))
+                .normalize().toAbsolutePath();
+        if (Files.exists(destinationFile)) {
+            try {
+                Files.delete(destinationFile);
+                log.debug("Resource {} deleted", resourceId);
+                return true;
+            } catch (IOException e) {
+                log.warn("Could not delete resource {}", resourceId);
+                log.warn("Error: {}", e.getMessage());
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get the URI of a resource.
      *
      * @param resourceId resource ID.
