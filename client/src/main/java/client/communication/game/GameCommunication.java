@@ -282,7 +282,11 @@ public class GameCommunication {
             @Override
             public void completed(Response response) {
                 if (response.getStatus() == 200) {
-                    handleSuccess.handle(response.readEntity(ActivityDTO.class));
+                    try {
+                        handleSuccess.handle(response.readEntity(ActivityDTO.class));
+                    } catch (Exception e) {
+                        handleSuccess.handle(null);
+                    }
                 } else {
                     handleFail.handle(response.readEntity(ApiError.class));
                 }

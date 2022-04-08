@@ -144,6 +144,10 @@ public class GameController {
 
         log.debug("Sending power-up to game {}", game.getId());
 
+        // Disable powerup for estimate question
+        if (powerUp.name().equals("IncorrectAnswer") && game.getQuestion().get() instanceof EstimateQuestion) {
+            throw new PowerUpDisabledException();
+        }
         gameService.sendPowerUp(game, gamePlayer, powerUp);
         gamePlayer.getUserPowerUps().put(powerUp, game.getCurrentQuestionNumber());
         gameRepository.save(game);
@@ -157,10 +161,6 @@ public class GameController {
                     return ResponseEntity.ok(activ.getDTO());
                 }
             }
-        }
-        // Disable powerup for estimate question
-        if (powerUp.name().equals("IncorrectAnswer") && game.getQuestion().get() instanceof EstimateQuestion) {
-            throw new PowerUpDisabledException();
         }
         // Return 200
         return ResponseEntity.ok().build();
