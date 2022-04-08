@@ -207,7 +207,7 @@ public class LobbyListCtrl implements Initializable {
         settingsPanel.setVisible(false);
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         communication.getLobbies(
-                games -> {
+                games -> runLater(() -> {
                     // Gets a random available lobby and joins it
                     games.removeIf(game -> (game.getConfiguration().getCapacity() <= game.getPlayers().size()));
                     if (games.isEmpty()) {
@@ -222,7 +222,7 @@ public class LobbyListCtrl implements Initializable {
                             });
                         });
                     }
-                },
+                }),
                 () -> {
                     // If there are no available games, the user creates a new lobby
                     runLater(this::createLobby);
