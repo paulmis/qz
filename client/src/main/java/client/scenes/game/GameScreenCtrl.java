@@ -366,7 +366,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
 
             // Create the tooltip
             Tooltip tooltip = new Tooltip();
-            tooltip.setText(player.getNickname() + ": " + player.getScore());
+            tooltip.setText(player.getNickname() + ": " + player.getScore() + " points");
             Tooltip.install(circle, tooltip);
         }
     }
@@ -402,7 +402,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
      */
     @SSEEventHandler(SSEMessageType.POWER_UP_PLAYED)
     public void handlePowerUP(PowerUp powerUp) {
-        mainCtrl.showInformationalSnackBar("A " + powerUp.name() + " Power-Up has been played!");
+        mainCtrl.showInformationalSnackBar(StringUtils.capitalize(powerUp.getPowerUpName()) + " has been played!");
         SoundManager.playMusic(SoundEffect.POWER_UP, getClass());
 
         switch (powerUp) {
