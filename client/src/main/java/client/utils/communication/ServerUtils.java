@@ -187,7 +187,7 @@ public class ServerUtils {
 
             @Override
             public void failed(Throwable throwable) {
-                System.out.println("HERE " + throwable.toString());
+                log.error("Request failed", throwable);
             }
         });
     }

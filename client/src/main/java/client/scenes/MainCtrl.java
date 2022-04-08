@@ -485,17 +485,17 @@ public class MainCtrl {
                 .filter(gp -> ClientState.user.getId().equals(gp.getUserId()))
                 .findAny();
         //Check if game player data is empty
-        if (!gamePlayerData.isEmpty()) {
+        if (gamePlayerData.isPresent()) {
             // Compare gamePlayer id with lobby host id to check if player is host
             if (gamePlayerData.get().getId().equals(ClientState.game.getHost())) {
-                System.out.println("Player is host");
+                log.debug("Player is host");
                 this.showDisbandButton();
             } else {
-                System.out.println("Player is not host");
+                log.debug("Player is not host");
                 this.hideDisbandButton();
             }
         } else {
-            System.out.println("Couldn't retrieve game player/User is not a game player");
+            log.error("Couldn't retrieve game player/User is not a game player");
             this.hideDisbandButton();
         }
     }

@@ -76,6 +76,7 @@ public abstract class GameFSM {
      */
     public void stop() {
         log.debug("[{}] Stopping FSM", getGame().getId());
+
         setRunning(false);
     }
 

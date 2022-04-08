@@ -15,11 +15,13 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Response;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Handles the communication that is done inside the lobby list screen
  * and other related screens.
  */
+@Slf4j
 public class LobbyListCommunication {
     /**
      * Handler for when the create lobby succeeds.
@@ -156,7 +158,7 @@ public class LobbyListCommunication {
 
             @Override
             public void completed(GameDTO game) {
-                System.out.println(game);
+                log.debug("{}", game);
                 ClientState.game = game;
                 ServerUtils.sseHandler.subscribe();
                 joinLobbyHandlerSuccess.handle(game);
