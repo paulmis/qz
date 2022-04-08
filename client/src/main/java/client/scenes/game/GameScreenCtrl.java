@@ -702,8 +702,7 @@ public class GameScreenCtrl implements Initializable, SSESource {
                             if (powerUp == PowerUp.IncorrectAnswer
                                     && activity != null && centerPane instanceof QuestionPane) {
                                 log.warn("Eliminating answer {}", activity.toString());
-                                List<ActivityDTO> activities = new ArrayList<ActivityDTO>();
-                                activities.add(activity);
+                                List<ActivityDTO> activities = List.of(activity);
                                 ((QuestionPane) centerPane).removeAnswer(
                                         new AnswerDTO(ClientState.game.getCurrentQuestion().getId(), activities));
                             }
