@@ -14,5 +14,5 @@ public class ResourceConfiguration {
      * The resource base URL - prepended to resource UUIDs to get the access URL.
      * This is the base URL of the resource server.
      */
-    private URI baseUri = URI.create("http://quizzz.rstular.eu:8080/api/resource/");
+    private URI baseUri = URI.create("http://localhost:8080/api/resource/");
 }
