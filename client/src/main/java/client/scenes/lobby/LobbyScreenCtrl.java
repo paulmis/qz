@@ -119,6 +119,7 @@ public class LobbyScreenCtrl implements SSESource, Initializable {
      */
     @SSEEventHandler(SSEMessageType.LOBBY_DELETED)
     public void lobbyDisbanded() {
+        settingsPanel.setVisible(false);
         mainCtrl.showErrorSnackBar("Lobby has been disbanded");
         mainCtrl.showLobbyListScreen();
     }
@@ -130,6 +131,7 @@ public class LobbyScreenCtrl implements SSESource, Initializable {
      */
     @SSEEventHandler(SSEMessageType.GAME_START)
     public void gameStarted(Integer preparationDuration) {
+        settingsPanel.setVisible(false);
         SoundManager.playMusic(SoundEffect.GAME_START, getClass());
         mainCtrl.showGameScreen(ClientState.game.getCurrentQuestion());
         mainCtrl.getGameScreenCtrl().startTimer(Duration.ofMillis(preparationDuration));
@@ -146,12 +148,6 @@ public class LobbyScreenCtrl implements SSESource, Initializable {
         }
         updateView();
         setUpVolume();
-    }
-
-    @FXML
-    private void leaderboardButtonClick() {
-        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
-        mainCtrl.showGlobalLeaderboardScreen();
     }
 
     @FXML
@@ -201,6 +197,7 @@ public class LobbyScreenCtrl implements SSESource, Initializable {
      */
     @FXML
     public void startButtonClick() {
+        settingsPanel.setVisible(false);
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         if (ClientState.game.getConfiguration().getCapacity() > ClientState.game.getPlayers().size()) {
             mainCtrl.showErrorSnackBar("You need to have "
@@ -244,6 +241,7 @@ public class LobbyScreenCtrl implements SSESource, Initializable {
      */
     @FXML
     private void leaveButtonClick() {
+        settingsPanel.setVisible(false);
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         // Open the warning and wait for user action
         mainCtrl.openLobbyLeaveWarning(
@@ -278,6 +276,7 @@ public class LobbyScreenCtrl implements SSESource, Initializable {
      * Fired when the disband button is clicked.
      */
     public void disbandButtonClick() {
+        settingsPanel.setVisible(false);
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.openLobbyDisbandWarning(() -> {
             mainCtrl.closeLobbyDisbandWarning();
@@ -326,6 +325,7 @@ public class LobbyScreenCtrl implements SSESource, Initializable {
      */
     @FXML
     public void lobbySettingsButtonClick() {
+        settingsPanel.setVisible(false);
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.openLobbySettings(ClientState.game.getConfiguration(), (conf) -> {
             // Close pop-up
@@ -423,6 +423,7 @@ public class LobbyScreenCtrl implements SSESource, Initializable {
      */
     @SSEEventHandler(SSEMessageType.YOU_HAVE_BEEN_KICKED)
     public void kicked() {
+        settingsPanel.setVisible(false);
         ClientState.game = null;
         ServerUtils.sseHandler.kill();
         mainCtrl.showLobbyListScreen();
