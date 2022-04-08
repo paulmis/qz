@@ -95,6 +95,11 @@ public class GameService {
     @Transactional
     public Game start(Game game)
             throws NotImplementedException, IllegalStateException {
+
+        if (game.getConfiguration().getCapacity() > game.getPlayers().size()) {
+            game.getConfiguration().setCapacity(game.getPlayers().size());
+        }
+
         // Make sure that the lobby is full and not started
         if (game.getStatus() != GameStatus.CREATED || !game.isFull()) {
             log.debug("[{}] Cannot start game: game is not full or has already started.", game.getId());
