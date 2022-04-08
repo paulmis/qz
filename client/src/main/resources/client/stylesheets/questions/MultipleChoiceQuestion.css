@@ -59,3 +59,7 @@
 .incorrect-answer {
     -fx-background-color: incorrectAnswerColor !important;
 }
+
+.incorrect-answer-powerup {
+    -fx-background-color: orange !important;
+}

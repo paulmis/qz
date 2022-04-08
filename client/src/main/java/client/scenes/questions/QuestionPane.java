@@ -93,4 +93,13 @@ public class QuestionPane extends StackPane {
     public void showAnswer(AnswerDTO answer) {
         controller.showAnswer(answer);
     }
+
+    /**
+     * Remove the answer.
+     *
+     * @param answer the answer to be removed.
+     */
+    public void removeAnswer(AnswerDTO answer) {
+        controller.removeAnswer(answer);
+    }
 }

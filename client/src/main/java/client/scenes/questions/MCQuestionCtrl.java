@@ -87,6 +87,11 @@ public abstract class MCQuestionCtrl extends QuestionCtrl {
         }
     }
 
+    /**
+     * Function that shows the correct answer.
+     *
+     * @param answer the correct answer.
+     */
     protected void showAnswer(AnswerDTO answer) {
         if (!this.question.getId().equals(answer.getQuestionId())) {
             log.error("Received answer for a different question: expected {} but got {}",
@@ -108,6 +113,32 @@ public abstract class MCQuestionCtrl extends QuestionCtrl {
                 button.getStyleClass().add("correct-answer");
             } else if (this.chosenAnswer == button) {
                 button.getStyleClass().add("incorrect-answer");
+            }
+        }
+    }
+
+    /**
+     * Function that removes a specific answer for the question.
+     *
+     * @param answer the answer we want to remove
+     */
+    protected void removeAnswer(AnswerDTO answer) {
+        if (!this.question.getId().equals(answer.getQuestionId())) {
+            log.error("Received answer for a different question: expected {} but got {}",
+                    this.question.getId(), answer.getQuestionId());
+            mainCtrl.showErrorSnackBar("Received answer for the wrong question.");
+            return;
+        }
+
+        log.debug("Removing answer: {}", answer);
+
+        UUID answerActivity = answer.getResponse().get(0).getId();
+        for (int i = 0; i < getButtons().size(); ++i) {
+            JFXButton button = getButtons().get(i);
+            if (question.getActivities().get(i).getId().equals(answerActivity)) {
+                button.getStyleClass().add("incorrect-answer-powerup");
+                button.setMouseTransparent(true);
+                return;
             }
         }
     }
