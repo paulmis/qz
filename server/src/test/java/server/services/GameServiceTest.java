@@ -174,18 +174,6 @@ public class GameServiceTest {
     }
 
     @Test
-    void startNotFull() throws LastPlayerRemovedException {
-        // Remove susanne
-        game.remove(susanne.getId());
-
-        // Start the game
-        assertThrows(IllegalStateException.class, () -> gameService.start(game));
-
-        // Verify interactions
-        verifyNoMoreInteractions(questionService);
-    }
-
-    @Test
     void startUnsupported() {
         // Create a mock game
         MockGame mockGame = new MockGame();

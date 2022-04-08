@@ -199,16 +199,10 @@ public class LobbyScreenCtrl implements SSESource, Initializable {
     public void startButtonClick() {
         settingsPanel.setVisible(false);
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
-        //ToDo: Move/Delete below code that check lobby capacity
-//        if (ClientState.game.getConfiguration().getCapacity() > ClientState.game.getPlayers().size()) {
-//            mainCtrl.showErrorSnackBar("You need to have "
-//                    + ClientState.game.getConfiguration().getCapacity()
-//                    + " players to start the game.");
-//            return;
-//        } else if (ClientState.game.getConfiguration().getCapacity() < ClientState.game.getPlayers().size()) {
-//            mainCtrl.showErrorSnackBar("The lobby exceeds the capacity. Kick some people out!");
-//            return;
-//        }
+        if (ClientState.game.getConfiguration().getCapacity() < ClientState.game.getPlayers().size()) {
+            mainCtrl.showErrorSnackBar("The lobby exceeds the capacity. Kick some people out!");
+            return;
+        }
 
         mainCtrl.openStartGameWarning(() -> {
             mainCtrl.closeStartGameWarning();
