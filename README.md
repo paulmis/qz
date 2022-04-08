@@ -3,25 +3,21 @@ This project is a quizzzz app. The quizzzz app is a single and multiplayer game 
 This project is made using the Spring BOOT REST API for the backend and OpenJavaFX for the frontend.
 Many design and feature choices were made to make this project intuitive and unique.\
 Here is an overview of our choices:
-<ul>
-    <li> Registration support, all the user's information are safely stored and easily retrieved from the database. </li>
-    <li> Private games, to play only with people you know. </li>
-    <li> Random lobby, to join just any game. </li>
-    <li> Ten reactions, to express different feelings to the other players as the game progresses. </li>
-    <li> Sound effects. </li>
-    <li> Fully customizable experience, the user can define: </li>
-    <ol type="a">
-        <li> How many questions are asked in a game. </li>
-        <li> How much time is available to answer. </li>
-        <li> How many players are allowed to participate. </li>
-        <li> How many points are awarded for a correct answer. </li>
-        <li> How many points are awarded for an incorrect answer. </li>
-        <li> How many correct answers in a row give streak bonuses. </li>
-        <li> How lenient is the scoring system. </li>
-        <li> To mute other players' reactions. </li>
-        <li> To mute the sound effects. </li>
-    </ol>
-</ul>
+- Registration support, all the user's information are safely stored and easily retrieved from the database.
+- Private games, to play only with people you know.
+- Random lobby, to join just any game.
+- Ten reactions, to express different feelings to the other players as the game progresses.
+- Sound effects.
+- Fully customizable experience, the user can define:
+  1. How many questions are asked in a game.
+  2. How much time is available to answer.
+  3. How many players are allowed to participate.
+  4. How many points are awarded for a correct answer.
+  5. How many points are awarded for an incorrect answer.
+  6. How many correct answers in a row give streak bonuses.
+  7. How lenient is the scoring system.
+  8. To mute other players' reactions.
+  9. To mute the sound effects. </li>
 
 ## Group members
 
