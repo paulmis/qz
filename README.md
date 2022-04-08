@@ -17,7 +17,7 @@ Here is an overview of our choices:
   6. How many correct answers in a row give streak bonuses.
   7. How lenient is the scoring system.
   8. To mute other players' reactions.
-  9. To mute the sound effects. </li>
+  9. To mute the sound effects.
 
 ## Group members
 
