@@ -49,7 +49,7 @@ Here is an overview of our choices:
     * Download and install [Python 3](https://www.python.org/downloads/).
 2. Clone this repository with `git clone https://gitlab.ewi.tudelft.nl/cse1105/2021-2022/team-repositories/oopp-group-60/repository-template.git`
 3. Initialize the project following the instructions below.
-4. From the repository folder, build the project with `gradle build` to verify that the source is valid.
+4. From the repository folder, build the project with `gradlew build` to verify that the source is valid.
 
 Additionally, these tools will aid you in development and are heavily recommended:
 - [Scene Builder](https://gluonhq.com/products/scene-builder/#download) - UI builder for `OpenJFX` frameworks.
