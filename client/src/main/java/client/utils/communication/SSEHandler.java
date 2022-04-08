@@ -213,7 +213,7 @@ public class SSEHandler {
                         : this.handlerSource.getClass().getName())
                     + " with events:");
                 for (SSEMessageType message : eventHandlers.keySet()) {
-                    System.out.println("    " + message.toString());
+                    log.info("    {}", message.toString());
                 }
             }
         } catch (Exception e) {
