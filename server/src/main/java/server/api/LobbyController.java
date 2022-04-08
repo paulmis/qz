@@ -88,7 +88,7 @@ public class LobbyController {
         NormalGame lobby = new NormalGame(gameDTO);
         lobby.setGameId(RandomStringUtils.random(6, true, true));
         lobby.setStatus(GameStatus.CREATED);
-        if (lobby.getGameName() == null) {
+        if (lobby.getGameName() == null || lobby.getGameName().equals("")) {
             lobby.setGameName(founder.getUsername());
         }
 
