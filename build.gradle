@@ -34,6 +34,12 @@ subprojects {
 		finalizedBy jacocoTestReport 
 	}
 
+	test {
+		testLogging {
+			exceptionFormat 'full'
+		}
+	}
+
 	jacocoTestReport {
 		reports {
 			xml.required = false

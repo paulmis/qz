@@ -29,4 +29,11 @@ public abstract class QuestionCtrl implements Initializable {
      * @param answer the correct answer.
      */
     protected abstract void showAnswer(AnswerDTO answer);
+
+    /**
+     * Removes the answer.
+     *
+     * @param answer answer to be removed.
+     */
+    protected abstract void removeAnswer(AnswerDTO answer);
 }

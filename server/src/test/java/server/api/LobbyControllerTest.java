@@ -376,7 +376,7 @@ class LobbyControllerTest {
     @Test
     void createCreated() throws Exception {
         // Mock the repositories
-        when(gamePlayerRepository.existsByUserIdAndGameStatusNot(john.getId(), GameStatus.FINISHED))
+        when(gamePlayerRepository.existsByUserIdAndGameStatusNotAndAbandonedIsFalse(john.getId(), GameStatus.FINISHED))
                 .thenReturn(false);
         when(gameConfigurationRepository.save(mockLobbyConfiguration))
                 .thenReturn(mockLobbyConfiguration);
@@ -406,7 +406,7 @@ class LobbyControllerTest {
     @Test
     void createUserAlreadyInGame() throws Exception {
         // Mock the repositories
-        when(gamePlayerRepository.existsByUserIdAndGameStatusNot(john.getId(), GameStatus.FINISHED))
+        when(gamePlayerRepository.existsByUserIdAndGameStatusNotAndAbandonedIsFalse(john.getId(), GameStatus.FINISHED))
                 .thenReturn(true);
 
         // Request

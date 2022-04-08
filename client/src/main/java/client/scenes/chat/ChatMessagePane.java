@@ -6,10 +6,12 @@ import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Widget representation of a chat message.
  */
+@Slf4j
 @Generated
 public class ChatMessagePane extends StackPane {
 
@@ -32,6 +34,7 @@ public class ChatMessagePane extends StackPane {
         try {
             view = fxmlLoader.load();
         } catch (Exception e) {
+            log.error("Error loading chat message pane fxml", e);
             Platform.exit();
             System.exit(0);
         }

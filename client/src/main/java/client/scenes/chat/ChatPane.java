@@ -5,10 +5,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Widget representation of the chat.
  */
+@Slf4j
 public class ChatPane extends StackPane {
 
     private Node view;
@@ -30,6 +32,7 @@ public class ChatPane extends StackPane {
         try {
             view = fxmlLoader.load();
         } catch (Exception e) {
+            log.error("Error loading the chat widget", e);
             Platform.exit();
             System.exit(0);
         }

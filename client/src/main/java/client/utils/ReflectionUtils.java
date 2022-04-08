@@ -1,5 +1,6 @@
-package client.utils.communication;
+package client.utils;
 
+import client.utils.communication.SSEEventHandler;
 import commons.entities.messages.SSEMessageType;
 import commons.entities.utils.Multiplier;
 import java.lang.annotation.Annotation;

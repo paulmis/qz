@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script that populates the database with activities from the activity-bank
+Script that populates the database with activities from the activity-bank and reactions
 Author: rstular <R.Stular@student.tudelft.nl>
 """
 
@@ -9,55 +9,9 @@ import json
 import logging
 import io
 import os
-from typing import Any
 
-import urllib.request
+import requests
 import urllib.parse
-import urllib.error
-
-import create_questions
-
-
-class Response:
-    """
-    Wrapper for response from post_data()
-    """
-
-    def __init__(self, resp_data: bytes, status_code: int):
-        """Initialize a new Response object
-
-        Args:
-            resp_data (bytes): response data
-            status_code (int): response status code
-        """
-        self.content: bytes = resp_data
-        self.status_code: int = status_code
-
-
-def post(url: str, post_data: Any, headers=None) -> Response:
-    """
-    POST data string to `url`, return page and headers
-
-    Args:
-        url (str): URL to post to
-        post_data (Any): Data to post
-        headers (dict[str, str]): HTTP headers to send with request
-
-    Returns:
-        Response: Response object
-    """
-    # if data is not in bytes, convert to it to utf-8 bytes
-    if headers is None:
-        headers = {}
-    bindata = post_data if type(post_data) == bytes else post_data.encode("utf-8")
-    # need Request to pass headers
-    req = urllib.request.Request(url, bindata, headers)
-    req.add_header("Content-Type", "application/json")
-    try:
-        response = urllib.request.urlopen(req)
-    except urllib.error.HTTPError as e:
-        return Response(b"", e.code)
-    return Response(response.read(), response.status)
 
 
 def status_is_ok(status_code: int) -> bool:
@@ -123,7 +77,7 @@ def dir_path(string):
 
 
 parser = argparse.ArgumentParser(
-    description="Populate the Quizzz database with activities."
+    description="Populate the Quizzz database with activities and reactions."
 )
 parser.add_argument(
     "activities_dir",
@@ -131,16 +85,15 @@ parser.add_argument(
     type=dir_path,
 )
 parser.add_argument(
+    "reactions_dir",
+    help="Directory containing the reactions and images to be added to the database.",
+    type=dir_path,
+)
+parser.add_argument(
     "-u",
     "--api-url",
     help="URL of the REST API. (default: %(default)s)",
     default="http://localhost:8080/",
-)
-parser.add_argument(
-    "-i",
-    "--images",
-    help="Do not upload images with the activities (avoids dependency on 'requests' module).",
-    action="store_false",
 )
 parser.add_argument(
     "-c",
@@ -163,12 +116,6 @@ auth_group.add_argument(
     "-a",
     "--auth-enabled",
     help="Enable authentication. (default: %(default)s)",
-    action="store_true",
-)
-auth_group.add_argument(
-    "-r",
-    "--register",
-    help="Register the user instead of trying to log in. (default: %(default)s)",
     action="store_true",
 )
 auth_group.add_argument(
@@ -209,23 +156,6 @@ dto_group.add_argument(
     help="Allow negative cost/consumption values. (default: %(default)s)",
     action="store_true",
 )
-questiongen_group = parser.add_argument_group(
-    "Question generation details",
-    "Run automatic question generation after adding activities",
-)
-questiongen_group.add_argument(
-    "-q",
-    "--question-gen",
-    help="Run automatic question generation after adding activities. (default: %(default)s)",
-    action="store_true",
-)
-questiongen_group.add_argument(
-    "-m",
-    "--multiple-choice",
-    help="Number of MC questions to generate. (default: %(default)s)",
-    type=int,
-    default=20,
-)
 args = parser.parse_args()
 
 logging.basicConfig(
@@ -233,63 +163,35 @@ logging.basicConfig(
     format="[%(asctime)s] %(levelname)s - %(filename)s - %(message)s",
 )
 
-if args.images:
-    try:
-        import requests
-    except ImportError:
-        logging.error(
-            "Image upload was requested, but the 'requests' module is not installed."
-        )
-        logging.error(
-            "Please install it via 'pip install requests' and re-run this script."
-        )
-        logging.error(
-            "Alternatively, you can run this script with -i to disable image upload."
-        )
-        exit(1)
-
 # Define all extra headers to be sent with the request
 HEADERS = {}
 if args.auth_enabled:
     logging.info("Authentication enabled")
 
-    # Obtain the JWT token to access the protected endpoint
-    data = json.dumps(
-        {"email": args.email, "username": args.email, "password": args.password}
-    )
-    # Check if we need to login or register
-    if args.register:
-        AUTH_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/auth/register")
-        logging.debug(f'Registering user "{args.email}"...')
-    else:
-        AUTH_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/auth/login")
-        logging.debug(f'Logging in user "{args.email}"...')
+    AUTH_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/auth/login")
+    logging.debug(f'Logging in user "{args.email}"...')
 
     # Perform the request to the correct endpoint
-    result = post(AUTH_ENDPOINT, data)
+    result = requests.post(
+        AUTH_ENDPOINT,
+        json={"email": args.email, "username": args.email, "password": args.password},
+    )
     # If the request failed, exit with an error
     if not status_is_ok(result.status_code):
-        logging.error(
-            f"Failed to {'register' if args.register else 'login'} user \"{args.email}\"."
-        )
+        logging.error(f'Failed to login user "{args.email}".')
         logging.error(f"Status code: {result.status_code}")
-        logging.error(f'Response: "{result.data.decode()}"')
+        logging.error(f'Response: "{result.text}"')
         exit(1)
 
     # If the request succeeded, load the JWT token
-    logging.debug(
-        f"Successfully {'registered' if args.register else 'logged in'} user \"{args.email}\"."
-    )
-    token = result.data.decode()
+    logging.debug(f'Successfully logged in user "{args.email}".')
+    token = result.text
     HEADERS["Authorization"] = f"Bearer {token}"
 else:
     logging.info("Authentication disabled")
 
 # Get the API endpoint URL
-if args.images:
-    API_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/activity/batch/images")
-else:
-    API_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/activity/batch")
+API_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/activity/batch/images")
 
 logging.debug(f"Using API endpoint: {API_ENDPOINT}")
 
@@ -309,50 +211,84 @@ for i in range(0, len(activities), args.chunk_size):
     # Get the activities to add
     chunk = activities[i : i + args.chunk_size]
     # POST the activities
-    if not args.images:
-        # If we don't need to upload images, just add them as-is
-        resp = post(API_ENDPOINT, json.dumps(chunk), HEADERS)
-    else:
-        # If we need to upload images load them first
-        files = [
+    # If we need to upload images load them first
+    files = [
+        (
+            "activities",
             (
-                "activities",
+                "blob",
+                io.StringIO(json.dumps(chunk)),
+                "application/json",
+            ),
+        )
+    ]
+    for activity in chunk:
+        # Open the image file
+        files.append(
+            (
+                "images",
                 (
-                    "blob",
-                    io.StringIO(json.dumps(chunk)),
-                    "application/json",
+                    activity["icon"],
+                    open(os.path.join(args.activities_dir, activity["icon"]), "rb"),
                 ),
             )
-        ]
-        for activity in chunk:
-            # Open the image file
-            files.append(
-                (
-                    "images",
-                    (
-                        activity["icon"],
-                        open(os.path.join(args.activities_dir, activity["icon"]), "rb"),
-                    ),
-                )
-            )
-        # Send the POST request with the images
-        resp = requests.post(
-            API_ENDPOINT,
-            headers=HEADERS,
-            files=files,
         )
+    # Send the POST request with the images
+    resp = requests.post(
+        API_ENDPOINT,
+        headers=HEADERS,
+        files=files,
+    )
 
     # If the request failed, exit with an error
     if not status_is_ok(resp.status_code):
         logging.error(f"Failed to add activities {i} to {i + args.chunk_size}")
         logging.error(f"Status code: {resp.status_code}")
-        logging.error(f'Response: "{resp.content.decode()}"')
+        logging.error(f'Response: "{resp.text}"')
         exit(1)
 
     logging.info(f"Added activities {i} to {i + args.chunk_size}")
 
-if args.question_gen:
-    logging.info("Running automatic question generation...")
-    create_questions.main(args)
+logging.info("Uploading reactions")
+
+API_ENDPOINT = urllib.parse.urljoin(args.api_url, "/api/reaction")
+
+with open(os.path.join(args.reactions_dir, "reactions.json"), "r") as reactions_file:
+    reactions = json.load(reactions_file)["reactions"]
+logging.info(f"Loaded {len(reactions)} reactions.")
+
+for reaction in reactions:
+    logging.debug(f"Uploading reaction: {reaction['name']}")
+
+    reaction_dto = {"reactionType": reaction["name"]}
+
+    response = requests.post(
+        API_ENDPOINT,
+        headers=HEADERS,
+        files=[
+            (
+                "reaction",
+                (
+                    "blob",
+                    io.StringIO(json.dumps(reaction_dto)),
+                    "application/json",
+                ),
+            ),
+            (
+                "image",
+                (
+                    reaction["image"],
+                    open(os.path.join(args.reactions_dir, reaction["image"]), "rb"),
+                ),
+            ),
+        ],
+    )
+    if not status_is_ok(response.status_code):
+        logging.error(f"Failed to add reaction {reaction['name']}")
+        logging.error(f"Status code: {response.status_code}")
+        logging.error(f'Response: "{response.text}"')
+        exit(1)
+
+    logging.info(f"Successfully added reaction {reaction['name']}.")
 
 logging.info("Done.")

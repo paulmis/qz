@@ -1,6 +1,8 @@
 package client.scenes.lobby.configuration;
 
-import client.utils.communication.ReflectionUtils;
+import client.utils.ReflectionUtils;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import com.jfoenix.controls.JFXButton;
 import commons.entities.game.configuration.GameConfigurationDTO;
 import java.lang.reflect.Field;
@@ -133,6 +135,7 @@ public class ConfigurationScreenCtrl implements Initializable {
      */
     @FXML
     private void saveConfig() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         saveHandler.handle(this.gameConfig);
     }
 

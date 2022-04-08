@@ -1,14 +1,12 @@
 package client.scenes.admin;
 
 import client.scenes.MainCtrl;
-import com.ctc.wstx.util.URLUtil;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextArea;
 import commons.entities.ActivityDTO;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -116,6 +114,7 @@ public class EditActivityScreenCtrl implements Initializable {
 
     @FXML
     private void saveActivityButtonClick() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         try {
             URL url = new URL(activitySourceTextArea.getText());
             url.toURI();
@@ -127,6 +126,7 @@ public class EditActivityScreenCtrl implements Initializable {
 
     @FXML
     private void changeImageClick() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         var fileSelector = new FileChooser();
         FileChooser.ExtensionFilter imageFilter =
                 new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.jpeg", "*.png");
@@ -139,7 +139,7 @@ public class EditActivityScreenCtrl implements Initializable {
             this.addImageActivityLabel.setVisible(false);
             changedImage = pictureFile;
             this.saveActivityButton.setDisable(false);
-            this.activity.setImage(new Image(pictureFile.getAbsolutePath()));
+            this.activity.setImage(new Image(pictureFile.toURI().toString()));
             this.activityImageView.setImage(this.activity.getImage());
         }
     }

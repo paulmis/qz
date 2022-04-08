@@ -11,5 +11,9 @@ public enum PowerUp {
     /**
      * The point doubling power-up.
      */
-    DoublePoints
+    DoublePoints,
+    /**
+     * The power-up to eliminate an incorrect answer.
+     */
+    IncorrectAnswer
 }

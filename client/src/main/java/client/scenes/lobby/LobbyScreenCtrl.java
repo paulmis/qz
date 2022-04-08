@@ -7,20 +7,30 @@ import client.communication.user.UserCommunication;
 import client.scenes.MainCtrl;
 import client.scenes.UserInfoPane;
 import client.utils.ClientState;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import client.utils.communication.SSEEventHandler;
 import client.utils.communication.SSEHandler;
 import client.utils.communication.SSESource;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXSlider;
+import com.jfoenix.controls.JFXToggleButton;
 import commons.entities.game.GameDTO;
-import commons.entities.game.GamePlayerDTO;
 import commons.entities.messages.SSEMessageType;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.net.URL;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -36,38 +46,32 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Generated
 @Slf4j
-public class LobbyScreenCtrl implements SSESource {
+public class LobbyScreenCtrl implements SSESource, Initializable {
     private final LobbyCommunication communication;
     private final MainCtrl mainCtrl;
     private final ServerUtils server;
     
-    @FXML
-    private AnchorPane mainAnchor;
-    @FXML
-    private Label gameName;
-    @FXML
-    private Label labelGameId;
-    @FXML
-    private Label gameType;
-    @FXML
-    private Label gameCapacity;
-    @FXML
-    private VBox playerList;
-    @FXML
-    private JFXButton disbandButton;
-    @FXML
-    private JFXButton settingsButton;
-    @FXML
-    private JFXButton userButton;
-    @FXML
-    private JFXButton copyLinkButton;
-    @FXML
-    private JFXButton startButton;
-    @FXML
-    private JFXButton lobbySettingsButton;
-    @FXML
-    private JFXButton leaveButton;
-    
+    @FXML private AnchorPane lobbyMainAnchor;
+    @FXML private Label gameName;
+    @FXML private Label labelGameId;
+    @FXML private Label gameType;
+    @FXML private Label gameCapacity;
+    @FXML private VBox playerList;
+    @FXML private JFXButton disbandButton;
+    @FXML private JFXButton settingsButton;
+    @FXML private JFXButton userButton;
+    @FXML private JFXButton copyLinkButton;
+    @FXML private JFXButton startButton;
+    @FXML private JFXButton lobbySettingsButton;
+    @FXML private JFXButton leaveButton;
+    @FXML private FontAwesomeIconView lockButtonIconView;
+    @FXML private AnchorPane settingsPanel;
+    @FXML private JFXButton volumeButton;
+    @FXML private JFXSlider volumeSlider;
+    @FXML private JFXToggleButton muteEveryoneToggleButton;
+    @FXML private FontAwesomeIconView volumeIconView;
+
+    private List<FontAwesomeIcon> volumeIconList;
     private UserInfoPane userInfo = null;
 
     /**
@@ -115,6 +119,7 @@ public class LobbyScreenCtrl implements SSESource {
      */
     @SSEEventHandler(SSEMessageType.LOBBY_DELETED)
     public void lobbyDisbanded() {
+        settingsPanel.setVisible(false);
         mainCtrl.showErrorSnackBar("Lobby has been disbanded");
         mainCtrl.showLobbyListScreen();
     }
@@ -126,6 +131,8 @@ public class LobbyScreenCtrl implements SSESource {
      */
     @SSEEventHandler(SSEMessageType.GAME_START)
     public void gameStarted(Integer preparationDuration) {
+        settingsPanel.setVisible(false);
+        SoundManager.playMusic(SoundEffect.GAME_START, getClass());
         mainCtrl.showGameScreen(ClientState.game.getCurrentQuestion());
         mainCtrl.getGameScreenCtrl().startTimer(Duration.ofMillis(preparationDuration));
         ClientState.previousScore = Optional.of(0);
@@ -140,6 +147,49 @@ public class LobbyScreenCtrl implements SSESource {
             userInfo.setVisible(false);
         }
         updateView();
+        setUpVolume();
+    }
+
+    @FXML
+    private void settingsButtonClick() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
+        if (userInfo != null) {
+            userInfo.setVisible(false);
+        }
+        settingsPanel.setVisible(!settingsPanel.isVisible());
+    }
+
+    @FXML
+    private void volumeButtonClick(ActionEvent actionEvent) {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
+        SoundManager.volume.setValue(SoundManager.volume.getValue() == 0 ? 100 : 0);
+    }
+
+    private void setUpVolume() {
+
+        // A list of icons so we can have a swift transition
+        // between them when changing the volume
+        volumeIconList = Arrays.asList(
+                FontAwesomeIcon.VOLUME_OFF,
+                FontAwesomeIcon.VOLUME_DOWN,
+                FontAwesomeIcon.VOLUME_UP);
+
+        // Bidirectional binding of the volume with the volume
+        // property. This is to ensure we can report changes
+        // instantly to the ui if the volume changes from
+        // outside of our control.
+        volumeSlider.valueProperty().bindBidirectional(SoundManager.volume);
+
+        // a listener on the volume to change the icon
+        // of the volume.
+        SoundManager.volume.addListener((observable, oldValue, newValue) -> {
+
+            // Sets the glyph name of the iconView directly
+            volumeIconView.setGlyphName(volumeIconList.get(
+                    Math.round(newValue.floatValue() / 100 * (volumeIconList.size() - 1))
+            ).name());
+        });
+        SoundManager.everyoneMuted.bindBidirectional(muteEveryoneToggleButton.selectedProperty());
     }
 
     /**
@@ -147,30 +197,40 @@ public class LobbyScreenCtrl implements SSESource {
      */
     @FXML
     public void startButtonClick() {
-        LobbyCommunication.startGame(
-            ClientState.game.getId(),
-            // Success
-            (response) -> runLater(() -> {
-                switch (response.getStatus()) {
-                    case 403:
-                        mainCtrl.showErrorSnackBar("Starting the game failed! You are not the host.");
-                        break;
-                    case 409:
-                        mainCtrl.showErrorSnackBar("Something went wrong while starting the game.");
-                        break;
-                    case 425:
-                        mainCtrl.showErrorSnackBar("Try again after a second.");
-                        break;
-                    case 200:
-                        mainCtrl.showInformationalSnackBar("Game started!");
-                        break;
-                    default:
-                        mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");
-                        break;
-                }
-            }),
-            // Failure
-            () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to start game.")));
+        settingsPanel.setVisible(false);
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
+        if (ClientState.game.getConfiguration().getCapacity() < ClientState.game.getPlayers().size()) {
+            mainCtrl.showErrorSnackBar("The lobby exceeds the capacity. Kick some people out!");
+            return;
+        }
+
+        mainCtrl.openStartGameWarning(() -> {
+            mainCtrl.closeStartGameWarning();
+            LobbyCommunication.startGame(
+                    ClientState.game.getId(),
+                    // Success
+                    (response) -> runLater(() -> {
+                        switch (response.getStatus()) {
+                            case 403:
+                                mainCtrl.showErrorSnackBar("Starting the game failed! You are not the host.");
+                                break;
+                            case 409:
+                                mainCtrl.showErrorSnackBar("Something went wrong while starting the game.");
+                                break;
+                            case 425:
+                                mainCtrl.showErrorSnackBar("Try again after a second.");
+                                break;
+                            case 200:
+                                mainCtrl.showInformationalSnackBar("Game started!");
+                                break;
+                            default:
+                                mainCtrl.showErrorSnackBar("Something went really bad. Try restarting the app.");
+                                break;
+                        }
+                    }),
+                    // Failure
+                    () -> runLater(() -> mainCtrl.showErrorSnackBar("Failed to start game.")));
+        }, () -> runLater(mainCtrl::closeStartGameWarning));
     }
     
     /**
@@ -179,6 +239,8 @@ public class LobbyScreenCtrl implements SSESource {
      */
     @FXML
     private void leaveButtonClick() {
+        settingsPanel.setVisible(false);
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         // Open the warning and wait for user action
         mainCtrl.openLobbyLeaveWarning(
             // If confirmed, exit the lobby
@@ -212,6 +274,8 @@ public class LobbyScreenCtrl implements SSESource {
      * Fired when the disband button is clicked.
      */
     public void disbandButtonClick() {
+        settingsPanel.setVisible(false);
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.openLobbyDisbandWarning(() -> {
             mainCtrl.closeLobbyDisbandWarning();
             this.communication.disbandLobby(response -> runLater(() -> {
@@ -240,15 +304,17 @@ public class LobbyScreenCtrl implements SSESource {
      * Fired when the user button is pressed.
      */
     public void showUserInfo() {
+        settingsPanel.setVisible(false);
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         if (userInfo == null) {
             // Create userInfo
             userInfo = new UserInfoPane(server, new UserCommunication(), mainCtrl);
-            mainAnchor.getChildren().add(userInfo);
+            lobbyMainAnchor.getChildren().add(userInfo);
             userInfo.setVisible(true);
-            runLater(() -> userInfo.setupPosition(userButton, mainAnchor));
+            runLater(() -> userInfo.setupPosition(userButton, lobbyMainAnchor));
         } else {
             // Toggle visibility
-            userInfo.setVisible(!userInfo.isVisible());
+            userInfo.setVisibility(!userInfo.isVisible());
         }
     }
 
@@ -257,6 +323,8 @@ public class LobbyScreenCtrl implements SSESource {
      */
     @FXML
     public void lobbySettingsButtonClick() {
+        settingsPanel.setVisible(false);
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.openLobbySettings(ClientState.game.getConfiguration(), (conf) -> {
             // Close pop-up
             mainCtrl.closeLobbySettings();
@@ -280,17 +348,13 @@ public class LobbyScreenCtrl implements SSESource {
     public void updateView() {
         GameDTO gameDTO = ClientState.game;
 
-        // ToDo: have a game name in gameDTO
-        // Set game's name as "host's game"
-        String hostNickname = gameDTO.getPlayers().stream()
-                .filter(player -> player.getId().equals(gameDTO.getHost()))
-                .findFirst()
-                .map(GamePlayerDTO::getNickname)
-                .orElse("N.A.");
-        gameName.setText(hostNickname + "'s game");
+        gameName.setText(gameDTO.getGameName());
 
         // Set game id
         labelGameId.setText(gameDTO.getGameId());
+
+        // Set if lobby is locked or not.
+        lockButtonIconView.setGlyphName((gameDTO.getIsPrivate() ? "LOCK" : "UNLOCK"));
 
         // Set game class
         gameType.setText(gameDTO.getClass().getName()
@@ -306,6 +370,7 @@ public class LobbyScreenCtrl implements SSESource {
                 .anyMatch(dto -> gameDTO.getHost().equals(dto.getId()));
         lobbySettingsButton.setDisable(!isHost);
         startButton.setDisable(!isHost);
+        disbandButton.setVisible(isHost);
 
         // Show list of participants
         updatePlayerList(gameDTO, isHost);
@@ -318,7 +383,6 @@ public class LobbyScreenCtrl implements SSESource {
      */
     private void updatePlayerList(GameDTO gameDTO, boolean isHost) {
         playerList.getChildren().clear();
-
         List<LobbyPlayerPane> playerElements = gameDTO.getPlayers().stream()
                 .sorted((p1, p2) ->
                         // Sort by join date, host always first
@@ -326,9 +390,13 @@ public class LobbyScreenCtrl implements SSESource {
                                 ? p1.getJoinDate().compareTo(p2.getJoinDate())
                                 : (gameDTO.getHost().equals(p1.getId()) ? -1 : 1))
                 .map(dto -> {
-                    LobbyPlayerPane elem = new LobbyPlayerPane(dto);
+                    LobbyPlayerPane elem = new LobbyPlayerPane(dto, () -> communication.kickPlayer(dto.getUserId(),
+                            () -> runLater(() -> mainCtrl.showInformationalSnackBar("Kicked user!")),
+                            error -> runLater(() ->
+                                    mainCtrl.showErrorSnackBar("Failed to kick user: " + error.getDescription()))));
+
                     // Show kick-out buttons only to host
-                    elem.showRemovePlayerBtn(isHost);
+                    elem.showRemovePlayerBtn(isHost && (!dto.getUserId().equals(ClientState.user.getId())));
                     // Indicate if the player is the host
                     elem.setPlayerHost(gameDTO.getHost().equals(dto.getId()));
                     return elem;
@@ -340,10 +408,28 @@ public class LobbyScreenCtrl implements SSESource {
 
     @FXML
     private void copyLinkButtonClick() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
         content.putString(labelGameId.getText());
         clipboard.setContent(content);
         mainCtrl.showInformationalSnackBar("Copied!");
+    }
+
+    /**
+     * Event handler for when you get kicked out of a lobby.
+     */
+    @SSEEventHandler(SSEMessageType.YOU_HAVE_BEEN_KICKED)
+    public void kicked() {
+        settingsPanel.setVisible(false);
+        ClientState.game = null;
+        ServerUtils.sseHandler.kill();
+        mainCtrl.showLobbyListScreen();
+        mainCtrl.showErrorSnackBar("You have been kicked from the lobby!");
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        setUpVolume();
     }
 }

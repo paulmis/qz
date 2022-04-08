@@ -41,6 +41,11 @@ public class GamePlayerDTO implements DTO {
     protected String nickname;
 
     /**
+     * ID of the user's profile image.
+     */
+    protected UUID profilePic;
+
+    /**
      * The date the player joined the lobby.
      */
     protected LocalDateTime joinDate;

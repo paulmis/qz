@@ -1,6 +1,7 @@
 package server.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import commons.entities.auth.LoginDTO;
 import commons.entities.auth.UserDTO;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
@@ -8,15 +9,18 @@ import commons.entities.utils.Views;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import javax.validation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 import server.api.exceptions.UserNotFoundException;
 import server.api.exceptions.UsernameInUseException;
 import server.database.entities.User;
 import server.database.entities.auth.config.AuthContext;
+import server.database.entities.auth.config.JWTHandler;
 import server.database.entities.game.Game;
 import server.database.repositories.UserRepository;
 import server.database.repositories.game.GameRepository;
@@ -39,16 +43,33 @@ public class UserController {
     SSEManager sseManager;
 
     /**
-     * Shows details of the currently logged in user.
+     * Shows details of the currently logged-in user.
      *
-     * @return details of the currently logged in user
+     * @return details of the currently logged-in user
      */
     @GetMapping
     @JsonView(value = Views.Private.class)
-    public ResponseEntity<UserDTO> get() {
-        Optional<User> user = userRepository.findByEmailIgnoreCase(AuthContext.get());
+    public ResponseEntity<LoginDTO> getUserInfo() {
+        log.trace("Getting user details");
+        User user = userRepository.findByEmailIgnoreCase(AuthContext.get()).orElseThrow(UserNotFoundException::new);
+        Game game = gameRepository.getPlayersLobbyOrGame(user.getId()).orElse(null);
+        return ResponseEntity.ok(new LoginDTO(
+                "",
+                game == null ? null : game.getDTO(),
+                user.getDTO()));
+    }
+
+    /**
+     * Gets the details of an arbitrary user.
+     *
+     * @return details of the requested user.
+     */
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserDTO> getById(@PathVariable UUID userId) {
+        log.trace("Getting user details");
+        Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new UserNotFoundException();
         }
         return ResponseEntity.ok(user.get().getDTO());
     }
@@ -75,8 +96,6 @@ public class UserController {
             throw new UsernameInUseException("Username is already in use.");
         }
 
-
-
         // Set the new username
         user.setUsername(newUsername);
 
@@ -94,11 +113,7 @@ public class UserController {
 
         Optional<Game> gameOptional = gameRepository.getPlayersLobbyOrGame(user.getId());
         if (gameOptional.isPresent()) {
-            try {
-                sseManager.send(gameOptional.get().getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
-            } catch (IOException exception) {
-                log.error("Error occurred while sending USERNAME_CHANGED event: " + exception);
-            }
+            sseManager.send(gameOptional.get().getUserIds(), new SSEMessage(SSEMessageType.LOBBY_MODIFIED));
         }
 
         return ResponseEntity.ok(user.getDTO());

@@ -11,7 +11,6 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="authenticationAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="1024.0" stylesheets="@/client/stylesheets/GlobalTheme.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.authentication.LogInScreenCtrl">
@@ -21,29 +20,29 @@
    <children>
       <BorderPane prefHeight="576.0" prefWidth="1024.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <left>
-            <Pane fx:id="pane" prefHeight="576.0" prefWidth="262.0" BorderPane.alignment="CENTER">
+            <AnchorPane prefWidth="262.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
                <children>
-                  <TextField fx:id="emailField" layoutX="53.0" layoutY="239.0" prefHeight="22.0" prefWidth="161.0">
+                  <TextField fx:id="emailField" layoutX="50.0" layoutY="239.0" prefHeight="22.0" prefWidth="160.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </TextField>
-                  <PasswordField fx:id="passwordField" layoutX="53.0" layoutY="290.0" prefHeight="22.0" prefWidth="161.0">
+                  <PasswordField fx:id="passwordField" layoutX="53.0" layoutY="290.0" prefHeight="22.0" prefWidth="160.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </PasswordField>
-                  <CheckBox fx:id="rememberMe" layoutX="52.0" layoutY="329.0" mnemonicParsing="false" onMouseClicked="#rememberMeTick" text="Remember me">
+                  <CheckBox fx:id="rememberUser" layoutX="52.0" layoutY="329.0" mnemonicParsing="false" text="Remember me">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </CheckBox>
-                  <JFXButton fx:id="logInButton" alignment="CENTER" layoutX="150.0" layoutY="361.0" mnemonicParsing="false" onMouseClicked="#logInButtonClick" prefHeight="22.0" prefWidth="84.0" style="-fx-background-color: #6EB26C;" text="Log in" textAlignment="CENTER" textFill="WHITE">
+                  <JFXButton fx:id="logInButton" alignment="CENTER" layoutX="131.0" layoutY="360.0" mnemonicParsing="false" onMouseClicked="#logInButtonClick" prefHeight="22.0" prefWidth="84.0" style="-fx-background-color: #6EB26C;" text="Log in" textAlignment="CENTER" textFill="WHITE" AnchorPane.rightAnchor="50.0">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton fx:id="createAccountButton" alignment="CENTER" layoutX="61.0" layoutY="414.0" mnemonicParsing="false" onMouseClicked="#createAccountButtonClick" prefHeight="31.0" prefWidth="161.0" style="-fx-background-color: #DFD93F;" text="I want to create an account" textAlignment="CENTER" textFill="WHITE">
+                  <JFXButton fx:id="createAccountButton" alignment="CENTER" layoutX="61.0" layoutY="414.0" mnemonicParsing="false" onMouseClicked="#createAccountButtonClick" prefHeight="31.0" prefWidth="160.0" style="-fx-background-color: #DFD93F;" text="I want to create an account" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0">
                      <font>
                         <Font name="System Bold" size="11.0" />
                      </font>
@@ -53,12 +52,12 @@
                         <Font name="System Bold" size="16.0" />
                      </font>
                   </Label>
-                  <Label layoutX="53.0" layoutY="218.0" prefHeight="21.0" prefWidth="103.0" text="Email">
+                  <Label layoutX="50.0" layoutY="217.0" prefHeight="21.0" prefWidth="160.0" text="Email" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="55.0" layoutY="272.0" prefHeight="21.0" prefWidth="161.0" text="Password">
+                  <Label layoutX="50.0" layoutY="272.0" prefHeight="21.0" prefWidth="160.0" text="Password" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
@@ -69,7 +68,7 @@
                      </image>
                   </ImageView>
                </children>
-            </Pane>
+            </AnchorPane>
          </left>
       </BorderPane>
       <JFXButton fx:id="adminPanelButton" contentDisplay="GRAPHIC_ONLY" onAction="#adminPanelButtonClick" style="-fx-background-color: white; -fx-background-radius: 20;" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="20.0">

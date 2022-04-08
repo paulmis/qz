@@ -1,12 +1,19 @@
 package server.services;
 
 import commons.entities.messages.SSEMessage;
+import commons.entities.messages.SSEMessageType;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.persistence.ElementCollection;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import server.api.exceptions.SSEFailedException;
@@ -18,11 +25,55 @@ import server.utils.SSE;
 @Slf4j
 @Service
 public class SSEManager {
+    private final Counter sseMessageCounter;
+
+    @Autowired
+    private ThreadPoolTaskScheduler taskScheduler;
+
+    /**
+     * Create a new SSE manager.
+     *
+     * @param registry Metrics registry.
+     */
+    @Autowired
+    public SSEManager(MeterRegistry registry) {
+        sseMessageCounter = Counter.builder("quiz_sse_messages")
+                .tag("type", "sent")
+                .description("Number of sent SSE messages")
+                .register(registry);
+        Gauge.builder("quiz_sse_emitters", this, SSEManager::size)
+                .description("Number of registered SSE emitters")
+                .register(registry);
+    }
+
     /**
      * The Map which maps user IDs to SSE emitters.
      * As this class can be called from different threads, we need to use a concurrent map.
      */
     private final Map<UUID, SseEmitter> emitters = new ConcurrentHashMap<>();
+
+    /**
+     * Initialization routine for the SSE manager.
+     */
+    @PostConstruct
+    public void init() {
+        taskScheduler.scheduleAtFixedRate(this::sendKeepAlive, Duration.ofSeconds(45));
+        log.info("Initialized SSE manager");
+    }
+
+    /**
+     * Send a keep alive message to all registered SSE emitters.
+     */
+    public void sendKeepAlive() {
+        emitters.forEach((userId, emitter) -> {
+            try {
+                emitter.send(new SSEMessage(SSEMessageType.KEEPALIVE));
+                log.trace("Sent keep alive to user {}", userId);
+            } catch (IOException e) {
+                log.error("Failed to send keep alive message to user {}", userId, e);
+            }
+        });
+    }
 
     /**
      * Get the number of registered SSE emitters.
@@ -116,22 +167,22 @@ public class SSEManager {
      * @return Whether the message was successfully sent or not.
      * @throws SSEFailedException If the message could not be sent.
      */
-    public boolean send(UUID userId, SseEmitter.SseEventBuilder message) throws SSEFailedException {
+    public boolean send(UUID userId, SseEmitter.SseEventBuilder message) {
         // Check that the emitter for the user exists
         if (!emitters.containsKey(userId)) {
             log.debug("Cannot send message: user {} has no registered emitter", userId);
             return false;
         }
 
-
         // Send the message
         try {
             emitters.get(userId).send(message);
+            sseMessageCounter.increment();
             log.debug("Sent message to user {}", userId);
             return true;
         } catch (IOException e) {
-            log.info("Failed to send message to user {}", userId);
-            throw new SSEFailedException(e.getMessage());
+            log.error("Failed to send message to user {}", userId);
+            return false;
         }
     }
 
@@ -141,9 +192,8 @@ public class SSEManager {
      * @param userId User ID to send the message to.
      * @param message Message to send.
      * @return Whether the message was successfully sent or not.
-     * @throws SSEFailedException If the message could not be sent.
      */
-    public boolean send(UUID userId, SSEMessage message) throws SSEFailedException {
+    public boolean send(UUID userId, SSEMessage message) {
         log.trace("Sending message of type {} to user {}", message.getType(), userId);
         return send(userId, SSE.createEvent(message));
     }
@@ -154,9 +204,8 @@ public class SSEManager {
      * @param users User IDs to send the message to.
      * @param message Message to send.
      * @return Whether the message was sent to all specified users or not.
-     * @throws SSEFailedException If the message could not be sent.
      */
-    public boolean send(Iterable<UUID> users, SseEmitter.SseEventBuilder message) throws SSEFailedException {
+    public boolean send(Iterable<UUID> users, SseEmitter.SseEventBuilder message) {
         boolean success = true;
         for (UUID userId : users) {
             success &= send(userId, message);
@@ -170,9 +219,9 @@ public class SSEManager {
      * @param users User IDs to send the message to.
      * @param message Message to send.
      * @return Whether the message was sent to all specified users or not.
-     * @throws SSEFailedException If the message could not be sent.
      */
-    public boolean send(Iterable<UUID> users, SSEMessage message) throws SSEFailedException {
+    public boolean send(Iterable<UUID> users, SSEMessage message) {
+        log.trace(String.valueOf(message));
         return send(users, SSE.createEvent(message));
     }
 
@@ -180,14 +229,13 @@ public class SSEManager {
      * Send a message to all users.
      *
      * @param message Message to send.
-     * @throws SSEFailedException If the message could not be sent.
      */
-    public void sendAll(SseEmitter.SseEventBuilder message) throws SSEFailedException {
+    public void sendAll(SseEmitter.SseEventBuilder message) {
         for (SseEmitter emitter : emitters.values()) {
             try {
                 emitter.send(message);
             } catch (IOException e) {
-                throw new SSEFailedException(e.getMessage());
+                log.error("Failed to send sse message: " + e.getMessage());
             }
         }
     }
@@ -196,9 +244,8 @@ public class SSEManager {
      * Send a message to all users.
      *
      * @param message Message to send.
-     * @throws SSEFailedException If the message could not be sent.
      */
-    public void sendAll(SSEMessage message) throws SSEFailedException {
+    public void sendAll(SSEMessage message) {
         log.trace("Sending message of type {} to all users", message.getType());
         sendAll(SSE.createEvent(message));
     }

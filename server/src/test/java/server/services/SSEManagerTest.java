@@ -7,6 +7,7 @@ import static server.utils.TestHelpers.getUUID;
 
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
@@ -24,7 +25,7 @@ class SSEManagerTest {
     @BeforeEach
     void setUp() {
         // We want a new SSEManager for each test run.
-        sseManager = new SSEManager();
+        sseManager = new SSEManager(new SimpleMeterRegistry());
     }
 
     /**

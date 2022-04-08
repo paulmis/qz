@@ -1,7 +1,6 @@
 package server.services;
 
 import static commons.entities.game.PowerUp.DoublePoints;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static server.utils.TestHelpers.getUUID;
@@ -34,10 +33,9 @@ import server.database.entities.game.exceptions.GameFinishedException;
 import server.database.entities.game.exceptions.LastPlayerRemovedException;
 import server.database.entities.question.Activity;
 import server.database.entities.question.MCQuestion;
-import server.database.entities.question.Question;
+import server.database.repositories.UserRepository;
 import server.database.repositories.game.GamePlayerRepository;
 import server.database.repositories.game.GameRepository;
-import server.database.repositories.question.QuestionRepository;
 import server.services.fsm.GameFSM;
 
 /**
@@ -49,10 +47,10 @@ public class GameServiceTest {
     private SSEManager sseManager;
 
     @Mock
-    private QuestionRepository questionRepository;
+    private GameRepository gameRepository;
 
     @Mock
-    private GameRepository gameRepository;
+    private UserRepository userRepository;
 
     @Mock
     private GamePlayerRepository gamePlayerRepository;
@@ -62,6 +60,9 @@ public class GameServiceTest {
 
     @Mock
     private ThreadPoolTaskScheduler taskScheduler;
+
+    @Mock
+    private QuestionService questionService;
 
     @InjectMocks
     private GameService gameService;
@@ -137,52 +138,13 @@ public class GameServiceTest {
         game.setConfiguration(new NormalGameConfiguration(3, Duration.ofSeconds(13), 2, 2, 2f, 100, -10, 75));
         game.add(joePlayer);
         game.add(susannePlayer);
-
-        // Mock the repository
-        lenient().when(questionRepository.count()).thenReturn(4L);
-        lenient().when(questionRepository.findAll())
-                .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
-    }
-
-    @Test
-    void provideQuestionsOk() {
-        // ToDo: fix QuestionRepository::findByIdNotIn
-        // Mock the repository
-        //when(questionRepository.findByIdNotIn(usedQuestionIds))
-        //        .thenReturn(Arrays.asList(questionD, questionC));
-
-        // Provide the questions
-        List<Question> questions = gameService.provideQuestions(2, Arrays.asList(questionB, questionA));
-        assertEquals(2, questions.size());
-        assertThat(questions).hasSameElementsAs(Arrays.asList(questionC, questionD));
-
-        // Verify interactions
-        verify(questionRepository).count();
-        // ToDo: fix QuestionRepository::findByIdNotIn
-        //verify(questionRepository).findByIdNotIn(usedQuestionIds);
-        verify(questionRepository).findAll();
-        verifyNoMoreInteractions(questionRepository);
-    }
-
-    @Test
-    void provideQuestionsNotEnough() {
-        // Expect a throw
-        assertThrows(IllegalStateException.class,
-                () -> gameService.provideQuestions(3, Arrays.asList(questionB, questionA)));
-
-        // Verify interactions
-        verify(questionRepository).count();
-        verifyNoMoreInteractions(questionRepository);
     }
 
     @Test
     void startNormal() throws IOException {
-        // ToDo: fix QuestionRepository::findByIdNotIn
         // Mock the repository
-
         when(gameRepository.save(any(Game.class))).thenReturn(game);
-        //when(questionRepository.findByIdNotIn(new ArrayList<>()))
-        //        .thenReturn(Arrays.asList(questionA, questionC, questionB, questionD));
+        when(questionService.provideQuestions(3)).thenReturn(List.of(questionA, questionB, questionC));
 
         // Start the game
         gameService.start(game);
@@ -193,13 +155,10 @@ public class GameServiceTest {
         assertNull(game.getCurrentQuestionNumber());
 
         // Verify interactions
-        verify(questionRepository).count();
-        // ToDo: fix QuestionRepository::findByIdNotIn
-        //verify(questionRepository).findByIdNotIn(new ArrayList<>());
-        verify(questionRepository).findAll();
+        verify(questionService).provideQuestions(3);
         verify(fsmManager, times(1)).addFSM(any(Game.class), any(GameFSM.class));
         verify(fsmManager, times(1)).startFSM(any(UUID.class));
-        verifyNoMoreInteractions(questionRepository, fsmManager);
+        verifyNoMoreInteractions(questionService, fsmManager);
     }
 
     @Test
@@ -211,19 +170,7 @@ public class GameServiceTest {
         assertThrows(IllegalStateException.class, () -> gameService.start(game));
 
         // Verify interactions
-        verifyNoMoreInteractions(questionRepository);
-    }
-
-    @Test
-    void startNotFull() throws LastPlayerRemovedException {
-        // Remove susanne
-        game.remove(susanne.getId());
-
-        // Start the game
-        assertThrows(IllegalStateException.class, () -> gameService.start(game));
-
-        // Verify interactions
-        verifyNoMoreInteractions(questionRepository);
+        verifyNoMoreInteractions(questionService);
     }
 
     @Test
@@ -231,7 +178,7 @@ public class GameServiceTest {
         // Create a mock game
         MockGame mockGame = new MockGame();
         MockGameConfiguration mockGameConfiguration =
-            new MockGameConfiguration(Duration.ofSeconds(13), 1, 2, 2f, 100, 0, 75);
+                new MockGameConfiguration(Duration.ofSeconds(13), 1, 2, 2f, 100, 0, 75);
         mockGame.setId(getUUID(6));
         mockGame.setConfiguration(mockGameConfiguration);
         mockGame.add(joePlayer);
@@ -309,8 +256,8 @@ public class GameServiceTest {
         // Verify interactions
         verify(gameRepository, times(1)).save(game);
         verify(sseManager, times(1)).send(
-            any(Iterable.class),
-            eq(new SSEMessage(SSEMessageType.START_QUESTION, delay)));
+                any(Iterable.class),
+                eq(new SSEMessage(SSEMessageType.START_QUESTION, delay)));
         verifyNoMoreInteractions(gameRepository, sseManager);
     }
 
@@ -341,8 +288,8 @@ public class GameServiceTest {
         // Verify interactions
         verify(gameRepository, times(1)).save(game);
         verify(sseManager, times(1)).send(
-            any(Iterable.class),
-            eq(new SSEMessage(SSEMessageType.STOP_QUESTION, delay)));
+                any(Iterable.class),
+                eq(new SSEMessage(SSEMessageType.STOP_QUESTION, delay)));
         verifyNoMoreInteractions(gameRepository, sseManager);
     }
 
@@ -351,6 +298,8 @@ public class GameServiceTest {
         // Set the game to be started and mock the repository
         game.setStatus(GameStatus.ONGOING);
         when(gameRepository.save(game)).thenReturn(game);
+        when(userRepository.findById(joe.getId())).thenReturn(Optional.ofNullable(joe));
+        when(userRepository.findById(susanne.getId())).thenReturn(Optional.ofNullable(susanne));
 
         // Call the service
         gameService.finish(game);
@@ -361,8 +310,8 @@ public class GameServiceTest {
         // Verify interactions
         verify(gameRepository, times(1)).save(game);
         verify(sseManager, times(1)).send(
-            any(Iterable.class),
-            eq(new SSEMessage(SSEMessageType.GAME_END)));
+                any(Iterable.class),
+                eq(new SSEMessage(SSEMessageType.GAME_END)));
         verifyNoMoreInteractions(gameRepository, sseManager);
     }
 
@@ -374,19 +323,27 @@ public class GameServiceTest {
         AnswerDTO answerA = new AnswerDTO();
         answerA.setResponse(List.of(questionA.getAnswer().getDTO()));
         answerA.setQuestionId(questionA.getId());
+        answerA.setAnswerTime(LocalDateTime.now().minusSeconds(6L));
         gameService.addAnswer(game, joePlayer, answerA);
 
         AnswerDTO answerB = new AnswerDTO();
         answerB.setResponse(List.of(questionA.getAnswer().getDTO()));
         answerB.setQuestionId(questionA.getId());
+        answerB.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, susannePlayer, answerB);
+
 
         gameService.updateScores(game);
 
-        assertEquals(100, joePlayer.getScore());
+        //Calculate time based score manually
+        int expectScoreJoe = (int) ((double) 6 / 13 * (0.4 * 100) + (0.8 * 100));
+        //Calculate time based score manually
+        int expectScoreSusanne = (int) ((double) 2 / 13 * (0.4 * 100) + (0.8 * 100));
+
+        assertEquals(expectScoreJoe, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
 
-        assertEquals(100, susannePlayer.getScore());
+        assertEquals(expectScoreSusanne, susannePlayer.getScore());
         assertEquals(1, susannePlayer.getStreak());
     }
 
@@ -398,21 +355,28 @@ public class GameServiceTest {
         AnswerDTO answerA = new AnswerDTO();
         answerA.setResponse(List.of(questionA.getAnswer().getDTO()));
         answerA.setQuestionId(questionA.getId());
+        answerA.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, joePlayer, answerA);
 
         AnswerDTO answerB = new AnswerDTO();
         answerB.setResponse(List.of(questionA.getAnswer().getDTO()));
         answerB.setQuestionId(questionA.getId());
+        answerB.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, susannePlayer, answerB);
 
         susannePlayer.getUserPowerUps().put(DoublePoints, game.getCurrentQuestionNumber());
 
         gameService.updateScores(game);
 
-        assertEquals(100, joePlayer.getScore());
+        //Calculate time based score manually for Joe
+        int expectScoreJoe = (int) ((double) 2 / 13 * (0.4 * 100) + (0.8 * 100));
+        //Calculate time based score manually for Susanne
+        int expectScoreSusanne = (int) (2 * ((double) 2 / 13 * (0.4 * 100) + (0.8 * 100)));
+
+        assertEquals(expectScoreJoe, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
 
-        assertEquals(200, susannePlayer.getScore());
+        assertEquals(expectScoreSusanne, susannePlayer.getScore());
         assertEquals(1, susannePlayer.getStreak());
     }
 
@@ -423,16 +387,22 @@ public class GameServiceTest {
 
         AnswerDTO answerJoe = new AnswerDTO();
         answerJoe.setResponse(List.of(questionA.getAnswer().getDTO()));
+        answerJoe.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, joePlayer, answerJoe);
 
         AnswerDTO answerSusanne = new AnswerDTO();
         ActivityDTO answerBActivity = new ActivityDTO();
         answerBActivity.setCost(300L);
         answerSusanne.setResponse(List.of(answerBActivity));
+        answerSusanne.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, susannePlayer, answerSusanne);
 
         gameService.updateScores(game);
-        assertEquals(100, joePlayer.getScore());
+
+        //Calculate time based score manually for Joe
+        int expectScoreJoe = (int) ((double) 2 / 13 * (0.4 * 100) + (0.8 * 100));
+
+        assertEquals(expectScoreJoe, joePlayer.getScore());
         assertEquals(1, joePlayer.getStreak());
 
         assertEquals(-10, susannePlayer.getScore());
@@ -450,12 +420,14 @@ public class GameServiceTest {
         ActivityDTO answerAActivity = new ActivityDTO();
         answerAActivity.setCost(300L);
         answerA.setResponse(List.of(answerAActivity));
+        answerA.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, joePlayer, answerA);
 
         AnswerDTO answerB = new AnswerDTO();
         ActivityDTO answerBActivity = new ActivityDTO();
         answerBActivity.setCost(300L);
         answerB.setResponse(List.of(answerBActivity));
+        answerB.setAnswerTime(LocalDateTime.now().minusSeconds(2L));
         gameService.addAnswer(game, susannePlayer, answerB);
 
         gameService.updateScores(game);

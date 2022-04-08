@@ -43,7 +43,7 @@
                         <Font size="24.0" />
                      </font>
                   </Label>
-                  <Label fx:id="whLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="wh" GridPane.columnIndex="2">
+                  <Label fx:id="whLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Wh" GridPane.columnIndex="2">
                      <font>
                         <Font size="24.0" />
                      </font>

@@ -1,6 +1,8 @@
 package client.scenes.leaderboard;
 
 import client.scenes.MainCtrl;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import commons.entities.auth.UserDTO;
@@ -85,6 +87,7 @@ public class GlobalLeaderboardCtrl implements Initializable {
 
     @FXML
     private void goBackToLobbies() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showLobbyListScreen();
         leaderboardPane.stop();
     }

@@ -7,11 +7,13 @@ import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The lobby list item pane.
  * It is used as a wrapper for a lobby list item.
  */
+@Slf4j
 @Generated
 public class LobbyListItemPane extends StackPane {
 
@@ -34,8 +36,9 @@ public class LobbyListItemPane extends StackPane {
 
         // This loads the fxml
         try {
-            view = (Node) fxmlLoader.load();
+            view = fxmlLoader.load();
         } catch (Exception e) {
+            log.error("Could not load the lobby list item fxml", e);
             Platform.exit();
             System.exit(0);
         }

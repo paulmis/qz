@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.fxyz3d.shapes.primitives.Text3DMesh?>
 
-<ScrollPane fx:id="scrollPaneLeaderboard" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="614.0" prefWidth="1000.0" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.leaderboard.LeaderboardCtrl" stylesheets="@/client/stylesheets/GlobalTheme.css" >
+<ScrollPane fx:id="scrollPaneLeaderboard" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" pannable="true" prefHeight="614.0" prefWidth="1000.0" stylesheets="@/client/stylesheets/GlobalTheme.css" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.leaderboard.LeaderboardCtrl">
    <content>
       <VBox fx:id="vboxScrollPaneLeaderboard" alignment="TOP_CENTER" fillWidth="false" prefHeight="200.0" prefWidth="100.0">
          <children>

@@ -4,6 +4,7 @@ import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 import lombok.SneakyThrows;
@@ -27,7 +28,7 @@ public class DefiniteGameFSM extends GameFSM {
     public DefiniteGameFSM(DefiniteGame<?> game, FSMContext context) {
         super(game, context);
         if (game.getStatus() != GameStatus.ONGOING) {
-            log.warn("[{}] Attempt to construct a FSM on a " + game.getStatus() + " game", game.getId());
+            log.warn("[{}] Attempt to construct a FSM on a " + game.getStatus() + " game", getGame().getId());
             throw new IllegalStateException("Attempt to construct a FSM on a " + game.getStatus() + " game");
         }
         log.debug("[{}] DefiniteFSM created.", game.getId());
@@ -46,6 +47,9 @@ public class DefiniteGameFSM extends GameFSM {
         // At the beginning of the game, give users a few seconds to prepare.
         if (getState() == FSMState.IDLE) {
             log.debug("[{}] FSM is in PREPARING state.", getGame().getId());
+
+            // Update the game
+            refreshGame();
 
             // Distribute the start event to all players
             getContext().getSseManager().send(getGame().getUserIds(), new SSEMessage(SSEMessageType.GAME_START,
@@ -159,6 +163,9 @@ public class DefiniteGameFSM extends GameFSM {
 
         // Delay before progressing to the next stage.
         int delay = getContext().getQuizConfiguration().getTiming().getLeaderboardTime();
+
+        // Update the game
+        refreshGame();
 
         // Notify all players to show the leaderboard.
         getContext().getSseManager().send(getGame().getUserIds(),

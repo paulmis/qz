@@ -9,6 +9,7 @@ import commons.entities.game.GameStatus;
 import commons.entities.messages.SSEMessage;
 import commons.entities.messages.SSEMessageType;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -99,16 +100,21 @@ class DefiniteGameFSMTest {
     @Test
     void run() {
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
+        fsm.getContext().setGameService(gameService);
+        when(fsm.getContext().getRepository()).thenReturn(gameRepository);
+        when(gameRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(game));
         fsm.run();
 
         // Verify that the game is in the correct state
         assertEquals(FSMState.PREPARING, fsm.getState());
     }
 
-
     @Test
     void runLeaderboard() throws IOException {
         DefiniteGameFSM fsm = new DefiniteGameFSM(game, context);
+        fsm.getContext().setGameService(gameService);
+        when(fsm.getContext().getRepository()).thenReturn(gameRepository);
+        when(gameRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(game));
         fsm.setRunning(true);
         // Force the game to be in the leaderboard state
         fsm.runLeaderboard();

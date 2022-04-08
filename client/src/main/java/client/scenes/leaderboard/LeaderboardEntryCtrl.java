@@ -1,6 +1,9 @@
 package client.scenes.leaderboard;
 
+import client.utils.FileUtils;
+import client.utils.communication.ServerUtils;
 import commons.entities.auth.UserDTO;
+import commons.entities.game.GamePlayerDTO;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -17,7 +20,8 @@ import lombok.Generated;
 @Generated
 public class LeaderboardEntryCtrl implements Initializable {
 
-    private final UserDTO user;
+    private UserDTO user;
+    private GamePlayerDTO gamePlayer;
     private final Integer rank;
 
     @FXML private Label rankLabel;
@@ -31,15 +35,36 @@ public class LeaderboardEntryCtrl implements Initializable {
         this.rank = rank;
     }
 
+    public LeaderboardEntryCtrl(GamePlayerDTO gamePlayer, Integer rank) {
+        this.gamePlayer = gamePlayer;
+        this.rank = rank;
+    }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.rankLabel.setText(String.valueOf(rank));
-        this.nameLabel.setText(user.getUsername());
-        this.gamesLabel.setText(String.valueOf(user.getGamesPlayed()));
-        this.scoreLabel.setText(String.valueOf(user.getScore()));
+        String name = gamePlayer == null ? user.getUsername() : gamePlayer.getNickname();
+        int points = gamePlayer == null ? user.getScore() : gamePlayer.getScore();
 
-        var tempUrl = "https://media.wnyc.org/i/800/0/c/85/photologue/photos/putin%20square.jpg";
-        this.imageView.setImage(new Image(tempUrl, true));
+        this.rankLabel.setText(String.valueOf(rank));
+        this.nameLabel.setText(name);
+        this.scoreLabel.setText(String.valueOf(points));
+
+        if (gamePlayer != null) {
+            this.gamesLabel.setVisible(false);
+            String imageUrl = FileUtils.defaultUserPic;
+            if (gamePlayer.getProfilePic() != null) {
+                imageUrl = ServerUtils.getImagePathFromId(gamePlayer.getProfilePic());
+            }
+            this.imageView.setImage(new Image(imageUrl, true));
+        } else {
+            this.gamesLabel.setText(String.valueOf(user.getGamesWon()));
+            String imageUrl = FileUtils.defaultUserPic;
+            if (user.getProfilePic() != null) {
+                imageUrl = ServerUtils.getImagePathFromId(user.getProfilePic());
+            }
+            this.imageView.setImage(new Image(imageUrl, true));
+        }
+
     }
 }

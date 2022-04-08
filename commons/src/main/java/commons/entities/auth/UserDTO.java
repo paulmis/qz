@@ -53,6 +53,12 @@ public class UserDTO implements DTO {
     protected String password;
 
     /**
+     * User's profile picture.
+     */
+    @JsonView(Views.Public.class)
+    protected UUID profilePic;
+
+    /**
      * User's global score.
      */
     @JsonView(Views.Public.class)
@@ -62,5 +68,5 @@ public class UserDTO implements DTO {
      * Number of games played by the user.
      */
     @JsonView(Views.Public.class)
-    protected int gamesPlayed;
+    protected int gamesWon;
 }

@@ -1,29 +1,33 @@
 package client.scenes.authentication;
 
 import client.scenes.MainCtrl;
-import client.utils.communication.FileUtils;
+import client.utils.PreferencesManager;
+import client.utils.SoundEffect;
+import client.utils.SoundManager;
 import client.utils.communication.ServerUtils;
 import com.google.inject.Inject;
 import com.jfoenix.controls.JFXButton;
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * ServerConnectScreen controller class.
  */
+@Slf4j
 @Generated
 public class ServerConnectScreenCtrl implements Initializable {
 
-    private final FileUtils file;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
-    private File localFile;
     private String serverPath;
 
     @FXML private JFXButton connectButton;
@@ -35,9 +39,8 @@ public class ServerConnectScreenCtrl implements Initializable {
      *
      */
     @Inject
-    public ServerConnectScreenCtrl(FileUtils file, ServerUtils server, MainCtrl mainCtrl) {
+    public ServerConnectScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
-        this.file = file;
         this.server = server;
     }
 
@@ -50,16 +53,24 @@ public class ServerConnectScreenCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Create a local file in documents to store server path
-        this.localFile = new File(System.getProperty("user.home") + "/Documents/quizzzServerPath.txt");
-        // Check if local file has a saved server path
-        this.serverPath = file.retrievePath(localFile);
+        // Check if local preferences contain a saved server path
+        this.serverPath = PreferencesManager.preferences.get("serverPath", null);
         if (serverPath != null) {
             rememberServer.setSelected(true);
         } else {
             this.serverPath = "http://localhost:8080/";
         }
         urlField.setText(this.serverPath);
+
+        // On enter, run the server connect code
+        urlField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent enter) {
+                if (enter.getCode().equals(KeyCode.ENTER)) {
+                    clickConnectButton();
+                }
+            }
+        });
     }
 
     /**
@@ -67,14 +78,21 @@ public class ServerConnectScreenCtrl implements Initializable {
      */
     @FXML
     private void clickConnectButton() {
+        SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         this.serverPath = urlField.getText().isEmpty() ? "http://localhost:8080/" : urlField.getText();
         if (rememberServer.isSelected()) {
-            file.savePath(localFile, this.serverPath);
+            PreferencesManager.preferences.put("serverPath", this.serverPath);
         } else {
-            localFile.delete();
+            PreferencesManager.preferences.remove("serverPath");
         }
-        server.connect(this.serverPath);
-        System.out.print("Connecting to server....\n");
-        mainCtrl.showLogInScreen();
+
+        log.debug("Connecting to server {}", this.serverPath);
+        if (server.connect(this.serverPath)) {
+            mainCtrl.setup();
+            mainCtrl.showLogInScreen();
+        } else {
+            log.error("Could not connect to server {}", this.serverPath);
+            mainCtrl.showErrorSnackBar("Could not connect to server");
+        }
     }
 }
