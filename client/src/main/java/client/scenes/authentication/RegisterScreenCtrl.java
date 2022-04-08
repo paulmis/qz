@@ -53,10 +53,7 @@ public class RegisterScreenCtrl implements Initializable {
     @FXML private TextField passwordField;
     @FXML private TextField usernameField;
     @FXML private ImageView profilePicture;
-    @FXML private ImageView logo;
     @FXML private Label uploadImage;
-    @FXML private Label userExists;
-    @FXML private Label registerMessage;
     @FXML private FileChooser selectFile;
     @FXML private Pane pane1;
     @FXML private Pane pane2;
@@ -81,8 +78,6 @@ public class RegisterScreenCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.userExists.setVisible(false);
-
         // On enter, run the login code
         emailField.setOnKeyPressed(enter -> {
             if (enter.getCode().equals(KeyCode.ENTER)) {
@@ -216,7 +211,6 @@ public class RegisterScreenCtrl implements Initializable {
         usernameSetButton.setDisable(true);
         profilePicture.setImage(generateImage(200, 200, 200, 1.0));
         uploadImage.setVisible(true);
-        registerMessage.setVisible(false);
         usernameField.clear();
     }
 
@@ -255,14 +249,6 @@ public class RegisterScreenCtrl implements Initializable {
     private void haveAccountButtonClick() {
         SoundManager.playMusic(SoundEffect.BUTTON_CLICK, getClass());
         mainCtrl.showLogInScreen();
-    }
-
-    /**
-     * Function that resets the message.
-     */
-    @FXML
-    private void resetMessage() {
-        this.userExists.setVisible(false);
     }
 
     /**
