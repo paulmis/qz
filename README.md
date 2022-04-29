@@ -1,25 +1,24 @@
-## Description of project
-This project is a quizzzz app. The quizzzz app is a single and multiplayer game which quizzes players to increase energy awareness.
-This project is made using the Spring BOOT REST API for the backend and OpenJavaFX for the frontend.
-Many design and feature choices were made to make this project intuitive and unique.\
-Here is an overview of our choices:
-- Registration support, all the user's information are safely stored and easily retrieved from the database.
-- Private games, to play only with people you know.
-- Random lobby, to join just any game.
-- Ten reactions, to express different feelings to the other players as the game progresses.
-- Sound effects.
-- Fully customizable experience, the user can define:
-  1. How many questions are asked in a game.
-  2. How much time is available to answer.
-  3. How many players are allowed to participate.
-  4. How many points are awarded for a correct answer.
-  5. How many points are awarded for an incorrect answer.
-  6. How many correct answers in a row give streak bonuses.
-  7. How lenient is the scoring system.
-  8. To mute other players' reactions.
-  9. To mute the sound effects.
+## About QZ
+*Note: this proejct has been migrated from [GitLab](https://gitlab.ewi.tudelft.nl/)*
 
-## Group members
+QZ is a single and multiplayer game which quizzes players to teach awareness about energy consuption. The objective of every game is to answer as many questions about energy consumption correctly as possible. To make the experience interesting, we've created a lot of features and configuration options, giving you the chance to play the game you want. QZ lets you:
+- easily create accounts and log in
+- play singleplayer quizz games to learn about everyday energy consumption
+- make multiplayer lobbies to invite other users to play with
+- answer different type of questions, including multiple choice and estimate questions
+- play different types of power-ups that let you e.g. halve the remaning time to answer the question
+- send cool reactions and message other people
+- look up leaderboards that show how you did compared to other people
+
+### Culture and design principles
+
+We've created this project over the duration of a 10-week introductory software engineering course at TU Delft using Spring Boot (REST & SSE) for the backend and JavaFX for the frontend. Our main goal was to learn how to conceptualize, design, and implement a fun and engaging application together, and learn how to structure our work in short, weekly sprints. From the technical side, our app was designed to be:
+- engaging - we interviewed numerous stakeholders, refined requirements, and carefully designed all components to make sure the game is fun to play
+- extendible - we boast a comprehensive class hierarchy that allows for quick and painless extension
+- maintainable - we used style checking, static analysis, and thoroughly reviewed MRs tools to ensure high code quality
+- feature-rich - we put in a lot of time to figure out and implement cool features that go beyond the course backlog
+
+## Development team
 
 | Picture                                                                               | Name                       | Email                             |
 | --------------------------------------------------------------------------------------------- | -------------------------- |-----------------------------------|
@@ -29,12 +28,6 @@ Here is an overview of our choices:
 | ![](https://secure.gravatar.com/avatar/065ab34531af46f9d554ea8c2067a07d?s=50&d=identicon)     | Alexandru-Gabriel Cojocaru | A.G.Cojocaru-2@student.tudelft.nl |
 | ![](https://avatars.githubusercontent.com/u/99262358?size=50)                                 | Giacomo Pezzali            | G.Pezzali@student.tudelft.nl      |
 | ![](https://secure.gravatar.com/avatar/fabe2c215ecceecd352547f2c5fbbef7?s=50&d=identicon)     | Aakanksh Singh             | A.Singh-27@student.tudelft.nl     |
-
-<!-- Instructions (remove once assignment has been completed -->
-<!-- - Add (only!) your own name to the table above (use Markdown formatting) -->
-<!-- - Mention your *student* email address -->
-<!-- - Preferably add a recognizable photo, otherwise add your GitLab photo -->
-<!-- - (please make sure the photos have the same size) -->
 
 ## How to run it
 ### Set up the environment
@@ -121,6 +114,9 @@ as well as an emoji bank (provided in `./reactions`).
 4. Run `python populate_db.py -c 100 ./activities ./reactions`. The script will import all activities (images included) and reactions.
 
 This script supports more configuration options; for a list and a brief description of the functionality run `python populate_db.py --help`.
+
+## Migration
+This project has been migrated from the EWI GitLab with the consent of all team members. The issues and merge requests have been ported using [this helper tool](https://github.com/piceaTech/node-gitlab-2-github). Note that a tiny number of issues and some issue comments had to be omitted, and merge requests have been converted into issues as their respective branches don't exist anymore.
 
 ## Copyright / License
 
