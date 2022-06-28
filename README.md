@@ -10,6 +10,8 @@ QZ is a single and multiplayer game which quizzes players to teach awareness abo
 - send cool reactions and message other people
 - look up leaderboards that show how you did compared to other people
 
+[**Visit our website!**](https://qzzz.nl/#/)
+
 ### Culture and design principles
 
 We've created this project over the duration of a 10-week introductory software engineering course at TU Delft using Spring Boot (REST & SSE) for the backend and JavaFX for the frontend. Our main goal was to learn how to conceptualize, design, and implement a fun and engaging application together, and learn how to structure our work in short, weekly sprints. From the technical side, our app was designed to be:
